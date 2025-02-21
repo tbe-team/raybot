@@ -1,0 +1,6 @@
+grpc:
+  port: 50051
+
+log:
+  level: DEBUG
+  colorize: true

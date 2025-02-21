@@ -1,0 +1,14 @@
+[project]
+name = "raybot"
+version = "0.1.0"
+description = "raybot"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "pydantic>=2.10.6",
+    "pyyaml>=6.0.2",
+    "raybot-api",
+]
+
+[tool.uv.sources]
+raybot-api = { git = "https://github.com/tbe-team/raybot-api", subdirectory = "python", rev = "dev" }
