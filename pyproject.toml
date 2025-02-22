@@ -7,8 +7,49 @@ requires-python = ">=3.12"
 dependencies = [
     "pydantic>=2.10.6",
     "pyyaml>=6.0.2",
-    "raybot-api",
+    "raybot-proto",
 ]
 
 [tool.uv.sources]
-raybot-api = { git = "https://github.com/tbe-team/raybot-api", subdirectory = "python", rev = "dev" }
+raybot-proto = { git = "https://github.com/tbe-team/raybot-api", subdirectory = "python", rev = "dev" }
+
+[dependency-groups]
+dev = [
+    "mypy>=1.15.0",
+    "pytest>=8.3.4",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.9.7",
+]
+
+[tool.mypy]
+strict = true
+exclude = ["venv", ".venv"]
+
+[[tool.mypy.overrides]]
+module = "src.controllers.grpc.*"
+ignore_errors = true
+
+[[tool.mypy.overrides]]
+module = "src.app.grpc.py"
+ignore_errors = true
+
+[tool.ruff]
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "B",  # flake8-bugbear
+    "C4",  # flake8-comprehensions
+    "UP",  # pyupgrade
+    "ARG001", # unused arguments in functions
+]
+ignore = [
+    "E501",  # line too long, handled by black
+    "B008",  # do not perform function calls in argument defaults
+    "W191",  # indentation contains tabs
+    "B904",  # Allow raising exceptions without from e, for HTTPException
+]
