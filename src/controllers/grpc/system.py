@@ -15,6 +15,3 @@ class SystemService(pb2_grpc.SystemServiceServicer):
     ) -> pb2.EmergencyStopResponse:
         logger.info(f"Emergency stop requested: {request}")
         return pb2.EmergencyStopResponse()
-
-    def register(self, srv: grpc.Server) -> None:
-        pb2_grpc.add_SystemServiceServicer_to_server(self, srv)  # type: ignore

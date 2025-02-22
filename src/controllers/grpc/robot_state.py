@@ -13,6 +13,3 @@ class RobotStateService(pb2_grpc.RobotStateServiceServicer):
     ) -> pb2.GetRobotStateResponse:
         logger.info(f"Getting robot state: {request}")
         return pb2.GetRobotStateResponse()
-
-    def register(self, srv: grpc.Server) -> None:
-        pb2_grpc.add_RobotStateServiceServicer_to_server(self, srv)  # type: ignore

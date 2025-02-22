@@ -15,6 +15,3 @@ class LiftMotorService(pb2_grpc.LiftMotorServiceServicer):
     ) -> pb2.SetLiftMotorConfigurationResponse:
         logger.info(f"Setting lift motor configuration: {request}")
         return pb2.SetLiftMotorConfigurationResponse()
-
-    def register(self, srv: grpc.Server) -> None:
-        pb2_grpc.add_LiftMotorServiceServicer_to_server(self, srv)  # type: ignore

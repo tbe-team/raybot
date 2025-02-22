@@ -13,7 +13,10 @@ class RaybotException(Exception):
 class InternalServerError(RaybotException):
     """Internal server error"""
 
-    pass
+    GRPC_STATUS = grpc.StatusCode.INTERNAL
+
+    def __init__(self, message: str = "Internal server error") -> None:
+        super().__init__(message)
 
 
 class Unauthorized(RaybotException):

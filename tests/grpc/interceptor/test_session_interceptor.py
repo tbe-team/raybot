@@ -9,7 +9,7 @@ from raybot.v1 import auth_pb2, auth_pb2_grpc, system_pb2, system_pb2_grpc
 
 from src.controllers.grpc.interceptor import ErrorInterceptor, SessionInterceptor
 from src.controllers.grpc.interceptor.session_interceptor import PUBLIC_METHODS
-from src.services.session import SessionService
+from src.services.auth_service import AuthService
 
 
 class TestPublicService(auth_pb2_grpc.AuthServiceServicer):
@@ -27,22 +27,22 @@ class TestPrivateService(system_pb2_grpc.SystemServiceServicer):
 
 
 @pytest.fixture(scope="module")
-def session_service() -> Mock:
-    return Mock(spec=SessionService)
+def auth_service() -> Mock:
+    return Mock(spec=AuthService)
 
 
 @pytest.fixture(autouse=True)
-def reset_mocks(session_service: Mock) -> None:
-    session_service.reset_mock()
+def reset_mocks(auth_service: Mock) -> None:
+    auth_service.reset_mock()
 
 
 @pytest.fixture(scope="module")
-def grpc_server(session_service: SessionService) -> Generator[str, None, None]:
+def grpc_server(auth_service: AuthService) -> Generator[str, None, None]:
     server = grpc.server(
         futures.ThreadPoolExecutor(max_workers=1),
         interceptors=[
             ErrorInterceptor(),  # We need to catch all exceptions
-            SessionInterceptor(session_service),
+            SessionInterceptor(auth_service),
         ],
     )
     auth_pb2_grpc.add_AuthServiceServicer_to_server(TestPublicService(), server)
@@ -95,19 +95,19 @@ def test_public_service_not_raise_exception(
 
 def test_private_service_with_session(
     private_client: system_pb2_grpc.SystemServiceStub,
-    session_service: Mock,
+    auth_service: Mock,
 ) -> None:
-    session_service.validate_session.return_value = None
+    auth_service.validate_session.return_value = None
 
     metadata = (("session-id", "test"),)
     private_client.EmergencyStop(system_pb2.EmergencyStopRequest(), metadata=metadata)
 
-    session_service.validate_session.assert_called_once()
+    auth_service.validate_session.assert_called_once()
 
 
 def test_private_service_without_session(
     private_client: system_pb2_grpc.SystemServiceStub,
-    session_service: Mock,
+    auth_service: Mock,
 ) -> None:
     with pytest.raises(grpc.RpcError) as exc:
         private_client.EmergencyStop(system_pb2.EmergencyStopRequest())
@@ -115,12 +115,12 @@ def test_private_service_without_session(
     assert exc.value.code() == grpc.StatusCode.UNAUTHENTICATED
     assert "Session ID is required" in exc.value.details()
 
-    session_service.validate_session.assert_not_called()
+    auth_service.validate_session.assert_not_called()
 
 
 def test_private_service_with_invalid_session_key(
     private_client: system_pb2_grpc.SystemServiceStub,
-    session_service: Mock,
+    auth_service: Mock,
 ) -> None:
     with pytest.raises(grpc.RpcError) as exc:
         metadata = (("invalid-session-key", "invalid"),)
@@ -131,4 +131,4 @@ def test_private_service_with_invalid_session_key(
     assert exc.value.code() == grpc.StatusCode.UNAUTHENTICATED
     assert "Session ID is required" in exc.value.details()
 
-    session_service.validate_session.assert_not_called()
+    auth_service.validate_session.assert_not_called()

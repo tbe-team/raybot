@@ -15,6 +15,3 @@ class DriveMotorService(pb2_grpc.DriveMotorServiceServicer):
     ) -> pb2.SetDriveMotorConfigurationResponse:
         logger.info(f"Setting drive motor configuration: {request}")
         return pb2.SetDriveMotorConfigurationResponse()
-
-    def register(self, srv: grpc.Server) -> None:
-        pb2_grpc.add_DriveMotorServiceServicer_to_server(self, srv)  # type: ignore

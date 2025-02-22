@@ -1,15 +1,20 @@
 # type:ignore
 from collections.abc import Callable
-from typing import Any
+from typing import Any, Protocol
 
 import grpc
 from grpc_interceptor import ServerInterceptor
 
 from src.exception import Unauthorized
-from src.services.session import SessionService
 
 SESSION_METADATA_KEY = "session-id"
 PUBLIC_METHODS = {"GetSession"}
+
+
+class SessionValidator(Protocol):
+    """Session validator interface"""
+
+    def validate_session(self, session_id: str) -> None: ...
 
 
 class SessionInterceptor(ServerInterceptor):
@@ -19,8 +24,8 @@ class SessionInterceptor(ServerInterceptor):
 
     """
 
-    def __init__(self, session_service: SessionService) -> None:
-        self._session_service = session_service
+    def __init__(self, session_validator: SessionValidator) -> None:
+        self._session_validator = session_validator
         super().__init__()
 
     def intercept(
@@ -42,6 +47,6 @@ class SessionInterceptor(ServerInterceptor):
             raise Unauthorized("Session ID is required")
 
         # Validate the session
-        self._session_service.validate_session(session_id)
+        self._session_validator.validate_session(session_id)
 
         return method(request, context)
