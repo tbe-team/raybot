@@ -7,6 +7,7 @@ import grpc  # type: ignore
 from src.config.grpc import GRPCConfig
 from src.controllers.grpc.auth import AuthService
 from src.controllers.grpc.drive_motor import DriveMotorService
+from src.controllers.grpc.interceptor import ErrorInterceptor
 from src.controllers.grpc.lift_motor import LiftMotorService
 from src.controllers.grpc.robot_state import RobotStateService
 from src.controllers.grpc.system import SystemService
@@ -23,7 +24,10 @@ def start_grpc_service(config: GRPCConfig, interupt_event: threading.Event) -> N
         config: The application config
         interupt_event: The event that will be set when the service should shutdown
     """
-    srv = grpc.server(futures.ThreadPoolExecutor(max_workers=10))  # type: ignore
+    srv = grpc.server(  # type: ignore[unused-ignore]
+        futures.ThreadPoolExecutor(max_workers=10),
+        interceptors=[ErrorInterceptor()],
+    )
 
     drive_motor_service = DriveMotorService()
     drive_motor_service.register(srv)

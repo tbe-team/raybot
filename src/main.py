@@ -3,14 +3,14 @@ import threading
 from src.app.grpc import start_grpc_service
 from src.config import load_yaml_config
 from src.interrupt import setup_interrupt_handler
-from src.logging import setup_logging
+from src.log import setup_log
 
 
 def main() -> None:
     """Main entry point for the application"""
 
     config = load_yaml_config("config.yml")
-    logger = setup_logging(config.log)
+    logger = setup_log(config.log)
 
     logger.info("Starting application")
 
