@@ -22,7 +22,7 @@ class TestAuthService(pb2_grpc.AuthServiceServicer):
         return pb2.GetSessionResponse()
 
 
-@pytest.fixture(scope="module", autouse=True)
+@pytest.fixture(scope="module")
 def grpc_server() -> Generator[str, None, None]:
     server = grpc.server(
         futures.ThreadPoolExecutor(max_workers=1),
@@ -39,7 +39,7 @@ def grpc_server() -> Generator[str, None, None]:
     server.wait_for_termination()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture
 def server_client(grpc_server: str) -> Generator[pb2_grpc.AuthServiceStub, None, None]:
     channel = grpc.insecure_channel(grpc_server)
     stub = pb2_grpc.AuthServiceStub(channel)
