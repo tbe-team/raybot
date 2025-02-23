@@ -3,6 +3,6 @@
 set -e
 set -x
 
-mypy src
-ruff check src
-ruff format --check src
+uv run mypy src
+uv run ruff check src
+uv run ruff format --check src
