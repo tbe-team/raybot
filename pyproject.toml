@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "apscheduler>=3.11.0",
+    "grpc-interceptor>=0.15.4",
     "pydantic>=2.10.6",
     "pyyaml>=6.0.2",
     "raybot-proto",
@@ -20,6 +21,7 @@ dev = [
     "pytest>=8.3.4",
     "pytest-cov>=6.0.0",
     "ruff>=0.9.7",
+    "types-pyyaml>=6.0.12.20241230",
 ]
 
 [tool.mypy]

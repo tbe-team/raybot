@@ -1,3 +1,5 @@
+# We have an issue with duplicate packages from proto repo
+# Now fix with PYTHONPATH
 export PYTHONPATH=$(shell printenv PYTHONPATH):$(pwd)/src/
 
 .PHONY: run
@@ -6,11 +8,11 @@ run:
 
 .PHONY: test
 test:
-	uv run pytest
+	uv run pytest tests
 
 .PHONY: test-cov
 test-cov:
-	uv run pytest --cov src
+	uv run pytest tests --cov src
 
 .PHONY: lint
 lint:
