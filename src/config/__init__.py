@@ -3,6 +3,7 @@ from typing import Any, cast
 import yaml
 from pydantic import Field
 
+from .auth import AuthConfig
 from .base import ConfigModel
 from .grpc import GRPCConfig
 from .log import LogConfig
@@ -13,6 +14,7 @@ class AppConfig(ConfigModel):
 
     grpc: GRPCConfig = Field(default_factory=GRPCConfig)
     log: LogConfig = Field(default_factory=LogConfig)
+    auth: AuthConfig
 
 
 def load_yaml_config(path: str) -> AppConfig:
@@ -22,7 +24,7 @@ def load_yaml_config(path: str) -> AppConfig:
 
 def _load_yaml(path: str) -> dict[str, Any]:
     """Load a yaml config file and return a dict"""
-    with open(path, "r") as f:
+    with open(path) as f:
         config = yaml.safe_load(f)
     if not isinstance(config, dict):
         raise TypeError(f"Config file {path} has no top level mapping")

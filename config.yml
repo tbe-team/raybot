@@ -4,3 +4,8 @@ grpc:
 log:
   level: DEBUG
   colorize: true
+
+auth:
+  credentials:
+    username: username
+    password: password
