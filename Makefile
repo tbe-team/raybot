@@ -1,7 +1,3 @@
-# We have an issue with duplicate packages from proto repo
-# Now fix with PYTHONPATH
-export PYTHONPATH=$(shell printenv PYTHONPATH):$(pwd)/src/
-
 .PHONY: run
 run:
 	uv run src/main.py
