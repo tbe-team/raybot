@@ -9,11 +9,8 @@ dependencies = [
     "grpc-interceptor>=0.15.4",
     "pydantic>=2.10.6",
     "pyyaml>=6.0.2",
-    "raybot-proto",
+    "tbe-team-raybot-api-grpc-python==1.70.1.1.20250224063629+c2aa6df9e215",
 ]
-
-[tool.uv.sources]
-raybot-proto = { git = "https://github.com/tbe-team/raybot-api", subdirectory = "python", rev = "dev" }
 
 [dependency-groups]
 dev = [
@@ -23,6 +20,13 @@ dev = [
     "ruff>=0.9.7",
     "types-pyyaml>=6.0.12.20241230",
 ]
+
+[tool.uv.sources]
+tbe-team-raybot-api-grpc-python = { index = "buf" }
+
+[[tool.uv.index]]
+name = "buf"
+url = "https://buf.build/gen/python"
 
 [build-system]
 requires = ["hatchling"]

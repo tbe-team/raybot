@@ -300,7 +300,7 @@ dependencies = [
     { name = "grpc-interceptor" },
     { name = "pydantic" },
     { name = "pyyaml" },
-    { name = "raybot-proto" },
+    { name = "tbe-team-raybot-api-grpc-python" },
 ]
 
 [package.dev-dependencies]
@@ -318,7 +318,7 @@ requires-dist = [
     { name = "grpc-interceptor", specifier = ">=0.15.4" },
     { name = "pydantic", specifier = ">=2.10.6" },
     { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "raybot-proto", git = "https://github.com/tbe-team/raybot-api?subdirectory=python&rev=dev" },
+    { name = "tbe-team-raybot-api-grpc-python", specifier = "==1.70.1.1.20250224063629+c2aa6df9e215", index = "https://buf.build/gen/python" },
 ]
 
 [package.metadata.requires-dev]
@@ -328,15 +328,6 @@ dev = [
     { name = "pytest-cov", specifier = ">=6.0.0" },
     { name = "ruff", specifier = ">=0.9.7" },
     { name = "types-pyyaml", specifier = ">=6.0.12.20241230" },
-]
-
-[[package]]
-name = "raybot-proto"
-version = "0.1.0"
-source = { git = "https://github.com/tbe-team/raybot-api?subdirectory=python&rev=dev#59ee207d863f5fd957fc347be1d1bcde91f6f3b4" }
-dependencies = [
-    { name = "grpcio" },
-    { name = "protobuf" },
 ]
 
 [[package]]
@@ -362,6 +353,51 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/49/79/acbc1edd03ac0e2a04ae2593555dbc9990b34090a9729a0c4c0cf20fb595/ruff-0.9.7-py3-none-win32.whl", hash = "sha256:e9ece95b7de5923cbf38893f066ed2872be2f2f477ba94f826c8defdd6ec6b7d", size = 9988751 },
     { url = "https://files.pythonhosted.org/packages/6d/95/67153a838c6b6ba7a2401241fd8a00cd8c627a8e4a0491b8d853dedeffe0/ruff-0.9.7-py3-none-win_amd64.whl", hash = "sha256:3770fe52b9d691a15f0b87ada29c45324b2ace8f01200fb0c14845e499eb0c2c", size = 11002987 },
     { url = "https://files.pythonhosted.org/packages/63/6a/aca01554949f3a401991dc32fe22837baeaccb8a0d868256cbb26a029778/ruff-0.9.7-py3-none-win_arm64.whl", hash = "sha256:b075a700b2533feb7a01130ff656a4ec0d5f340bb540ad98759b8401c32c2037", size = 10177763 },
+]
+
+[[package]]
+name = "tbe-team-raybot-api-grpc-python"
+version = "1.70.1.1.20250224063629+c2aa6df9e215"
+source = { registry = "https://buf.build/gen/python" }
+dependencies = [
+    { name = "grpcio" },
+    { name = "tbe-team-raybot-api-protocolbuffers-python" },
+]
+wheels = [
+    { url = "https://buf.build/gen/python/tbe-team-raybot-api-grpc-python/tbe_team_raybot_api_grpc_python-1.70.1.1.20250224063629+c2aa6df9e215-py3-none-any.whl" },
+]
+
+[[package]]
+name = "tbe-team-raybot-api-protocolbuffers-pyi"
+version = "29.3.0.1.20250224063629+c2aa6df9e215"
+source = { registry = "https://buf.build/gen/python" }
+dependencies = [
+    { name = "protobuf" },
+    { name = "types-protobuf" },
+]
+wheels = [
+    { url = "https://buf.build/gen/python/tbe-team-raybot-api-protocolbuffers-pyi/tbe_team_raybot_api_protocolbuffers_pyi-29.3.0.1.20250224063629+c2aa6df9e215-py3-none-any.whl" },
+]
+
+[[package]]
+name = "tbe-team-raybot-api-protocolbuffers-python"
+version = "29.3.0.1.20250224063629+c2aa6df9e215"
+source = { registry = "https://buf.build/gen/python" }
+dependencies = [
+    { name = "protobuf" },
+    { name = "tbe-team-raybot-api-protocolbuffers-pyi" },
+]
+wheels = [
+    { url = "https://buf.build/gen/python/tbe-team-raybot-api-protocolbuffers-python/tbe_team_raybot_api_protocolbuffers_python-29.3.0.1.20250224063629+c2aa6df9e215-py3-none-any.whl" },
+]
+
+[[package]]
+name = "types-protobuf"
+version = "5.29.1.20250208"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/ff/75/8effaebae86ae9e489d4d453b30c6da728e8a9267a261418d476c5c2fbe6/types_protobuf-5.29.1.20250208.tar.gz", hash = "sha256:c1acd6a59ab554dbe09b5d1fa7dd701e2fcfb2212937a3af1c03b736060b792a", size = 59330 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/96/e9/095c36efdc9dbb1df75ce42f37c0de6a6879aad937a08f0b97942b7c5968/types_protobuf-5.29.1.20250208-py3-none-any.whl", hash = "sha256:c5f8bfb4afdc1b5cbca1848f2c8b361a2090add7401f410b22b599ef647bf483", size = 73925 },
 ]
 
 [[package]]
