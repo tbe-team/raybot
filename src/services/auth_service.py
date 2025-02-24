@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from uuid import uuid4
 
 from src.config import AppConfig
@@ -42,3 +42,6 @@ class AuthService:
 
         session.last_seen_at = datetime.now()
         self._session_repository.update_session(session)
+
+    def get_session_expiration_time(self) -> timedelta:
+        return self._session_expiration_time
