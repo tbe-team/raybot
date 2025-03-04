@@ -28,6 +28,7 @@ jobs:
           GOOS=linux GOARCH=arm64 go build -o raybot-${{ env.VERSION }}-linux-arm64 cmd/raybot/main.go
           GOOS=windows GOARCH=amd64 go build -o raybot-${{ env.VERSION }}-windows-amd64.exe cmd/raybot/main.go
 
+
       - name: Package binaries
         run: |
           tar -czf raybot-${{ env.VERSION }}-linux-amd64.tar.gz raybot-${{ env.VERSION }}-linux-amd64
