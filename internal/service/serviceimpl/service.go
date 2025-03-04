@@ -7,12 +7,12 @@ import (
 )
 
 type serviceImpl struct {
-	robotService *robotService
+	robotService *RobotService
 }
 
 func New(repo repository.Repository, validator validator.Validator) service.Service {
 	return &serviceImpl{
-		robotService: newRobotService(repo.RobotState(), validator),
+		robotService: NewRobotService(repo.RobotState(), validator),
 	}
 }
 

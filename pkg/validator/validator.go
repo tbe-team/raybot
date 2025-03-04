@@ -1,9 +1,7 @@
 package validator
 
 import (
-	"encoding"
 	"fmt"
-	"reflect"
 	"regexp"
 
 	"github.com/go-playground/validator/v10"
@@ -26,19 +24,16 @@ func newValidator() *validator.Validate {
 }
 
 func validateEnum(fl validator.FieldLevel) bool {
-	field := fl.Field()
-	fieldType := field.Type()
+	type Enum interface {
+		Validate() error
+	}
 
-	// Create new instance of the enum type
-	enumPtr := reflect.New(fieldType).Interface()
-
-	val, ok := enumPtr.(encoding.TextUnmarshaler)
+	value, ok := fl.Field().Interface().(Enum)
 	if !ok {
 		return false
 	}
 
-	err := val.UnmarshalText([]byte(field.String()))
-	return err == nil
+	return value.Validate() == nil
 }
 
 // IsValidationError checks if the given error is a validation error

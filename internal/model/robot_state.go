@@ -1,43 +1,55 @@
 package model
 
-import "time"
+import (
+	"fmt"
+	"time"
+)
 
 // BatteryState represents the state of the battery
 type BatteryState struct {
-	Current      int
-	Temp         int
-	Voltage      int
-	CellVoltages []int
+	Current      uint
+	Temp         uint
+	Voltage      uint
+	CellVoltages []uint
 	Percent      uint8
 	Fault        uint8
 	Health       uint8
-	Status       int
+	Status       uint8
 	UpdatedAt    time.Time
 }
 
 // ChargeState represents the state of the charge
 type ChargeState struct {
-	CurrentLimit int
+	CurrentLimit uint
 	Enabled      bool
 	UpdatedAt    time.Time
 }
 
 // DischargeState represents the state of the discharge
 type DischargeState struct {
-	CurrentLimit int
+	CurrentLimit uint
 	Enabled      bool
 	UpdatedAt    time.Time
 }
 
 // DistanceSensorState represents the state of the distance sensors
 type DistanceSensorState struct {
-	FrontDistance int
-	BackDistance  int
-	DownDistance  int
+	FrontDistance uint
+	BackDistance  uint
+	DownDistance  uint
 	UpdatedAt     time.Time
 }
 
-type LiftMotorDirection int8
+type LiftMotorDirection uint8
+
+func (s LiftMotorDirection) Validate() error {
+	switch s {
+	case LiftMotorDirectionDown, LiftMotorDirectionUp:
+		return nil
+	default:
+		return fmt.Errorf("invalid lift motor direction: %d", s)
+	}
+}
 
 const (
 	LiftMotorDirectionUp LiftMotorDirection = iota
@@ -51,7 +63,16 @@ type LiftMotorState struct {
 	UpdatedAt time.Time
 }
 
-type DriveMotorDirection int8
+type DriveMotorDirection uint8
+
+func (s DriveMotorDirection) Validate() error {
+	switch s {
+	case DriveMotorDirectionForward, DriveMotorDirectionBackward:
+		return nil
+	default:
+		return fmt.Errorf("invalid drive motor direction: %d", s)
+	}
+}
 
 const (
 	DriveMotorDirectionForward DriveMotorDirection = iota

@@ -1,3 +1,10 @@
+########################
+# Code generation
+########################
+.PHONY: gen-mock
+gen-mock:
+	go run github.com/vektra/mockery/v2@v2.50 --config .mockery.yml
+
 #########################
 # Build
 #########################
@@ -25,9 +32,9 @@ test:
 
 .PHONY: test-cov
 test-cov:
-	go test -coverprofile=coverage.out ./...
-	go tool cover -html=coverage.out -o coverage.html
-	@echo "Coverage report saved to coverage.html"
+	go test -coverprofile=bin/coverage.out ./...
+	go tool cover -html=bin/coverage.out -o bin/coverage.html
+	@echo "Coverage report saved to bin/coverage.html"
 
 ########################
 # Lint

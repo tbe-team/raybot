@@ -7,54 +7,54 @@ import (
 )
 
 type BatteryParams struct {
-	Current      int   `validate:"required"`
-	Temp         int   `validate:"required"`
-	Voltage      int   `validate:"required"`
-	CellVoltages []int `validate:"required"`
-	Percent      uint8 `validate:"required"`
-	Fault        uint8 `validate:"required"`
-	Health       uint8 `validate:"required"`
-	Status       int   `validate:"required"`
+	Current      uint
+	Temp         uint `validate:"gt=0,lte=100"`
+	Voltage      uint
+	CellVoltages []uint
+	Percent      uint8 `validate:"gte=0,lte=100"`
+	Fault        uint8
+	Health       uint8
+	Status       uint8
 }
 
 type ChargeParams struct {
-	CurrentLimit int `validate:"required"`
+	CurrentLimit uint
 	Enabled      bool
 }
 
 type DischargeParams struct {
-	CurrentLimit int `validate:"required"`
+	CurrentLimit uint
 	Enabled      bool
 }
 
 type DistanceSensorParams struct {
-	FrontDistance int `validate:"required"`
-	BackDistance  int `validate:"required"`
-	DownDistance  int `validate:"required"`
+	FrontDistance uint
+	BackDistance  uint
+	DownDistance  uint
 }
 
 type LiftMotorParams struct {
-	Direction model.LiftMotorDirection `validate:"required"`
-	Speed     uint8                    `validate:"required"`
+	Direction model.LiftMotorDirection `validate:"enum"`
+	Speed     uint8                    `validate:"gte=0,lte=100"`
 }
 
 type DriveMotorParams struct {
-	Direction model.DriveMotorDirection `validate:"required"`
-	Speed     uint8                     `validate:"required"`
+	Direction model.DriveMotorDirection `validate:"enum"`
+	Speed     uint8                     `validate:"gte=0,lte=100"`
 }
 
 type UpdateRobotStateParams struct {
-	Battery           BatteryParams `validate:"required_if=SetBattery true"`
+	Battery           BatteryParams `validate:"required_if=SetBattery true,omitempty"`
 	SetBattery        bool
-	Charge            ChargeParams `validate:"required_if=SetCharge true"`
+	Charge            ChargeParams `validate:"required_if=SetCharge true,omitempty"`
 	SetCharge         bool
-	Discharge         DischargeParams `validate:"required_if=SetDischarge true"`
+	Discharge         DischargeParams `validate:"required_if=SetDischarge true,omitempty"`
 	SetDischarge      bool
-	DistanceSensor    DistanceSensorParams `validate:"required_if=SetDistanceSensor true"`
+	DistanceSensor    DistanceSensorParams `validate:"required_if=SetDistanceSensor true,omitempty"`
 	SetDistanceSensor bool
-	LiftMotor         LiftMotorParams `validate:"required_if=SetLiftMotor true"`
+	LiftMotor         LiftMotorParams `validate:"required_if=SetLiftMotor true,omitempty"`
 	SetLiftMotor      bool
-	DriveMotor        DriveMotorParams `validate:"required_if=SetDriveMotor true"`
+	DriveMotor        DriveMotorParams `validate:"required_if=SetDriveMotor true,omitempty"`
 	SetDriveMotor     bool
 }
 

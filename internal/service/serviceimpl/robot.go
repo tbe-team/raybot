@@ -11,22 +11,22 @@ import (
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
-type robotService struct {
+type RobotService struct {
 	robotStateRepo repository.RobotStateRepository
 	validator      validator.Validator
 }
 
-func newRobotService(
+func NewRobotService(
 	robotStateRepo repository.RobotStateRepository,
 	validator validator.Validator,
-) *robotService {
-	return &robotService{
+) *RobotService {
+	return &RobotService{
 		robotStateRepo: robotStateRepo,
 		validator:      validator,
 	}
 }
 
-func (s *robotService) UpdateRobotState(ctx context.Context, params service.UpdateRobotStateParams) (model.RobotState, error) {
+func (s RobotService) UpdateRobotState(ctx context.Context, params service.UpdateRobotStateParams) (model.RobotState, error) {
 	if err := s.validator.Validate(params); err != nil {
 		return model.RobotState{}, fmt.Errorf("validate params: %w", err)
 	}
