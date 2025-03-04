@@ -8,7 +8,7 @@ type repo struct {
 
 func New() repository.Repository {
 	return &repo{
-		robotStateRepo: newRobotStateRepository(),
+		robotStateRepo: NewRobotStateRepository(),
 	}
 }
 

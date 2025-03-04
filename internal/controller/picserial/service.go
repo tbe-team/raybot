@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"log/slog"
+	"strconv"
 
 	"github.com/tbe-team/raybot/internal/controller/picserial/handler"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
@@ -113,16 +114,16 @@ func (s *PICSerialService) routeMessage(ctx context.Context, msg []byte) {
 }
 
 // messageType is the type of message received from the PIC
-type messageType int
+type messageType uint8
 
-// UnmarshalText implements the encoding.TextUnmarshaler interface.
-func (m *messageType) UnmarshalText(text []byte) error {
-	length := len(text)
-	if length == 0 || length > 1 {
-		return fmt.Errorf("invalid message type: %s", string(text))
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (m *messageType) UnmarshalJSON(text []byte) error {
+	n, err := strconv.ParseUint(string(text), 10, 8)
+	if err != nil {
+		return fmt.Errorf("parse uint8: %w", err)
 	}
 
-	switch int(text[0]) {
+	switch n {
 	case 0:
 		*m = messageTypeSyncState
 	default:
