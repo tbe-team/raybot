@@ -1,0 +1,43 @@
+name: Build and release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  attach-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.23.x"
+          cache: false
+
+      - name: Get version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+
+      - name: Build binaries
+        run: |
+          set -e
+
+          GOOS=linux GOARCH=amd64 go build -o raybot-${{ env.VERSION }}-linux-amd64
+          GOOS=linux GOARCH=arm64 go build -o raybot-${{ env.VERSION }}-linux-arm64
+          GOOS=windows GOARCH=amd64 go build -o raybot-${{ env.VERSION }}-windows-amd64.exe
+
+      - name: Package binaries
+        run: |
+          tar -czf raybot-${{ env.VERSION }}-linux-amd64.tar.gz raybot-${{ env.VERSION }}-linux-amd64
+          tar -czf raybot-${{ env.VERSION }}-linux-arm64.tar.gz raybot-${{ env.VERSION }}-linux-arm64
+          zip raybot-${{ env.VERSION }}-windows-amd64.zip raybot-${{ env.VERSION }}-windows-amd64.exe
+
+      - name: Upload binaries to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            raybot-${{ env.VERSION }}-linux-amd64.tar.gz
+            raybot-${{ env.VERSION }}-linux-arm64.tar.gz
+            raybot-${{ env.VERSION }}-windows-amd64.zip
