@@ -14,8 +14,8 @@ type defaultValidator struct {
 	v10 *validator.Validate
 }
 
-// NewValidator creates a new default validator.
-func NewValidator() Validator {
+// New creates a new default validator.
+func New() Validator {
 	return &defaultValidator{
 		v10: newValidator(),
 	}

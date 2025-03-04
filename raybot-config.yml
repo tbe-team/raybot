@@ -1,0 +1,11 @@
+log:
+  level: debug
+  format: json
+
+pic:
+  serial:
+    port: /dev/ttyUSB0
+    baud_rate: 9600
+    data_bits: 8
+    stop_bits: 1
+    parity: none

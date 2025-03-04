@@ -67,13 +67,21 @@ func NewClient(cfg Config) (Client, error) {
 		return nil, fmt.Errorf("invalid parity: %s", cfg.Parity)
 	}
 
-	port, err := serial.Open(cfg.Port, mode)
-	if err != nil {
-		return nil, err
+	var port serial.Port
+	var openErr error
+
+	slog.Info("opening serial port", slog.String("port", cfg.Port))
+	port, openErr = serial.Open(cfg.Port, mode)
+	if openErr != nil {
+		// Now we just ignore the error
+		slog.Error("failed to open serial port", slog.Any("error", openErr))
+		// return nil, err
 	}
 
-	if err := port.SetReadTimeout(cfg.ReadTimeout); err != nil {
-		return nil, err
+	if openErr == nil {
+		if err := port.SetReadTimeout(cfg.ReadTimeout); err != nil {
+			return nil, err
+		}
 	}
 
 	client := &client{
@@ -87,7 +95,9 @@ func NewClient(cfg Config) (Client, error) {
 		),
 	}
 
-	go client.readLoop()
+	if openErr == nil {
+		go client.readLoop()
+	}
 
 	return client, nil
 }
@@ -115,7 +125,10 @@ func (c *client) Read() <-chan []byte {
 // Stop stops the client.
 func (c *client) Stop() error {
 	close(c.stop)
-	return c.port.Close()
+	if c.port != nil {
+		return c.port.Close()
+	}
+	return nil
 }
 
 // readLoop reads from the serial port and sends the data to the read channel.
