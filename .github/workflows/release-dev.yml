@@ -8,6 +8,9 @@ on:
     paths-ignore:
       - '**/*.md'
 
+permissions:
+  contents: write
+
 jobs:
   release-dev:
     if: github.event.pull_request.merged == true
