@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"github.com/tbe-team/raybot/internal/pic/serial/mocks"
+	"github.com/tbe-team/raybot/internal/controller/picserial/serial/mocks"
 )
 
 func TestWrite(t *testing.T) {

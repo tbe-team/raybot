@@ -1,0 +1,36 @@
+run:
+  timeout: 5m
+linters:
+  disable-all: true
+  enable:
+    - gofmt
+    - unused
+    - gosimple
+    - copyloopvar
+    - gocritic
+    - gosec
+    - errcheck
+    - goimports
+    - revive
+    - staticcheck
+    - govet
+    - stylecheck
+    - unconvert
+    - ineffassign
+
+linters-settings:
+  goimports:
+    local-prefixes: github.com/tuanvumaihuynh/roboflow
+  staticcheck:
+    checks:
+      - all
+      - "-ST1003"
+      - "-SA4006"
+      - "-SA1029"
+  stylecheck:
+    checks:
+      - all
+      - "-ST1003"
+      - "-SA4006"
+      - "-ST1016"
+      - "-ST1005"
