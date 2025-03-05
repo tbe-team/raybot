@@ -46,7 +46,7 @@ func TestIntegrationSyncStateHandler_Handle(t *testing.T) {
 			name: "charge update",
 			message: SyncStateMessage{
 				StateType: syncStateTypeCharge,
-				Data:      []byte(`{"current_limit": 1000, "enabled": true}`),
+				Data:      []byte(`{"current_limit": 1000, "enabled": 1}`),
 			},
 			expected: func(state model.RobotState) bool {
 				return state.Charge.CurrentLimit == 1000 &&
@@ -57,7 +57,7 @@ func TestIntegrationSyncStateHandler_Handle(t *testing.T) {
 			name: "discharge update",
 			message: SyncStateMessage{
 				StateType: syncStateTypeDischarge,
-				Data:      []byte(`{"current_limit": 2000, "enabled": false}`),
+				Data:      []byte(`{"current_limit": 2000, "enabled": 0}`),
 			},
 			expected: func(state model.RobotState) bool {
 				return state.Discharge.CurrentLimit == 2000 &&

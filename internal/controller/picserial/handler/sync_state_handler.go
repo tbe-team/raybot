@@ -70,10 +70,10 @@ func NewSyncStateHandler(robotService service.RobotService) *SyncStateHandler {
 }
 
 func (h *SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
+	h.log.Debug("received sync state message", slog.Any("msg", msg))
 	params := service.UpdateRobotStateParams{}
 	switch msg.StateType {
 	case syncStateTypeBattery:
-		params.SetBattery = true
 		var temp struct {
 			Current      uint   `json:"current"`
 			Temp         uint   `json:"temp"`
@@ -89,45 +89,51 @@ func (h *SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
 			return
 		}
 
-		params.Battery.Current = temp.Current
-		params.Battery.Temp = temp.Temp
-		params.Battery.Voltage = temp.Voltage
-		params.Battery.CellVoltages = temp.CellVoltages
-		params.Battery.Percent = temp.Percent
-		params.Battery.Fault = temp.Fault
-		params.Battery.Health = temp.Health
-		params.Battery.Status = temp.Status
+		params.SetBattery = true
+		params.Battery = service.BatteryParams{
+			Current:      temp.Current,
+			Temp:         temp.Temp,
+			Voltage:      temp.Voltage,
+			CellVoltages: temp.CellVoltages,
+			Percent:      temp.Percent,
+			Fault:        temp.Fault,
+			Health:       temp.Health,
+			Status:       temp.Status,
+		}
 
 	case syncStateTypeCharge:
-		params.SetCharge = true
 		var temp struct {
-			CurrentLimit uint `json:"current_limit"`
-			Enabled      bool `json:"enabled"`
+			CurrentLimit uint  `json:"current_limit"`
+			Enabled      uint8 `json:"enabled"`
 		}
 		if err := json.Unmarshal(msg.Data, &temp); err != nil {
 			h.log.Error("failed to unmarshal charge data", "error", err)
 			return
 		}
 
-		params.Charge.CurrentLimit = temp.CurrentLimit
-		params.Charge.Enabled = temp.Enabled
+		params.SetCharge = true
+		params.Charge = service.ChargeParams{
+			CurrentLimit: temp.CurrentLimit,
+			Enabled:      temp.Enabled == 1,
+		}
 
 	case syncStateTypeDischarge:
-		params.SetDischarge = true
 		var temp struct {
-			CurrentLimit uint `json:"current_limit"`
-			Enabled      bool `json:"enabled"`
+			CurrentLimit uint  `json:"current_limit"`
+			Enabled      uint8 `json:"enabled"`
 		}
 		if err := json.Unmarshal(msg.Data, &temp); err != nil {
 			h.log.Error("failed to unmarshal discharge data", "error", err)
 			return
 		}
 
-		params.Discharge.CurrentLimit = temp.CurrentLimit
-		params.Discharge.Enabled = temp.Enabled
+		params.SetDischarge = true
+		params.Discharge = service.DischargeParams{
+			CurrentLimit: temp.CurrentLimit,
+			Enabled:      temp.Enabled == 1,
+		}
 
 	case syncStateTypeDistanceSensor:
-		params.SetDistanceSensor = true
 		var temp struct {
 			FrontDistance uint `json:"front_distance"`
 			BackDistance  uint `json:"back_distance"`
@@ -138,12 +144,14 @@ func (h *SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
 			return
 		}
 
-		params.DistanceSensor.FrontDistance = temp.FrontDistance
-		params.DistanceSensor.BackDistance = temp.BackDistance
-		params.DistanceSensor.DownDistance = temp.DownDistance
+		params.SetDistanceSensor = true
+		params.DistanceSensor = service.DistanceSensorParams{
+			FrontDistance: temp.FrontDistance,
+			BackDistance:  temp.BackDistance,
+			DownDistance:  temp.DownDistance,
+		}
 
 	case syncStateTypeLiftMotor:
-		params.SetLiftMotor = true
 		var temp struct {
 			Direction model.LiftMotorDirection `json:"direction"`
 			Speed     uint8                    `json:"speed"`
@@ -153,11 +161,13 @@ func (h *SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
 			return
 		}
 
-		params.LiftMotor.Direction = temp.Direction
-		params.LiftMotor.Speed = temp.Speed
+		params.SetLiftMotor = true
+		params.LiftMotor = service.LiftMotorParams{
+			Direction: temp.Direction,
+			Speed:     temp.Speed,
+		}
 
 	case syncStateTypeDriveMotor:
-		params.SetDriveMotor = true
 		var temp struct {
 			Direction model.DriveMotorDirection `json:"direction"`
 			Speed     uint8                     `json:"speed"`
@@ -167,8 +177,11 @@ func (h *SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
 			return
 		}
 
-		params.DriveMotor.Direction = temp.Direction
-		params.DriveMotor.Speed = temp.Speed
+		params.SetDriveMotor = true
+		params.DriveMotor = service.DriveMotorParams{
+			Direction: temp.Direction,
+			Speed:     temp.Speed,
+		}
 
 	default:
 		h.log.Error("unknown state type", "type", msg.StateType)
