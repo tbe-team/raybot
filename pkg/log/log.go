@@ -4,7 +4,6 @@ import (
 	"context"
 	"log/slog"
 	"os"
-	"strings"
 )
 
 type loggerCtxKey int
@@ -31,16 +30,9 @@ func FromContext(ctx context.Context) *slog.Logger {
 func NewLogger(cfg Config) *slog.Logger {
 	var handler slog.Handler
 
-	level := slog.LevelInfo
-	switch strings.ToLower(cfg.Level) {
-	case "debug":
-		level = slog.LevelDebug
-	case "info":
+	var level slog.Level
+	if err := level.UnmarshalText([]byte(cfg.Level)); err != nil {
 		level = slog.LevelInfo
-	case "warn":
-		level = slog.LevelWarn
-	case "error":
-		level = slog.LevelError
 	}
 
 	if cfg.Format == "json" {
