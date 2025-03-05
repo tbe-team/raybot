@@ -117,8 +117,8 @@ func (s *PICSerialService) routeMessage(ctx context.Context, msg []byte) {
 type messageType uint8
 
 // UnmarshalJSON implements the json.Unmarshaler interface.
-func (m *messageType) UnmarshalJSON(text []byte) error {
-	n, err := strconv.ParseUint(string(text), 10, 8)
+func (m *messageType) UnmarshalJSON(data []byte) error {
+	n, err := strconv.ParseUint(string(data), 10, 8)
 	if err != nil {
 		return fmt.Errorf("parse uint8: %w", err)
 	}
@@ -127,7 +127,7 @@ func (m *messageType) UnmarshalJSON(text []byte) error {
 	case 0:
 		*m = messageTypeSyncState
 	default:
-		return fmt.Errorf("invalid message type: %s", string(text))
+		return fmt.Errorf("invalid message type: %s", string(data))
 	}
 	return nil
 }

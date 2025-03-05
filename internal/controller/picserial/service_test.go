@@ -35,14 +35,13 @@ func TestUnmarshalMessageType(t *testing.T) {
 				if err == nil {
 					t.Fatalf("expected error, got nil")
 				}
-				return
-			}
-
-			if err != nil {
-				t.Fatalf("failed to unmarshal message type: %v", err)
-			}
-			if temp.Type != tt.want {
-				t.Errorf("got %v, want %v", temp.Type, tt.want)
+			} else {
+				if err != nil {
+					t.Fatalf("failed to unmarshal message type: %v", err)
+				}
+				if temp.Type != tt.want {
+					t.Errorf("got %v, want %v", temp.Type, tt.want)
+				}
 			}
 		})
 	}

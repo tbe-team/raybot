@@ -14,9 +14,9 @@ import (
 // syncStateType is the type of sync state received from the PIC
 type syncStateType uint8
 
-// UnmarshalText implements the encoding.TextUnmarshaler interface.
-func (s *syncStateType) UnmarshalText(text []byte) error {
-	n, err := strconv.ParseUint(string(text), 10, 8)
+// UnmarshalJSON implements the json.Unmarshaler interface.
+func (s *syncStateType) UnmarshalJSON(data []byte) error {
+	n, err := strconv.ParseUint(string(data), 10, 8)
 	if err != nil {
 		return fmt.Errorf("parse uint8: %w", err)
 	}
@@ -35,7 +35,7 @@ func (s *syncStateType) UnmarshalText(text []byte) error {
 	case 5:
 		*s = syncStateTypeDriveMotor
 	default:
-		return fmt.Errorf("invalid sync state type: %s", string(text))
+		return fmt.Errorf("invalid sync state type: %s", string(data))
 	}
 	return nil
 }
