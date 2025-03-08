@@ -158,7 +158,7 @@ Cấu trúc JSON:
 
 ### status
 
-| Trường | Kiểu dữ liệu | Mô tả |
-|-------|-----------|----------|
-| 0 | uint8 | Thành công |
-| 1 | uint8 | Lỗi |
+| Trường | Kiểu dữ liệu | Mô tả      |
+|--------|--------------|------------|
+| 0      | uint8        | Lỗi        |
+| 1      | uint8        | Thành công |
