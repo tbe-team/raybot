@@ -2,6 +2,8 @@ package handler
 
 import (
 	"context"
+	"fmt"
+	"math"
 
 	"buf.build/gen/go/tbe-team/raybot-api/grpc/go/raybot/v1/raybotv1grpc"
 	raybotv1 "buf.build/gen/go/tbe-team/raybot-api/protocolbuffers/go/raybot/v1"
@@ -24,8 +26,8 @@ func NewLiftMotorHandler(picService service.PICService) *LiftMotorHandler {
 }
 
 func (h LiftMotorHandler) SetLiftMotorConfiguration(ctx context.Context, req *raybotv1.SetLiftMotorConfigurationRequest) (*raybotv1.SetLiftMotorConfigurationResponse, error) {
-	if req.TargetPosition > 2<<15 {
-		return nil, xerror.ValidationFailed(nil, "target position must be less than or equal to 2^15")
+	if req.TargetPosition > math.MaxUint16 {
+		return nil, xerror.ValidationFailed(nil, fmt.Sprintf("target position must be less than or equal to %d", math.MaxUint16))
 	}
 
 	params := service.CreateSerialCommandParams{
