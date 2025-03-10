@@ -112,12 +112,16 @@ func TestSystemHandler(t *testing.T) {
 				// Process the result to simulate middleware behavior
 				if err != nil {
 					rec.WriteHeader(http.StatusInternalServerError)
-					rec.Write([]byte(err.Error()))
+					if _, err := rec.Write([]byte(err.Error())); err != nil {
+						assert.Fail(t, "failed to write response body")
+					}
 				} else if response, ok := result.(gen.GetSystemConfig200JSONResponse); ok {
 					data, _ := json.Marshal(response)
 					rec.Header().Set("Content-Type", "application/json")
 					rec.WriteHeader(http.StatusOK)
-					rec.Write(data)
+					if _, err := rec.Write(data); err != nil {
+						assert.Fail(t, "failed to write response body")
+					}
 				}
 
 				// Assertions
@@ -301,12 +305,16 @@ func TestSystemHandler(t *testing.T) {
 				// Process the result as middleware would
 				if err != nil {
 					rec.WriteHeader(http.StatusInternalServerError)
-					rec.Write([]byte(err.Error()))
+					if _, err := rec.Write([]byte(err.Error())); err != nil {
+						assert.Fail(t, "failed to write response body")
+					}
 				} else if response, ok := result.(gen.UpdateSystemConfig200JSONResponse); ok {
 					data, _ := json.Marshal(response)
 					rec.Header().Set("Content-Type", "application/json")
 					rec.WriteHeader(http.StatusOK)
-					rec.Write(data)
+					if _, err := rec.Write(data); err != nil {
+						assert.Fail(t, "failed to write response body")
+					}
 				}
 
 				// Assertions
