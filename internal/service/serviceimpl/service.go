@@ -10,12 +10,14 @@ import (
 type serviceImpl struct {
 	robotService  *RobotService
 	systemService *SystemService
+	picService    *PICService
 }
 
 func New(cfgManager *config.Manager, repo repository.Repository, validator validator.Validator) service.Service {
 	return &serviceImpl{
 		robotService:  NewRobotService(repo.RobotState(), validator),
 		systemService: NewSystemService(cfgManager),
+		picService:    NewPICService(repo.RobotState(), repo.PICSerialCommand(), validator),
 	}
 }
 
@@ -25,4 +27,8 @@ func (s serviceImpl) RobotService() service.RobotService {
 
 func (s serviceImpl) SystemService() service.SystemService {
 	return s.systemService
+}
+
+func (s serviceImpl) PICService() service.PICService {
+	return s.picService
 }

@@ -69,7 +69,7 @@ func NewSyncStateHandler(robotService service.RobotService) *SyncStateHandler {
 	}
 }
 
-func (h *SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
+func (h SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
 	params := service.UpdateRobotStateParams{}
 	switch msg.StateType {
 	case SyncStateTypeBattery:

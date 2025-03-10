@@ -22,7 +22,8 @@ func (cfg *Config) Validate() error {
 }
 
 type Handlers struct {
-	SyncStateHandler *handler.SyncStateHandler
+	SyncStateHandler  *handler.SyncStateHandler
+	CommandACKHandler *handler.CommandACKHandler
 }
 
 //nolint:revive
@@ -44,7 +45,8 @@ func NewPICSerialService(cfg Config, service service.Service) (*PICSerialService
 	}
 
 	handlers := Handlers{
-		SyncStateHandler: handler.NewSyncStateHandler(service.RobotService()),
+		SyncStateHandler:  handler.NewSyncStateHandler(service.RobotService()),
+		CommandACKHandler: handler.NewCommandACKHandler(service.PICService()),
 	}
 
 	return &PICSerialService{
@@ -107,6 +109,17 @@ func (s *PICSerialService) routeMessage(ctx context.Context, msg []byte) {
 			return
 		}
 		s.handlers.SyncStateHandler.Handle(ctx, syncStateMsg)
+
+	case messageTypeSyncStateACK:
+		var commandACKMsg handler.CommandACKMessage
+		if err := json.Unmarshal(msg, &commandACKMsg); err != nil {
+			s.log.Error("failed to unmarshal command ack message", slog.Any("error", err), slog.Any("message", msg))
+			return
+		}
+		s.handlers.CommandACKHandler.Handle(ctx, commandACKMsg)
+
+	default:
+		s.log.Error("unknown message type", slog.Any("type", temp.Type))
 	}
 }
 
@@ -123,6 +136,8 @@ func (m *messageType) UnmarshalJSON(data []byte) error {
 	switch n {
 	case 0:
 		*m = messageTypeSyncState
+	case 1:
+		*m = messageTypeSyncStateACK
 	default:
 		return fmt.Errorf("invalid message type: %s", string(data))
 	}
@@ -131,4 +146,5 @@ func (m *messageType) UnmarshalJSON(data []byte) error {
 
 const (
 	messageTypeSyncState messageType = iota
+	messageTypeSyncStateACK
 )

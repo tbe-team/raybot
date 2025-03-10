@@ -17,6 +17,7 @@ const (
 // Client is the interface for the serial client.
 type Client interface {
 	// Write sends data to the serial port.
+	// It is safe to call this method from multiple goroutines.
 	Write(data []byte) error
 
 	// Read reads data from the serial port.
