@@ -15,10 +15,10 @@ var (
 )
 
 type SystemService struct {
-	cfgManager *config.Manager
+	cfgManager config.Manager
 }
 
-func NewSystemService(cfgManager *config.Manager) *SystemService {
+func NewSystemService(cfgManager config.Manager) *SystemService {
 	return &SystemService{
 		cfgManager: cfgManager,
 	}
