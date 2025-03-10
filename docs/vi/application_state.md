@@ -12,7 +12,6 @@ Chi tiết trạng thái robot mà ứng dụng quản lý.
 | Percent        | uint8    | percent       | Phần trăm pin                          |
 | Fault          | uint8    | fault         | Trạng thái lỗi pin                     |
 | Health         | uint8    | health        | Trạng thái sức khỏe pin                |
-| Status         | uint8    | status        | Trạng thái chung của pin               |
 
 ## ChargeState (Trạng Thái Sạc)
 | Trường dữ liệu | Kiểu    | JSON Key      | Mô tả                                    |
