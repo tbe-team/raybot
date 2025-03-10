@@ -10,7 +10,10 @@ func ToSystemConfigResponse(cfg service.GetSystemConfigOutput) gen.SystemConfigR
 		Grpc: gen.GRPCConfig{
 			Port: cfg.GRPCConfig.Port,
 		},
-		Http: gen.HTTPConfig{},
+		Http: gen.HTTPConfig{
+			Port:          cfg.HTTPConfig.Port,
+			EnableSwagger: cfg.HTTPConfig.EnableSwagger,
+		},
 		Log: gen.LogConfig{
 			Level:     cfg.LogConfig.Level,
 			Format:    cfg.LogConfig.Format,
