@@ -40,7 +40,7 @@ run:
 #########################
 .PHONY: test
 test:
-	go test -v -short ./...
+	go test -v ./...
 
 .PHONY: test-cov
 test-cov:
