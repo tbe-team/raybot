@@ -7,11 +7,11 @@ import (
 )
 
 type BatteryParams struct {
-	Current      uint16
-	Temp         uint8
-	Voltage      uint16
+	Current      uint16 `validate:"min=0"`
+	Temp         uint8  `validate:"min=0,max=100"`
+	Voltage      uint16 `validate:"min=0"`
 	CellVoltages []uint16
-	Percent      uint8
+	Percent      uint8 `validate:"min=0,max=100"`
 	Fault        uint8
 	Health       uint8
 	Status       uint8
@@ -41,24 +41,24 @@ type LiftMotorParams struct {
 }
 
 type DriveMotorParams struct {
-	Direction model.DriveMotorDirection
-	Speed     uint8
+	Direction model.DriveMotorDirection `validate:"enum"`
+	Speed     uint8                     `validate:"min=0,max=100"`
 	IsRunning bool
 	Enabled   bool
 }
 
 type UpdateRobotStateParams struct {
-	Battery           BatteryParams
+	Battery           BatteryParams `validate:"omitempty,required_if=SetBattery true"`
 	SetBattery        bool
-	Charge            ChargeParams
+	Charge            ChargeParams `validate:"omitempty,required_if=SetCharge true"`
 	SetCharge         bool
-	Discharge         DischargeParams
+	Discharge         DischargeParams `validate:"omitempty,required_if=SetDischarge true"`
 	SetDischarge      bool
-	DistanceSensor    DistanceSensorParams
+	DistanceSensor    DistanceSensorParams `validate:"omitempty,required_if=SetDistanceSensor true"`
 	SetDistanceSensor bool
-	LiftMotor         LiftMotorParams
+	LiftMotor         LiftMotorParams `validate:"omitempty,required_if=SetLiftMotor true"`
 	SetLiftMotor      bool
-	DriveMotor        DriveMotorParams
+	DriveMotor        DriveMotorParams `validate:"omitempty,required_if=SetDriveMotor true"`
 	SetDriveMotor     bool
 }
 
