@@ -81,7 +81,6 @@ func (h *SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
 			Percent      uint8    `json:"percent"`
 			Fault        uint8    `json:"fault"`
 			Health       uint8    `json:"health"`
-			Status       uint8    `json:"status"`
 		}
 		if err := json.Unmarshal(msg.Data, &temp); err != nil {
 			h.log.Error("failed to unmarshal battery data", slog.Any("error", err), slog.Any("data", msg.Data))
@@ -97,7 +96,6 @@ func (h *SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
 			Percent:      temp.Percent,
 			Fault:        temp.Fault,
 			Health:       temp.Health,
-			Status:       temp.Status,
 		}
 
 	case SyncStateTypeCharge:

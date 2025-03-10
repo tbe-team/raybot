@@ -30,7 +30,7 @@ func TestIntegrationSyncStateHandler_Handle(t *testing.T) {
 			name: "battery update",
 			message: handler.SyncStateMessage{
 				StateType: handler.SyncStateTypeBattery,
-				Data:      []byte(`{"current": 500, "temp": 25, "voltage": 12000, "cell_voltages": [4000, 4000, 4000], "percent": 100, "fault": 0, "health": 100, "status": 1}`),
+				Data:      []byte(`{"current": 500, "temp": 25, "voltage": 12000, "cell_voltages": [4000, 4000, 4000], "percent": 100, "fault": 0, "health": 100}`),
 			},
 			expected: func(state model.RobotState) bool {
 				return state.Battery.Current == 500 &&
@@ -39,8 +39,7 @@ func TestIntegrationSyncStateHandler_Handle(t *testing.T) {
 					len(state.Battery.CellVoltages) == 3 &&
 					state.Battery.Percent == 100 &&
 					state.Battery.Fault == 0 &&
-					state.Battery.Health == 100 &&
-					state.Battery.Status == 1
+					state.Battery.Health == 100
 			},
 		},
 		{
