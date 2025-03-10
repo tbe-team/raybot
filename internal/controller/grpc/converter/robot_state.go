@@ -14,7 +14,6 @@ func ToGetRobotStateResponse(state model.RobotState) *raybotv1.GetRobotStateResp
 				ChargePercentage: uint32(state.Battery.Percent),
 				Voltage:          uint32(state.Battery.Voltage),
 				Temperature:      uint32(state.Battery.Temp),
-				Status:           raybotv1.BatteryState_STATUS_UNSPECIFIED,
 			},
 			DistanceSensorData: &raybotv1.DistanceSensorData{
 				FrontDistance: uint32(state.DistanceSensor.FrontDistance),

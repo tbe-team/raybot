@@ -132,7 +132,6 @@ func TestRobotService(t *testing.T) {
 						Percent:      80,
 						Fault:        0,
 						Health:       100,
-						Status:       1,
 					},
 				},
 				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {

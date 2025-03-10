@@ -38,12 +38,7 @@ type PICSerialService struct {
 
 type CleanupFunc func(context.Context) error
 
-func NewPICSerialService(cfg Config, service service.Service, log *slog.Logger) (*PICSerialService, error) {
-	serialClient, err := serial.NewClient(cfg.Serial, log)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create serial client: %w", err)
-	}
-
+func NewPICSerialService(cfg Config, client serial.Client, service service.Service, log *slog.Logger) (*PICSerialService, error) {
 	handlers := Handlers{
 		SyncStateHandler:  handler.NewSyncStateHandler(service.RobotService(), log),
 		CommandACKHandler: handler.NewCommandACKHandler(service.PICService(), log),
@@ -51,7 +46,7 @@ func NewPICSerialService(cfg Config, service service.Service, log *slog.Logger) 
 
 	return &PICSerialService{
 		cfg:          cfg,
-		serialClient: serialClient,
+		serialClient: client,
 		handlers:     handlers,
 		log:          log.With(slog.String("service", "PICSerialService")),
 	}, nil
@@ -64,11 +59,6 @@ func (s *PICSerialService) Run(ctx context.Context) (CleanupFunc, error) {
 	go s.readLoop(ctx)
 
 	cleanup := func(_ context.Context) error {
-		s.log.Debug("PIC serial service is shutting down")
-		if err := s.serialClient.Stop(); err != nil {
-			s.log.Error("failed to stop serial client", "error", err)
-			return err
-		}
 		s.log.Debug("PIC serial service shut down complete")
 		return nil
 	}

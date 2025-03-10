@@ -54,7 +54,10 @@ func (s GRPCService) Run() (CleanupFunc, error) {
 		})
 	}
 	grpcPanicRecoveryHandler := func(p any) (err error) {
-		s.log.Error("recovered from panic", "panic", p, "stack", debug.Stack())
+		s.log.Error("recovered from panic",
+			slog.Any("panic", p),
+			slog.String("stack", string(debug.Stack())),
+		)
 		return status.Errorf(codes.Internal, "%s", p)
 	}
 
@@ -96,4 +99,10 @@ func (s GRPCService) Run() (CleanupFunc, error) {
 func (s GRPCService) registerHandlers(server *grpc.Server) {
 	robotStateHandler := handler.NewRobotStateHandler(s.service.RobotService())
 	raybotv1grpc.RegisterRobotStateServiceServer(server, robotStateHandler)
+
+	driveMotorHandler := handler.NewDriveMotorHandler(s.service.PICService())
+	raybotv1grpc.RegisterDriveMotorServiceServer(server, driveMotorHandler)
+
+	liftMotorHandler := handler.NewLiftMotorHandler(s.service.PICService())
+	raybotv1grpc.RegisterLiftMotorServiceServer(server, liftMotorHandler)
 }

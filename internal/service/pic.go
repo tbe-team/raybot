@@ -1,12 +1,21 @@
 package service
 
-import "context"
+import (
+	"context"
 
-type ProcessSerialCommandACK struct {
+	"github.com/tbe-team/raybot/internal/model"
+)
+
+type CreateSerialCommandParams struct {
+	Data model.PICSerialCommandData `validate:"required"`
+}
+
+type ProcessSerialCommandACKParams struct {
 	ID      string `validate:"required"`
 	Success bool
 }
 
 type PICService interface {
-	ProcessSerialCommandACK(ctx context.Context, params ProcessSerialCommandACK) error
+	CreateSerialCommand(ctx context.Context, params CreateSerialCommandParams) error
+	ProcessSerialCommandACK(ctx context.Context, params ProcessSerialCommandACKParams) error
 }

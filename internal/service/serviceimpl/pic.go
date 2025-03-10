@@ -2,9 +2,13 @@ package serviceimpl
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/lithammer/shortuuid/v4"
+
+	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
@@ -14,22 +18,79 @@ import (
 type PICService struct {
 	robotStateRepo       repository.RobotStateRepository
 	picCommandSerialRepo repository.PICSerialCommandRepository
+	picSerialClient      serial.Client
 	validator            validator.Validator
 }
 
 func NewPICService(
 	robotStateRepo repository.RobotStateRepository,
 	picCommandSerialRepo repository.PICSerialCommandRepository,
+	picSerialClient serial.Client,
 	validator validator.Validator,
 ) *PICService {
 	return &PICService{
 		robotStateRepo:       robotStateRepo,
 		picCommandSerialRepo: picCommandSerialRepo,
+		picSerialClient:      picSerialClient,
 		validator:            validator,
 	}
 }
 
-func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.ProcessSerialCommandACK) error {
+func (s PICService) CreateSerialCommand(ctx context.Context, params service.CreateSerialCommandParams) error {
+	if err := s.validator.Validate(params); err != nil {
+		return fmt.Errorf("validate params: %w", err)
+	}
+
+	var cmdType model.PICSerialCommandType
+	switch params.Data.(type) {
+	case model.PICSerialCommandBatteryChargeData:
+		cmdType = model.PICSerialCommandTypeBatteryCharge
+	case model.PICSerialCommandBatteryDischargeData:
+		cmdType = model.PICSerialCommandTypeBatteryDischarge
+	case model.PICSerialCommandBatteryLiftMotorData:
+		cmdType = model.PICSerialCommandTypeLiftMotor
+	case model.PICSerialCommandBatteryDriveMotorData:
+		cmdType = model.PICSerialCommandTypeDriveMotor
+	}
+
+	cmd := model.PICSerialCommand{
+		ID:        shortuuid.New(),
+		Type:      cmdType,
+		Data:      params.Data,
+		CreatedAt: time.Now(),
+	}
+	if err := s.picCommandSerialRepo.CreatePICSerialCommand(ctx, cmd); err != nil {
+		return fmt.Errorf("create pic serial command: %w", err)
+	}
+
+	// Send command to PIC serial
+	cmdData, err := buildCommandData(params.Data)
+	if err != nil {
+		return fmt.Errorf("marshal command data: %w", err)
+	}
+
+	msg := struct {
+		ID   string                     `json:"id"`
+		Type model.PICSerialCommandType `json:"type"`
+		Data any                        `json:"data"`
+	}{
+		ID:   cmd.ID,
+		Type: cmd.Type,
+		Data: cmdData,
+	}
+	msgJSON, err := json.Marshal(msg)
+	if err != nil {
+		return fmt.Errorf("marshal command message: %w", err)
+	}
+
+	if err := s.picSerialClient.Write(msgJSON); err != nil {
+		return fmt.Errorf("pic serial client write: %w", err)
+	}
+
+	return nil
+}
+
+func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.ProcessSerialCommandACKParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
 	}
@@ -111,4 +172,45 @@ func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.
 	}
 
 	return nil
+}
+
+func buildCommandData(data model.PICSerialCommandData) (any, error) {
+	switch data := data.(type) {
+	case model.PICSerialCommandBatteryChargeData:
+		return struct {
+			CurrentLimit uint16 `json:"current_limit"`
+			Enable       bool   `json:"enable"`
+		}{
+			CurrentLimit: data.CurrentLimit,
+			Enable:       data.Enable,
+		}, nil
+	case model.PICSerialCommandBatteryDischargeData:
+		return struct {
+			CurrentLimit uint16 `json:"current_limit"`
+			Enable       bool   `json:"enable"`
+		}{
+			CurrentLimit: data.CurrentLimit,
+			Enable:       data.Enable,
+		}, nil
+	case model.PICSerialCommandBatteryLiftMotorData:
+		return struct {
+			TargetPosition uint16 `json:"target_position"`
+			Enable         bool   `json:"enable"`
+		}{
+			TargetPosition: data.TargetPosition,
+			Enable:         data.Enable,
+		}, nil
+	case model.PICSerialCommandBatteryDriveMotorData:
+		return struct {
+			Direction uint8 `json:"direction"`
+			Speed     uint8 `json:"speed"`
+			Enable    bool  `json:"enable"`
+		}{
+			Direction: uint8(data.Direction),
+			Speed:     data.Speed,
+			Enable:    data.Enable,
+		}, nil
+	default:
+		return nil, fmt.Errorf("unknown command data type: %T", data)
+	}
 }
