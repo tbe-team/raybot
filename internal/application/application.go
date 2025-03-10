@@ -14,7 +14,7 @@ import (
 )
 
 type Application struct {
-	CfgManager *config.Manager
+	CfgManager config.Manager
 
 	Service service.Service
 
@@ -31,7 +31,7 @@ func (a *Application) Context() context.Context {
 
 type CleanupFunc func() error
 
-func New(cfgManager *config.Manager) (*Application, CleanupFunc, error) {
+func New(cfgManager config.Manager) (*Application, CleanupFunc, error) {
 	// Set UTC timezone
 	time.Local = time.UTC
 	// Create context

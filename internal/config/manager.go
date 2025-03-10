@@ -18,9 +18,18 @@ const (
 
 var (
 	ErrInvalidConfig = errors.New("invalid config")
+
+	_ Manager = (*DefaultManager)(nil)
 )
 
-type Manager struct {
+type Manager interface {
+	GetConfig() Config
+	SetConfig(cfg Config) error
+	SaveConfig() error
+	LoadConfig() error
+}
+
+type DefaultManager struct {
 	cfg Config
 
 	configPath string
@@ -31,11 +40,11 @@ type Manager struct {
 // It detects the install path of the application and loads the config file.
 // If the config file does not exist, it creates it and saves the default config.
 // If the config file exists, it loads the config file.
-func NewManager() (*Manager, error) {
+func NewManager() (*DefaultManager, error) {
 	installPath := detectInstallPath()
 	configPath := filepath.Join(installPath, configFileName)
 
-	s := &Manager{
+	s := &DefaultManager{
 		cfg:        DefaultConfig,
 		configPath: configPath,
 		log:        slog.Default(),
@@ -65,13 +74,13 @@ func NewManager() (*Manager, error) {
 }
 
 // GetConfig returns the config.
-func (s *Manager) GetConfig() Config {
+func (s *DefaultManager) GetConfig() Config {
 	return s.cfg
 }
 
 // SetConfig sets the config. It does not save the config to the file.
 // It is recommended to use SaveConfig() to save the config to the file.
-func (s *Manager) SetConfig(cfg Config) error {
+func (s *DefaultManager) SetConfig(cfg Config) error {
 	if err := cfg.Validate(); err != nil {
 		return fmt.Errorf("%w: %w", ErrInvalidConfig, err)
 	}
@@ -81,7 +90,7 @@ func (s *Manager) SetConfig(cfg Config) error {
 }
 
 // LoadConfig loads the config from the file.
-func (s *Manager) LoadConfig() error {
+func (s *DefaultManager) LoadConfig() error {
 	data, err := os.ReadFile(s.configPath)
 	if err != nil {
 		return fmt.Errorf("read config: %w", err)
@@ -102,7 +111,7 @@ func (s *Manager) LoadConfig() error {
 }
 
 // SaveConfig saves the config to the file.
-func (s *Manager) SaveConfig() error {
+func (s *DefaultManager) SaveConfig() error {
 	// yaml.Marshal() indent 4 by default, so we use a custom encoder to indent 2
 	buf := bytes.Buffer{}
 	encoder := yaml.NewEncoder(&buf)

@@ -13,7 +13,7 @@ type serviceImpl struct {
 	picService    *PICService
 }
 
-func New(cfgManager *config.Manager, repo repository.Repository, validator validator.Validator) service.Service {
+func New(cfgManager config.Manager, repo repository.Repository, validator validator.Validator) service.Service {
 	return &serviceImpl{
 		robotService:  NewRobotService(repo.RobotState(), validator),
 		systemService: NewSystemService(cfgManager),
