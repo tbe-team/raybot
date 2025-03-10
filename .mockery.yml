@@ -10,6 +10,9 @@ issue-845-fix: true
 resolve-type-alias: false
 
 packages:
+  github.com/tbe-team/raybot/internal/config:
+    config:
+      all: true
   github.com/tbe-team/raybot/internal/repository:
     config:
       all: true
