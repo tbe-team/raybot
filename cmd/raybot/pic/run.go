@@ -8,7 +8,7 @@ import (
 )
 
 func Start(app *application.Application) error {
-	picSerialService, err := picserial.NewPICSerialService(app.CfgManager.GetConfig().PIC, app.Service)
+	picSerialService, err := picserial.NewPICSerialService(app.CfgManager.GetConfig().PIC, app.Service, app.Log)
 	if err != nil {
 		return fmt.Errorf("failed to create PIC serial service: %w", err)
 	}

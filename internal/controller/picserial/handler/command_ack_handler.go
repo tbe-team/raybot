@@ -44,11 +44,10 @@ type CommandACKHandler struct {
 	log        *slog.Logger
 }
 
-func NewCommandACKHandler(picService service.PICService) *CommandACKHandler {
+func NewCommandACKHandler(picService service.PICService, log *slog.Logger) *CommandACKHandler {
 	return &CommandACKHandler{
 		picService: picService,
-		log: slog.With(
-			slog.String("module", "pic"),
+		log: log.With(
 			slog.String("handler", "CommandACKHandler"),
 		),
 	}

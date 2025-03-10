@@ -59,11 +59,10 @@ type SyncStateHandler struct {
 	log          *slog.Logger
 }
 
-func NewSyncStateHandler(robotService service.RobotService) *SyncStateHandler {
+func NewSyncStateHandler(robotService service.RobotService, log *slog.Logger) *SyncStateHandler {
 	return &SyncStateHandler{
 		robotService: robotService,
-		log: slog.With(
-			slog.String("module", "pic"),
+		log: log.With(
 			slog.String("handler", "SyncStateHandler"),
 		),
 	}

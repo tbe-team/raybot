@@ -8,7 +8,7 @@ import (
 )
 
 func Start(app *application.Application) error {
-	httpService, err := http.NewHTTPService(app.CfgManager.GetConfig().HTTP, app.Service)
+	httpService, err := http.NewHTTPService(app.CfgManager.GetConfig().HTTP, app.Service, app.Log)
 	if err != nil {
 		return fmt.Errorf("failed to create HTTP service: %w", err)
 	}

@@ -40,7 +40,16 @@ type client struct {
 }
 
 // NewClient creates a new serial client.
-func NewClient(cfg Config) (Client, error) {
+func NewClient(cfg Config, log *slog.Logger) (Client, error) {
+	clientLog := log.With(
+		slog.Group("serial_client",
+			slog.String("port", cfg.Port),
+			slog.Int("baud_rate", cfg.BaudRate),
+			slog.Int("data_bits", cfg.DataBits),
+			slog.String("parity", cfg.Parity),
+			slog.Float64("stop_bits", cfg.StopBits),
+		),
+	)
 	mode := &serial.Mode{
 		BaudRate: cfg.BaudRate,
 		DataBits: cfg.DataBits,
@@ -74,16 +83,7 @@ func NewClient(cfg Config) (Client, error) {
 	port, openErr = serial.Open(cfg.Port, mode)
 	if openErr != nil {
 		// Now we just ignore the error
-		slog.Error("failed to open serial port",
-			slog.Group("serial_port",
-				slog.String("port", cfg.Port),
-				slog.Int("baud_rate", cfg.BaudRate),
-				slog.Int("data_bits", cfg.DataBits),
-				slog.String("parity", cfg.Parity),
-				slog.Float64("stop_bits", cfg.StopBits),
-			),
-			slog.Any("error", openErr),
-		)
+		clientLog.Error("failed to open serial port", slog.Any("error", openErr))
 		// return nil, err
 	}
 
@@ -98,10 +98,7 @@ func NewClient(cfg Config) (Client, error) {
 		port:     port,
 		readChan: make(chan []byte, 1),
 		stop:     make(chan struct{}),
-		log: slog.With(
-			slog.String("module", "serial"),
-			slog.String("serial_port", cfg.Port),
-		),
+		log:      clientLog,
 	}
 
 	if openErr == nil {

@@ -2,6 +2,7 @@ package log
 
 import (
 	"context"
+	"io"
 	"log/slog"
 	"os"
 )
@@ -53,4 +54,9 @@ func NewLogger(cfg Config) *slog.Logger {
 // CloneLogger creates a new logger with the same configuration as the provided logger.
 func CloneLogger(logger *slog.Logger) *slog.Logger {
 	return slog.New(logger.Handler())
+}
+
+// NewNopLogger creates a new logger that discards all log messages.
+func NewNopLogger() *slog.Logger {
+	return slog.New(slog.NewTextHandler(io.Discard, nil))
 }

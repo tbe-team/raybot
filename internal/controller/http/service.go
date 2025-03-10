@@ -39,11 +39,11 @@ type HTTPService struct {
 	log     *slog.Logger
 }
 
-func NewHTTPService(cfg Config, service service.Service) (*HTTPService, error) {
+func NewHTTPService(cfg Config, service service.Service, log *slog.Logger) (*HTTPService, error) {
 	return &HTTPService{
 		cfg:     cfg,
 		service: service,
-		log:     slog.With(slog.String("service", "HTTPService")),
+		log:     log.With(slog.String("service", "HTTPService")),
 	}, nil
 }
 

@@ -38,22 +38,22 @@ type PICSerialService struct {
 
 type CleanupFunc func(context.Context) error
 
-func NewPICSerialService(cfg Config, service service.Service) (*PICSerialService, error) {
-	serialClient, err := serial.NewClient(cfg.Serial)
+func NewPICSerialService(cfg Config, service service.Service, log *slog.Logger) (*PICSerialService, error) {
+	serialClient, err := serial.NewClient(cfg.Serial, log)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create serial client: %w", err)
 	}
 
 	handlers := Handlers{
-		SyncStateHandler:  handler.NewSyncStateHandler(service.RobotService()),
-		CommandACKHandler: handler.NewCommandACKHandler(service.PICService()),
+		SyncStateHandler:  handler.NewSyncStateHandler(service.RobotService(), log),
+		CommandACKHandler: handler.NewCommandACKHandler(service.PICService(), log),
 	}
 
 	return &PICSerialService{
 		cfg:          cfg,
 		serialClient: serialClient,
 		handlers:     handlers,
-		log:          slog.With(slog.String("service", "PICSerialService")),
+		log:          log.With(slog.String("service", "PICSerialService")),
 	}, nil
 }
 

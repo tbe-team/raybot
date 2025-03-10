@@ -39,11 +39,11 @@ type GRPCService struct {
 	log     *slog.Logger
 }
 
-func NewGRPCService(cfg Config, service service.Service) (*GRPCService, error) {
+func NewGRPCService(cfg Config, service service.Service, log *slog.Logger) (*GRPCService, error) {
 	return &GRPCService{
 		cfg:     cfg,
 		service: service,
-		log:     slog.With(slog.String("service", "GRPCService")),
+		log:     log.With(slog.String("service", "GRPCService")),
 	}, nil
 }
 

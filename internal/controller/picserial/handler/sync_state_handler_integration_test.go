@@ -10,6 +10,7 @@ import (
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/repository/repoimpl"
 	"github.com/tbe-team/raybot/internal/service/serviceimpl"
+	"github.com/tbe-team/raybot/pkg/log"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -18,6 +19,7 @@ func TestIntegrationSyncStateHandler_Handle(t *testing.T) {
 		t.Skip("skipping integration test")
 	}
 
+	log := log.NewNopLogger()
 	ctx := context.Background()
 	validator := validator.New()
 
@@ -109,7 +111,7 @@ func TestIntegrationSyncStateHandler_Handle(t *testing.T) {
 		t.Run(tt.name, func(_ *testing.T) {
 			robotStateRepo := repoimpl.NewRobotStateRepository()
 			robotService := serviceimpl.NewRobotService(robotStateRepo, validator)
-			handler := handler.NewSyncStateHandler(robotService)
+			handler := handler.NewSyncStateHandler(robotService, log)
 
 			handler.Handle(ctx, tt.message)
 

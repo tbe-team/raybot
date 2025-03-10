@@ -10,6 +10,7 @@ import (
 	"github.com/tbe-team/raybot/internal/controller/picserial/handler"
 	"github.com/tbe-team/raybot/internal/service"
 	"github.com/tbe-team/raybot/internal/service/mocks"
+	"github.com/tbe-team/raybot/pkg/log"
 )
 
 func TestACKStatusUnmarshal(t *testing.T) {
@@ -59,7 +60,9 @@ func TestACKStatusUnmarshal(t *testing.T) {
 }
 
 func TestCommandACKHandler_Handle(t *testing.T) {
+	log := log.NewNopLogger()
 	ctx := context.Background()
+
 	tests := []struct {
 		name          string
 		msg           handler.CommandACKMessage
@@ -89,7 +92,7 @@ func TestCommandACKHandler_Handle(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			picService := mocks.NewFakePICService(t)
-			commandACKHandler := handler.NewCommandACKHandler(picService)
+			commandACKHandler := handler.NewCommandACKHandler(picService, log)
 
 			params := service.ProcessSerialCommandACK{
 				ID:      tc.msg.ID,
