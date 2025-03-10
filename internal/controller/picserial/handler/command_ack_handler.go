@@ -54,7 +54,7 @@ func NewCommandACKHandler(picService service.PICService, log *slog.Logger) *Comm
 }
 
 func (h CommandACKHandler) Handle(ctx context.Context, msg CommandACKMessage) {
-	params := service.ProcessSerialCommandACK{
+	params := service.ProcessSerialCommandACKParams{
 		ID:      msg.ID,
 		Success: msg.Status == ACKStatusSuccess,
 	}

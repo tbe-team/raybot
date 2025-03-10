@@ -94,7 +94,7 @@ func TestCommandACKHandler_Handle(t *testing.T) {
 			picService := mocks.NewFakePICService(t)
 			commandACKHandler := handler.NewCommandACKHandler(picService, log)
 
-			params := service.ProcessSerialCommandACK{
+			params := service.ProcessSerialCommandACKParams{
 				ID:      tc.msg.ID,
 				Success: tc.msg.Status == handler.ACKStatusSuccess,
 			}
