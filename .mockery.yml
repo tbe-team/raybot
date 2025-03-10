@@ -13,6 +13,9 @@ packages:
   github.com/tbe-team/raybot/internal/config:
     config:
       all: true
+  github.com/tbe-team/raybot/internal/controller/picserial/serial:
+    config:
+      all: true
   github.com/tbe-team/raybot/internal/repository:
     config:
       all: true

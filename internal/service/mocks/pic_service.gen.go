@@ -22,8 +22,55 @@ func (_m *FakePICService) EXPECT() *FakePICService_Expecter {
 	return &FakePICService_Expecter{mock: &_m.Mock}
 }
 
+// CreateSerialCommand provides a mock function with given fields: ctx, params
+func (_m *FakePICService) CreateSerialCommand(ctx context.Context, params service.CreateSerialCommandParams) error {
+	ret := _m.Called(ctx, params)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateSerialCommand")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, service.CreateSerialCommandParams) error); ok {
+		r0 = rf(ctx, params)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakePICService_CreateSerialCommand_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateSerialCommand'
+type FakePICService_CreateSerialCommand_Call struct {
+	*mock.Call
+}
+
+// CreateSerialCommand is a helper method to define mock.On call
+//   - ctx context.Context
+//   - params service.CreateSerialCommandParams
+func (_e *FakePICService_Expecter) CreateSerialCommand(ctx interface{}, params interface{}) *FakePICService_CreateSerialCommand_Call {
+	return &FakePICService_CreateSerialCommand_Call{Call: _e.mock.On("CreateSerialCommand", ctx, params)}
+}
+
+func (_c *FakePICService_CreateSerialCommand_Call) Run(run func(ctx context.Context, params service.CreateSerialCommandParams)) *FakePICService_CreateSerialCommand_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(service.CreateSerialCommandParams))
+	})
+	return _c
+}
+
+func (_c *FakePICService_CreateSerialCommand_Call) Return(_a0 error) *FakePICService_CreateSerialCommand_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakePICService_CreateSerialCommand_Call) RunAndReturn(run func(context.Context, service.CreateSerialCommandParams) error) *FakePICService_CreateSerialCommand_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ProcessSerialCommandACK provides a mock function with given fields: ctx, params
-func (_m *FakePICService) ProcessSerialCommandACK(ctx context.Context, params service.ProcessSerialCommandACK) error {
+func (_m *FakePICService) ProcessSerialCommandACK(ctx context.Context, params service.ProcessSerialCommandACKParams) error {
 	ret := _m.Called(ctx, params)
 
 	if len(ret) == 0 {
@@ -31,7 +78,7 @@ func (_m *FakePICService) ProcessSerialCommandACK(ctx context.Context, params se
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, service.ProcessSerialCommandACK) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, service.ProcessSerialCommandACKParams) error); ok {
 		r0 = rf(ctx, params)
 	} else {
 		r0 = ret.Error(0)
@@ -47,14 +94,14 @@ type FakePICService_ProcessSerialCommandACK_Call struct {
 
 // ProcessSerialCommandACK is a helper method to define mock.On call
 //   - ctx context.Context
-//   - params service.ProcessSerialCommandACK
+//   - params service.ProcessSerialCommandACKParams
 func (_e *FakePICService_Expecter) ProcessSerialCommandACK(ctx interface{}, params interface{}) *FakePICService_ProcessSerialCommandACK_Call {
 	return &FakePICService_ProcessSerialCommandACK_Call{Call: _e.mock.On("ProcessSerialCommandACK", ctx, params)}
 }
 
-func (_c *FakePICService_ProcessSerialCommandACK_Call) Run(run func(ctx context.Context, params service.ProcessSerialCommandACK)) *FakePICService_ProcessSerialCommandACK_Call {
+func (_c *FakePICService_ProcessSerialCommandACK_Call) Run(run func(ctx context.Context, params service.ProcessSerialCommandACKParams)) *FakePICService_ProcessSerialCommandACK_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(service.ProcessSerialCommandACK))
+		run(args[0].(context.Context), args[1].(service.ProcessSerialCommandACKParams))
 	})
 	return _c
 }
@@ -64,7 +111,7 @@ func (_c *FakePICService_ProcessSerialCommandACK_Call) Return(_a0 error) *FakePI
 	return _c
 }
 
-func (_c *FakePICService_ProcessSerialCommandACK_Call) RunAndReturn(run func(context.Context, service.ProcessSerialCommandACK) error) *FakePICService_ProcessSerialCommandACK_Call {
+func (_c *FakePICService_ProcessSerialCommandACK_Call) RunAndReturn(run func(context.Context, service.ProcessSerialCommandACKParams) error) *FakePICService_ProcessSerialCommandACK_Call {
 	_c.Call.Return(run)
 	return _c
 }
