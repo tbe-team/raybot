@@ -19,8 +19,14 @@ func TestUnmarshalMessageType(t *testing.T) {
 			want:      messageTypeSyncState,
 		},
 		{
-			name:      "invalid message type",
+			name:      "ack message type",
 			msg:       []byte(`{"type": 1}`),
+			shouldErr: false,
+			want:      messageTypeSyncStateACK,
+		},
+		{
+			name:      "invalid message type",
+			msg:       []byte(`{"type": 2}`),
 			shouldErr: true,
 		},
 	}

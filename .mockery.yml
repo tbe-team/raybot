@@ -13,3 +13,6 @@ packages:
   github.com/tbe-team/raybot/internal/repository:
     config:
       all: true
+  github.com/tbe-team/raybot/internal/service:
+    config:
+      all: true
