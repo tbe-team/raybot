@@ -14,7 +14,6 @@ type BatteryParams struct {
 	Percent      uint8 `validate:"min=0,max=100"`
 	Fault        uint8
 	Health       uint8
-	Status       uint8
 }
 
 type ChargeParams struct {

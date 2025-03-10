@@ -50,7 +50,6 @@ func (s RobotService) UpdateRobotState(ctx context.Context, params service.Updat
 			Percent:      params.Battery.Percent,
 			Fault:        params.Battery.Fault,
 			Health:       params.Battery.Health,
-			Status:       params.Battery.Status,
 			UpdatedAt:    now,
 		}
 	}

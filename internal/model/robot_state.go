@@ -14,7 +14,6 @@ type BatteryState struct {
 	Percent      uint8
 	Fault        uint8
 	Health       uint8
-	Status       uint8
 	UpdatedAt    time.Time
 }
 

@@ -65,11 +65,10 @@ Dữ liệu khác nhau cho mỗi loại trạng thái.
 | Percent | uint8 | percent | Phần trăm pin |
 | Fault | uint8 | fault | Trạng thái lỗi pin |
 | Health | uint8 | health | Trạng thái sức khỏe pin |
-| Status | uint8 | status | Trạng thái chung của pin |
 
 Ví dụ phản hồi:
 ```
->{"type":0,"state_type":0,"data":{"current":500,"temp":25,"voltage":12000,"cell_voltages":[4000,4000,4000,4000],"percent":80,"fault":0,"health":0,"status":0}}\r\n
+>{"type":0,"state_type":0,"data":{"current":500,"temp":25,"voltage":12000,"cell_voltages":[4000,4000,4000,4000],"percent":80,"fault":0,"health":0}}\r\n
 ```
 
 ### 2.2. Trạng thái sạc
