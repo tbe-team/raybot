@@ -1,7 +1,11 @@
 buf.build/gen/go/tbe-team/raybot-api/grpc/go v1.5.1-20250310071020-110e0b3e70b3.2 h1:ufOHw6qtlWvPAhD07l6UYYYeMS5HuMuJ1H+mHsl019Q=
 buf.build/gen/go/tbe-team/raybot-api/grpc/go v1.5.1-20250310071020-110e0b3e70b3.2/go.mod h1:ib6EuGiVGWKccl7vG5i3qxyMiLwVg7aO/y4S+QczL7g=
+buf.build/gen/go/tbe-team/raybot-api/grpc/go v1.5.1-20250310125418-04155442fda5.2 h1:PfVr2GtS1q/djxm4nAHKO24+E7RC0qLKIaGS1luDbmE=
+buf.build/gen/go/tbe-team/raybot-api/grpc/go v1.5.1-20250310125418-04155442fda5.2/go.mod h1:+RQZiWa1jJ8CQcQRi212KOUARm+LCTzktDsJiB6wanI=
 buf.build/gen/go/tbe-team/raybot-api/protocolbuffers/go v1.36.5-20250310071020-110e0b3e70b3.1 h1:KUH1OJaOTt8khxrV10hgEtCEYAwVcxtjHvIZP/b4xYM=
 buf.build/gen/go/tbe-team/raybot-api/protocolbuffers/go v1.36.5-20250310071020-110e0b3e70b3.1/go.mod h1:CbvzJ/DrkNm3U3YOWL7P0L49URI7n/ayFSA43eNUPg8=
+buf.build/gen/go/tbe-team/raybot-api/protocolbuffers/go v1.36.5-20250310125418-04155442fda5.1 h1:mhG811U9e4h0liMqeBazUbDPsD7tqosb8kuLq7sj/i4=
+buf.build/gen/go/tbe-team/raybot-api/protocolbuffers/go v1.36.5-20250310125418-04155442fda5.1/go.mod h1:CbvzJ/DrkNm3U3YOWL7P0L49URI7n/ayFSA43eNUPg8=
 github.com/creack/goselect v0.1.2 h1:2DNy14+JPjRBgPzAd1thbQp4BSIihxcBf0IXhQXDRa0=
 github.com/creack/goselect v0.1.2/go.mod h1:a/NhLweNvqIYMuxcMOuWY516Cimucms3DglDzQP3hKY=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=

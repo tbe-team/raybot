@@ -3,8 +3,8 @@ module github.com/tbe-team/raybot
 go 1.24
 
 require (
-	buf.build/gen/go/tbe-team/raybot-api/grpc/go v1.5.1-20250310071020-110e0b3e70b3.2
-	buf.build/gen/go/tbe-team/raybot-api/protocolbuffers/go v1.36.5-20250310071020-110e0b3e70b3.1
+	buf.build/gen/go/tbe-team/raybot-api/grpc/go v1.5.1-20250310125418-04155442fda5.2
+	buf.build/gen/go/tbe-team/raybot-api/protocolbuffers/go v1.36.5-20250310125418-04155442fda5.1
 	github.com/getkin/kin-openapi v0.129.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-playground/validator/v10 v10.25.0
