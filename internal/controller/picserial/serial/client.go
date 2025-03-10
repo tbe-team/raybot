@@ -2,6 +2,7 @@ package serial
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"log/slog"
 	"strings"
@@ -12,6 +13,10 @@ import (
 
 const (
 	readBufferSize = 64
+)
+
+var (
+	ErrPortNotOpen = errors.New("port not open")
 )
 
 // Client is the interface for the serial client.
@@ -116,6 +121,10 @@ func (c *client) Write(data []byte) error {
 
 	c.writeMu.Lock()
 	defer c.writeMu.Unlock()
+
+	if c.port == nil {
+		return ErrPortNotOpen
+	}
 
 	_, err := c.port.Write(data)
 	return err
