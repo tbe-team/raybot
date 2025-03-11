@@ -38,7 +38,7 @@ watch(() => props.systemConfig, (data) => {
 const onSubmit = form.handleSubmit((values) => {
   mutate(values, {
     onSuccess: () => {
-      push.success({ message: 'Update successful', title: 'Success!' })
+      push.success({ message: 'Update successfully', title: 'Success!' })
     },
     onError: (error) => {
       if (error instanceof RaybotError)
@@ -58,7 +58,11 @@ const onSubmit = form.handleSubmit((values) => {
       <div class="space-y-2">
         <CardTitle>System config</CardTitle>
         <CardDescription>
-          Important: Any changes made here require a system restart to take effect
+          Important: Any changes made here require a
+          <RouterLink to="/system/restart" class="text-blue-500 underline">
+            system restart
+          </RouterLink>
+          to take effect
         </CardDescription>
       </div>
       <Button type="submit" class="w-fit">
