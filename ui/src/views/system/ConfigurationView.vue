@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useQuerySystemConfig } from '@/composables/use-system-config'
+import { useQuerySystemConfig } from '@/composables/use-system'
 import { SystemConfigForm } from '@/views/system/components/system-config-form'
 import { Loader } from 'lucide-vue-next'
 
@@ -17,8 +17,8 @@ const { isPending, data, isError, error } = useQuerySystemConfig()
     <div v-else-if="!data" class="pt-20 text-2xl">
       System Config Not Found
     </div>
-    <div v-else class="flex justify-center w-full">
-      <SystemConfigForm class="w-full" :system-config="data" />
+    <div v-else class="flex flex-col w-full gap-4">
+      <SystemConfigForm :system-config="data" />
     </div>
   </div>
 </template>
