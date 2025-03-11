@@ -1,6 +1,6 @@
 import type { Component } from 'vue'
 import {
-  Bot,
+  Power,
   Settings2,
 } from 'lucide-vue-next'
 
@@ -12,14 +12,14 @@ interface Item {
 
 const items: Item[] = [
   {
-    name: 'Home',
-    path: '/home',
-    icon: Bot,
-  },
-  {
     name: 'System config',
     path: '/system',
     icon: Settings2,
+  },
+  {
+    name: 'Restart',
+    path: '/system/restart',
+    icon: Power,
   },
 ]
 

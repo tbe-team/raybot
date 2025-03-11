@@ -24,7 +24,7 @@ import { routes } from './menu'
           <SidebarMenuButton as-child>
             <RouterLink
               :to="route.path"
-              active-class="text-primary bg-muted"
+              exact-active-class="text-primary bg-muted"
               class="text-xs font-medium transition-colors rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground"
             >
               <component :is="route.icon" class="w-4 h-4" />
