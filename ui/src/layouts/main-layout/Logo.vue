@@ -6,7 +6,7 @@ const appName = import.meta.env.VITE_APP_NAME
 </script>
 
 <template>
-  <img alt="Vue logo" src="@/assets/logo.svg" width="32" height="32">
+  <img alt="Vue logo" src="./logo.svg" width="32" height="32">
   <Transition name="fade">
     <span v-if="open" class="ml-2 font-bold">{{ appName }}</span>
   </Transition>
