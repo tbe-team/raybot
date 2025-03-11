@@ -1,54 +1,32 @@
 <script setup lang="ts">
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarInset,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarProvider,
-  SidebarRail,
-  SidebarTrigger,
-} from '@/components/ui/sidebar'
-
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { useLocalStorage } from '@vueuse/core'
-import Logo from './Logo.vue'
-import { routes } from './menu'
+import { Notification, Notivue } from 'notivue'
+import HeaderActions from './HeaderActions.vue'
+import AppSidebar from './Sidebar.vue'
 
 const open = useLocalStorage('sidebar', true)
 </script>
 
 <template>
-  <SidebarProvider v-model:open="open">
-    <Sidebar collapsible="icon" class="bg-popover">
-      <SidebarHeader class="flex-row items-center mt-3">
-        <Logo />
-      </SidebarHeader>
-      <SidebarContent class="mx-2 mt-6">
-        <SidebarMenu>
-          <SidebarMenuItem v-for="route in routes" :key="route.name">
-            <SidebarMenuButton as-child>
-              <RouterLink
-                :to="route.path"
-                active-class="text-primary bg-muted"
-                class="text-xs font-medium transition-colors rounded-lg text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-              >
-                <component :is="route.icon" class="w-4 h-4" />
-                {{ route.name }}
-              </RouterLink>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-        <SidebarTrigger class="absolute -right-4 bottom-8" />
-      </SidebarContent>
-      <SidebarRail />
-    </Sidebar>
+  <div class="flex min-h-screen">
+    <SidebarProvider v-model:open="open">
+      <AppSidebar />
+      <SidebarInset>
+        <header class="flex items-center h-16 gap-2 px-4 border-b shrink-0">
+          <SidebarTrigger />
+          <div class="px-4 ml-auto">
+            <HeaderActions />
+          </div>
+        </header>
 
-    <SidebarInset>
-      <div class="flex-1 w-full h-full p-4">
-        <RouterView />
-      </div>
-    </SidebarInset>
-  </SidebarProvider>
+        <main class="flex flex-col flex-1">
+          <RouterView />
+        </main>
+        <Notivue v-slot="item">
+          <Notification :item="item" />
+        </Notivue>
+      </SidebarInset>
+    </SidebarProvider>
+  </div>
 </template>
