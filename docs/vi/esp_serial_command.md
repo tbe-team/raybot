@@ -13,7 +13,7 @@ Chi tiết: [ESP response ACK](esp_response.md#3-phản-hồi-ack)
 
 Ví dụ lệnh:
 ```
->{"type":"a","data":{"speed":100}}\r\n
+>{"type":0,"data":{"speed":100}}\r\n
 ```
 
 Cấu trúc JSON:
@@ -34,7 +34,7 @@ Cấu trúc JSON:
 
 | Loại | Kiểu dữ liệu| Mô tả                      |
 |------|-------------|----------------------------|
-| a    | char        | Cấu hình động cơ đóng mở   |
+| 0    | uint8        | Cấu hình động cơ đóng mở   |
 
 ### cmd_data
 Cấu hình động cơ đóng mở cửa
@@ -46,5 +46,5 @@ Cấu hình động cơ đóng mở cửa
 
 Ví dụ:
 ```json
->{"id":"abc","type":"a","data":{"state":1,"speed":50,"enable":1}}\r\n
+>{"id":"abc","type":0,"data":{"state":1,"speed":50,"enable":1}}\r\n
 ```

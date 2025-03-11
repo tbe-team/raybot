@@ -8,16 +8,16 @@
 
 Ví dụ phản hồi:
 ```
-sync: >{"type":0,"state_type":0;"data":{"speed":100}}\r\n
-ack:  >{"type":1,"id":"abc123xyz";"status":0}\r\n
+>{"type":0,"state_type":0;"data":{"speed":100}}\r\n
+
 ```
 
 Cấu trúc JSON:
 ```json
 {
   "type": <response_type>,
-  "state_type": <state_type>, / "id":<id>,
-  "data": <response_data>     / "status": <status>
+  ...,
+  "data": <response_data> 
 }
 ```
 
@@ -45,10 +45,10 @@ Cấu trúc JSON:
 
 | Loại | Kiểu dữ liệu | Mô tả                           |
 |------|--------------|---------------------------------|
-| a    | char         | Trạng thái cửa                  |
-| b    | char         | Trạng thái động cơ đóng mở      |
-| c    | char         | Trạng thái QR                   |
-| d    | char         | Trạng thái cảm biến khoảng cách |
+| 0    | uint8        | Trạng thái cửa                  |
+| 1    | uint8        | Trạng thái động cơ đóng mở      |
+| 2    | uint8        | Trạng thái QR                   |
+| 3    | uint8        | Trạng thái cảm biến khoảng cách |
 
 ### data
 
@@ -58,12 +58,12 @@ Dữ liệu khác nhau cho mỗi loại trạng thái.
 
 | Trường | Kiểu dữ liệu | Khóa JSON | Mô tả |
 |-------|-----------|----------|-------------|
-| State | uint8 | state | Trạng thái cửa (0=Đóng/1=Mở) |
+| isOpen | bool | is_open | Trạng thái cửa (flase=Đóng/true=Mở) |
 
 
 Ví dụ phản hồi:
 ```
->{"type":0,"state_type":"a","data":{"state":0}}\r\n
+>{"type":0,"state_type":0,"data":{"is_open":true}}\r\n
 ```
 
 ### 2.2. Trạng thái động cơ đóng mở
@@ -77,7 +77,7 @@ Ví dụ phản hồi:
 
 Ví dụ phản hồi:
 ```
->{"type":0,"state_type":"b","data":{"state":0,"speed":50,"is_running":1,"enabled":1}}\r\n
+>{"type":0,"state_type":1,"data":{"state":0,"speed":50,"is_running":1,"enabled":1}}\r\n
 ```
 
 ### 2.3. Trạng thái QR Scanner
@@ -88,19 +88,19 @@ Ví dụ phản hồi:
 
 Ví dụ phản hồi:
 ```
->{"type":0,"state_type":"c","data":{"code":"abcxyz123"}}\r\n
+>{"type":0,"state_type":2,"data":{"code":"abcxyz123"}}\r\n
 ```
 
 ### 2.4. Trạng thái cảm biến khoảng cách dưới
 
 | Trường | Kiểu dữ liệu | Khóa JSON | Mô tả |
 |-------|-----------|----------|-------------|
-| Front | uint8 | front | Khoảng cách đến vật phía trước tính bằng cm |
-| Back | uint8 | back | Khoảng cách đến vật phía sau tính bằng cm |
+| Under | uint8 | under_1 | Khoảng cách đến vật phía dưới tính bằng cm |
+| Under | uint8 | under_2 | Khoảng cách đến vật phía dưới tính bằng cm |
 
 Ví dụ phản hồi:
 ```
->{"type":0,"state_type":"d","data":{"front":100,"back":100}}\r\n
+>{"type":0,"state_type":3,"data":{"under_1":100,"under_2":100}}\r\n
 ```
 
 ## 3. Phản hồi ACK
