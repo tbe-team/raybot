@@ -21,10 +21,10 @@ Cấu trúc JSON:
 
 ### response_type
 
-| Loại | Mô tả                     |
-|------|---------------------------|
-| 0    | Đồng bộ trạng thái từ PIC |
-| 1    | ACK                       |
+| Loại | Kiểu dữ liệu | Mô tả                     |
+|------|--------------|---------------------------|
+| 0    | uint8        | Đồng bộ trạng thái từ PIC |
+| 1    | uint8        | ACK                       |
 
 ## 2. Phản hồi đồng bộ trạng thái (response_type = 0)
 
@@ -41,14 +41,14 @@ Cấu trúc JSON:
 
 ### state_type
 
-| Loại | Mô tả                           |
-|------|---------------------------------|
-| 0    | Trạng thái pin                  |
-| 1    | Trạng thái sạc                  |
-| 2    | Trạng thái xả                   |
-| 3    | Trạng thái cảm biến khoảng cách |
-| 4    | Trạng thái động cơ nâng         |
-| 5    | Trạng thái động cơ di chuyển    |
+| Loại |  Kiểu dữ liệu | Mô tả                           |
+|------|---------------|---------------------------------|
+| 0    | uint8         | Trạng thái pin                  |
+| 1    | uint8         | Trạng thái sạc                  |
+| 2    | uint8         | Trạng thái xả                   |
+| 3    | uint8         | Trạng thái cảm biến khoảng cách |
+| 4    | uint8         | Trạng thái động cơ nâng         |
+| 5    | uint8         | Trạng thái động cơ di chuyển    |
 
 ### data
 
@@ -99,9 +99,9 @@ Ví dụ phản hồi:
 
 | Trường | Kiểu dữ liệu | Khóa JSON | Mô tả |
 |-------|-----------|----------|-------------|
-| Front | uint16 | front | Khoảng cách đến vật phía trước tính bằng cm |
-| Back | uint16 | back | Khoảng cách đến vật phía sau tính bằng cm |
-| Down | uint16 | down | Khoảng cách đến vật bên dưới tính bằng cm |
+| Front | uint8 | front | Khoảng cách đến vật phía trước tính bằng cm |
+| Back | uint8 | back | Khoảng cách đến vật phía sau tính bằng cm |
+| Down | uint8 | down | Khoảng cách đến vật bên dưới tính bằng cm |
 
 Ví dụ phản hồi:
 ```
@@ -112,8 +112,8 @@ Ví dụ phản hồi:
 
 | Trường | Kiểu dữ liệu | Khóa JSON | Mô tả |
 |-------|-----------|----------|-------------|
-| CurrentPosition | uint16 | current_position | Vị trí hiện tại của động cơ nâng (cm) |
-| TargetPosition | uint16 | target_position | Vị trí mục tiêu của động cơ nâng (cm) |
+| CurrentPosition | uint8 | current_position | Vị trí hiện tại của động cơ nâng (cm) |
+| TargetPosition | uint8 | target_position | Vị trí mục tiêu của động cơ nâng (cm) |
 | IsRunning | uint8 | is_running | Động cơ có đang chạy hay không (0=false/1=true) |
 | Enabled | uint8 | enabled | Cho phép động cơ nâng hoạt động hay không (0=false/1=true) |
 
