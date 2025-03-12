@@ -55,6 +55,7 @@ func (s HTTPService) Run() (CleanupFunc, error) {
 	if s.cfg.EnableSwagger {
 		s.registerSwaggerHandler(r)
 	}
+	s.RegisterUIHandler(r)
 	s.RegisterAPIHandlers(r)
 
 	return s.RunWithServer(r)

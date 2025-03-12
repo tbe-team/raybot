@@ -3,40 +3,51 @@ import vue from '@vitejs/plugin-vue'
 import autoprefixer from 'autoprefixer'
 import tailwind from 'tailwindcss'
 import AutoImport from 'unplugin-auto-import/vite'
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig } from 'vite'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd())
-
-  return {
-    server: {
-      proxy: {
-        '/api': {
-          target: env.VITE_BASE_API_URL,
-          changeOrigin: true,
-          rewrite: path => path.replace(/^\/api/, ''),
+export default defineConfig({
+  base: '/ui/',
+  plugins: [
+    vue(),
+    vueDevTools(),
+    AutoImport({
+      imports: ['vue', 'vue-router'],
+      dts: 'src/auto-imports.d.ts',
+      vueTemplate: true,
+    }),
+  ],
+  css: {
+    postcss: {
+      plugins: [tailwind(), autoprefixer()],
+    },
+  },
+  build: {
+    outDir: 'dist',
+    emptyOutDir: true,
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        // https://stackoverflow.com/questions/78633671/vue-app-getting-a-plugin-vue-export-helper-404-error-when-deployed
+        sanitizeFileName: (name) => {
+          // Sanitizes file names generated during the build process:
+          // - Replaces spaces with dashes ('-').
+          // - Removes invalid characters that are not alphanumeric, underscores (_), periods (.), or dashes (-).
+          return name
+            .replace(/\s+/g, '-') // Replaces spaces with dashes.
+            .replace(/[^\w.-]/g, '') // Removes all invalid characters.
         },
       },
     },
-    plugins: [
-      vue(),
-      vueDevTools(),
-      AutoImport({
-        imports: ['vue', 'vue-router'],
-        dts: 'src/auto-imports.d.ts',
-        vueTemplate: true,
-      }),
-    ],
-    css: {
-      postcss: {
-        plugins: [tailwind(), autoprefixer()],
-      },
+  },
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
-    resolve: {
-      alias: {
-        '@': fileURLToPath(new URL('./src', import.meta.url)),
-      },
+  },
+  server: {
+    proxy: {
+      '/api/v1': 'http://localhost:3000/api/v1',
     },
-  }
+  },
 })
