@@ -9,7 +9,6 @@ interface GrpcConfig {
 }
 
 interface HttpConfig {
-  port: number
   enableSwagger: boolean
 }
 
