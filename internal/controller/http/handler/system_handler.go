@@ -44,7 +44,6 @@ func (h systemHandler) UpdateSystemConfig(ctx context.Context, request gen.Updat
 			Port: request.Body.Grpc.Port,
 		},
 		HTTPConfig: service.HTTPConfig{
-			Port:          request.Body.Http.Port,
 			EnableSwagger: request.Body.Http.EnableSwagger,
 		},
 	}

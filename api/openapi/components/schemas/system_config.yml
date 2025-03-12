@@ -46,18 +46,12 @@ GRPCConfig:
 HTTPConfig:
   type: object
   properties:
-    port:
-      type: integer
-      example: 8080
-      description: The port number for the HTTP server
-      x-order: 1
     enableSwagger:
       type: boolean
       example: true
       description: Whether to enable the Swagger UI
-      x-order: 2
+      x-order: 1
   required:
-    - port
     - enableSwagger
 
 LogConfig:

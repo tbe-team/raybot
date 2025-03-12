@@ -43,7 +43,6 @@ func TestSystemService(t *testing.T) {
 							Port: 50051,
 						},
 						HTTP: http.Config{
-							Port:          8080,
 							EnableSwagger: true,
 						},
 						PIC: picserial.Config{
@@ -68,7 +67,6 @@ func TestSystemService(t *testing.T) {
 						Port: 50051,
 					},
 					HTTPConfig: service.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					PICConfig: service.PICConfig{
@@ -126,7 +124,6 @@ func TestSystemService(t *testing.T) {
 						Port: 50051,
 					},
 					HTTPConfig: service.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					PICConfig: service.PICConfig{
@@ -151,7 +148,6 @@ func TestSystemService(t *testing.T) {
 							Port: 50051,
 						},
 						HTTP: http.Config{
-							Port:          8080,
 							EnableSwagger: false,
 						},
 						PIC: picserial.Config{
@@ -173,7 +169,6 @@ func TestSystemService(t *testing.T) {
 						assert.Equal(t, "json", cfg.Log.Format)
 						assert.True(t, cfg.Log.AddSource)
 						assert.Equal(t, 50051, cfg.GRPC.Port)
-						assert.Equal(t, 8080, cfg.HTTP.Port)
 						assert.True(t, cfg.HTTP.EnableSwagger)
 						assert.Equal(t, "/dev/ttyUSB0", cfg.PIC.Serial.Port)
 						assert.Equal(t, 115200, cfg.PIC.Serial.BaudRate)
@@ -195,7 +190,6 @@ func TestSystemService(t *testing.T) {
 						Port: 50051,
 					},
 					HTTPConfig: service.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					PICConfig: service.PICConfig{

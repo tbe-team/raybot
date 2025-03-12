@@ -18,15 +18,15 @@ import (
 	"github.com/tbe-team/raybot/internal/service"
 )
 
+const (
+	DefaultPort = 3000
+)
+
 type Config struct {
-	Port          int  `yaml:"port"`
 	EnableSwagger bool `yaml:"enable_swagger"`
 }
 
 func (c *Config) Validate() error {
-	if c.Port <= 0 || c.Port > 65535 {
-		return fmt.Errorf("invalid port: %d", c.Port)
-	}
 	return nil
 }
 
@@ -62,7 +62,7 @@ func (s HTTPService) Run() (CleanupFunc, error) {
 
 func (s HTTPService) RunWithServer(r chi.Router) (CleanupFunc, error) {
 	srv := &http.Server{
-		Addr:              fmt.Sprintf(":%d", s.cfg.Port),
+		Addr:              fmt.Sprintf(":%d", DefaultPort),
 		Handler:           r,
 		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      10 * time.Second,
@@ -72,7 +72,7 @@ func (s HTTPService) RunWithServer(r chi.Router) (CleanupFunc, error) {
 	}
 
 	go func() {
-		s.log.Info(fmt.Sprintf("HTTP server is listening on port %d", s.cfg.Port))
+		s.log.Info(fmt.Sprintf("HTTP server is listening on port %d", DefaultPort))
 		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			s.log.Error("HTTP server error", slog.Any("error", err))
 			os.Exit(1)

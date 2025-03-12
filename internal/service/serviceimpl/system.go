@@ -43,7 +43,6 @@ func (s SystemService) UpdateSystemConfig(_ context.Context, params service.Upda
 
 	cfg.GRPC.Port = params.GRPCConfig.Port
 
-	cfg.HTTP.Port = params.HTTPConfig.Port
 	cfg.HTTP.EnableSwagger = params.HTTPConfig.EnableSwagger
 
 	cfg.PIC.Serial.Port = params.PICConfig.Serial.Port
@@ -102,7 +101,6 @@ func configToUpdateSystemConfigOutput(cfg config.Config) service.UpdateSystemCon
 			Port: cfg.GRPC.Port,
 		},
 		HTTPConfig: service.HTTPConfig{
-			Port:          cfg.HTTP.Port,
 			EnableSwagger: cfg.HTTP.EnableSwagger,
 		},
 		PICConfig: service.PICConfig{

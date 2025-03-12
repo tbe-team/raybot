@@ -41,7 +41,6 @@ func TestSystemHandler(t *testing.T) {
 								Port: 50051,
 							},
 							HTTPConfig: service.HTTPConfig{
-								Port:          8080,
 								EnableSwagger: true,
 							},
 							PICConfig: service.PICConfig{
@@ -67,7 +66,6 @@ func TestSystemHandler(t *testing.T) {
 						Port: 50051,
 					},
 					Http: gen.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					Pic: gen.PicConfig{
@@ -159,7 +157,6 @@ func TestSystemHandler(t *testing.T) {
 						Port: 50051,
 					},
 					Http: gen.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					Pic: gen.PicConfig{
@@ -181,7 +178,6 @@ func TestSystemHandler(t *testing.T) {
 								params.LogConfig.Format == "json" &&
 								params.LogConfig.AddSource == true &&
 								params.GRPCConfig.Port == 50051 &&
-								params.HTTPConfig.Port == 8080 &&
 								params.HTTPConfig.EnableSwagger == true &&
 								params.PICConfig.Serial.Port == "/dev/ttyUSB0" &&
 								params.PICConfig.Serial.BaudRate == 115200 &&
@@ -201,7 +197,6 @@ func TestSystemHandler(t *testing.T) {
 								Port: 50051,
 							},
 							HTTPConfig: service.HTTPConfig{
-								Port:          8080,
 								EnableSwagger: true,
 							},
 							PICConfig: service.PICConfig{
@@ -227,7 +222,6 @@ func TestSystemHandler(t *testing.T) {
 						Port: 50051,
 					},
 					Http: gen.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					Pic: gen.PicConfig{
@@ -254,7 +248,6 @@ func TestSystemHandler(t *testing.T) {
 						Port: 50051,
 					},
 					Http: gen.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					Pic: gen.PicConfig{

@@ -23,7 +23,6 @@ type GRPCConfig struct {
 }
 
 type HTTPConfig struct {
-	Port          int
 	EnableSwagger bool
 }
 

@@ -57,7 +57,7 @@ var DefaultConfig = Config{
 		Port: 50051,
 	},
 	HTTP: http.Config{
-		Port: 8080,
+		EnableSwagger: true,
 	},
 	Log: log.Config{
 		Level:     "info",
