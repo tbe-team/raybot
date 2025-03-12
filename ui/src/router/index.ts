@@ -30,6 +30,10 @@ const routes: RouteRecordRaw[] = [
       },
     ],
   },
+  {
+    path: '/404',
+    component: () => import('@/views/NotFoundView.vue'),
+  },
 ]
 
 const router = createRouter({
@@ -40,7 +44,7 @@ const router = createRouter({
 const nprogress = useNProgress()
 
 router.beforeEach((to, _, next) => {
-  let title = import.meta.env.VITE_APP_NAME
+  let title = 'Raybot UI'
   if (to.meta.title) {
     title = `${to.meta.title} | ${title}`
   }
