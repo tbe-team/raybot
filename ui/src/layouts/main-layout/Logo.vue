@@ -2,7 +2,7 @@
 import { useSidebar } from '@/components/ui/sidebar'
 
 const { open } = useSidebar()
-const appName = import.meta.env.VITE_APP_NAME
+const appName = 'Raybot'
 </script>
 
 <template>
