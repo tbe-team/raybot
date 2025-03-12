@@ -24,6 +24,10 @@ gen-all: gen-openapi gen-mock
 build:
 	go build -o bin/raybot cmd/raybot/main.go
 
+.PHONY: build-ui
+build-ui:
+	make -C ui build
+
 .PHONY: build-arm64
 build-arm64:
 	GOOS=linux GOARCH=arm64 go build -o bin/raybot-arm64 cmd/raybot/main.go
