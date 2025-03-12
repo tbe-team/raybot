@@ -7,7 +7,6 @@ import (
 	"log/slog"
 	"os"
 	"os/exec"
-	"syscall"
 	"time"
 
 	"github.com/tbe-team/raybot/internal/config"
@@ -79,9 +78,6 @@ func (s SystemService) RestartApplication(_ context.Context) error {
 		cmd.Stderr = os.Stderr
 		cmd.Stdin = os.Stdin
 		cmd.Env = os.Environ()
-		cmd.SysProcAttr = &syscall.SysProcAttr{
-			Setpgid: true,
-		}
 		if err := cmd.Start(); err != nil {
 			slog.Error("failed to restart application", slog.Any("error", err))
 		}

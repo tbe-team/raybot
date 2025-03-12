@@ -32,6 +32,10 @@ build-ui:
 build-arm64:
 	GOOS=linux GOARCH=arm64 go build -o bin/raybot-arm64 cmd/raybot/main.go
 
+.PHONY: build-windows
+build-windows:
+	GOOS=windows GOARCH=amd64 go build -o bin/raybot.exe cmd/raybot/main.go
+
 #########################
 # Run
 #########################
