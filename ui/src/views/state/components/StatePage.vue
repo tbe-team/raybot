@@ -31,13 +31,13 @@ const props = defineProps<Props>()
     </CardHeader>
 
     <CardContent class="grid grid-cols-4 gap-4">
-        <BatteryCard :battery="props.robotState.battery" class="col-span-2" />
-        <ChargeCard :charge="props.robotState.charge" />
-        <DischargeCard :discharge="props.robotState.discharge" />
-        <LiftMotorCard :lift-motor="props.robotState.liftMotor" />
-        <DriveMotorCard :drive-motor="props.robotState.driveMotor" />
-        <DistanceSensorCard :distance-sensor="props.robotState.distanceSensor" />
-        <LocationCard :location="props.locationState" />
+      <BatteryCard :battery="props.robotState.battery" class="col-span-2" />
+      <ChargeCard :charge="props.robotState.charge" />
+      <DischargeCard :discharge="props.robotState.discharge" />
+      <LiftMotorCard :lift-motor="props.robotState.liftMotor" />
+      <DriveMotorCard :drive-motor="props.robotState.driveMotor" />
+      <DistanceSensorCard :distance-sensor="props.robotState.distanceSensor" />
+      <LocationCard :location="props.locationState" />
     </CardContent>
   </div>
 </template>

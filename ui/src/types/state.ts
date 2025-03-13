@@ -1,61 +1,61 @@
 export interface BatteryState {
-  current: number;
-  temp: number;
-  voltage: number;
-  cellVoltages: number[];
-  percent: number;
-  fault: number;
-  health: number;
-  updatedAt: Date;
+  current: number
+  temp: number
+  voltage: number
+  cellVoltages: number[]
+  percent: number
+  fault: number
+  health: number
+  updatedAt: Date
 }
 
 export interface ChargeState {
-  currentLimit: number;
-  enabled: boolean;
-  updatedAt: Date;
+  currentLimit: number
+  enabled: boolean
+  updatedAt: Date
 }
 
 export interface DischargeState {
-  currentLimit: number;
-  enabled: boolean;
-  updatedAt: Date;
+  currentLimit: number
+  enabled: boolean
+  updatedAt: Date
 }
 
 export interface DistanceSensorState {
-  frontDistance: number;
-  backDistance: number;
-  downDistance: number;
-  updatedAt: Date;
+  frontDistance: number
+  backDistance: number
+  downDistance: number
+  updatedAt: Date
 }
 
 export interface LiftMotorState {
-  currentPosition: number;
-  targetPosition: number;
-  isRunning: boolean;
-  enabled: boolean;
-  updatedAt: Date;
+  currentPosition: number
+  targetPosition: number
+  isRunning: boolean
+  enabled: boolean
+  updatedAt: Date
 }
 
 export type DriveMotorDirection = 'Forward' | 'Backward'
 
 export interface DriveMotorState {
-  direction: DriveMotorDirection;
-  speed: number;
-  isRunning: boolean;
-  enabled: boolean;
-  updatedAt: Date;
+  direction: DriveMotorDirection
+  speed: number
+  isRunning: boolean
+  enabled: boolean
+  updatedAt: Date
 }
 
 export interface RobotState {
-  battery: BatteryState;
-  charge: ChargeState;
-  discharge: DischargeState;
-  distanceSensor: DistanceSensorState;
-  liftMotor: LiftMotorState;
-  driveMotor: DriveMotorState;
+  battery: BatteryState
+  charge: ChargeState
+  discharge: DischargeState
+  distanceSensor: DistanceSensorState
+  liftMotor: LiftMotorState
+  driveMotor: DriveMotorState
 }
 export interface LocationState {
-  targetLocation: string;
-  currentLocation: string;
-  updatedAt: Date;
+  targetLocation: string
+  currentLocation: string
+  updatedAt: Date
 }
