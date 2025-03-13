@@ -18,6 +18,48 @@ gen-mock:
 gen-all: gen-openapi gen-mock
 
 #########################
+# Database
+#########################
+GOOSE_DRIVER=sqlite3
+GOOSE_DBSTRING="file:./.raybot/data/raybot.db"
+GOOSE_MIGRATION_DIR=internal/db/migration
+
+.PHONY: migrate-up
+migrate-up:
+	GOOSE_DRIVER=$(GOOSE_DRIVER) \
+	GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
+	GOOSE_MIGRATION_DIR=$(GOOSE_MIGRATION_DIR) \
+	go run github.com/pressly/goose/v3/cmd/goose@v3.24.1 up
+
+.PHONY: migrate-down
+migrate-down:
+	GOOSE_DRIVER=$(GOOSE_DRIVER) \
+	GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
+	GOOSE_MIGRATION_DIR=$(GOOSE_MIGRATION_DIR) \
+	go run github.com/pressly/goose/v3/cmd/goose@v3.24.1 down
+
+.PHONY: migrate-status
+migrate-status:
+	GOOSE_DRIVER=$(GOOSE_DRIVER) \
+	GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
+	GOOSE_MIGRATION_DIR=$(GOOSE_MIGRATION_DIR) \
+	go run github.com/pressly/goose/v3/cmd/goose@v3.24.1 status
+
+.PHONY: migrate-create
+migrate-create:
+	GOOSE_DRIVER=$(GOOSE_DRIVER) \
+	GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
+	GOOSE_MIGRATION_DIR=$(GOOSE_MIGRATION_DIR) \
+	go run github.com/pressly/goose/v3/cmd/goose@v3.24.1 create $(name) sql
+
+.PHONY: migrate-reset
+migrate-reset:
+	GOOSE_DRIVER=$(GOOSE_DRIVER) \
+	GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
+	GOOSE_MIGRATION_DIR=$(GOOSE_MIGRATION_DIR) \
+	go run github.com/pressly/goose/v3/cmd/goose@v3.24.1 reset
+
+#########################
 # Build
 #########################
 .PHONY: build
