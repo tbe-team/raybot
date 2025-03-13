@@ -6,14 +6,8 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
-	"path/filepath"
 
 	"gopkg.in/yaml.v3"
-)
-
-const (
-	// configFileName is the name of the config file.
-	configFileName = "config.yml"
 )
 
 var (
@@ -32,8 +26,8 @@ type Manager interface {
 type DefaultManager struct {
 	cfg Config
 
-	configPath string
-	log        *slog.Logger
+	path *Path
+	log  *slog.Logger
 }
 
 // NewManager creates a new config manager.
@@ -41,21 +35,19 @@ type DefaultManager struct {
 // If the config file does not exist, it creates it and saves the default config.
 // If the config file exists, it loads the config file.
 func NewManager() (*DefaultManager, error) {
-	installPath := detectInstallPath()
-	configPath := filepath.Join(installPath, configFileName)
-
-	s := &DefaultManager{
-		cfg:        DefaultConfig,
-		configPath: configPath,
-		log:        slog.Default(),
+	path, err := NewPath()
+	if err != nil {
+		return nil, fmt.Errorf("create path: %w", err)
 	}
 
-	if _, err := os.Stat(configPath); os.IsNotExist(err) {
-		s.log.Info("Config file not found, creating it", slog.String("configPath", configPath))
-		if err := initDirs(installPath); err != nil {
-			return nil, fmt.Errorf("create config directory: %w", err)
-		}
+	s := &DefaultManager{
+		cfg:  DefaultConfig,
+		path: path,
+		log:  slog.Default(),
+	}
 
+	// check if the config file exists
+	if _, err := os.Stat(path.ConfigPath()); os.IsNotExist(err) {
 		if err := s.SaveConfig(); err != nil {
 			return nil, fmt.Errorf("save default config: %w", err)
 		}
@@ -91,7 +83,7 @@ func (s *DefaultManager) SetConfig(cfg Config) error {
 
 // LoadConfig loads the config from the file.
 func (s *DefaultManager) LoadConfig() error {
-	data, err := os.ReadFile(s.configPath)
+	data, err := os.ReadFile(s.path.ConfigPath())
 	if err != nil {
 		return fmt.Errorf("read config: %w", err)
 	}
@@ -120,7 +112,7 @@ func (s *DefaultManager) SaveConfig() error {
 		return fmt.Errorf("marshal config: %w", err)
 	}
 
-	if err := os.WriteFile(s.configPath, buf.Bytes(), 0600); err != nil {
+	if err := os.WriteFile(s.path.ConfigPath(), buf.Bytes(), 0600); err != nil {
 		return fmt.Errorf("write config: %w", err)
 	}
 
