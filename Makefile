@@ -10,12 +10,16 @@ gen-openapi:
 		-config internal/controller/http/oas/gen/oapi-codegen.yml \
 		api/openapi/gen/openapi.yml
 
+.PHONY: gen-sqlc
+gen-sqlc:
+	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0 generate --file internal/db/sqlc/sqlc.yml
+
 .PHONY: gen-mock
 gen-mock:
 	go run github.com/vektra/mockery/v2@v2.53.1 --config .mockery.yml
 
 .PHONY: gen-all
-gen-all: gen-openapi gen-mock
+gen-all: gen-openapi gen-mock gen-sqlc
 
 #########################
 # Database
