@@ -2,6 +2,7 @@ import type { Component } from 'vue'
 import {
   Power,
   Settings2,
+  ChartBarBig
 } from 'lucide-vue-next'
 
 interface Item {
@@ -11,6 +12,11 @@ interface Item {
 }
 
 const items: Item[] = [
+  {
+    name: 'State',
+    path: '/state',
+    icon: ChartBarBig
+  },
   {
     name: 'System config',
     path: '/system',

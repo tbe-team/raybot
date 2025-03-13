@@ -36,7 +36,7 @@ function handleRestart() {
 
 <template>
   <PageContainer>
-    <Card>
+    <Card class="rounded-sm">
       <CardHeader>
         <CardTitle>System Restart</CardTitle>
         <CardDescription>
