@@ -12,7 +12,7 @@ gen-openapi:
 
 .PHONY: gen-sqlc
 gen-sqlc:
-	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0 generate --file internal/db/sqlc/sqlc.yml
+	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0 generate --file internal/storage/db/sqlc/sqlc.yml
 
 .PHONY: gen-mock
 gen-mock:
@@ -26,7 +26,7 @@ gen-all: gen-openapi gen-mock gen-sqlc
 #########################
 GOOSE_DRIVER=sqlite3
 GOOSE_DBSTRING="file:./.raybot/data/raybot.db"
-GOOSE_MIGRATION_DIR=internal/db/migration
+GOOSE_MIGRATION_DIR=internal/storage/db/migration
 
 .PHONY: migrate-up
 migrate-up:
