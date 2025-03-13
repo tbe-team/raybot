@@ -1,6 +1,9 @@
 package repoimpl
 
-import "github.com/tbe-team/raybot/internal/repository"
+import (
+	"github.com/tbe-team/raybot/internal/repository"
+	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
+)
 
 type repo struct {
 	robotStateRepo       repository.RobotStateRepository
@@ -8,8 +11,9 @@ type repo struct {
 }
 
 func New() repository.Repository {
+	queries := sqlc.New()
 	return &repo{
-		robotStateRepo:       NewRobotStateRepository(),
+		robotStateRepo:       NewRobotStateRepository(queries),
 		picSerialCommandRepo: NewPICSerialCommandRepository(),
 	}
 }

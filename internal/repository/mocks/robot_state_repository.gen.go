@@ -6,6 +6,8 @@ import (
 	context "context"
 
 	mock "github.com/stretchr/testify/mock"
+	db "github.com/tbe-team/raybot/internal/storage/db"
+
 	model "github.com/tbe-team/raybot/internal/model"
 )
 
@@ -22,9 +24,9 @@ func (_m *FakeRobotStateRepository) EXPECT() *FakeRobotStateRepository_Expecter 
 	return &FakeRobotStateRepository_Expecter{mock: &_m.Mock}
 }
 
-// GetRobotState provides a mock function with given fields: ctx
-func (_m *FakeRobotStateRepository) GetRobotState(ctx context.Context) (model.RobotState, error) {
-	ret := _m.Called(ctx)
+// GetRobotState provides a mock function with given fields: ctx, _a1
+func (_m *FakeRobotStateRepository) GetRobotState(ctx context.Context, _a1 db.SQLDB) (model.RobotState, error) {
+	ret := _m.Called(ctx, _a1)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetRobotState")
@@ -32,17 +34,17 @@ func (_m *FakeRobotStateRepository) GetRobotState(ctx context.Context) (model.Ro
 
 	var r0 model.RobotState
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (model.RobotState, error)); ok {
-		return rf(ctx)
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) (model.RobotState, error)); ok {
+		return rf(ctx, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context) model.RobotState); ok {
-		r0 = rf(ctx)
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) model.RobotState); ok {
+		r0 = rf(ctx, _a1)
 	} else {
 		r0 = ret.Get(0).(model.RobotState)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
+	if rf, ok := ret.Get(1).(func(context.Context, db.SQLDB) error); ok {
+		r1 = rf(ctx, _a1)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -57,13 +59,14 @@ type FakeRobotStateRepository_GetRobotState_Call struct {
 
 // GetRobotState is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *FakeRobotStateRepository_Expecter) GetRobotState(ctx interface{}) *FakeRobotStateRepository_GetRobotState_Call {
-	return &FakeRobotStateRepository_GetRobotState_Call{Call: _e.mock.On("GetRobotState", ctx)}
+//   - _a1 db.SQLDB
+func (_e *FakeRobotStateRepository_Expecter) GetRobotState(ctx interface{}, _a1 interface{}) *FakeRobotStateRepository_GetRobotState_Call {
+	return &FakeRobotStateRepository_GetRobotState_Call{Call: _e.mock.On("GetRobotState", ctx, _a1)}
 }
 
-func (_c *FakeRobotStateRepository_GetRobotState_Call) Run(run func(ctx context.Context)) *FakeRobotStateRepository_GetRobotState_Call {
+func (_c *FakeRobotStateRepository_GetRobotState_Call) Run(run func(ctx context.Context, _a1 db.SQLDB)) *FakeRobotStateRepository_GetRobotState_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context))
+		run(args[0].(context.Context), args[1].(db.SQLDB))
 	})
 	return _c
 }
@@ -73,22 +76,22 @@ func (_c *FakeRobotStateRepository_GetRobotState_Call) Return(_a0 model.RobotSta
 	return _c
 }
 
-func (_c *FakeRobotStateRepository_GetRobotState_Call) RunAndReturn(run func(context.Context) (model.RobotState, error)) *FakeRobotStateRepository_GetRobotState_Call {
+func (_c *FakeRobotStateRepository_GetRobotState_Call) RunAndReturn(run func(context.Context, db.SQLDB) (model.RobotState, error)) *FakeRobotStateRepository_GetRobotState_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
-// UpdateRobotState provides a mock function with given fields: ctx, state
-func (_m *FakeRobotStateRepository) UpdateRobotState(ctx context.Context, state model.RobotState) error {
-	ret := _m.Called(ctx, state)
+// UpdateRobotState provides a mock function with given fields: ctx, _a1, state
+func (_m *FakeRobotStateRepository) UpdateRobotState(ctx context.Context, _a1 db.SQLDB, state model.RobotState) error {
+	ret := _m.Called(ctx, _a1, state)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateRobotState")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.RobotState) error); ok {
-		r0 = rf(ctx, state)
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB, model.RobotState) error); ok {
+		r0 = rf(ctx, _a1, state)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -103,14 +106,15 @@ type FakeRobotStateRepository_UpdateRobotState_Call struct {
 
 // UpdateRobotState is a helper method to define mock.On call
 //   - ctx context.Context
+//   - _a1 db.SQLDB
 //   - state model.RobotState
-func (_e *FakeRobotStateRepository_Expecter) UpdateRobotState(ctx interface{}, state interface{}) *FakeRobotStateRepository_UpdateRobotState_Call {
-	return &FakeRobotStateRepository_UpdateRobotState_Call{Call: _e.mock.On("UpdateRobotState", ctx, state)}
+func (_e *FakeRobotStateRepository_Expecter) UpdateRobotState(ctx interface{}, _a1 interface{}, state interface{}) *FakeRobotStateRepository_UpdateRobotState_Call {
+	return &FakeRobotStateRepository_UpdateRobotState_Call{Call: _e.mock.On("UpdateRobotState", ctx, _a1, state)}
 }
 
-func (_c *FakeRobotStateRepository_UpdateRobotState_Call) Run(run func(ctx context.Context, state model.RobotState)) *FakeRobotStateRepository_UpdateRobotState_Call {
+func (_c *FakeRobotStateRepository_UpdateRobotState_Call) Run(run func(ctx context.Context, _a1 db.SQLDB, state model.RobotState)) *FakeRobotStateRepository_UpdateRobotState_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.RobotState))
+		run(args[0].(context.Context), args[1].(db.SQLDB), args[2].(model.RobotState))
 	})
 	return _c
 }
@@ -120,7 +124,7 @@ func (_c *FakeRobotStateRepository_UpdateRobotState_Call) Return(_a0 error) *Fak
 	return _c
 }
 
-func (_c *FakeRobotStateRepository_UpdateRobotState_Call) RunAndReturn(run func(context.Context, model.RobotState) error) *FakeRobotStateRepository_UpdateRobotState_Call {
+func (_c *FakeRobotStateRepository_UpdateRobotState_Call) RunAndReturn(run func(context.Context, db.SQLDB, model.RobotState) error) *FakeRobotStateRepository_UpdateRobotState_Call {
 	_c.Call.Return(run)
 	return _c
 }

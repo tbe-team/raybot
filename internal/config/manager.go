@@ -21,6 +21,7 @@ type Manager interface {
 	SetConfig(cfg Config) error
 	SaveConfig() error
 	LoadConfig() error
+	Path() Path
 }
 
 type DefaultManager struct {
@@ -63,6 +64,10 @@ func NewManager() (*DefaultManager, error) {
 	}
 
 	return s, nil
+}
+
+func (s *DefaultManager) Path() Path {
+	return *s.path
 }
 
 // GetConfig returns the config.

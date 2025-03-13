@@ -35,7 +35,7 @@ func (p Path) ConfigPath() string {
 }
 
 func (p Path) DBPath() string {
-	return filepath.Join(p.root, DBFileName)
+	return filepath.Join(p.DataPath(), DBFileName)
 }
 
 func (p Path) LogPath() string {

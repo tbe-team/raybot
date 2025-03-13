@@ -11,6 +11,7 @@ import (
 	"github.com/tbe-team/raybot/internal/repository/repoimpl"
 	"github.com/tbe-team/raybot/internal/service"
 	"github.com/tbe-team/raybot/internal/service/serviceimpl"
+	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/pkg/log"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
@@ -44,6 +45,12 @@ func New(cfgManager config.Manager) (*Application, CleanupFunc, error) {
 	slog.SetDefault(logger)
 
 	// Setup repository
+	dbProvider, err := db.NewProvider(db.Config{
+		DBPath: cfgManager.Path().DBPath(),
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create db provider: %w", err)
+	}
 	repo := repoimpl.New()
 
 	// Setup serial client
@@ -54,7 +61,7 @@ func New(cfgManager config.Manager) (*Application, CleanupFunc, error) {
 
 	// Setup service
 	validator := validator.New()
-	service := serviceimpl.New(cfgManager, picSerialClient, repo, validator)
+	service := serviceimpl.New(cfgManager, picSerialClient, repo, dbProvider, validator)
 
 	// Setup application
 	app := &Application{

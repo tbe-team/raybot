@@ -11,6 +11,7 @@ import (
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/repository/mocks"
 	"github.com/tbe-team/raybot/internal/service"
+	dbmocks "github.com/tbe-team/raybot/internal/storage/db/mocks"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -21,14 +22,15 @@ func TestRobotService(t *testing.T) {
 	t.Run("test GetRobotState", func(t *testing.T) {
 		tests := []struct {
 			name          string
-			mock          func(_ *mocks.FakeRobotStateRepository)
+			mock          func(_ *mocks.FakeRobotStateRepository, _ *dbmocks.FakeProvider)
 			expectedState model.RobotState
 			expectedError bool
 		}{
 			{
 				name: "successful get robot state",
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{
 						Battery: model.BatteryState{
 							Current: 100,
 						},
@@ -43,8 +45,9 @@ func TestRobotService(t *testing.T) {
 			},
 			{
 				name: "get robot state failed",
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, assert.AnError)
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, assert.AnError)
 				},
 				expectedState: model.RobotState{},
 				expectedError: true,
@@ -54,9 +57,10 @@ func TestRobotService(t *testing.T) {
 		for _, tc := range tests {
 			t.Run(tc.name, func(t *testing.T) {
 				robotStateRepo := mocks.NewFakeRobotStateRepository(t)
-				s := NewRobotService(robotStateRepo, validator)
+				dbProvider := dbmocks.NewFakeProvider(t)
+				s := NewRobotService(robotStateRepo, dbProvider, validator)
 
-				tc.mock(robotStateRepo)
+				tc.mock(robotStateRepo, dbProvider)
 
 				state, err := s.GetRobotState(ctx)
 				if tc.expectedError {
@@ -73,7 +77,7 @@ func TestRobotService(t *testing.T) {
 		tests := []struct {
 			name          string
 			params        service.UpdateRobotStateParams
-			mock          func(_ *mocks.FakeRobotStateRepository)
+			mock          func(_ *mocks.FakeRobotStateRepository, _ *dbmocks.FakeProvider)
 			expectedState model.RobotState
 			expectedError bool
 		}{
@@ -85,8 +89,7 @@ func TestRobotService(t *testing.T) {
 						Direction: 99, // Invalid direction
 					},
 				},
-				mock: func(_ *mocks.FakeRobotStateRepository) {
-					// No mocks needed as validation should fail
+				mock: func(_ *mocks.FakeRobotStateRepository, _ *dbmocks.FakeProvider) {
 				},
 				expectedState: model.RobotState{},
 				expectedError: true,
@@ -99,8 +102,9 @@ func TestRobotService(t *testing.T) {
 						Current: 100,
 					},
 				},
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, assert.AnError)
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, assert.AnError)
 				},
 				expectedState: model.RobotState{},
 				expectedError: true,
@@ -113,9 +117,10 @@ func TestRobotService(t *testing.T) {
 						Current: 100,
 					},
 				},
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(assert.AnError)
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(assert.AnError)
 				},
 				expectedState: model.RobotState{},
 				expectedError: true,
@@ -134,9 +139,10 @@ func TestRobotService(t *testing.T) {
 						Health:       100,
 					},
 				},
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 				},
 				expectedState: model.RobotState{},
 				expectedError: false,
@@ -150,9 +156,10 @@ func TestRobotService(t *testing.T) {
 						Enabled:      true,
 					},
 				},
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 				},
 				expectedState: model.RobotState{},
 				expectedError: false,
@@ -166,9 +173,10 @@ func TestRobotService(t *testing.T) {
 						Enabled:      true,
 					},
 				},
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 				},
 				expectedState: model.RobotState{},
 				expectedError: false,
@@ -183,9 +191,10 @@ func TestRobotService(t *testing.T) {
 						DownDistance:  50,
 					},
 				},
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 				},
 				expectedState: model.RobotState{},
 				expectedError: false,
@@ -201,9 +210,10 @@ func TestRobotService(t *testing.T) {
 						Enabled:         true,
 					},
 				},
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 				},
 				expectedState: model.RobotState{},
 				expectedError: false,
@@ -219,9 +229,10 @@ func TestRobotService(t *testing.T) {
 						Enabled:   true,
 					},
 				},
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 				},
 				expectedState: model.RobotState{},
 				expectedError: false,
@@ -240,9 +251,10 @@ func TestRobotService(t *testing.T) {
 						Speed:     50,
 					},
 				},
-				mock: func(robotStateRepo *mocks.FakeRobotStateRepository) {
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 				},
 				expectedState: model.RobotState{},
 				expectedError: false,
@@ -252,9 +264,10 @@ func TestRobotService(t *testing.T) {
 		for _, tc := range tests {
 			t.Run(tc.name, func(t *testing.T) {
 				robotStateRepo := mocks.NewFakeRobotStateRepository(t)
-				s := NewRobotService(robotStateRepo, validator)
+				dbProvider := dbmocks.NewFakeProvider(t)
+				s := NewRobotService(robotStateRepo, dbProvider, validator)
 
-				tc.mock(robotStateRepo)
+				tc.mock(robotStateRepo, dbProvider)
 
 				state, err := s.UpdateRobotState(ctx, tc.params)
 				if tc.expectedError {

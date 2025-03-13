@@ -8,26 +8,30 @@ import (
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
+	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
 type RobotService struct {
 	robotStateRepo repository.RobotStateRepository
+	dbProvider     db.Provider
 	validator      validator.Validator
 }
 
 func NewRobotService(
 	robotStateRepo repository.RobotStateRepository,
+	dbProvider db.Provider,
 	validator validator.Validator,
 ) *RobotService {
 	return &RobotService{
 		robotStateRepo: robotStateRepo,
+		dbProvider:     dbProvider,
 		validator:      validator,
 	}
 }
 
 func (s RobotService) GetRobotState(ctx context.Context) (model.RobotState, error) {
-	return s.robotStateRepo.GetRobotState(ctx)
+	return s.robotStateRepo.GetRobotState(ctx, s.dbProvider.DB())
 }
 
 func (s RobotService) UpdateRobotState(ctx context.Context, params service.UpdateRobotStateParams) (model.RobotState, error) {
@@ -35,7 +39,7 @@ func (s RobotService) UpdateRobotState(ctx context.Context, params service.Updat
 		return model.RobotState{}, fmt.Errorf("validate params: %w", err)
 	}
 
-	state, err := s.robotStateRepo.GetRobotState(ctx)
+	state, err := s.robotStateRepo.GetRobotState(ctx, s.dbProvider.DB())
 	if err != nil {
 		return model.RobotState{}, fmt.Errorf("get robot state: %w", err)
 	}
@@ -98,5 +102,5 @@ func (s RobotService) UpdateRobotState(ctx context.Context, params service.Updat
 		}
 	}
 
-	return state, s.robotStateRepo.UpdateRobotState(ctx, state)
+	return state, s.robotStateRepo.UpdateRobotState(ctx, s.dbProvider.DB(), state)
 }

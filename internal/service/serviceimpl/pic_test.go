@@ -11,6 +11,7 @@ import (
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/repository/mocks"
 	"github.com/tbe-team/raybot/internal/service"
+	dbmocks "github.com/tbe-team/raybot/internal/storage/db/mocks"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -21,7 +22,7 @@ func TestPICService(t *testing.T) {
 		tests := []struct {
 			name          string
 			params        service.ProcessSerialCommandACKParams
-			mock          func(_ *mocks.FakePICSerialCommandRepository, _ *mocks.FakeRobotStateRepository)
+			mock          func(_ *mocks.FakePICSerialCommandRepository, _ *mocks.FakeRobotStateRepository, _ *dbmocks.FakeProvider)
 			expectedError bool
 		}{
 			{
@@ -30,7 +31,7 @@ func TestPICService(t *testing.T) {
 					ID:      "",
 					Success: true,
 				},
-				mock: func(_ *mocks.FakePICSerialCommandRepository, _ *mocks.FakeRobotStateRepository) {
+				mock: func(_ *mocks.FakePICSerialCommandRepository, _ *mocks.FakeRobotStateRepository, _ *dbmocks.FakeProvider) {
 				},
 				expectedError: true,
 			},
@@ -40,7 +41,7 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: false,
 				},
-				mock: func(_ *mocks.FakePICSerialCommandRepository, _ *mocks.FakeRobotStateRepository) {
+				mock: func(_ *mocks.FakePICSerialCommandRepository, _ *mocks.FakeRobotStateRepository, _ *dbmocks.FakeProvider) {
 				},
 				expectedError: true,
 			},
@@ -50,7 +51,7 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, _ *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, _ *mocks.FakeRobotStateRepository, _ *dbmocks.FakeProvider) {
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{}, assert.AnError)
 				},
 				expectedError: true,
@@ -61,9 +62,10 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, assert.AnError)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, assert.AnError)
 				},
 				expectedError: true,
 			},
@@ -73,7 +75,8 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeBatteryCharge,
 						Data: model.PICSerialCommandBatteryChargeData{
@@ -81,8 +84,8 @@ func TestPICService(t *testing.T) {
 							Enable:       true,
 						},
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 					picCommandSerialRepo.EXPECT().DeletePICSerialCommand(ctx, "123").Return(nil)
 				},
 				expectedError: false,
@@ -93,7 +96,8 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeBatteryDischarge,
 						Data: model.PICSerialCommandBatteryDischargeData{
@@ -101,8 +105,8 @@ func TestPICService(t *testing.T) {
 							Enable:       true,
 						},
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 					picCommandSerialRepo.EXPECT().DeletePICSerialCommand(ctx, "123").Return(nil)
 				},
 				expectedError: false,
@@ -113,7 +117,8 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeLiftMotor,
 						Data: model.PICSerialCommandBatteryLiftMotorData{
@@ -121,8 +126,8 @@ func TestPICService(t *testing.T) {
 							Enable:         true,
 						},
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 					picCommandSerialRepo.EXPECT().DeletePICSerialCommand(ctx, "123").Return(nil)
 				},
 				expectedError: false,
@@ -133,7 +138,8 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeDriveMotor,
 						Data: model.PICSerialCommandBatteryDriveMotorData{
@@ -142,8 +148,8 @@ func TestPICService(t *testing.T) {
 							Enable:    true,
 						},
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 					picCommandSerialRepo.EXPECT().DeletePICSerialCommand(ctx, "123").Return(nil)
 				},
 				expectedError: false,
@@ -154,7 +160,8 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeDriveMotor,
 						Data: model.PICSerialCommandBatteryDriveMotorData{
@@ -163,8 +170,8 @@ func TestPICService(t *testing.T) {
 							Enable:    true,
 						},
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 					picCommandSerialRepo.EXPECT().DeletePICSerialCommand(ctx, "123").Return(nil)
 				},
 				expectedError: false,
@@ -175,7 +182,8 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeDriveMotor,
 						Data: model.PICSerialCommandBatteryDriveMotorData{
@@ -184,7 +192,7 @@ func TestPICService(t *testing.T) {
 							Enable:    true,
 						},
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
 				},
 				expectedError: true,
 			},
@@ -194,12 +202,13 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: 99, // Unknown command type
 						Data: nil,
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
 				},
 				expectedError: true,
 			},
@@ -209,12 +218,13 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeBatteryCharge,
 						Data: model.PICSerialCommandBatteryDischargeData{}, // Invalid data type
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
 				},
 				expectedError: true,
 			},
@@ -224,12 +234,13 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeBatteryDischarge,
 						Data: model.PICSerialCommandBatteryChargeData{}, // Invalid data type
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
 				},
 				expectedError: true,
 			},
@@ -239,12 +250,13 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeLiftMotor,
 						Data: model.PICSerialCommandBatteryChargeData{}, // Invalid data type
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
 				},
 				expectedError: true,
 			},
@@ -254,12 +266,13 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeDriveMotor,
 						Data: model.PICSerialCommandBatteryChargeData{}, // Invalid data type
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
 				},
 				expectedError: true,
 			},
@@ -269,7 +282,8 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeBatteryCharge,
 						Data: model.PICSerialCommandBatteryChargeData{
@@ -277,8 +291,8 @@ func TestPICService(t *testing.T) {
 							Enable:       true,
 						},
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(assert.AnError)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(assert.AnError)
 				},
 				expectedError: true,
 			},
@@ -288,7 +302,8 @@ func TestPICService(t *testing.T) {
 					ID:      "123",
 					Success: true,
 				},
-				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository) {
+				mock: func(picCommandSerialRepo *mocks.FakePICSerialCommandRepository, robotStateRepo *mocks.FakeRobotStateRepository, provider *dbmocks.FakeProvider) {
+					provider.EXPECT().DB().Return(nil)
 					picCommandSerialRepo.EXPECT().GetPICSerialCommand(ctx, "123").Return(model.PICSerialCommand{
 						Type: model.PICSerialCommandTypeBatteryCharge,
 						Data: model.PICSerialCommandBatteryChargeData{
@@ -296,8 +311,8 @@ func TestPICService(t *testing.T) {
 							Enable:       true,
 						},
 					}, nil)
-					robotStateRepo.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, nil)
-					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything).Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
 					picCommandSerialRepo.EXPECT().DeletePICSerialCommand(ctx, "123").Return(assert.AnError)
 				},
 				expectedError: true,
@@ -308,9 +323,10 @@ func TestPICService(t *testing.T) {
 			t.Run(tc.name, func(t *testing.T) {
 				picCommandSerialRepo := mocks.NewFakePICSerialCommandRepository(t)
 				robotStateRepo := mocks.NewFakeRobotStateRepository(t)
-				s := NewPICService(robotStateRepo, picCommandSerialRepo, nil, validator)
+				dbProvider := dbmocks.NewFakeProvider(t)
+				s := NewPICService(robotStateRepo, picCommandSerialRepo, nil, dbProvider, validator)
 
-				tc.mock(picCommandSerialRepo, robotStateRepo)
+				tc.mock(picCommandSerialRepo, robotStateRepo, dbProvider)
 
 				err := s.ProcessSerialCommandACK(ctx, tc.params)
 				if tc.expectedError {
@@ -479,8 +495,10 @@ func TestPICService(t *testing.T) {
 		for _, tc := range tests {
 			t.Run(tc.name, func(t *testing.T) {
 				picCommandSerialRepo := mocks.NewFakePICSerialCommandRepository(t)
+				robotStateRepo := mocks.NewFakeRobotStateRepository(t)
 				picSerialClient := serialmocks.NewFakeClient(t)
-				s := NewPICService(mocks.NewFakeRobotStateRepository(t), picCommandSerialRepo, picSerialClient, validator)
+				dbProvider := dbmocks.NewFakeProvider(t)
+				s := NewPICService(robotStateRepo, picCommandSerialRepo, picSerialClient, dbProvider, validator)
 
 				tc.mock(picCommandSerialRepo, picSerialClient)
 
