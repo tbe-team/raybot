@@ -7,15 +7,20 @@ interface Props {
 }
 const props = defineProps<Props>()
 function getBatteryColor(percent: number): string {
-  if (percent < 20) return 'text-red-5500';
-  if (percent < 40) return 'text-orange-500';
-  if (percent < 60) return 'text-yellow-500';
-  return 'text-green-500';
+  if (percent < 20)
+    return 'text-red-5500'
+  if (percent < 40)
+    return 'text-orange-500'
+  if (percent < 60)
+    return 'text-yellow-500'
+  return 'text-green-500'
 }
 function getTemperatureColor(temp: number): string {
-  if (temp < 15) return 'text-blue-500';
-  if (temp < 35) return 'text-green-500';
-  return 'text-red-500';
+  if (temp < 15)
+    return 'text-blue-500'
+  if (temp < 35)
+    return 'text-green-500'
+  return 'text-red-500'
 }
 </script>
 

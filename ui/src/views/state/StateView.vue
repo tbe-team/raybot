@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { LocationState, RobotState } from '@/types/state'
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { locationState, robotState } from '@/views/state/components/fake-data'
 import StatePage from '@/views/state/components/StatePage.vue'
