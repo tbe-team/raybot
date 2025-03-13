@@ -67,6 +67,12 @@ func New() (*Application, CleanupFunc, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create db provider: %w", err)
 	}
+
+	// Auto migrate the database
+	if err := dbProvider.AutoMigrate(); err != nil {
+		return nil, nil, fmt.Errorf("failed to auto migrate the database: %w", err)
+	}
+
 	repo := repoimpl.New()
 
 	// Setup serial client

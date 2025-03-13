@@ -10,7 +10,7 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-var _ Provider = (*provider)(nil)
+var _ Provider = (*DefaultProvider)(nil)
 
 // Provider is a wrapper around *sql.DB that provides a SQLStore and a way to run transactions
 type Provider interface {
@@ -22,7 +22,7 @@ type Provider interface {
 	WithTX(ctx context.Context, fn func(SQLDB) error) error
 }
 
-type provider struct {
+type DefaultProvider struct {
 	db *sql.DB
 }
 
@@ -31,7 +31,7 @@ type Config struct {
 }
 
 // NewProvider creates a new db provider
-func NewProvider(cfg Config) (Provider, error) {
+func NewProvider(cfg Config) (*DefaultProvider, error) {
 	db, err := sql.Open("sqlite3", cfg.DBPath)
 	if err != nil {
 		return nil, fmt.Errorf("open sqlite db: %w", err)
@@ -41,14 +41,14 @@ func NewProvider(cfg Config) (Provider, error) {
 		return nil, fmt.Errorf("ping sqlite db: %w", err)
 	}
 
-	return &provider{db: db}, nil
+	return &DefaultProvider{db: db}, nil
 }
 
-func (p *provider) DB() SQLDB {
+func (p *DefaultProvider) DB() SQLDB {
 	return p.db
 }
 
-func (p *provider) WithTX(ctx context.Context, fn func(SQLDB) error) (err error) {
+func (p *DefaultProvider) WithTX(ctx context.Context, fn func(SQLDB) error) (err error) {
 	tx, err := p.db.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("begin tx: %w", err)
