@@ -9,18 +9,11 @@ import (
 	"github.com/tbe-team/raybot/cmd/raybot/http"
 	"github.com/tbe-team/raybot/cmd/raybot/pic"
 	"github.com/tbe-team/raybot/internal/application"
-	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/pkg/cmdutil"
 )
 
 func main() {
-	configSvc, err := config.NewManager()
-	if err != nil {
-		log.Printf("failed to create config service: %v\n", err)
-		os.Exit(1)
-	}
-
-	app, cleanup, err := application.New(configSvc)
+	app, cleanup, err := application.New()
 	if err != nil {
 		log.Printf("failed to create application: %v\n", err)
 		os.Exit(1)

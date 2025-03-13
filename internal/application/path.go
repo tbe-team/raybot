@@ -1,4 +1,4 @@
-package config
+package application
 
 import (
 	"fmt"
@@ -28,6 +28,10 @@ func NewPath() (*Path, error) {
 	}
 
 	return p, nil
+}
+
+func (p Path) RootPath() string {
+	return p.root
 }
 
 func (p Path) ConfigPath() string {

@@ -12,6 +12,7 @@ import (
 	"github.com/tbe-team/raybot/internal/service"
 	"github.com/tbe-team/raybot/internal/service/serviceimpl"
 	"github.com/tbe-team/raybot/internal/storage/db"
+	"github.com/tbe-team/raybot/internal/storage/file"
 	"github.com/tbe-team/raybot/pkg/log"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
@@ -35,18 +36,33 @@ func (a *Application) Context() context.Context {
 
 type CleanupFunc func() error
 
-func New(cfgManager config.Manager) (*Application, CleanupFunc, error) {
+func New() (*Application, CleanupFunc, error) {
 	// Set UTC timezone
 	time.Local = time.UTC
 	// Create context
 	ctx := context.Background()
+
+	path, err := NewPath()
+	if err != nil {
+		return nil, nil, fmt.Errorf("create path: %w", err)
+	}
+
+	fileClient, err := file.NewLocalFileClient(".")
+	if err != nil {
+		return nil, nil, fmt.Errorf("create file client: %w", err)
+	}
+
+	cfgManager, err := config.NewManager(fileClient, path.ConfigPath(), slog.Default())
+	if err != nil {
+		return nil, nil, fmt.Errorf("create config manager: %w", err)
+	}
 
 	logger := log.NewLogger(cfgManager.GetConfig().Log)
 	slog.SetDefault(logger)
 
 	// Setup repository
 	dbProvider, err := db.NewProvider(db.Config{
-		DBPath: cfgManager.Path().DBPath(),
+		DBPath: path.DBPath(),
 	})
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create db provider: %w", err)

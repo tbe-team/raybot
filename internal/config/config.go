@@ -16,8 +16,6 @@ type Config struct {
 	GRPC grpc.Config      `yaml:"grpc"`
 	HTTP http.Config      `yaml:"http"`
 	PIC  picserial.Config `yaml:"pic"`
-
-	ConfigPath string `yaml:"-"`
 }
 
 // Validate validates the application configuration.
