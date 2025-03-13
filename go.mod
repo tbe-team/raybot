@@ -10,6 +10,7 @@ require (
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.1
 	github.com/lithammer/shortuuid/v4 v4.2.0
+	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/stretchr/testify v1.10.0
 	go.bug.st/serial v1.6.2
