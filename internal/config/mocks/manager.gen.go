@@ -110,6 +110,51 @@ func (_c *FakeManager_LoadConfig_Call) RunAndReturn(run func() error) *FakeManag
 	return _c
 }
 
+// Path provides a mock function with no fields
+func (_m *FakeManager) Path() config.Path {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Path")
+	}
+
+	var r0 config.Path
+	if rf, ok := ret.Get(0).(func() config.Path); ok {
+		r0 = rf()
+	} else {
+		r0 = ret.Get(0).(config.Path)
+	}
+
+	return r0
+}
+
+// FakeManager_Path_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Path'
+type FakeManager_Path_Call struct {
+	*mock.Call
+}
+
+// Path is a helper method to define mock.On call
+func (_e *FakeManager_Expecter) Path() *FakeManager_Path_Call {
+	return &FakeManager_Path_Call{Call: _e.mock.On("Path")}
+}
+
+func (_c *FakeManager_Path_Call) Run(run func()) *FakeManager_Path_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *FakeManager_Path_Call) Return(_a0 config.Path) *FakeManager_Path_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeManager_Path_Call) RunAndReturn(run func() config.Path) *FakeManager_Path_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SaveConfig provides a mock function with no fields
 func (_m *FakeManager) SaveConfig() error {
 	ret := _m.Called()
