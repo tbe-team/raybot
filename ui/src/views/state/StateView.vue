@@ -1,12 +1,10 @@
 <script setup lang="ts">
 import PageContainer from '@/components/shared/PageContainer.vue'
-import { locationState, robotState } from '@/views/state/components/fake-data'
+import { useQueryRobotState } from '@/composables/use-robot-state'
 import StatePage from '@/views/state/components/StatePage.vue'
-import { Loader } from 'lucide-vue-next'
+import { AlertCircle, Loader } from 'lucide-vue-next'
 
-const isPending = ref(false)
-const isError = ref(false)
-const error = ref({ message: '' })
+const { data: robotState, isPending, isError, error } = useQueryRobotState()
 </script>
 
 <template>
@@ -34,7 +32,7 @@ const error = ref({ message: '' })
       </Card>
     </div>
 
-    <div v-else-if="!robotState || !locationState" class="flex flex-col items-center justify-center gap-4 pt-20">
+    <div v-else-if="!robotState" class="flex flex-col items-center justify-center gap-4 pt-20">
       <Card class="flex flex-col items-center gap-4 p-6">
         <AlertCircle class="w-8 h-8 text-muted-foreground" />
         <div class="space-y-2 text-center">
@@ -49,7 +47,7 @@ const error = ref({ message: '' })
     </div>
 
     <div v-else class="flex flex-col w-full gap-4">
-      <StatePage :robot-state="robotState" :location-state="locationState" />
+      <StatePage :robot-state="robotState" />
     </div>
   </PageContainer>
 </template>

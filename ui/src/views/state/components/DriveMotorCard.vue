@@ -18,10 +18,10 @@ const props = defineProps<Props>()
 
       <CardContent>
         <div class="mx-auto space-x-2">
-          <div class="grid grid-rows-1 gap-2 text-sm">
+          <div class="grid grid-rows-1 gap-2 ">
             <div class="grid grid-cols-2 gap-2">
               <p><span class="font-medium">Direction: </span>{{ props.driveMotor.direction }}</p>
-              <p><span class="font-medium">Speed: </span>{{ props.driveMotor.speed }} m/s</p>
+              <p><span class="font-medium">Speed: </span>{{ props.driveMotor.speed }} %</p>
               <p>
                 <span class="font-medium">Running: </span>
                 <span :class="props.driveMotor.isRunning ? 'text-green-500' : 'text-red-500'">
@@ -35,7 +35,7 @@ const props = defineProps<Props>()
                 </span>
               </p>
             </div>
-            <p><span class="font-medium">Last Updated: </span>{{ new Date(props.driveMotor.updatedAt).toISOString() }}</p>
+            <p><span class="font-medium">Last updated: </span>{{ props.driveMotor.updatedAt }}</p>
           </div>
         </div>
       </CardContent>

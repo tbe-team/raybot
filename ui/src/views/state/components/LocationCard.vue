@@ -21,12 +21,9 @@ const props = defineProps<Props>()
 
       <CardContent>
         <div class="mx-auto space-x-2">
-          <div class="grid grid-rows-1 gap-2 text-sm">
-            <div class="grid grid-cols-2 gap-2">
-              <p><span class="font-medium">Current: </span>{{ props.location.currentLocation }}</p>
-              <p><span class="font-medium">Target: </span>{{ props.location.targetLocation }}</p>
-            </div>
-            <p><span class="font-medium">Last Updated:</span> {{ (props.location.updatedAt).toISOString() }}</p>
+          <div class="grid grid-rows-1 gap-2 ">
+            <p><span class="font-medium">RFID tag: </span>{{ props.location.currentLocation }}</p>
+            <p><span class="font-medium">Last updated:</span> {{ props.location.updatedAt }}</p>
           </div>
         </div>
       </CardContent>

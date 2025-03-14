@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { LocationState, RobotState } from '@/types/robot-state'
+import type { RobotState } from '@/types/robot-state'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import BatteryCard from '@/views/state/components/BatteryCard.vue'
 import ChargeCard from '@/views/state/components/ChargeCard.vue'
@@ -11,7 +11,6 @@ import LocationCard from '@/views/state/components/LocationCard.vue'
 
 interface Props {
   robotState: RobotState
-  locationState: LocationState
 }
 
 const props = defineProps<Props>()
@@ -37,7 +36,7 @@ const props = defineProps<Props>()
       <LiftMotorCard :lift-motor="props.robotState.liftMotor" />
       <DriveMotorCard :drive-motor="props.robotState.driveMotor" />
       <DistanceSensorCard :distance-sensor="props.robotState.distanceSensor" />
-      <LocationCard :location="props.locationState" />
+      <LocationCard :location="props.robotState.location" />
     </CardContent>
   </div>
 </template>

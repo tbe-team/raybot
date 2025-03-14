@@ -18,16 +18,16 @@ const props = defineProps<Props>()
 
       <CardContent>
         <div class="mx-auto space-x-2">
-          <div class="flex flex-col gap-2 text-sm">
+          <div class="flex flex-col gap-2 ">
             <p>
-              <span class="font-medium">Current Limit: </span>{{ props.discharge.currentLimit }} A
+              <span class="font-medium">Current limit: </span>{{ props.discharge.currentLimit }} mA
             </p>
             <p>
               <span class="font-medium">Discharging: </span>
               <span :class="props.discharge.enabled ? 'text-green-500' : 'text-red-500'">{{ props.discharge.enabled ? 'Yes' : 'No' }}</span>
             </p>
             <p>
-              <span class="font-medium">Last Updated: </span>{{ (props.discharge.updatedAt).toISOString() }}
+              <span class="font-medium">Last updated: </span>{{ props.discharge.updatedAt }}
             </p>
           </div>
         </div>
