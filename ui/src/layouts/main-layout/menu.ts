@@ -19,7 +19,7 @@ const items: Item[] = [
   },
   {
     name: 'System config',
-    path: '/system',
+    path: '/system/configuration',
     icon: Settings2,
   },
   {
