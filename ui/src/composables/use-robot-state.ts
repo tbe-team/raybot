@@ -6,6 +6,6 @@ export function useQueryRobotState(opt?: Partial<AxiosRequestConfig>, refetchInt
   return useQuery({
     queryKey: ['robotState'],
     queryFn: () => robotStateAPI.getRobotState(opt),
-    refetchInterval: refetchInterval || false,
+    refetchInterval,
   })
 }
