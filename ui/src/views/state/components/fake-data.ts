@@ -1,55 +1,54 @@
-import type { BatteryState, ChargeState, DischargeState, DistanceSensorState, DriveMotorState, LiftMotorState, LocationState, RobotState } from '@/types/state'
+import type { BatteryState, ChargeState, DischargeState, DistanceSensorState, DriveMotorState, LiftMotorState, LocationState, RobotState } from '@/types/robot-state'
 
 const batteryState: BatteryState = {
   current: 100,
-  temp: 30,
-  voltage: 24.5,
-  cellVoltages: [4.1, 4.0, 4.1, 4.2],
-  percent: 59,
+  temp: 25,
+  voltage: 120,
+  cellVoltages: [12, 12, 12, 12],
+  percent: 50,
   fault: 0,
-  health: 95,
-  updatedAt: new Date(),
+  health: 100,
+  updatedAt: '2021-01-01T00:00:00Z',
 }
 
 const chargeState: ChargeState = {
-  currentLimit: 10,
+  currentLimit: 100,
   enabled: true,
-  updatedAt: new Date(),
+  updatedAt: '2021-01-01T00:00:00Z',
 }
 
 const dischargeState: DischargeState = {
-  currentLimit: 15,
-  enabled: false,
-  updatedAt: new Date(),
+  currentLimit: 100,
+  enabled: true,
+  updatedAt: '2021-01-01T00:00:00Z',
 }
 
 const distanceSensorState: DistanceSensorState = {
-  frontDistance: 50,
-  backDistance: 30,
-  downDistance: 10,
-  updatedAt: new Date(),
+  frontDistance: 100,
+  backDistance: 100,
+  downDistance: 100,
+  updatedAt: '2021-01-01T00:00:00Z',
 }
 
 const liftMotorState: LiftMotorState = {
-  currentPosition: 20,
-  targetPosition: 50,
-  isRunning: false,
+  currentPosition: 100,
+  targetPosition: 100,
+  isRunning: true,
   enabled: true,
-  updatedAt: new Date(),
+  updatedAt: '2021-01-01T00:00:00Z',
 }
 
 const driveMotorState: DriveMotorState = {
-  direction: 'Forward',
-  speed: 5.5,
+  direction: 'FORWARD',
+  speed: 100,
   isRunning: true,
   enabled: true,
-  updatedAt: new Date(),
+  updatedAt: '2021-01-01T00:00:00Z',
 }
 
-export const locationState: LocationState = {
-  targetLocation: 'TB10',
-  currentLocation: 'TB03',
-  updatedAt: new Date(),
+const locationState: LocationState = {
+  currentLocation: 'ABCxyz',
+  updatedAt: '2021-01-01T00:00:00Z',
 }
 
 export const robotState: RobotState = {
@@ -59,4 +58,5 @@ export const robotState: RobotState = {
   distanceSensor: distanceSensorState,
   liftMotor: liftMotorState,
   driveMotor: driveMotorState,
+  location: locationState,
 }

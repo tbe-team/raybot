@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { LocationState } from '@/types/state'
+import type { LocationState } from '@/types/robot-state'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface Props {

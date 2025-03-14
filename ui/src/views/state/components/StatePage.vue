@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { LocationState, RobotState } from '@/types/state'
+import type { LocationState, RobotState } from '@/types/robot-state'
 import { CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import BatteryCard from '@/views/state/components/BatteryCard.vue'
 import ChargeCard from '@/views/state/components/ChargeCard.vue'

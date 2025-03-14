@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { ChargeState } from '@/types/state'
+import type { ChargeState } from '@/types/robot-state'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface Props {
