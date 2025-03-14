@@ -33,15 +33,15 @@ function getTemperatureColor(temp: number): string {
 
       <CardContent>
         <div class="mx-auto space-x-2">
-          <div class="grid grid-cols-2 gap-2 text-sm">
-            <p><span class="font-medium">Current: </span>{{ props.battery.current }} A</p>
-            <p><span class="font-medium">Battery Level: </span><span :class="getBatteryColor(props.battery.percent)">{{ props.battery.percent }}%</span></p>
+          <div class="grid grid-cols-2 gap-2">
+            <p><span class="font-medium">Current: </span>{{ props.battery.current }} mA</p>
+            <p><span class="font-medium">Battery level: </span><span :class="getBatteryColor(props.battery.percent)">{{ props.battery.percent }}%</span></p>
             <p><span class="font-medium">Voltage: </span>{{ props.battery.voltage }} V</p>
             <p><span class="font-medium">Health: </span>{{ props.battery.health }}%</p>
-            <p><span class="font-medium">Cell Voltages: </span><span>{{ props.battery.cellVoltages.join(', ') }} V</span></p>
-            <p><span class="font-medium">Fault Status: </span><span class="text-green-600">{{ props.battery.fault }}</span></p>
+            <p><span class="font-medium">Cell voltages: </span><span>{{ props.battery.cellVoltages.join(', ') }} V</span></p>
+            <p><span class="font-medium">Fault status: </span><span class="text-green-600">{{ props.battery.fault }}</span></p>
             <p><span class="font-medium">Temperature: </span><span :class="getTemperatureColor(props.battery.temp)">{{ props.battery.temp }}°C</span></p>
-            <p><span class="font-medium">Last Updated: </span>{{ (props.battery.updatedAt).toISOString() }}</p>
+            <p><span class="font-medium">Last updated: </span>{{ props.battery.updatedAt }}</p>
           </div>
         </div>
       </CardContent>

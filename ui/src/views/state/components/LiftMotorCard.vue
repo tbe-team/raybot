@@ -21,10 +21,10 @@ const props = defineProps<Props>()
 
       <CardContent>
         <div class="mx-auto space-x-2">
-          <div class="grid grid-rows-1 gap-2 text-sm">
+          <div class="grid grid-rows-1 gap-2 ">
             <div class="grid grid-cols-2 gap-2">
-              <p><span class="font-medium">Current Position: </span>{{ props.liftMotor.currentPosition }}%</p>
-              <p><span class="font-medium">Target Position: </span>{{ props.liftMotor.targetPosition }}%</p>
+              <p><span class="font-medium">Current: </span>{{ props.liftMotor.currentPosition }} cm</p>
+              <p><span class="font-medium">Target: </span>{{ props.liftMotor.targetPosition }} cm</p>
               <p>
                 <span class="font-medium">Running: </span>
                 <span :class="props.liftMotor.isRunning ? 'text-green-500' : 'text-red-500'">{{ props.liftMotor.isRunning ? 'Yes' : 'No' }}</span>
@@ -34,7 +34,7 @@ const props = defineProps<Props>()
                 <span :class="props.liftMotor.enabled ? 'text-green-500' : 'text-red-500'">{{ props.liftMotor.enabled ? 'Yes' : 'No' }}</span>
               </p>
             </div>
-            <p><span class="font-medium">Last Updated:</span> {{ (props.liftMotor.updatedAt).toISOString() }}</p>
+            <p><span class="font-medium">Last updated:</span> {{ props.liftMotor.updatedAt }}</p>
           </div>
         </div>
       </CardContent>
