@@ -24,21 +24,22 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/system',
     component: MainLayout,
-    children: [{
-      path: '',
-      children: [
-        {
-          path: '',
-          component: () => import('@/views/system/ConfigurationView.vue'),
-          meta: { title: 'System Configuration' },
-        },
-        {
-          path: 'restart',
-          component: () => import('@/views/system/RestartView.vue'),
-          meta: { title: 'System Restart' },
-        },
-      ],
-    }],
+    children: [
+      {
+        path: '',
+        redirect: '/system/configuration',
+      },
+      {
+        path: 'configuration',
+        component: () => import('@/views/system/ConfigurationView.vue'),
+        meta: { title: 'System Configuration' },
+      },
+      {
+        path: 'restart',
+        component: () => import('@/views/system/RestartView.vue'),
+        meta: { title: 'System Restart' },
+      },
+    ],
   },
   {
     path: '/404',
