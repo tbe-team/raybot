@@ -4,7 +4,7 @@ import { useQueryRobotState } from '@/composables/use-robot-state'
 import StatePage from '@/views/state/components/StatePage.vue'
 import { AlertCircle, Loader } from 'lucide-vue-next'
 
-const { data: robotState, isPending, isError, error } = useQueryRobotState()
+const { data: robotState, isPending, isError, error } = useQueryRobotState({ doNotShowLoading: true }, 1000)
 </script>
 
 <template>

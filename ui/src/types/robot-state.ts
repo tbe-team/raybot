@@ -1,3 +1,5 @@
+export type DriveMotorDirection = 'FORWARD' | 'BACKWARD'
+
 export interface BatteryState {
   current: number
   temp: number
@@ -36,13 +38,16 @@ export interface LiftMotorState {
   updatedAt: string
 }
 
-export type DriveMotorDirection = 'FORWARD' | 'BACKWARD'
-
 export interface DriveMotorState {
   direction: DriveMotorDirection
   speed: number
   isRunning: boolean
   enabled: boolean
+  updatedAt: string
+}
+
+export interface LocationState {
+  currentLocation: string
   updatedAt: string
 }
 
@@ -54,8 +59,4 @@ export interface RobotState {
   liftMotor: LiftMotorState
   driveMotor: DriveMotorState
   location: LocationState
-}
-export interface LocationState {
-  currentLocation: string
-  updatedAt: string
 }

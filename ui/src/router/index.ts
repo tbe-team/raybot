@@ -11,30 +11,34 @@ const routes: RouteRecordRaw[] = [
     redirect: '/state',
   },
   {
-    path: '/',
+    path: '/state',
     component: MainLayout,
     children: [
       {
-        path: 'state',
+        path: '',
         component: () => import('@/views/state/StateView.vue'),
         meta: { title: 'State' },
       },
-      {
-        path: 'system',
-        children: [
-          {
-            path: '',
-            component: () => import('@/views/system/ConfigurationView.vue'),
-            meta: { title: 'System Configuration' },
-          },
-          {
-            path: 'restart',
-            component: () => import('@/views/system/RestartView.vue'),
-            meta: { title: 'System Restart' },
-          },
-        ],
-      },
     ],
+  },
+  {
+    path: '/system',
+    component: MainLayout,
+    children: [{
+      path: '',
+      children: [
+        {
+          path: '',
+          component: () => import('@/views/system/ConfigurationView.vue'),
+          meta: { title: 'System Configuration' },
+        },
+        {
+          path: 'restart',
+          component: () => import('@/views/system/RestartView.vue'),
+          meta: { title: 'System Restart' },
+        },
+      ],
+    }],
   },
   {
     path: '/404',
