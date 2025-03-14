@@ -1,0 +1,19 @@
+get:
+  summary: Get robot state
+  operationId: getRobotState
+  description: Get the current state of the robot
+  tags:
+    - robot-state
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/state.yml#/RobotStateResponse"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
