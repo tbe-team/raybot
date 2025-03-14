@@ -11,4 +11,5 @@ type RobotState struct {
 	DistanceSensorState string `json:"distance_sensor_state"`
 	LiftMotorState      string `json:"lift_motor_state"`
 	DriveMotorState     string `json:"drive_motor_state"`
+	LocationState       string `json:"location_state"`
 }

@@ -6,7 +6,8 @@ CREATE TABLE robot_state (
 	discharge_state TEXT NOT NULL,
 	distance_sensor_state TEXT NOT NULL,
 	lift_motor_state TEXT NOT NULL,
-	drive_motor_state TEXT NOT NULL
+	drive_motor_state TEXT NOT NULL,
+	location_state TEXT NOT NULL
 );
 
 -- Insert default values
@@ -16,18 +17,20 @@ INSERT INTO robot_state (
 	discharge_state,
 	distance_sensor_state,
 	lift_motor_state,
-	drive_motor_state
+	drive_motor_state,
+	location_state
 ) VALUES (
-	'{"current": 0, "temp": 0, "voltage": 0, "cell_voltages": [0, 0, 0, 0], "percent": 0, "fault": 0, "health": 0, "updated_at": "0000-00-00 00:00:00"}',
-	'{"current_limit": 0, "enabled": true, "updated_at": "0000-00-00 00:00:00"}',
-	'{"current_limit": 0, "enabled": true, "updated_at": "0000-00-00 00:00:00"}',
-	'{"front_distance": 0, "back_distance": 0, "down_distance": 0, "updated_at": "0000-00-00 00:00:00"}',
-	'{"current_position": 0, "target_position": 0, "is_running": false, "enabled": true, "updated_at": "0000-00-00 00:00:00"}',
-	'{"direction": 0, "speed": 0, "is_running": false, "enabled": true, "updated_at": "0000-00-00 00:00:00"}'
+	'{"Current": 0, "Temp": 0, "Voltage": 0, "CellVoltages": [0, 0, 0, 0], "Percent": 0, "Fault": 0, "Health": 0, "UpdatedAt": "0000-00-00 00:00:00"}',
+	'{"CurrentLimit": 0, "Enabled": true, "UpdatedAt": "0000-00-00 00:00:00"}',
+	'{"CurrentLimit": 0, "Enabled": true, "UpdatedAt": "0000-00-00 00:00:00"}',
+	'{"FrontDistance": 0, "BackDistance": 0, "DownDistance": 0, "UpdatedAt": "0000-00-00 00:00:00"}',
+	'{"CurrentPosition": 0, "TargetPosition": 0, "IsRunning": false, "Enabled": true, "UpdatedAt": "0000-00-00 00:00:00"}',
+	'{"Direction": 0, "Speed": 0, "IsRunning": false, "Enabled": true, "UpdatedAt": "0000-00-00 00:00:00"}',
+	'{"CurrentLocation": "", "UpdatedAt": "0000-00-00 00:00:00"}'
 );
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE robot_config;
+DROP TABLE robot_state;
 -- +goose StatementEnd
