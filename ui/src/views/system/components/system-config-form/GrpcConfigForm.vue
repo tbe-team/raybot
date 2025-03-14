@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input'
 </script>
 
 <template>
-  <Card class="rounded-sm">
+  <Card>
     <CardHeader>
       <CardTitle>GRPC Configuration</CardTitle>
     </CardHeader>

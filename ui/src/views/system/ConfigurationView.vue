@@ -47,7 +47,7 @@ const { isPending, data, isError, error } = useQuerySystemConfig()
       </Card>
     </div>
 
-    <div v-else class="flex flex-col w-full gap-4">
+    <div v-else class="flex flex-col w-full">
       <SystemConfigForm :system-config="data" />
     </div>
   </PageContainer>

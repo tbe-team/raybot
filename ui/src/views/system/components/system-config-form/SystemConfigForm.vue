@@ -2,9 +2,7 @@
 import type { SystemConfig } from '@/types/system-config'
 import { Button } from '@/components/ui/button'
 import {
-  CardContent,
   CardDescription,
-  CardHeader,
   CardTitle,
 } from '@/components/ui/card'
 import { useMutationSystemConfig } from '@/composables/use-system'
@@ -53,27 +51,29 @@ const onSubmit = form.handleSubmit((values) => {
 
 <template>
   <form @submit="onSubmit">
-    <CardHeader class="flex flex-row items-center justify-between">
-      <div class="space-y-2">
-        <CardTitle>System config</CardTitle>
-        <CardDescription>
+    <div class="flex flex-col items-start justify-between gap-4 mb-6 sm:flex-row sm:items-center sm:gap-0">
+      <div>
+        <h1 class="text-xl font-semibold">
+          System config
+        </h1>
+        <p class="text-sm text-muted-foreground">
           Important: Any changes made here require a
           <RouterLink to="/system/restart" class="text-blue-500 underline">
             system restart
           </RouterLink>
           to take effect
-        </CardDescription>
+        </p>
       </div>
       <Button type="submit" class="w-fit">
         <Loader v-if="isPending" class="w-4 h-4 animate-spin" />
         Save
       </Button>
-    </CardHeader>
-    <CardContent class="grid grid-cols-2 gap-4">
+    </div>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <GrpcConfigForm />
       <HttpConfigForm />
       <LogConfigForm />
       <PicConfigForm />
-    </CardContent>
+    </div>
   </form>
 </template>

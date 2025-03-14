@@ -10,7 +10,7 @@ import { Switch } from '@/components/ui/switch'
 </script>
 
 <template>
-  <Card class="rounded-sm">
+  <Card>
     <CardHeader>
       <CardTitle>Http Configuration</CardTitle>
     </CardHeader>

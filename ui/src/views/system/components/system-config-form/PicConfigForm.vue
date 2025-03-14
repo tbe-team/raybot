@@ -29,7 +29,7 @@ const stopBitsOption = [
 </script>
 
 <template>
-  <Card class="rounded-sm">
+  <Card>
     <CardHeader>
       <CardTitle>PIC Configuration</CardTitle>
     </CardHeader>

@@ -22,7 +22,7 @@ const logFormatOption = [
 </script>
 
 <template>
-  <Card class="rounded-sm">
+  <Card>
     <CardHeader>
       <CardTitle>Log Configuration</CardTitle>
     </CardHeader>
