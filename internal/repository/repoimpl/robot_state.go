@@ -115,5 +115,10 @@ func (RobotStateRepository) unmarshalRobotState(row sqlc.RobotState) (model.Robo
 		return model.RobotState{}, fmt.Errorf("unmarshal drive motor state: %w", err)
 	}
 
+	err = json.Unmarshal([]byte(row.LocationState), &state.Location)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("unmarshal location state: %w", err)
+	}
+
 	return state, nil
 }
