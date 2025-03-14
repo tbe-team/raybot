@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { BatteryState } from '@/types/state'
+import type { BatteryState } from '@/types/robot-state'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 interface Props {

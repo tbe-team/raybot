@@ -6,26 +6,26 @@ export interface BatteryState {
   percent: number
   fault: number
   health: number
-  updatedAt: Date
+  updatedAt: string
 }
 
 export interface ChargeState {
   currentLimit: number
   enabled: boolean
-  updatedAt: Date
+  updatedAt: string
 }
 
 export interface DischargeState {
   currentLimit: number
   enabled: boolean
-  updatedAt: Date
+  updatedAt: string
 }
 
 export interface DistanceSensorState {
   frontDistance: number
   backDistance: number
   downDistance: number
-  updatedAt: Date
+  updatedAt: string
 }
 
 export interface LiftMotorState {
@@ -33,17 +33,17 @@ export interface LiftMotorState {
   targetPosition: number
   isRunning: boolean
   enabled: boolean
-  updatedAt: Date
+  updatedAt: string
 }
 
-export type DriveMotorDirection = 'Forward' | 'Backward'
+export type DriveMotorDirection = 'FORWARD' | 'BACKWARD'
 
 export interface DriveMotorState {
   direction: DriveMotorDirection
   speed: number
   isRunning: boolean
   enabled: boolean
-  updatedAt: Date
+  updatedAt: string
 }
 
 export interface RobotState {
@@ -53,9 +53,9 @@ export interface RobotState {
   distanceSensor: DistanceSensorState
   liftMotor: LiftMotorState
   driveMotor: DriveMotorState
+  location: LocationState
 }
 export interface LocationState {
-  targetLocation: string
   currentLocation: string
-  updatedAt: Date
+  updatedAt: string
 }
