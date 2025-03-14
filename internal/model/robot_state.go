@@ -59,6 +59,10 @@ func (s DriveMotorDirection) Validate() error {
 	}
 }
 
+func (s DriveMotorDirection) String() string {
+	return []string{"FORWARD", "BACKWARD"}[s]
+}
+
 const (
 	DriveMotorDirectionForward DriveMotorDirection = iota
 	DriveMotorDirectionBackward
@@ -73,6 +77,11 @@ type DriveMotorState struct {
 	UpdatedAt time.Time
 }
 
+type LocationState struct {
+	CurrentLocation string
+	UpdatedAt       time.Time
+}
+
 type RobotState struct {
 	Battery        BatteryState
 	Charge         ChargeState
@@ -80,4 +89,5 @@ type RobotState struct {
 	DistanceSensor DistanceSensorState
 	LiftMotor      LiftMotorState
 	DriveMotor     DriveMotorState
+	Location       LocationState
 }

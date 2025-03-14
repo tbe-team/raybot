@@ -33,7 +33,7 @@ func (s SystemService) GetSystemConfig(_ context.Context) (service.GetSystemConf
 	return configToUpdateSystemConfigOutput(cfg), nil
 }
 
-func (s SystemService) UpdateSystemConfig(_ context.Context, params service.UpdateSystemConfigParams) (service.UpdateSystemConfigOutput, error) {
+func (s SystemService) UpdateSystemConfig(ctx context.Context, params service.UpdateSystemConfigParams) (service.UpdateSystemConfigOutput, error) {
 	cfg := s.cfgManager.GetConfig()
 
 	cfg.Log.Level = params.LogConfig.Level
@@ -51,14 +51,11 @@ func (s SystemService) UpdateSystemConfig(_ context.Context, params service.Upda
 	cfg.PIC.Serial.Parity = params.PICConfig.Serial.Parity
 	cfg.PIC.Serial.ReadTimeout = params.PICConfig.Serial.ReadTimeout
 
-	if err := s.cfgManager.SetConfig(cfg); err != nil {
+	if err := s.cfgManager.SaveConfig(ctx, cfg); err != nil {
 		if errors.Is(err, config.ErrInvalidConfig) {
 			return service.UpdateSystemConfigOutput{}, ErrInvalidConfig
 		}
 		return service.UpdateSystemConfigOutput{}, fmt.Errorf("failed to set config: %w", err)
-	}
-	if err := s.cfgManager.SaveConfig(); err != nil {
-		return service.UpdateSystemConfigOutput{}, fmt.Errorf("failed to save config: %w", err)
 	}
 
 	return configToUpdateSystemConfigOutput(cfg), nil

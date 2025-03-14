@@ -90,6 +90,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /robot-state:
+    get:
+      summary: Get robot state
+      operationId: getRobotState
+      description: Get the current state of the robot
+      tags:
+        - robot-state
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RobotStateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     LogConfig:
@@ -279,3 +299,268 @@ components:
           x-order: 1
       required:
         - status
+    BatteryState:
+      type: object
+      properties:
+        current:
+          type: integer
+          example: 100
+          description: The current of the battery
+          x-order: 1
+          x-go-type: uint16
+        temp:
+          type: integer
+          example: 25
+          description: The temperature of the battery
+          x-order: 2
+          x-go-type: uint8
+        voltage:
+          type: integer
+          example: 120
+          description: The voltage of the battery
+          x-order: 3
+          x-go-type: uint16
+        cellVoltages:
+          type: array
+          items:
+            type: integer
+          example:
+            - 12
+            - 12
+            - 12
+            - 12
+          description: The cell voltages of the battery
+          x-order: 4
+          x-go-type: '[]uint16'
+        percent:
+          type: integer
+          example: 50
+          description: The percentage of the battery
+          x-order: 5
+          x-go-type: uint8
+        fault:
+          type: integer
+          example: 0
+          description: The fault of the battery
+          x-order: 6
+          x-go-type: uint8
+        health:
+          type: integer
+          example: 100
+          description: The health of the battery
+          x-order: 7
+          x-go-type: uint8
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the battery
+          x-order: 8
+      required:
+        - current
+        - temp
+        - voltage
+        - cellVoltages
+        - percent
+        - fault
+        - health
+        - updatedAt
+    ChargeState:
+      type: object
+      properties:
+        currentLimit:
+          type: integer
+          example: 100
+          description: The current limit of the charge
+          x-order: 1
+          x-go-type: uint16
+        enabled:
+          type: boolean
+          example: true
+          description: Whether the charge is enabled
+          x-order: 2
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the charge
+          x-order: 3
+      required:
+        - currentLimit
+        - enabled
+        - updatedAt
+    DischargeState:
+      type: object
+      properties:
+        currentLimit:
+          type: integer
+          example: 100
+          description: The current limit of the discharge
+          x-order: 1
+          x-go-type: uint16
+        enabled:
+          type: boolean
+          example: true
+          description: Whether the discharge is enabled
+          x-order: 2
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the discharge
+          x-order: 3
+      required:
+        - currentLimit
+        - enabled
+        - updatedAt
+    DistanceSensorState:
+      type: object
+      properties:
+        frontDistance:
+          type: integer
+          example: 100
+          description: The front distance of the distance sensor
+          x-order: 1
+          x-go-type: uint16
+        backDistance:
+          type: integer
+          example: 100
+          description: The back distance of the distance sensor
+          x-order: 2
+          x-go-type: uint16
+        downDistance:
+          type: integer
+          example: 100
+          description: The down distance of the distance sensor
+          x-order: 3
+          x-go-type: uint16
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the distance sensor
+          x-order: 4
+      required:
+        - frontDistance
+        - backDistance
+        - downDistance
+        - updatedAt
+    LiftMotorState:
+      type: object
+      properties:
+        currentPosition:
+          type: integer
+          example: 100
+          description: The current position of the lift motor
+          x-order: 1
+          x-go-type: uint16
+        targetPosition:
+          type: integer
+          example: 100
+          description: The target position of the lift motor
+          x-order: 2
+          x-go-type: uint16
+        isRunning:
+          type: boolean
+          example: true
+          description: Whether the lift motor is running
+          x-order: 3
+        enabled:
+          type: boolean
+          example: true
+          description: Whether the lift motor is enabled
+          x-order: 4
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the lift motor
+          x-order: 5
+      required:
+        - currentPosition
+        - targetPosition
+        - isRunning
+        - enabled
+        - updatedAt
+    DriveMotorState:
+      type: object
+      properties:
+        direction:
+          type: string
+          enum:
+            - FORWARD
+            - BACKWARD
+          example: FORWARD
+          description: The direction of the drive motor
+          x-order: 1
+          x-go-type: string
+        speed:
+          type: integer
+          example: 100
+          description: The speed of the drive motor (0-100)
+          x-order: 2
+          x-go-type: uint8
+        isRunning:
+          type: boolean
+          example: true
+          description: Whether the drive motor is running
+          x-order: 3
+        enabled:
+          type: boolean
+          example: true
+          description: Whether the drive motor is enabled
+          x-order: 4
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the drive motor
+          x-order: 5
+      required:
+        - direction
+        - speed
+        - isRunning
+        - enabled
+        - updatedAt
+    LocationState:
+      type: object
+      properties:
+        currentLocation:
+          type: string
+          example: ABCxyz
+          description: The current location of the robot
+          x-order: 1
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the location
+          x-order: 2
+      required:
+        - currentLocation
+        - updatedAt
+    RobotStateResponse:
+      type: object
+      properties:
+        battery:
+          $ref: '#/components/schemas/BatteryState'
+        charge:
+          $ref: '#/components/schemas/ChargeState'
+        discharge:
+          $ref: '#/components/schemas/DischargeState'
+        distanceSensor:
+          $ref: '#/components/schemas/DistanceSensorState'
+        liftMotor:
+          $ref: '#/components/schemas/LiftMotorState'
+        driveMotor:
+          $ref: '#/components/schemas/DriveMotorState'
+        location:
+          $ref: '#/components/schemas/LocationState'
+      required:
+        - battery
+        - charge
+        - discharge
+        - distanceSensor
+        - liftMotor
+        - driveMotor
+        - location

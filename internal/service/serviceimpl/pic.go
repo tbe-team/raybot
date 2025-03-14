@@ -12,6 +12,7 @@ import (
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
+	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -19,6 +20,7 @@ type PICService struct {
 	robotStateRepo       repository.RobotStateRepository
 	picCommandSerialRepo repository.PICSerialCommandRepository
 	picSerialClient      serial.Client
+	dbProvider           db.Provider
 	validator            validator.Validator
 }
 
@@ -26,12 +28,14 @@ func NewPICService(
 	robotStateRepo repository.RobotStateRepository,
 	picCommandSerialRepo repository.PICSerialCommandRepository,
 	picSerialClient serial.Client,
+	dbProvider db.Provider,
 	validator validator.Validator,
 ) *PICService {
 	return &PICService{
 		robotStateRepo:       robotStateRepo,
 		picCommandSerialRepo: picCommandSerialRepo,
 		picSerialClient:      picSerialClient,
+		dbProvider:           dbProvider,
 		validator:            validator,
 	}
 }
@@ -105,7 +109,7 @@ func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.
 		return fmt.Errorf("get pic serial command: %w", err)
 	}
 
-	robotState, err := s.robotStateRepo.GetRobotState(ctx)
+	robotState, err := s.robotStateRepo.GetRobotState(ctx, s.dbProvider.DB())
 	if err != nil {
 		return fmt.Errorf("get robot state: %w", err)
 	}
@@ -163,7 +167,7 @@ func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.
 		return fmt.Errorf("unknown command type: %d", cmd.Type)
 	}
 
-	if err := s.robotStateRepo.UpdateRobotState(ctx, robotState); err != nil {
+	if err := s.robotStateRepo.UpdateRobotState(ctx, s.dbProvider.DB(), robotState); err != nil {
 		return fmt.Errorf("update robot state %w", err)
 	}
 

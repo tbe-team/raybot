@@ -17,3 +17,5 @@ paths:
     $ref: "./paths/system@restart.yml"
   /health:
     $ref: "./paths/health.yml"
+  /robot-state:
+    $ref: "./paths/robot-state.yml"

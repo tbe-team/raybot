@@ -164,7 +164,7 @@ func TestSystemService(t *testing.T) {
 					cfgManager.EXPECT().GetConfig().Return(cfg)
 
 					// Create a matcher function for SetConfig
-					cfgManager.EXPECT().SetConfig(mock.Anything).Run(func(cfg config.Config) {
+					cfgManager.EXPECT().SaveConfig(mock.Anything, mock.Anything).Run(func(_ context.Context, cfg config.Config) {
 						assert.Equal(t, "debug", cfg.Log.Level)
 						assert.Equal(t, "json", cfg.Log.Format)
 						assert.True(t, cfg.Log.AddSource)
@@ -177,8 +177,6 @@ func TestSystemService(t *testing.T) {
 						assert.Equal(t, "none", cfg.PIC.Serial.Parity)
 						assert.Equal(t, time.Second*1, cfg.PIC.Serial.ReadTimeout)
 					}).Return(nil)
-
-					cfgManager.EXPECT().SaveConfig().Return(nil)
 				},
 				expected: service.UpdateSystemConfigOutput{
 					LogConfig: service.LogConfig{
@@ -225,7 +223,7 @@ func TestSystemService(t *testing.T) {
 					cfgManager.EXPECT().GetConfig().Return(cfg)
 
 					// Mock SetConfig to return validation error
-					cfgManager.EXPECT().SetConfig(mock.Anything).Return(config.ErrInvalidConfig)
+					cfgManager.EXPECT().SaveConfig(mock.Anything, mock.Anything).Return(config.ErrInvalidConfig)
 				},
 				expectedError: true,
 				errorType:     ErrInvalidConfig,
@@ -248,7 +246,7 @@ func TestSystemService(t *testing.T) {
 					cfgManager.EXPECT().GetConfig().Return(cfg)
 
 					// Mock generic error during SetConfig
-					cfgManager.EXPECT().SetConfig(mock.Anything).Return(assert.AnError)
+					cfgManager.EXPECT().SaveConfig(mock.Anything, mock.Anything).Return(assert.AnError)
 				},
 				expectedError: true,
 			},
@@ -270,8 +268,7 @@ func TestSystemService(t *testing.T) {
 					cfgManager.EXPECT().GetConfig().Return(cfg)
 
 					// SetConfig succeeds but SaveConfig fails
-					cfgManager.EXPECT().SetConfig(mock.Anything).Return(nil)
-					cfgManager.EXPECT().SaveConfig().Return(assert.AnError)
+					cfgManager.EXPECT().SaveConfig(mock.Anything, mock.Anything).Return(assert.AnError)
 				},
 				expectedError: true,
 			},
