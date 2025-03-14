@@ -3,7 +3,6 @@ package handler
 import (
 	"context"
 	"fmt"
-	"log"
 
 	"github.com/tbe-team/raybot/internal/controller/http/converter"
 	"github.com/tbe-team/raybot/internal/controller/http/oas/gen"
@@ -16,7 +15,6 @@ type robotStateHandler struct {
 
 func (h robotStateHandler) GetRobotState(ctx context.Context, _ gen.GetRobotStateRequestObject) (gen.GetRobotStateResponseObject, error) {
 	state, err := h.robotService.GetRobotState(ctx)
-	log.Printf("state: %+v", state)
 	if err != nil {
 		return nil, fmt.Errorf("robot service get robot state: %w", err)
 	}

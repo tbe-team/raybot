@@ -83,6 +83,17 @@ build-windows:
 	GOOS=windows GOARCH=amd64 go build -o bin/raybot.exe cmd/raybot/main.go
 
 #########################
+# Docker
+#########################
+.PHONY: docker-build-raybot
+docker-build-raybot:
+	docker build -t raybot -f docker/raybot/Dockerfile .
+
+.PHONY: docker-run-raybot
+docker-run-raybot:
+	docker run -p 3000:3000 -v $(PWD)/.raybot:/app/.raybot raybot
+
+#########################
 # Run
 #########################
 .PHONY: run
