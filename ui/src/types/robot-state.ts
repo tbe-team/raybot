@@ -1,5 +1,3 @@
-export type DriveMotorDirection = 'FORWARD' | 'BACKWARD'
-
 export interface BatteryState {
   current: number
   temp: number
@@ -39,7 +37,7 @@ export interface LiftMotorState {
 }
 
 export interface DriveMotorState {
-  direction: DriveMotorDirection
+  direction: 'FORWARD' | 'BACKWARD'
   speed: number
   isRunning: boolean
   enabled: boolean

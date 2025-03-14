@@ -3,8 +3,8 @@ import type { AxiosRequestConfig } from 'axios'
 import http from '@/lib/http'
 
 const robotStateAPI = {
-  getRobotState(opt?: Partial<AxiosRequestConfig>): Promise<RobotState> {
-    return http.get('/robot-state', opt)
+  getRobotState(opts?: Partial<AxiosRequestConfig>): Promise<RobotState> {
+    return http.get('/robot-state', opts)
   },
 }
 export default robotStateAPI

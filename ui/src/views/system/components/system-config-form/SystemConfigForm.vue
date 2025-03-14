@@ -1,4 +1,3 @@
-<!-- ConfigForm.vue -->
 <script setup lang="ts">
 import type { SystemConfig } from '@/types/system-config'
 import { Button } from '@/components/ui/button'
