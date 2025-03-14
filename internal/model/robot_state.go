@@ -59,6 +59,10 @@ func (s DriveMotorDirection) Validate() error {
 	}
 }
 
+func (s DriveMotorDirection) String() string {
+	return []string{"FORWARD", "BACKWARD"}[s]
+}
+
 const (
 	DriveMotorDirectionForward DriveMotorDirection = iota
 	DriveMotorDirectionBackward

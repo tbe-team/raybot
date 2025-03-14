@@ -14,11 +14,96 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
+
+// BatteryState defines model for BatteryState.
+type BatteryState struct {
+	// Current The current of the battery
+	Current uint16 `json:"current"`
+
+	// Temp The temperature of the battery
+	Temp uint8 `json:"temp"`
+
+	// Voltage The voltage of the battery
+	Voltage uint16 `json:"voltage"`
+
+	// CellVoltages The cell voltages of the battery
+	CellVoltages []uint16 `json:"cellVoltages"`
+
+	// Percent The percentage of the battery
+	Percent uint8 `json:"percent"`
+
+	// Fault The fault of the battery
+	Fault uint8 `json:"fault"`
+
+	// Health The health of the battery
+	Health uint8 `json:"health"`
+
+	// UpdatedAt The updated at time of the battery
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// ChargeState defines model for ChargeState.
+type ChargeState struct {
+	// CurrentLimit The current limit of the charge
+	CurrentLimit uint16 `json:"currentLimit"`
+
+	// Enabled Whether the charge is enabled
+	Enabled bool `json:"enabled"`
+
+	// UpdatedAt The updated at time of the charge
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// DischargeState defines model for DischargeState.
+type DischargeState struct {
+	// CurrentLimit The current limit of the discharge
+	CurrentLimit uint16 `json:"currentLimit"`
+
+	// Enabled Whether the discharge is enabled
+	Enabled bool `json:"enabled"`
+
+	// UpdatedAt The updated at time of the discharge
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// DistanceSensorState defines model for DistanceSensorState.
+type DistanceSensorState struct {
+	// FrontDistance The front distance of the distance sensor
+	FrontDistance uint16 `json:"frontDistance"`
+
+	// BackDistance The back distance of the distance sensor
+	BackDistance uint16 `json:"backDistance"`
+
+	// DownDistance The down distance of the distance sensor
+	DownDistance uint16 `json:"downDistance"`
+
+	// UpdatedAt The updated at time of the distance sensor
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// DriveMotorState defines model for DriveMotorState.
+type DriveMotorState struct {
+	// Direction The direction of the drive motor
+	Direction string `json:"direction"`
+
+	// Speed The speed of the drive motor (0-100)
+	Speed uint8 `json:"speed"`
+
+	// IsRunning Whether the drive motor is running
+	IsRunning bool `json:"isRunning"`
+
+	// Enabled Whether the drive motor is enabled
+	Enabled bool `json:"enabled"`
+
+	// UpdatedAt The updated at time of the drive motor
+	UpdatedAt time.Time `json:"updatedAt"`
+}
 
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
@@ -57,6 +142,33 @@ type HealthResponse struct {
 	Status string `json:"status"`
 }
 
+// LiftMotorState defines model for LiftMotorState.
+type LiftMotorState struct {
+	// CurrentPosition The current position of the lift motor
+	CurrentPosition uint16 `json:"currentPosition"`
+
+	// TargetPosition The target position of the lift motor
+	TargetPosition uint16 `json:"targetPosition"`
+
+	// IsRunning Whether the lift motor is running
+	IsRunning bool `json:"isRunning"`
+
+	// Enabled Whether the lift motor is enabled
+	Enabled bool `json:"enabled"`
+
+	// UpdatedAt The updated at time of the lift motor
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// LocationState defines model for LocationState.
+type LocationState struct {
+	// CurrentLocation The current location of the robot
+	CurrentLocation string `json:"currentLocation"`
+
+	// UpdatedAt The updated at time of the location
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
 // LogConfig defines model for LogConfig.
 type LogConfig struct {
 	// Level The log level for the gRPC server
@@ -72,6 +184,17 @@ type LogConfig struct {
 // PicConfig defines model for PicConfig.
 type PicConfig struct {
 	Serial SerialConfig `json:"serial"`
+}
+
+// RobotStateResponse defines model for RobotStateResponse.
+type RobotStateResponse struct {
+	Battery        BatteryState        `json:"battery"`
+	Charge         ChargeState         `json:"charge"`
+	Discharge      DischargeState      `json:"discharge"`
+	DistanceSensor DistanceSensorState `json:"distanceSensor"`
+	DriveMotor     DriveMotorState     `json:"driveMotor"`
+	LiftMotor      LiftMotorState      `json:"liftMotor"`
+	Location       LocationState       `json:"location"`
 }
 
 // SerialConfig defines model for SerialConfig.
@@ -119,6 +242,9 @@ type ServerInterface interface {
 	// Get health status
 	// (GET /health)
 	GetHealth(w http.ResponseWriter, r *http.Request)
+	// Get robot state
+	// (GET /robot-state)
+	GetRobotState(w http.ResponseWriter, r *http.Request)
 	// Get system configuration
 	// (GET /system/config)
 	GetSystemConfig(w http.ResponseWriter, r *http.Request)
@@ -137,6 +263,12 @@ type Unimplemented struct{}
 // Get health status
 // (GET /health)
 func (_ Unimplemented) GetHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get robot state
+// (GET /robot-state)
+func (_ Unimplemented) GetRobotState(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -172,6 +304,20 @@ func (siw *ServerInterfaceWrapper) GetHealth(w http.ResponseWriter, r *http.Requ
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetHealth(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetRobotState operation middleware
+func (siw *ServerInterfaceWrapper) GetRobotState(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRobotState(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -340,6 +486,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Get(options.BaseURL+"/health", wrapper.GetHealth)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/robot-state", wrapper.GetRobotState)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/system/config", wrapper.GetSystemConfig)
 	})
 	r.Group(func(r chi.Router) {
@@ -371,6 +520,31 @@ func (response GetHealth200JSONResponse) VisitGetHealthResponse(w http.ResponseW
 type GetHealth400JSONResponse ErrorResponse
 
 func (response GetHealth400JSONResponse) VisitGetHealthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetRobotStateRequestObject struct {
+}
+
+type GetRobotStateResponseObject interface {
+	VisitGetRobotStateResponse(w http.ResponseWriter) error
+}
+
+type GetRobotState200JSONResponse RobotStateResponse
+
+func (response GetRobotState200JSONResponse) VisitGetRobotStateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetRobotState400JSONResponse ErrorResponse
+
+func (response GetRobotState400JSONResponse) VisitGetRobotStateResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(400)
 
@@ -457,6 +631,9 @@ type StrictServerInterface interface {
 	// Get health status
 	// (GET /health)
 	GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error)
+	// Get robot state
+	// (GET /robot-state)
+	GetRobotState(ctx context.Context, request GetRobotStateRequestObject) (GetRobotStateResponseObject, error)
 	// Get system configuration
 	// (GET /system/config)
 	GetSystemConfig(ctx context.Context, request GetSystemConfigRequestObject) (GetSystemConfigResponseObject, error)
@@ -514,6 +691,30 @@ func (sh *strictHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetHealthResponseObject); ok {
 		if err := validResponse.VisitGetHealthResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetRobotState operation middleware
+func (sh *strictHandler) GetRobotState(w http.ResponseWriter, r *http.Request) {
+	var request GetRobotStateRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetRobotState(ctx, request.(GetRobotStateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetRobotState")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetRobotStateResponseObject); ok {
+		if err := validResponse.VisitGetRobotStateResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
@@ -603,26 +804,39 @@ func (sh *strictHandler) RestartApplication(w http.ResponseWriter, r *http.Reque
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xXX2/bNhD/KgS3R9VS2rTY/NYEaxdsywInwR6GPNDiWWYn8VTy5MYI/N0HkrItRf8c",
-	"oAU2bG82ebz73e/+6omnWJSoQZPl8ydu0zUUwv/8yRg0C7AlagvuoDRYgiEF/jpF6U8l2NSokhRqPudp",
-	"ZQkLZsR2icTAqWBeMuLwKIoyBz7niqCYXSN9wEpLHnHalu7YklE64xF/fIVGguHzs13EJZBQuTfp3vkf",
-	"3xtY8Tn/Lj6Cj2vk8QcFufTY+e6gWhgjtk3Nb3YRL8BakZ3oxF646ccVQcE0EltNOfJ6t4u4gc+VMiD5",
-	"/E9ec7LX+nB4i8tPkJKD3nCkQ/7K3XWB+2OmRdHGWR+M0jxIxrD716IApiw7+PUSAoIH4wx8XNxcXqJe",
-	"qazLQImGumDv1sDcDdNVsQTDVmgYrYFli5tLZsFswDRdeJskb88OhpUmyLxAg5lnsL3ZPqw/393dDGEF",
-	"LZY53H4RmVPfAf3HGmgNhhGyIOkh1+Ls/qqJmEwFB+tLxByEHgXctt2LHERO6+FCtySosv1cr/1bVos0",
-	"kwP/Gs+4ZzBrDX34fsVsiFgh5S1WJoVRUoWUnlHrRd2J+5dj1gS8ErkdZdZ1jBWaQgykXY4ZC/dDWaer",
-	"wrn6yaJTTPDoM+lI2f6iQ1qGr0YKK+I5bCAfRuWvJ0BJWFZOr9Ir5BH/IoyD4mu/DXIv+DKUnXgHyAdG",
-	"o0Yo+3LgRqVDOWDBKJFPTYVbL1Xr6CRfUNFnuPWuY3spKrkQBP3cu1tmBMGB+2CIpag1pF6yQe2P75Jk",
-	"rBe5SEtB4kLRQDW6W7ZUZE8z+MOYNZfupTCKtgNd1t+NG6pzS6P2g2MD7hSlbGdUff2yhHrr4E2MADee",
-	"TiKCxxI2MdH2/vYimRqUBoS8UwVgNWDcCTAKEqfZPzt2Fi6xWuYNPsIge8bHKkdB786b0N7tIm4Jy+Hs",
-	"cLcvyI6vAeq8d3xGx7ppZHQD/iHz2mz31ufWEhShPhfwuQJL3TLNTJlONYjGrrGL+JqonHrRmPiuB2M2",
-	"9eA4yFzyqklIx6bX6Z5+dnm3aqxB4TRDQ0P+P0yRe+nHXm/VLMJHwPsbt4blKoWaPr9Tz/lvV3c84pXJ",
-	"+dxbsfM4xhJ02DVmaLK4fmRjJ+s+SRT5ptPSvAFjg9FkdjZLnJxTI0rF5/zNLJklvipo7aMVh73LBw56",
-	"2tBHIF/grfVsxr1OI5zQlQxiYfnzhRZSw+t/nSThE08TaK9flGWuUv809nvK4VtxMgfa66Wnu43291+c",
-	"u+df0Wb707XH5IWQbN8u3K2tikKYbU3d862WRGZdTtWsP7gXsfV1FaeH1WA0EkGaBekqxKAvHs1q/ZZR",
-	"6e0K/4bYDBC5D1G45g+uffQN6PtSuoXs5JAE+U5UPLoLlNtvFJC996Gr/Z8DxxyoA3hqGjQq1YAlETbG",
-	"Em1PbiyCgE+Ohm9MrAgMe8MspKhlTx+tH74/vumW7nnX3jWyy5rNfw6/AyT0cuse+g9Jd/5UT8FYlCre",
-	"nPHdw+7vAAAA///IfolhXRQAAA==",
+	"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",
+	"BJ8qAAA=",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
