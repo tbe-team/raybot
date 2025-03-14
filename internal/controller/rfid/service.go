@@ -23,7 +23,8 @@ func NewRFIDService(service service.Service, log *slog.Logger) (*Service, error)
 	rfidClient, err := newClient(log)
 	if err != nil {
 		s.log.Error("failed to create rfid client", slog.Any("error", err))
-		return nil, err
+		// Avoid crashing the application if RFID reader is not connected
+		// return nil, err
 	}
 
 	s.rfidClient = rfidClient
@@ -34,9 +35,22 @@ func NewRFIDService(service service.Service, log *slog.Logger) (*Service, error)
 func (s Service) Run(ctx context.Context) (CleanupFunc, error) {
 	s.log.Info("RFID service is running")
 
-	go s.readLoop(ctx)
+	// Only start the read loop if we have a client
+	if s.rfidClient != nil {
+		go s.readLoop(ctx)
+	} else {
+		s.log.Warn("RFID service running without a reader connected")
+	}
 
 	cleanup := func(_ context.Context) error {
+		s.log.Debug("RFID service is shutting down")
+
+		if s.rfidClient != nil {
+			if err := s.rfidClient.Stop(); err != nil {
+				s.log.Error("failed to stop rfid client", slog.Any("error", err))
+			}
+		}
+
 		s.log.Debug("RFID service shut down complete")
 		return nil
 	}
