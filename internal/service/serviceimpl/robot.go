@@ -102,5 +102,12 @@ func (s RobotService) UpdateRobotState(ctx context.Context, params service.Updat
 		}
 	}
 
+	if params.SetLocation {
+		state.Location = model.LocationState{
+			CurrentLocation: params.Location.CurrentLocation,
+			UpdatedAt:       now,
+		}
+	}
+
 	return state, s.robotStateRepo.UpdateRobotState(ctx, s.dbProvider.DB(), state)
 }

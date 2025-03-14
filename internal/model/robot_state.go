@@ -73,6 +73,11 @@ type DriveMotorState struct {
 	UpdatedAt time.Time
 }
 
+type LocationState struct {
+	CurrentLocation string
+	UpdatedAt       time.Time
+}
+
 type RobotState struct {
 	Battery        BatteryState
 	Charge         ChargeState
@@ -80,4 +85,5 @@ type RobotState struct {
 	DistanceSensor DistanceSensorState
 	LiftMotor      LiftMotorState
 	DriveMotor     DriveMotorState
+	Location       LocationState
 }

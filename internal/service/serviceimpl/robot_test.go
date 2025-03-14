@@ -126,7 +126,7 @@ func TestRobotService(t *testing.T) {
 				expectedError: true,
 			},
 			{
-				name: "update battery state successful",
+				name: "update battery state successfully",
 				params: service.UpdateRobotStateParams{
 					SetBattery: true,
 					Battery: service.BatteryParams{
@@ -148,7 +148,7 @@ func TestRobotService(t *testing.T) {
 				expectedError: false,
 			},
 			{
-				name: "update charge state successful",
+				name: "update charge state successfully",
 				params: service.UpdateRobotStateParams{
 					SetCharge: true,
 					Charge: service.ChargeParams{
@@ -165,7 +165,7 @@ func TestRobotService(t *testing.T) {
 				expectedError: false,
 			},
 			{
-				name: "update discharge state successful",
+				name: "update discharge state successfully",
 				params: service.UpdateRobotStateParams{
 					SetDischarge: true,
 					Discharge: service.DischargeParams{
@@ -182,7 +182,7 @@ func TestRobotService(t *testing.T) {
 				expectedError: false,
 			},
 			{
-				name: "update distance sensor state successful",
+				name: "update distance sensor state successfully",
 				params: service.UpdateRobotStateParams{
 					SetDistanceSensor: true,
 					DistanceSensor: service.DistanceSensorParams{
@@ -200,7 +200,7 @@ func TestRobotService(t *testing.T) {
 				expectedError: false,
 			},
 			{
-				name: "update lift motor state successful",
+				name: "update lift motor state successfully",
 				params: service.UpdateRobotStateParams{
 					SetLiftMotor: true,
 					LiftMotor: service.LiftMotorParams{
@@ -219,7 +219,7 @@ func TestRobotService(t *testing.T) {
 				expectedError: false,
 			},
 			{
-				name: "update drive motor state successful",
+				name: "update drive motor state successfully",
 				params: service.UpdateRobotStateParams{
 					SetDriveMotor: true,
 					DriveMotor: service.DriveMotorParams{
@@ -238,7 +238,23 @@ func TestRobotService(t *testing.T) {
 				expectedError: false,
 			},
 			{
-				name: "update multiple states successful",
+				name: "update location state successfully",
+				params: service.UpdateRobotStateParams{
+					SetLocation: true,
+					Location: service.LocationParams{
+						CurrentLocation: "ABCXYZ",
+					},
+				},
+				mock: func(robotStateRepo *mocks.FakeRobotStateRepository, dbProvider *dbmocks.FakeProvider) {
+					dbProvider.EXPECT().DB().Return(nil)
+					robotStateRepo.EXPECT().GetRobotState(ctx, mock.Anything).Return(model.RobotState{}, nil)
+					robotStateRepo.EXPECT().UpdateRobotState(ctx, mock.Anything, mock.Anything).Return(nil)
+				},
+				expectedState: model.RobotState{},
+				expectedError: false,
+			},
+			{
+				name: "update multiple states successfully",
 				params: service.UpdateRobotStateParams{
 					SetBattery: true,
 					Battery: service.BatteryParams{
@@ -295,6 +311,9 @@ func TestRobotService(t *testing.T) {
 				}
 				if tc.params.SetDriveMotor {
 					assert.WithinDuration(t, time.Now(), state.DriveMotor.UpdatedAt, 2*time.Second)
+				}
+				if tc.params.SetLocation {
+					assert.WithinDuration(t, time.Now(), state.Location.UpdatedAt, 2*time.Second)
 				}
 			})
 		}

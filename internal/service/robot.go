@@ -46,6 +46,10 @@ type DriveMotorParams struct {
 	Enabled   bool
 }
 
+type LocationParams struct {
+	CurrentLocation string
+}
+
 type UpdateRobotStateParams struct {
 	Battery           BatteryParams `validate:"omitempty,required_if=SetBattery true"`
 	SetBattery        bool
@@ -59,6 +63,8 @@ type UpdateRobotStateParams struct {
 	SetLiftMotor      bool
 	DriveMotor        DriveMotorParams `validate:"omitempty,required_if=SetDriveMotor true"`
 	SetDriveMotor     bool
+	Location          LocationParams `validate:"omitempty,required_if=SetLocation true"`
+	SetLocation       bool
 }
 
 type RobotService interface {

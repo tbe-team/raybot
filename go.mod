@@ -9,6 +9,7 @@ require (
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.1
+	github.com/karalabe/hid v1.0.0
 	github.com/lithammer/shortuuid/v4 v4.2.0
 	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/oapi-codegen/runtime v1.1.1

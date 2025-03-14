@@ -26,7 +26,7 @@ func (r RobotStateRepository) GetRobotState(ctx context.Context, db db.SQLDB) (m
 		return model.RobotState{}, fmt.Errorf("queries get robot state: %w", err)
 	}
 
-	return r.scanRobotState(row)
+	return r.unmarshalRobotState(row)
 }
 
 func (r RobotStateRepository) UpdateRobotState(ctx context.Context, db db.SQLDB, state model.RobotState) error {
@@ -60,6 +60,11 @@ func (r RobotStateRepository) UpdateRobotState(ctx context.Context, db db.SQLDB,
 		return fmt.Errorf("marshal drive motor state: %w", err)
 	}
 
+	locationState, err := json.Marshal(state.Location)
+	if err != nil {
+		return fmt.Errorf("marshal location state: %w", err)
+	}
+
 	params := sqlc.RobotStateUpdateParams{
 		BatteryState:        string(batteryState),
 		ChargeState:         string(chargeState),
@@ -67,6 +72,7 @@ func (r RobotStateRepository) UpdateRobotState(ctx context.Context, db db.SQLDB,
 		DistanceSensorState: string(distanceSensorState),
 		LiftMotorState:      string(liftMotorState),
 		DriveMotorState:     string(driveMotorState),
+		LocationState:       string(locationState),
 	}
 	err = r.queries.RobotStateUpdate(ctx, db, params)
 	if err != nil {
@@ -76,7 +82,7 @@ func (r RobotStateRepository) UpdateRobotState(ctx context.Context, db db.SQLDB,
 	return nil
 }
 
-func (r RobotStateRepository) scanRobotState(row sqlc.RobotState) (model.RobotState, error) {
+func (RobotStateRepository) unmarshalRobotState(row sqlc.RobotState) (model.RobotState, error) {
 	var state model.RobotState
 
 	err := json.Unmarshal([]byte(row.BatteryState), &state.Battery)
@@ -102,6 +108,11 @@ func (r RobotStateRepository) scanRobotState(row sqlc.RobotState) (model.RobotSt
 	err = json.Unmarshal([]byte(row.LiftMotorState), &state.LiftMotor)
 	if err != nil {
 		return model.RobotState{}, fmt.Errorf("unmarshal lift motor state: %w", err)
+	}
+
+	err = json.Unmarshal([]byte(row.DriveMotorState), &state.DriveMotor)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("unmarshal drive motor state: %w", err)
 	}
 
 	return state, nil
