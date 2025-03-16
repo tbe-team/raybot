@@ -38,6 +38,10 @@ jobs:
     name: Build for Linux arm64
     runs-on: ubuntu-latest
     steps:
+      - name: Install build dependencies
+        run: |
+          sudo apt-get -qq update
+          sudo apt-get install -y gcc-aarch64-linux-gnu
       - name: Checkout
         uses: actions/checkout@v4
       - name: Setup Go
@@ -49,6 +53,7 @@ jobs:
           CGO_ENABLED: 1
           GOOS: linux
           GOARCH: arm64
+          CC: aarch64-linux-gnu-gcc
         run: go build -o raybot cmd/raybot/main.go
       - name: Package binary
         run: |
