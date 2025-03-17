@@ -30,14 +30,14 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10
-      - name: Use Node.js 20
+          run_install: false
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          cache-dependency-path: ui/pnpm-lock.yaml
-          node-version: 20
           cache: 'pnpm'
+          cache-dependency-path: ui/pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - name: Build UI
         run: pnpm run build
       - name: Check for diff
@@ -59,13 +59,13 @@ jobs:
         uses: pnpm/action-setup@v4
         with:
           version: 10
-      - name: Use Node.js 20
+          run_install: false
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          cache-dependency-path: ui/pnpm-lock.yaml
-          node-version: 20
           cache: 'pnpm'
+          cache-dependency-path: ui/pnpm-lock.yaml
       - name: Install dependencies
-        run: pnpm install
+        run: pnpm install --frozen-lockfile
       - name: Lint
         run: pnpm run lint
