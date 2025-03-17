@@ -5,7 +5,7 @@
 gen-openapi:
 	set -eux
 
-	npx --yes @redocly/cli bundle ./api/openapi/openapi.yml --output api/openapi/gen/openapi.yml --ext yml
+	pnpm --package=@redocly/cli dlx redocly bundle ./api/openapi/openapi.yml --output api/openapi/gen/openapi.yml --ext yml
 	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1 \
 		-config internal/controller/http/oas/gen/oapi-codegen.yml \
 		api/openapi/gen/openapi.yml
