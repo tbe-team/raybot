@@ -5,6 +5,7 @@ import (
 	"os"
 	"sync"
 
+	"github.com/tbe-team/raybot/cmd/raybot/cloud"
 	"github.com/tbe-team/raybot/cmd/raybot/grpc"
 	"github.com/tbe-team/raybot/cmd/raybot/http"
 	"github.com/tbe-team/raybot/cmd/raybot/pic"
@@ -49,6 +50,13 @@ func main() {
 	}()
 
 	wg.Wait()
+
+	go func() {
+		if err := cloud.Start(app); err != nil {
+			log.Printf("failed to start cloud service: %v\n", err)
+			os.Exit(1)
+		}
+	}()
 
 	go func() {
 		if err := grpc.Start(app); err != nil {

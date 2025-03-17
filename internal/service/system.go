@@ -19,7 +19,16 @@ type PICConfig struct {
 }
 
 type GRPCConfig struct {
-	Port int
+	Server GRPCServerConfig
+	Cloud  CloudConfig
+}
+
+type GRPCServerConfig struct {
+	Enable bool
+}
+
+type CloudConfig struct {
+	Address string
 }
 
 type HTTPConfig struct {

@@ -8,7 +8,12 @@ import (
 func ToSystemConfigResponse(cfg service.GetSystemConfigOutput) gen.SystemConfigResponse {
 	return gen.SystemConfigResponse{
 		Grpc: gen.GRPCConfig{
-			Port: cfg.GRPCConfig.Port,
+			Server: gen.GRPCServerConfig{
+				Enable: cfg.GRPCConfig.Server.Enable,
+			},
+			Cloud: gen.CloudConfig{
+				Address: cfg.GRPCConfig.Cloud.Address,
+			},
 		},
 		Http: gen.HTTPConfig{
 			EnableSwagger: cfg.HTTPConfig.EnableSwagger,

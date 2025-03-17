@@ -40,7 +40,8 @@ func (s SystemService) UpdateSystemConfig(ctx context.Context, params service.Up
 	cfg.Log.Format = params.LogConfig.Format
 	cfg.Log.AddSource = params.LogConfig.AddSource
 
-	cfg.GRPC.Port = params.GRPCConfig.Port
+	cfg.GRPC.Server.Enable = params.GRPCConfig.Server.Enable
+	cfg.GRPC.Cloud.Address = params.GRPCConfig.Cloud.Address
 
 	cfg.HTTP.EnableSwagger = params.HTTPConfig.EnableSwagger
 
@@ -93,7 +94,12 @@ func configToUpdateSystemConfigOutput(cfg config.Config) service.UpdateSystemCon
 			AddSource: cfg.Log.AddSource,
 		},
 		GRPCConfig: service.GRPCConfig{
-			Port: cfg.GRPC.Port,
+			Server: service.GRPCServerConfig{
+				Enable: cfg.GRPC.Server.Enable,
+			},
+			Cloud: service.CloudConfig{
+				Address: cfg.GRPC.Cloud.Address,
+			},
 		},
 		HTTPConfig: service.HTTPConfig{
 			EnableSwagger: cfg.HTTP.EnableSwagger,

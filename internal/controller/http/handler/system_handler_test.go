@@ -38,7 +38,12 @@ func TestSystemHandler(t *testing.T) {
 								AddSource: true,
 							},
 							GRPCConfig: service.GRPCConfig{
-								Port: 50051,
+								Server: service.GRPCServerConfig{
+									Enable: true,
+								},
+								Cloud: service.CloudConfig{
+									Address: "localhost:50051",
+								},
 							},
 							HTTPConfig: service.HTTPConfig{
 								EnableSwagger: true,
@@ -63,7 +68,12 @@ func TestSystemHandler(t *testing.T) {
 						AddSource: true,
 					},
 					Grpc: gen.GRPCConfig{
-						Port: 50051,
+						Server: gen.GRPCServerConfig{
+							Enable: true,
+						},
+						Cloud: gen.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 					Http: gen.HTTPConfig{
 						EnableSwagger: true,
@@ -154,7 +164,12 @@ func TestSystemHandler(t *testing.T) {
 						AddSource: true,
 					},
 					Grpc: gen.GRPCConfig{
-						Port: 50051,
+						Server: gen.GRPCServerConfig{
+							Enable: true,
+						},
+						Cloud: gen.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 					Http: gen.HTTPConfig{
 						EnableSwagger: true,
@@ -177,7 +192,8 @@ func TestSystemHandler(t *testing.T) {
 							return params.LogConfig.Level == "debug" &&
 								params.LogConfig.Format == "json" &&
 								params.LogConfig.AddSource == true &&
-								params.GRPCConfig.Port == 50051 &&
+								params.GRPCConfig.Server.Enable == true &&
+								params.GRPCConfig.Cloud.Address == "localhost:50051" &&
 								params.HTTPConfig.EnableSwagger == true &&
 								params.PICConfig.Serial.Port == "/dev/ttyUSB0" &&
 								params.PICConfig.Serial.BaudRate == 115200 &&
@@ -194,7 +210,12 @@ func TestSystemHandler(t *testing.T) {
 								AddSource: true,
 							},
 							GRPCConfig: service.GRPCConfig{
-								Port: 50051,
+								Server: service.GRPCServerConfig{
+									Enable: true,
+								},
+								Cloud: service.CloudConfig{
+									Address: "localhost:50051",
+								},
 							},
 							HTTPConfig: service.HTTPConfig{
 								EnableSwagger: true,
@@ -219,7 +240,12 @@ func TestSystemHandler(t *testing.T) {
 						AddSource: true,
 					},
 					Grpc: gen.GRPCConfig{
-						Port: 50051,
+						Server: gen.GRPCServerConfig{
+							Enable: true,
+						},
+						Cloud: gen.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 					Http: gen.HTTPConfig{
 						EnableSwagger: true,
@@ -245,7 +271,12 @@ func TestSystemHandler(t *testing.T) {
 						AddSource: true,
 					},
 					Grpc: gen.GRPCConfig{
-						Port: 50051,
+						Server: gen.GRPCServerConfig{
+							Enable: true,
+						},
+						Cloud: gen.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 					Http: gen.HTTPConfig{
 						EnableSwagger: true,

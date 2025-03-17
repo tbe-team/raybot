@@ -8,7 +8,7 @@ import (
 )
 
 func Start(app *application.Application) error {
-	grpcService, err := grpc.NewGRPCService(app.CfgManager.GetConfig().GRPC, app.Service, app.Log)
+	grpcService, err := grpc.NewGRPCService(app.CfgManager.GetConfig().GRPC.Server, app.Service, app.Log)
 	if err != nil {
 		return fmt.Errorf("failed to create GRPC service: %w", err)
 	}

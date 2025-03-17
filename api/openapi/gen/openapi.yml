@@ -154,13 +154,26 @@ components:
           x-order: 1
       required:
         - enable
+    CloudConfig:
+      type: object
+      properties:
+        address:
+          type: string
+          example: localhost:50051
+          description: The address for the cloud service
+          x-order: 1
+      required:
+        - address
     GRPCConfig:
       type: object
       properties:
         server:
           $ref: '#/components/schemas/GRPCServerConfig'
+        cloud:
+          $ref: '#/components/schemas/CloudConfig'
       required:
         - server
+        - cloud
     HTTPConfig:
       type: object
       properties:

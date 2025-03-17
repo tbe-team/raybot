@@ -18,14 +18,13 @@ import (
 	"github.com/tbe-team/raybot/internal/service"
 )
 
+const GRPCPort = 60000
+
 type Config struct {
-	Port int `yaml:"port"`
+	Enable bool `yaml:"enable"`
 }
 
 func (c *Config) Validate() error {
-	if c.Port <= 0 || c.Port > 65535 {
-		return fmt.Errorf("invalid port: %d", c.Port)
-	}
 	return nil
 }
 
@@ -74,13 +73,13 @@ func (s GRPCService) Run() (CleanupFunc, error) {
 
 	s.registerHandlers(server)
 
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", s.cfg.Port))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", GRPCPort))
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to listen on port %d: %w", GRPCPort, err)
 	}
 
 	go func() {
-		s.log.Info(fmt.Sprintf("GRPC server is listening on port %d", s.cfg.Port))
+		s.log.Info(fmt.Sprintf("GRPC server is listening on port %d", GRPCPort))
 		if err := server.Serve(lis); err != nil {
 			s.log.Error("failed to serve GRPC", "error", err)
 		}

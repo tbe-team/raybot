@@ -10,7 +10,6 @@ import (
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/config/mocks"
-	"github.com/tbe-team/raybot/internal/controller/grpc"
 	"github.com/tbe-team/raybot/internal/controller/http"
 	"github.com/tbe-team/raybot/internal/controller/picserial"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
@@ -39,8 +38,10 @@ func TestSystemService(t *testing.T) {
 							Format:    "json",
 							AddSource: true,
 						},
-						GRPC: grpc.Config{
-							Port: 50051,
+						GRPC: config.GRPCConfig{
+							Server: config.GRPCServerConfig{
+								Enable: true,
+							},
 						},
 						HTTP: http.Config{
 							EnableSwagger: true,
@@ -64,7 +65,9 @@ func TestSystemService(t *testing.T) {
 						AddSource: true,
 					},
 					GRPCConfig: service.GRPCConfig{
-						Port: 50051,
+						Server: service.GRPCServerConfig{
+							Enable: true,
+						},
 					},
 					HTTPConfig: service.HTTPConfig{
 						EnableSwagger: true,
@@ -121,7 +124,12 @@ func TestSystemService(t *testing.T) {
 						AddSource: true,
 					},
 					GRPCConfig: service.GRPCConfig{
-						Port: 50051,
+						Server: service.GRPCServerConfig{
+							Enable: true,
+						},
+						Cloud: service.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 					HTTPConfig: service.HTTPConfig{
 						EnableSwagger: true,
@@ -144,8 +152,10 @@ func TestSystemService(t *testing.T) {
 							Format:    "json",
 							AddSource: false,
 						},
-						GRPC: grpc.Config{
-							Port: 50051,
+						GRPC: config.GRPCConfig{
+							Server: config.GRPCServerConfig{
+								Enable: true,
+							},
 						},
 						HTTP: http.Config{
 							EnableSwagger: false,
@@ -168,7 +178,7 @@ func TestSystemService(t *testing.T) {
 						assert.Equal(t, "debug", cfg.Log.Level)
 						assert.Equal(t, "json", cfg.Log.Format)
 						assert.True(t, cfg.Log.AddSource)
-						assert.Equal(t, 50051, cfg.GRPC.Port)
+						assert.True(t, cfg.GRPC.Server.Enable)
 						assert.True(t, cfg.HTTP.EnableSwagger)
 						assert.Equal(t, "/dev/ttyUSB0", cfg.PIC.Serial.Port)
 						assert.Equal(t, 115200, cfg.PIC.Serial.BaudRate)
@@ -185,7 +195,12 @@ func TestSystemService(t *testing.T) {
 						AddSource: true,
 					},
 					GRPCConfig: service.GRPCConfig{
-						Port: 50051,
+						Server: service.GRPCServerConfig{
+							Enable: true,
+						},
+						Cloud: service.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 					HTTPConfig: service.HTTPConfig{
 						EnableSwagger: true,
@@ -210,6 +225,11 @@ func TestSystemService(t *testing.T) {
 						Level:     "invalid",
 						Format:    "json",
 						AddSource: true,
+					},
+					GRPCConfig: service.GRPCConfig{
+						Cloud: service.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 				},
 				mock: func(cfgManager *mocks.FakeManager) {

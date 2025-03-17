@@ -41,7 +41,12 @@ func (h systemHandler) UpdateSystemConfig(ctx context.Context, request gen.Updat
 			},
 		},
 		GRPCConfig: service.GRPCConfig{
-			Port: request.Body.Grpc.Port,
+			Server: service.GRPCServerConfig{
+				Enable: request.Body.Grpc.Server.Enable,
+			},
+			Cloud: service.CloudConfig{
+				Address: request.Body.Grpc.Cloud.Address,
+			},
 		},
 		HTTPConfig: service.HTTPConfig{
 			EnableSwagger: request.Body.Http.EnableSwagger,

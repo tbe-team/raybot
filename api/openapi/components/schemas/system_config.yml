@@ -37,8 +37,11 @@ GRPCConfig:
   properties:
     server:
       $ref: "#/GRPCServerConfig"
+    cloud:
+      $ref: "#/CloudConfig"
   required:
     - server
+    - cloud
 
 GRPCServerConfig:
   type: object
@@ -50,6 +53,17 @@ GRPCServerConfig:
       x-order: 1
   required:
     - enable
+
+CloudConfig:
+  type: object
+  properties:
+    address:
+      type: string
+      example: "localhost:50051"
+      description: The address for the cloud service
+      x-order: 1
+  required:
+    - address
 
 HTTPConfig:
   type: object
