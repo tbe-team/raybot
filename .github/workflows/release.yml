@@ -12,12 +12,46 @@ env:
   GO_VERSION: "1.24.x"
 
 jobs:
+  build-ui:
+    name: Build UI
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ui
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          cache: 'pnpm'
+          cache-dependency-path: ui/pnpm-lock.yaml
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      - name: Build UI
+        run: pnpm run build
+      - name: Upload UI build
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-dist
+          path: ui/dist
+
   build-linux-amd64:
     name: Build for Linux amd64
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Download UI build
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist
+          path: ui/dist
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -47,6 +81,11 @@ jobs:
           sudo apt-get install -y gcc-aarch64-linux-gnu
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Download UI build
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist
+          path: ui/dist
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
@@ -77,6 +116,11 @@ jobs:
           sudo apt-get install -y mingw-w64
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Download UI build
+        uses: actions/download-artifact@v4
+        with:
+          name: ui-dist
+          path: ui/dist
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
