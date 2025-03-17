@@ -18,6 +18,7 @@ permissions:
 
 jobs:
   build:
+    if: github.actor != 'renovate[bot]' # Ignore renovate bot
     name: Build UI
     runs-on: ubuntu-latest
     defaults:
