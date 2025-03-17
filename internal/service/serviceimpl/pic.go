@@ -179,40 +179,47 @@ func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.
 }
 
 func buildCommandData(data model.PICSerialCommandData) (any, error) {
+	boolToUint8 := func(b bool) uint8 {
+		if b {
+			return 1
+		}
+		return 0
+	}
+
 	switch data := data.(type) {
 	case model.PICSerialCommandBatteryChargeData:
 		return struct {
 			CurrentLimit uint16 `json:"current_limit"`
-			Enable       bool   `json:"enable"`
+			Enable       uint8  `json:"enable"`
 		}{
 			CurrentLimit: data.CurrentLimit,
-			Enable:       data.Enable,
+			Enable:       boolToUint8(data.Enable),
 		}, nil
 	case model.PICSerialCommandBatteryDischargeData:
 		return struct {
 			CurrentLimit uint16 `json:"current_limit"`
-			Enable       bool   `json:"enable"`
+			Enable       uint8  `json:"enable"`
 		}{
 			CurrentLimit: data.CurrentLimit,
-			Enable:       data.Enable,
+			Enable:       boolToUint8(data.Enable),
 		}, nil
 	case model.PICSerialCommandBatteryLiftMotorData:
 		return struct {
 			TargetPosition uint16 `json:"target_position"`
-			Enable         bool   `json:"enable"`
+			Enable         uint8  `json:"enable"`
 		}{
 			TargetPosition: data.TargetPosition,
-			Enable:         data.Enable,
+			Enable:         boolToUint8(data.Enable),
 		}, nil
 	case model.PICSerialCommandBatteryDriveMotorData:
 		return struct {
 			Direction uint8 `json:"direction"`
 			Speed     uint8 `json:"speed"`
-			Enable    bool  `json:"enable"`
+			Enable    uint8 `json:"enable"`
 		}{
 			Direction: uint8(data.Direction),
 			Speed:     data.Speed,
-			Enable:    data.Enable,
+			Enable:    boolToUint8(data.Enable),
 		}, nil
 	default:
 		return nil, fmt.Errorf("unknown command data type: %T", data)
