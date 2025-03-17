@@ -131,9 +131,9 @@ func (h SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
 
 	case SyncStateTypeDistanceSensor:
 		var temp struct {
-			FrontDistance uint16 `json:"front_distance"`
-			BackDistance  uint16 `json:"back_distance"`
-			DownDistance  uint16 `json:"down_distance"`
+			FrontDistance uint16 `json:"front"`
+			BackDistance  uint16 `json:"back"`
+			DownDistance  uint16 `json:"down"`
 		}
 		if err := json.Unmarshal(msg.Data, &temp); err != nil {
 			h.log.Error("failed to unmarshal distance sensor data", slog.Any("error", err), slog.Any("data", msg.Data))

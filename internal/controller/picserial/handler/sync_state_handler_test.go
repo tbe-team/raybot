@@ -148,7 +148,7 @@ func TestSyncStateHandler_Handle(t *testing.T) {
 			name: "process distance sensor state",
 			msg: handler.SyncStateMessage{
 				StateType: handler.SyncStateTypeDistanceSensor,
-				Data:      []byte(`{"front_distance": 100, "back_distance": 200, "down_distance": 50}`),
+				Data:      []byte(`{"front": 100, "back": 200, "down": 50}`),
 			},
 			mockSetup: func(robotService *mocks.FakeRobotService) {
 				robotService.EXPECT().UpdateRobotState(ctx, mock.MatchedBy(func(params service.UpdateRobotStateParams) bool {
