@@ -3,7 +3,7 @@ FROM node:20 AS ui-builder
 WORKDIR /app/ui
 
 COPY ui/package.json ui/pnpm-lock.yaml ./
-RUN corepack enable && pnpm install --prod --frozen-lockfile
+RUN corepack enable && pnpm install --frozen-lockfile
 
 COPY ui ./
 RUN pnpm run build

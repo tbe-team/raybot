@@ -3,13 +3,14 @@ name: Release
 on:
   push:
     tags:
-    - 'v*'
+    - 'v*.*.*'
 
 permissions:
   contents: write
 
 env:
   GO_VERSION: "1.24.x"
+  VERSION: ${{ github.ref_name }}
 
 jobs:
   build-ui:
@@ -66,12 +67,12 @@ jobs:
         run: go build -o raybot cmd/raybot/main.go
       - name: Package binary
         run: |
-          tar -czf raybot-linux-amd64.tar.gz raybot
+          tar -czf raybot-linux-amd64-${{ env.VERSION }}.tar.gz raybot
       - name: Archive artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-linux-amd64
-          path: raybot-linux-amd64.tar.gz
+          path: raybot-linux-amd64-${{ env.VERSION }}.tar.gz
 
   build-linux-arm64:
     name: Build for Linux arm64
@@ -103,12 +104,12 @@ jobs:
         run: go build -o raybot cmd/raybot/main.go
       - name: Package binary
         run: |
-          tar -czf raybot-linux-arm64.tar.gz raybot
+          tar -czf raybot-linux-arm64-${{ env.VERSION }}.tar.gz raybot
       - name: Archive artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-linux-arm64
-          path: raybot-linux-arm64.tar.gz
+          path: raybot-linux-arm64-${{ env.VERSION }}.tar.gz
 
   build-windows-amd64:
     name: Build for Windows amd64
@@ -140,12 +141,12 @@ jobs:
         run: go build -o raybot.exe cmd/raybot/main.go
       - name: Package binary
         run: |
-          zip raybot-windows-amd64.zip raybot.exe
+          zip raybot-windows-amd64-${{ env.VERSION }}.zip raybot.exe
       - name: Archive artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-windows-amd64
-          path: raybot-windows-amd64.zip
+          path: raybot-windows-amd64-${{ env.VERSION }}.zip
 
   release:
     name: Draft Release
@@ -157,8 +158,6 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
-      - name: Get version from tag
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
       - name: Draft Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
