@@ -144,16 +144,23 @@ components:
         - level
         - format
         - addSource
+    GRPCServerConfig:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: true
+          description: Whether to enable the gRPC server
+          x-order: 1
+      required:
+        - enable
     GRPCConfig:
       type: object
       properties:
-        port:
-          type: integer
-          example: 50051
-          description: The port number for the gRPC server
-          x-order: 1
+        server:
+          $ref: '#/components/schemas/GRPCServerConfig'
       required:
-        - port
+        - server
     HTTPConfig:
       type: object
       properties:

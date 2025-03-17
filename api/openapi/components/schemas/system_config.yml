@@ -35,13 +35,21 @@ SystemConfigRequest:
 GRPCConfig:
   type: object
   properties:
-    port:
-      type: integer
-      example: 50051
-      description: The port number for the gRPC server
+    server:
+      $ref: "#/GRPCServerConfig"
+  required:
+    - server
+
+GRPCServerConfig:
+  type: object
+  properties:
+    enable:
+      type: boolean
+      example: true
+      description: Whether to enable the gRPC server
       x-order: 1
   required:
-    - port
+    - enable
 
 HTTPConfig:
   type: object
