@@ -43,6 +43,8 @@ jobs:
 
   build-linux-amd64:
     name: Build for Linux amd64
+    needs:
+      - build-ui
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -73,6 +75,8 @@ jobs:
 
   build-linux-arm64:
     name: Build for Linux arm64
+    needs:
+      - build-ui
     runs-on: ubuntu-latest
     steps:
       - name: Install build dependencies
@@ -108,6 +112,8 @@ jobs:
 
   build-windows-amd64:
     name: Build for Windows amd64
+    needs:
+      - build-ui
     runs-on: ubuntu-latest
     steps:
       - name: Install build dependencies
