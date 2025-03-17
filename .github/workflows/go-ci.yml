@@ -28,6 +28,7 @@ on:
 
 jobs:
   code-gen:
+    name: Code Generation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -51,6 +52,7 @@ jobs:
           fi
 
   golangci:
+    name: GolangCI
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -65,6 +67,7 @@ jobs:
           version: v1.64.6
 
   test:
+    name: Test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
