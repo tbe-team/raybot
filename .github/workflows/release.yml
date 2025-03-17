@@ -67,12 +67,12 @@ jobs:
         run: go build -o raybot cmd/raybot/main.go
       - name: Package binary
         run: |
-          tar -czf raybot-linux-amd64-${{ env.VERSION }}.tar.gz raybot
+          tar -czf raybot-${{ env.VERSION }}-linux-amd64.tar.gz raybot
       - name: Archive artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-linux-amd64
-          path: raybot-linux-amd64-${{ env.VERSION }}.tar.gz
+          path: raybot-${{ env.VERSION }}-linux-amd64.tar.gz
 
   build-linux-arm64:
     name: Build for Linux arm64
@@ -104,12 +104,12 @@ jobs:
         run: go build -o raybot cmd/raybot/main.go
       - name: Package binary
         run: |
-          tar -czf raybot-linux-arm64-${{ env.VERSION }}.tar.gz raybot
+          tar -czf raybot-${{ env.VERSION }}-linux-arm64.tar.gz raybot
       - name: Archive artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-linux-arm64
-          path: raybot-linux-arm64-${{ env.VERSION }}.tar.gz
+          path: raybot-${{ env.VERSION }}-linux-arm64.tar.gz
 
   build-windows-amd64:
     name: Build for Windows amd64
@@ -141,12 +141,12 @@ jobs:
         run: go build -o raybot.exe cmd/raybot/main.go
       - name: Package binary
         run: |
-          zip raybot-windows-amd64-${{ env.VERSION }}.zip raybot.exe
+          zip raybot-${{ env.VERSION }}-windows-amd64.zip raybot.exe
       - name: Archive artifact
         uses: actions/upload-artifact@v4
         with:
           name: dist-windows-amd64
-          path: raybot-windows-amd64-${{ env.VERSION }}.zip
+          path: raybot-${{ env.VERSION }}-windows-amd64.zip
 
   release:
     name: Draft Release
