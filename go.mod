@@ -16,7 +16,7 @@ require (
 	github.com/oapi-codegen/runtime v1.1.1
 	github.com/pressly/goose/v3 v3.24.1
 	github.com/stretchr/testify v1.10.0
-	go.bug.st/serial v1.6.2
+	go.bug.st/serial v1.6.3
 	google.golang.org/grpc v1.71.0
 	gopkg.in/yaml.v3 v3.0.1
 )
