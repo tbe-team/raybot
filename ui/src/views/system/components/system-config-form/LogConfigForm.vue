@@ -30,7 +30,7 @@ const logFormatOption = [
       <div class="space-y-2">
         <FormField v-slot="{ componentField }" name="log.level">
           <FormItem>
-            <FormLabel>Level</FormLabel>
+            <FormLabel class="font-normal">Level</FormLabel>
             <Select
               v-bind="componentField"
             >
@@ -54,7 +54,7 @@ const logFormatOption = [
       <div class="space-y-2">
         <FormField v-slot="{ componentField }" name="log.format">
           <FormItem>
-            <FormLabel>Log Format</FormLabel>
+            <FormLabel class="font-normal">Log Format</FormLabel>
             <Select
               v-bind="componentField"
             >
@@ -79,7 +79,7 @@ const logFormatOption = [
         <FormField v-slot="{ value, handleChange }" name="log.addSource">
           <FormItem>
             <div class="flex items-center space-x-2">
-              <FormLabel>Add Source</FormLabel>
+              <FormLabel class="font-normal">Add Source</FormLabel>
               <FormControl>
                 <Switch
                   class="!mt-0"

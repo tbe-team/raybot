@@ -16,13 +16,15 @@ import { Switch } from '@/components/ui/switch'
       <CardTitle>GRPC Configuration</CardTitle>
     </CardHeader>
     <CardContent class="space-y-4">
-      <section class="space-y-3">
-        <span class="font-medium">Server</span>
-        <div class="pl-4 space-y-2">
+      <section class="space-y-3 ">
+        <span class="font-semibold">Server</span>
+        <div class="space-y-2">
           <FormField v-slot="{ value, handleChange }" name="grpc.server.enable">
             <FormItem>
               <div class="flex items-center space-x-2">
-                <FormLabel>Enable</FormLabel>
+                <FormLabel class="font-normal">
+                  Enable
+                </FormLabel>
                 <FormControl>
                   <Switch
                     class="!mt-0"
@@ -37,11 +39,13 @@ import { Switch } from '@/components/ui/switch'
         </div>
       </section>
       <section class="space-y-3">
-        <span class="font-medium">Cloud</span>
-        <div class="pl-4 space-y-2">
+        <span class="font-semibold">Cloud</span>
+        <div class="space-y-2">
           <FormField v-slot="{ componentField }" name="grpc.cloud.address">
             <FormItem>
-              <FormLabel>Address</FormLabel>
+              <FormLabel class="font-normal">
+                Address
+              </FormLabel>
               <FormControl>
                 <Input
                   v-bind="componentField"

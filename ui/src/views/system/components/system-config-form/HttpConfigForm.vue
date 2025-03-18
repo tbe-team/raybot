@@ -19,7 +19,7 @@ import { Switch } from '@/components/ui/switch'
         <FormField v-slot="{ value, handleChange }" name="http.enableSwagger">
           <FormItem>
             <div class="flex items-center space-x-2">
-              <FormLabel>Enable Swagger</FormLabel>
+              <FormLabel class="font-normal">Enable Swagger</FormLabel>
               <FormControl>
                 <Switch
                   class="!mt-0"

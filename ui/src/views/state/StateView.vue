@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useQueryRobotState } from '@/composables/use-robot-state'
 import { formatDate } from '@/lib/date'
 import { AlertCircle, Loader } from 'lucide-vue-next'
 
-const REFRESH_INTERVAL = 1000
+const REFRESH_INTERVAL = ref(5000)
 
 const { data: robotState, isPending, isError, error } = useQueryRobotState({
   axiosOpts: { doNotShowLoading: true },
-  refetchInterval: REFRESH_INTERVAL,
+  refetchInterval: REFRESH_INTERVAL.value,
 })
 
 function getBatteryColor(percent: number): string {
@@ -67,13 +68,31 @@ function getTemperatureColor(temp: number): string {
       </Card>
     </div>
     <div v-else class="flex flex-col w-full">
-      <div class="mb-6">
-        <h1 class="text-xl font-semibold">
-          Robot state
-        </h1>
-        <p class="text-sm text-muted-foreground">
-          The current state of the robot is updated once per second.
-        </p>
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-xl font-semibold">
+            Robot state
+          </h1>
+          <p class="text-sm text-muted-foreground">
+            The current state of the robot is continuously updated.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="whitespace-nowrap">Refresh rate: </span>
+          <Select v-model="REFRESH_INTERVAL">
+            <SelectTrigger>
+              <SelectValue class="w-5" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem v-for="interval in [1000, 3000, 5000, 10000]" :key="interval" :value="interval">
+                  <SelectValue>{{ interval / 1000 }}</SelectValue>
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <span>seconds</span>
+        </div>
       </div>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <Card class="col-span-1 sm:col-span-2">

@@ -37,7 +37,7 @@ const stopBitsOption = [
       <div class="space-y-2">
         <FormField v-slot="{ componentField }" name="pic.serial.port">
           <FormItem>
-            <FormLabel>Port</FormLabel>
+            <FormLabel class="font-normal">Port</FormLabel>
             <FormControl>
               <Input
                 v-bind="componentField"
@@ -50,7 +50,7 @@ const stopBitsOption = [
       <div class="space-y-2">
         <FormField v-slot="{ componentField }" name="pic.serial.baudRate">
           <FormItem>
-            <FormLabel>Baud Rate</FormLabel>
+            <FormLabel class="font-normal">Baud Rate</FormLabel>
             <FormControl>
               <Input
                 v-bind="componentField"
@@ -64,7 +64,7 @@ const stopBitsOption = [
       <div class="space-y-2">
         <FormField v-slot="{ componentField }" name="pic.serial.dataBits">
           <FormItem>
-            <FormLabel>Data Bits</FormLabel>
+            <FormLabel class="font-normal">Data Bits</FormLabel>
             <Select
               v-bind="componentField"
             >
@@ -88,7 +88,7 @@ const stopBitsOption = [
       <div class="space-y-2">
         <FormField v-slot="{ componentField }" name="pic.serial.stopBits">
           <FormItem>
-            <FormLabel>Stop Bits</FormLabel>
+            <FormLabel class="font-normal">Stop Bits</FormLabel>
             <Select
               v-bind="componentField"
             >
@@ -112,7 +112,7 @@ const stopBitsOption = [
       <div class="space-y-2">
         <FormField v-slot="{ componentField }" name="pic.serial.parity">
           <FormItem>
-            <FormLabel>Parity</FormLabel>
+            <FormLabel class="font-normal">Parity</FormLabel>
             <Select
               v-bind="componentField"
             >
@@ -136,7 +136,7 @@ const stopBitsOption = [
       <div class="space-y-2">
         <FormField v-slot="{ componentField }" name="pic.serial.readTimeout">
           <FormItem>
-            <FormLabel>Read Timeout</FormLabel>
+            <FormLabel class="font-normal">Read Timeout</FormLabel>
             <FormControl>
               <Input
                 v-bind="componentField"
