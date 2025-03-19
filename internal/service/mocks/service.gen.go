@@ -67,49 +67,49 @@ func (_c *FakeService_PICService_Call) RunAndReturn(run func() service.PICServic
 	return _c
 }
 
-// RobotService provides a mock function with no fields
-func (_m *FakeService) RobotService() service.RobotService {
+// RobotStateService provides a mock function with no fields
+func (_m *FakeService) RobotStateService() service.RobotStateService {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for RobotService")
+		panic("no return value specified for RobotStateService")
 	}
 
-	var r0 service.RobotService
-	if rf, ok := ret.Get(0).(func() service.RobotService); ok {
+	var r0 service.RobotStateService
+	if rf, ok := ret.Get(0).(func() service.RobotStateService); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.RobotService)
+			r0 = ret.Get(0).(service.RobotStateService)
 		}
 	}
 
 	return r0
 }
 
-// FakeService_RobotService_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RobotService'
-type FakeService_RobotService_Call struct {
+// FakeService_RobotStateService_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RobotStateService'
+type FakeService_RobotStateService_Call struct {
 	*mock.Call
 }
 
-// RobotService is a helper method to define mock.On call
-func (_e *FakeService_Expecter) RobotService() *FakeService_RobotService_Call {
-	return &FakeService_RobotService_Call{Call: _e.mock.On("RobotService")}
+// RobotStateService is a helper method to define mock.On call
+func (_e *FakeService_Expecter) RobotStateService() *FakeService_RobotStateService_Call {
+	return &FakeService_RobotStateService_Call{Call: _e.mock.On("RobotStateService")}
 }
 
-func (_c *FakeService_RobotService_Call) Run(run func()) *FakeService_RobotService_Call {
+func (_c *FakeService_RobotStateService_Call) Run(run func()) *FakeService_RobotStateService_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *FakeService_RobotService_Call) Return(_a0 service.RobotService) *FakeService_RobotService_Call {
+func (_c *FakeService_RobotStateService_Call) Return(_a0 service.RobotStateService) *FakeService_RobotStateService_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *FakeService_RobotService_Call) RunAndReturn(run func() service.RobotService) *FakeService_RobotService_Call {
+func (_c *FakeService_RobotStateService_Call) RunAndReturn(run func() service.RobotStateService) *FakeService_RobotStateService_Call {
 	_c.Call.Return(run)
 	return _c
 }

@@ -10,9 +10,10 @@ import (
 )
 
 type serviceImpl struct {
-	robotService  *RobotService
-	systemService *SystemService
-	picService    *PICService
+	robotStateService *RobotStateService
+	systemService     *SystemService
+	picService        *PICService
+	locationService   *LocationService
 }
 
 func New(
@@ -23,14 +24,26 @@ func New(
 	validator validator.Validator,
 ) service.Service {
 	return &serviceImpl{
-		robotService:  NewRobotService(repo.RobotState(), dbProvider, validator),
-		systemService: NewSystemService(cfgManager),
-		picService:    NewPICService(repo.RobotState(), repo.PICSerialCommand(), picSerialClient, dbProvider, validator),
+		robotStateService: NewRobotStateService(repo.RobotState(), dbProvider),
+		systemService:     NewSystemService(cfgManager),
+		picService: NewPICService(
+			repo.RobotState(),
+			repo.PICSerialCommand(),
+			repo.Battery(),
+			repo.DistanceSensor(),
+			repo.LiftMotor(),
+			repo.DriveMotor(),
+			repo.Location(),
+			picSerialClient,
+			dbProvider,
+			validator,
+		),
+		locationService: NewLocationService(repo.Location(), dbProvider),
 	}
 }
 
-func (s serviceImpl) RobotService() service.RobotService {
-	return s.robotService
+func (s serviceImpl) RobotStateService() service.RobotStateService {
+	return s.robotStateService
 }
 
 func (s serviceImpl) SystemService() service.SystemService {
@@ -39,4 +52,8 @@ func (s serviceImpl) SystemService() service.SystemService {
 
 func (s serviceImpl) PICService() service.PICService {
 	return s.picService
+}
+
+func (s serviceImpl) LocationService() service.LocationService {
+	return s.locationService
 }

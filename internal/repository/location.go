@@ -7,6 +7,6 @@ import (
 	"github.com/tbe-team/raybot/internal/storage/db"
 )
 
-type RobotStateRepository interface {
-	GetRobotState(ctx context.Context, db db.SQLDB) (model.RobotState, error)
+type LocationRepository interface {
+	UpdateLocation(ctx context.Context, db db.SQLDB, location model.Location) error
 }

@@ -48,7 +48,7 @@ func NewCloudService(cfg Config, service service.Service, log *slog.Logger) (*Cl
 	return &CloudService{
 		cfg:     cfg,
 		service: service,
-		log:     log.With(slog.String("service", "CloudService")),
+		log:     log,
 	}, nil
 }
 
@@ -88,7 +88,7 @@ func (s CloudService) Run() (CleanupFunc, error) {
 }
 
 func (s CloudService) registerHandlers(server *grpctunnel.ReverseTunnelServer) {
-	robotStateHandler := handler.NewRobotStateHandler(s.service.RobotService())
+	robotStateHandler := handler.NewRobotStateHandler(s.service.RobotStateService())
 	raybotv1grpc.RegisterRobotStateServiceServer(server, robotStateHandler)
 
 	driveMotorHandler := handler.NewDriveMotorHandler(s.service.PICService())

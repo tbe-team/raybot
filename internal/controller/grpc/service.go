@@ -42,7 +42,7 @@ func NewGRPCService(cfg Config, service service.Service, log *slog.Logger) (*GRP
 	return &GRPCService{
 		cfg:     cfg,
 		service: service,
-		log:     log.With(slog.String("service", "GRPCService")),
+		log:     log,
 	}, nil
 }
 
@@ -96,7 +96,7 @@ func (s GRPCService) Run() (CleanupFunc, error) {
 }
 
 func (s GRPCService) registerHandlers(server *grpc.Server) {
-	robotStateHandler := handler.NewRobotStateHandler(s.service.RobotService())
+	robotStateHandler := handler.NewRobotStateHandler(s.service.RobotStateService())
 	raybotv1grpc.RegisterRobotStateServiceServer(server, robotStateHandler)
 
 	driveMotorHandler := handler.NewDriveMotorHandler(s.service.PICService())

@@ -73,7 +73,7 @@ var DefaultConfig = Config{
 	},
 	GRPC: GRPCConfig{
 		Server: grpc.Config{
-			Enable: false,
+			Enable: true,
 		},
 		Cloud: cloud.Config{
 			Address: "localhost:50051",
@@ -84,7 +84,7 @@ var DefaultConfig = Config{
 	},
 	Log: log.Config{
 		Level:     "info",
-		Format:    "json",
+		Format:    "text",
 		AddSource: false,
 	},
 }
