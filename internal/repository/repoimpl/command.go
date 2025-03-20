@@ -29,7 +29,7 @@ func NewCommandRepository(queries *sqlc.Queries) *CommandRepository {
 	return &CommandRepository{queries: queries}
 }
 
-func (r CommandRepository) ListCommands(ctx context.Context, db db.SQLDB, params paging.Params, sorts []sort.Sort) ([]model.Command, error) {
+func (r CommandRepository) ListCommands(ctx context.Context, db db.SQLDB, params paging.Params, sorts []sort.Sort) (paging.List[model.Command], error) {
 	query := sq.Select("*").
 		From("commands").
 		Limit(uint64(params.Limit())).
@@ -41,12 +41,12 @@ func (r CommandRepository) ListCommands(ctx context.Context, db db.SQLDB, params
 
 	sql, args, err := query.ToSql()
 	if err != nil {
-		return nil, fmt.Errorf("build query: %w", err)
+		return paging.List[model.Command]{}, fmt.Errorf("build query: %w", err)
 	}
 
 	rows, err := db.QueryContext(ctx, sql, args...)
 	if err != nil {
-		return nil, fmt.Errorf("query commands: %w", err)
+		return paging.List[model.Command]{}, fmt.Errorf("query commands: %w", err)
 	}
 	defer rows.Close()
 
@@ -63,18 +63,31 @@ func (r CommandRepository) ListCommands(ctx context.Context, db db.SQLDB, params
 			&i.CreatedAt,
 			&i.CompletedAt,
 		); err != nil {
-			return nil, fmt.Errorf("scan command: %w", err)
+			return paging.List[model.Command]{}, fmt.Errorf("scan command: %w", err)
 		}
 
 		item, err := r.convertRowToCommand(i)
 		if err != nil {
-			return nil, fmt.Errorf("convert row to command: %w", err)
+			return paging.List[model.Command]{}, fmt.Errorf("convert row to command: %w", err)
 		}
 
 		items = append(items, item)
 	}
 
-	return items, nil
+	countQuery := sq.Select("COUNT(*)").
+		From("commands")
+
+	countSQL, countArgs, err := countQuery.ToSql()
+	if err != nil {
+		return paging.List[model.Command]{}, fmt.Errorf("build count query: %w", err)
+	}
+
+	var count int64
+	if err := db.QueryRowContext(ctx, countSQL, countArgs...).Scan(&count); err != nil {
+		return paging.List[model.Command]{}, fmt.Errorf("queries count commands: %w", err)
+	}
+
+	return paging.NewList(items, count), nil
 }
 
 func (r CommandRepository) GetCommandByStatusInProgress(ctx context.Context, sqldb db.SQLDB) (model.Command, error) {

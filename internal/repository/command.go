@@ -21,7 +21,7 @@ type UpdateCommandParams struct {
 }
 
 type CommandRepository interface {
-	ListCommands(ctx context.Context, db db.SQLDB, params paging.Params, sorts []sort.Sort) ([]model.Command, error)
+	ListCommands(ctx context.Context, db db.SQLDB, params paging.Params, sorts []sort.Sort) (paging.List[model.Command], error)
 	GetCommandByStatusInProgress(ctx context.Context, db db.SQLDB) (model.Command, error)
 	CreateCommand(ctx context.Context, db db.SQLDB, command model.Command) error
 	UpdateCommand(ctx context.Context, db db.SQLDB, params UpdateCommandParams) (model.Command, error)

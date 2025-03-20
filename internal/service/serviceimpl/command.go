@@ -12,6 +12,7 @@ import (
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
 	"github.com/tbe-team/raybot/internal/storage/db"
+	"github.com/tbe-team/raybot/pkg/paging"
 	"github.com/tbe-team/raybot/pkg/validator"
 	"github.com/tbe-team/raybot/pkg/xerror"
 )
@@ -49,17 +50,17 @@ func NewCommandService(
 	}
 }
 
-func (s CommandService) ListCommands(ctx context.Context, params service.ListCommandsParams) ([]model.Command, error) {
+func (s CommandService) ListCommands(ctx context.Context, params service.ListCommandsParams) (paging.List[model.Command], error) {
 	if err := s.validator.Validate(params); err != nil {
-		return nil, err
+		return paging.List[model.Command]{}, err
 	}
 
-	commands, err := s.commandRepo.ListCommands(ctx, s.dbProvider.DB(), params.PagingParams, params.Sorts)
+	ret, err := s.commandRepo.ListCommands(ctx, s.dbProvider.DB(), params.PagingParams, params.Sorts)
 	if err != nil {
-		return nil, fmt.Errorf("command repository list commands: %w", err)
+		return paging.List[model.Command]{}, fmt.Errorf("command repository list commands: %w", err)
 	}
 
-	return commands, nil
+	return ret, nil
 }
 
 func (s CommandService) GetCurrentProcessingCommand(ctx context.Context) (model.Command, error) {

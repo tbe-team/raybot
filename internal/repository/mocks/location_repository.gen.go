@@ -24,6 +24,63 @@ func (_m *FakeLocationRepository) EXPECT() *FakeLocationRepository_Expecter {
 	return &FakeLocationRepository_Expecter{mock: &_m.Mock}
 }
 
+// GetCurrentLocation provides a mock function with given fields: ctx, _a1
+func (_m *FakeLocationRepository) GetCurrentLocation(ctx context.Context, _a1 db.SQLDB) (model.Location, error) {
+	ret := _m.Called(ctx, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCurrentLocation")
+	}
+
+	var r0 model.Location
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) (model.Location, error)); ok {
+		return rf(ctx, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) model.Location); ok {
+		r0 = rf(ctx, _a1)
+	} else {
+		r0 = ret.Get(0).(model.Location)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, db.SQLDB) error); ok {
+		r1 = rf(ctx, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeLocationRepository_GetCurrentLocation_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCurrentLocation'
+type FakeLocationRepository_GetCurrentLocation_Call struct {
+	*mock.Call
+}
+
+// GetCurrentLocation is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 db.SQLDB
+func (_e *FakeLocationRepository_Expecter) GetCurrentLocation(ctx interface{}, _a1 interface{}) *FakeLocationRepository_GetCurrentLocation_Call {
+	return &FakeLocationRepository_GetCurrentLocation_Call{Call: _e.mock.On("GetCurrentLocation", ctx, _a1)}
+}
+
+func (_c *FakeLocationRepository_GetCurrentLocation_Call) Run(run func(ctx context.Context, _a1 db.SQLDB)) *FakeLocationRepository_GetCurrentLocation_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(db.SQLDB))
+	})
+	return _c
+}
+
+func (_c *FakeLocationRepository_GetCurrentLocation_Call) Return(_a0 model.Location, _a1 error) *FakeLocationRepository_GetCurrentLocation_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeLocationRepository_GetCurrentLocation_Call) RunAndReturn(run func(context.Context, db.SQLDB) (model.Location, error)) *FakeLocationRepository_GetCurrentLocation_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateLocation provides a mock function with given fields: ctx, _a1, location
 func (_m *FakeLocationRepository) UpdateLocation(ctx context.Context, _a1 db.SQLDB, location model.Location) error {
 	ret := _m.Called(ctx, _a1, location)

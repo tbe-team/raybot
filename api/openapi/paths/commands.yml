@@ -29,9 +29,7 @@ get:
       content:
         application/json:
           schema:
-            type: array
-            items:
-              $ref: "../components/schemas/command.yml#/CommandResponse"
+            $ref: "../components/schemas/command.yml#/CommandListResponse"
     "400":
       description: Bad Request
       content:

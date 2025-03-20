@@ -47,8 +47,8 @@ func (h commandHandler) ListCommands(ctx context.Context, req gen.ListCommandsRe
 		return nil, fmt.Errorf("command service list commands: %w", err)
 	}
 
-	res := make([]gen.CommandResponse, len(commands))
-	for i, command := range commands {
+	res := make([]gen.CommandResponse, len(commands.Items))
+	for i, command := range commands.Items {
 		response, err := converter.ConvertCommandToResponse(command)
 		if err != nil {
 			return nil, fmt.Errorf("convert command to response: %w", err)
@@ -56,7 +56,10 @@ func (h commandHandler) ListCommands(ctx context.Context, req gen.ListCommandsRe
 		res[i] = response
 	}
 
-	return gen.ListCommands200JSONResponse(res), nil
+	return gen.ListCommands200JSONResponse{
+		TotalItems: int(commands.TotalItems),
+		Items:      res,
+	}, nil
 }
 
 func (h commandHandler) GetCurrentProcessingCommand(ctx context.Context, _ gen.GetCurrentProcessingCommandRequestObject) (gen.GetCurrentProcessingCommandResponseObject, error) {

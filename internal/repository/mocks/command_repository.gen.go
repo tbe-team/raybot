@@ -12,6 +12,8 @@ import (
 
 	paging "github.com/tbe-team/raybot/pkg/paging"
 
+	repository "github.com/tbe-team/raybot/internal/repository"
+
 	sort "github.com/tbe-team/raybot/pkg/sort"
 )
 
@@ -190,6 +192,64 @@ func (_c *FakeCommandRepository_ListCommands_Call) Return(_a0 []model.Command, _
 }
 
 func (_c *FakeCommandRepository_ListCommands_Call) RunAndReturn(run func(context.Context, db.SQLDB, paging.Params, []sort.Sort) ([]model.Command, error)) *FakeCommandRepository_ListCommands_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateCommand provides a mock function with given fields: ctx, _a1, params
+func (_m *FakeCommandRepository) UpdateCommand(ctx context.Context, _a1 db.SQLDB, params repository.UpdateCommandParams) (model.Command, error) {
+	ret := _m.Called(ctx, _a1, params)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateCommand")
+	}
+
+	var r0 model.Command
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB, repository.UpdateCommandParams) (model.Command, error)); ok {
+		return rf(ctx, _a1, params)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB, repository.UpdateCommandParams) model.Command); ok {
+		r0 = rf(ctx, _a1, params)
+	} else {
+		r0 = ret.Get(0).(model.Command)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, db.SQLDB, repository.UpdateCommandParams) error); ok {
+		r1 = rf(ctx, _a1, params)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeCommandRepository_UpdateCommand_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateCommand'
+type FakeCommandRepository_UpdateCommand_Call struct {
+	*mock.Call
+}
+
+// UpdateCommand is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 db.SQLDB
+//   - params repository.UpdateCommandParams
+func (_e *FakeCommandRepository_Expecter) UpdateCommand(ctx interface{}, _a1 interface{}, params interface{}) *FakeCommandRepository_UpdateCommand_Call {
+	return &FakeCommandRepository_UpdateCommand_Call{Call: _e.mock.On("UpdateCommand", ctx, _a1, params)}
+}
+
+func (_c *FakeCommandRepository_UpdateCommand_Call) Run(run func(ctx context.Context, _a1 db.SQLDB, params repository.UpdateCommandParams)) *FakeCommandRepository_UpdateCommand_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(db.SQLDB), args[2].(repository.UpdateCommandParams))
+	})
+	return _c
+}
+
+func (_c *FakeCommandRepository_UpdateCommand_Call) Return(_a0 model.Command, _a1 error) *FakeCommandRepository_UpdateCommand_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeCommandRepository_UpdateCommand_Call) RunAndReturn(run func(context.Context, db.SQLDB, repository.UpdateCommandParams) (model.Command, error)) *FakeCommandRepository_UpdateCommand_Call {
 	_c.Call.Return(run)
 	return _c
 }

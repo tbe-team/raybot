@@ -21,11 +21,11 @@ func (s CommandType) Validate() error {
 func (s CommandType) String() string {
 	return []string{
 		"MOVE_TO_LOCATION",
-	}[s-1]
+	}[s]
 }
 
 const (
-	CommandTypeMoveToLocation CommandType = iota + 1
+	CommandTypeMoveToLocation CommandType = iota
 )
 
 // CommandStatus represents the status of the command
@@ -43,12 +43,11 @@ func (s CommandStatus) String() string {
 		"IN_PROGRESS",
 		"SUCCEEDED",
 		"FAILED",
-	}[s-1]
+	}[s]
 }
 
 const (
-	CommandStatusInProgress CommandStatus = iota + 1
-
+	CommandStatusInProgress CommandStatus = iota
 	CommandStatusSucceeded
 	CommandStatusFailed
 )
@@ -57,7 +56,7 @@ const (
 type CommandSource uint8
 
 const (
-	CommandSourceManual CommandSource = iota + 1
+	CommandSourceManual CommandSource = iota
 	CommandSourceCloud
 )
 
@@ -74,7 +73,7 @@ func (s CommandSource) String() string {
 	return []string{
 		"MANUAL",
 		"CLOUD",
-	}[s-1]
+	}[s]
 }
 
 // Command represents a robot command
