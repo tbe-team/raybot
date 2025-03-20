@@ -675,8 +675,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          example: 1
+          type: string
+          example: 123e4567-e89b-12d3-a456-426614174000
           description: The id of the command
           x-order: 1
         type:
