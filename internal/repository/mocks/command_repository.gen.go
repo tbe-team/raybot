@@ -136,24 +136,22 @@ func (_c *FakeCommandRepository_GetCommandByStatusInProgress_Call) RunAndReturn(
 }
 
 // ListCommands provides a mock function with given fields: ctx, _a1, params, sorts
-func (_m *FakeCommandRepository) ListCommands(ctx context.Context, _a1 db.SQLDB, params paging.Params, sorts []sort.Sort) ([]model.Command, error) {
+func (_m *FakeCommandRepository) ListCommands(ctx context.Context, _a1 db.SQLDB, params paging.Params, sorts []sort.Sort) (paging.List[model.Command], error) {
 	ret := _m.Called(ctx, _a1, params, sorts)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListCommands")
 	}
 
-	var r0 []model.Command
+	var r0 paging.List[model.Command]
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB, paging.Params, []sort.Sort) ([]model.Command, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB, paging.Params, []sort.Sort) (paging.List[model.Command], error)); ok {
 		return rf(ctx, _a1, params, sorts)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB, paging.Params, []sort.Sort) []model.Command); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB, paging.Params, []sort.Sort) paging.List[model.Command]); ok {
 		r0 = rf(ctx, _a1, params, sorts)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.Command)
-		}
+		r0 = ret.Get(0).(paging.List[model.Command])
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, db.SQLDB, paging.Params, []sort.Sort) error); ok {
@@ -186,12 +184,12 @@ func (_c *FakeCommandRepository_ListCommands_Call) Run(run func(ctx context.Cont
 	return _c
 }
 
-func (_c *FakeCommandRepository_ListCommands_Call) Return(_a0 []model.Command, _a1 error) *FakeCommandRepository_ListCommands_Call {
+func (_c *FakeCommandRepository_ListCommands_Call) Return(_a0 paging.List[model.Command], _a1 error) *FakeCommandRepository_ListCommands_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FakeCommandRepository_ListCommands_Call) RunAndReturn(run func(context.Context, db.SQLDB, paging.Params, []sort.Sort) ([]model.Command, error)) *FakeCommandRepository_ListCommands_Call {
+func (_c *FakeCommandRepository_ListCommands_Call) RunAndReturn(run func(context.Context, db.SQLDB, paging.Params, []sort.Sort) (paging.List[model.Command], error)) *FakeCommandRepository_ListCommands_Call {
 	_c.Call.Return(run)
 	return _c
 }

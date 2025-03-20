@@ -8,6 +8,8 @@ import (
 	mock "github.com/stretchr/testify/mock"
 	model "github.com/tbe-team/raybot/internal/model"
 
+	paging "github.com/tbe-team/raybot/pkg/paging"
+
 	service "github.com/tbe-team/raybot/internal/service"
 )
 
@@ -184,24 +186,22 @@ func (_c *FakeCommandService_GetCurrentProcessingCommand_Call) RunAndReturn(run 
 }
 
 // ListCommands provides a mock function with given fields: ctx, params
-func (_m *FakeCommandService) ListCommands(ctx context.Context, params service.ListCommandsParams) ([]model.Command, error) {
+func (_m *FakeCommandService) ListCommands(ctx context.Context, params service.ListCommandsParams) (paging.List[model.Command], error) {
 	ret := _m.Called(ctx, params)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListCommands")
 	}
 
-	var r0 []model.Command
+	var r0 paging.List[model.Command]
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, service.ListCommandsParams) ([]model.Command, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, service.ListCommandsParams) (paging.List[model.Command], error)); ok {
 		return rf(ctx, params)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, service.ListCommandsParams) []model.Command); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, service.ListCommandsParams) paging.List[model.Command]); ok {
 		r0 = rf(ctx, params)
 	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]model.Command)
-		}
+		r0 = ret.Get(0).(paging.List[model.Command])
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, service.ListCommandsParams) error); ok {
@@ -232,12 +232,12 @@ func (_c *FakeCommandService_ListCommands_Call) Run(run func(ctx context.Context
 	return _c
 }
 
-func (_c *FakeCommandService_ListCommands_Call) Return(_a0 []model.Command, _a1 error) *FakeCommandService_ListCommands_Call {
+func (_c *FakeCommandService_ListCommands_Call) Return(_a0 paging.List[model.Command], _a1 error) *FakeCommandService_ListCommands_Call {
 	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *FakeCommandService_ListCommands_Call) RunAndReturn(run func(context.Context, service.ListCommandsParams) ([]model.Command, error)) *FakeCommandService_ListCommands_Call {
+func (_c *FakeCommandService_ListCommands_Call) RunAndReturn(run func(context.Context, service.ListCommandsParams) (paging.List[model.Command], error)) *FakeCommandService_ListCommands_Call {
 	_c.Call.Return(run)
 	return _c
 }
