@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
@@ -37,8 +36,6 @@ func (a *Application) Context() context.Context {
 type CleanupFunc func() error
 
 func New() (*Application, CleanupFunc, error) {
-	// Set UTC timezone
-	time.Local = time.UTC
 	// Create context
 	ctx := context.Background()
 
