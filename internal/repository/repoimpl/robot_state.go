@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/storage/db"
@@ -98,6 +99,41 @@ func (r RobotStateRepository) convertRowToRobotState(row sqlc.RobotStateGetRow) 
 		return model.RobotState{}, fmt.Errorf("unmarshal cell voltages: %w", err)
 	}
 
+	batteryUpdatedAt, err := time.Parse(time.RFC3339, battery.UpdatedAt)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
+	batteryChargeUpdatedAt, err := time.Parse(time.RFC3339, batteryCharge.UpdatedAt)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
+	batteryDischargeUpdatedAt, err := time.Parse(time.RFC3339, batteryDischarge.UpdatedAt)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
+	distanceSensorUpdatedAt, err := time.Parse(time.RFC3339, distanceSensor.UpdatedAt)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
+	driveMotorUpdatedAt, err := time.Parse(time.RFC3339, driveMotor.UpdatedAt)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
+	liftMotorUpdatedAt, err := time.Parse(time.RFC3339, liftMotor.UpdatedAt)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
+	locationUpdatedAt, err := time.Parse(time.RFC3339, location.UpdatedAt)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
 	//nolint:gosec
 	return model.RobotState{
 		Battery: model.Battery{
@@ -108,41 +144,41 @@ func (r RobotStateRepository) convertRowToRobotState(row sqlc.RobotStateGetRow) 
 			Percent:      uint8(battery.Percent),
 			Fault:        uint8(battery.Fault),
 			Health:       uint8(battery.Health),
-			UpdatedAt:    battery.UpdatedAt,
+			UpdatedAt:    batteryUpdatedAt,
 		},
 		Charge: model.BatteryCharge{
 			CurrentLimit: uint16(batteryCharge.CurrentLimit),
 			Enabled:      batteryCharge.Enabled == 1,
-			UpdatedAt:    batteryCharge.UpdatedAt,
+			UpdatedAt:    batteryChargeUpdatedAt,
 		},
 		Discharge: model.BatteryDischarge{
 			CurrentLimit: uint16(batteryDischarge.CurrentLimit),
 			Enabled:      batteryDischarge.Enabled == 1,
-			UpdatedAt:    batteryDischarge.UpdatedAt,
+			UpdatedAt:    batteryDischargeUpdatedAt,
 		},
 		DistanceSensor: model.DistanceSensor{
 			FrontDistance: uint16(distanceSensor.FrontDistance),
 			BackDistance:  uint16(distanceSensor.BackDistance),
 			DownDistance:  uint16(distanceSensor.DownDistance),
-			UpdatedAt:     distanceSensor.UpdatedAt,
+			UpdatedAt:     distanceSensorUpdatedAt,
 		},
 		DriveMotor: model.DriveMotor{
 			Direction: model.DriveMotorDirection(driveMotor.Direction),
 			Speed:     uint8(driveMotor.Speed),
 			IsRunning: driveMotor.IsRunning == 1,
 			Enabled:   driveMotor.Enabled == 1,
-			UpdatedAt: driveMotor.UpdatedAt,
+			UpdatedAt: driveMotorUpdatedAt,
 		},
 		LiftMotor: model.LiftMotor{
 			CurrentPosition: uint16(liftMotor.CurrentPosition),
 			TargetPosition:  uint16(liftMotor.TargetPosition),
 			IsRunning:       liftMotor.IsRunning == 1,
 			Enabled:         liftMotor.Enabled == 1,
-			UpdatedAt:       liftMotor.UpdatedAt,
+			UpdatedAt:       liftMotorUpdatedAt,
 		},
 		Location: model.Location{
 			CurrentLocation: location.CurrentLocation,
-			UpdatedAt:       location.UpdatedAt,
+			UpdatedAt:       locationUpdatedAt,
 		},
 	}, nil
 }

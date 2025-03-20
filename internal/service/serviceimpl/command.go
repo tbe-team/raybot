@@ -3,6 +3,7 @@ package serviceimpl
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,17 +18,34 @@ import (
 
 var ErrRobotIsProcessingCommand = xerror.Conflict(nil, "command.alreadyProcessing", "robot is already processing another command")
 
-type CommandService struct {
-	commandRepo repository.CommandRepository
-	dbProvider  db.Provider
-	validator   validator.Validator
+type CreateSerialCommander interface {
+	CreateSerialCommand(ctx context.Context, params service.CreateSerialCommandParams) error
 }
 
-func NewCommandService(commandRepo repository.CommandRepository, dbProvider db.Provider, validator validator.Validator) *CommandService {
+type CommandService struct {
+	commandRepo           repository.CommandRepository
+	locationRepo          repository.LocationRepository
+	createSerialCommander CreateSerialCommander
+	dbProvider            db.Provider
+	validator             validator.Validator
+	log                   *slog.Logger
+}
+
+func NewCommandService(
+	commandRepo repository.CommandRepository,
+	locationRepo repository.LocationRepository,
+	createSerialCommander CreateSerialCommander,
+	dbProvider db.Provider,
+	validator validator.Validator,
+	log *slog.Logger,
+) *CommandService {
 	return &CommandService{
-		commandRepo: commandRepo,
-		dbProvider:  dbProvider,
-		validator:   validator,
+		commandRepo:           commandRepo,
+		locationRepo:          locationRepo,
+		createSerialCommander: createSerialCommander,
+		dbProvider:            dbProvider,
+		validator:             validator,
+		log:                   log,
 	}
 }
 
@@ -70,7 +88,7 @@ func (s CommandService) CreateCommand(ctx context.Context, params service.Create
 
 	// check if robot is already processing another command
 	if _, err := s.commandRepo.GetCommandByStatusInProgress(ctx, s.dbProvider.DB()); err != nil {
-		if !db.IsNoRowsError(err) {
+		if !xerror.IsNotFound(err) {
 			return model.Command{}, fmt.Errorf("command repository get command by status in progress: %w", err)
 		}
 	} else {
@@ -95,4 +113,65 @@ func (s CommandService) CreateCommand(ctx context.Context, params service.Create
 	}
 
 	return command, nil
+}
+
+func (s CommandService) ExecuteInProgressCommand(ctx context.Context) error {
+	command, err := s.commandRepo.GetCommandByStatusInProgress(ctx, s.dbProvider.DB())
+	if err != nil {
+		if xerror.IsNotFound(err) {
+			return nil
+		}
+		return fmt.Errorf("command repository get command by status in progress: %w", err)
+	}
+
+	//nolint:gocritic // it's ok to use switch here we will add more command types in the future
+	switch command.Type {
+	case model.CommandTypeMoveToLocation:
+		inputs, ok := command.Inputs.(model.CommandMoveToLocationInputs)
+		if !ok {
+			return fmt.Errorf("command inputs is not model.CommandMoveToLocationInputs")
+		}
+		// We need to start tracking the location
+		go func() {
+			for {
+				loc, err := s.locationRepo.GetCurrentLocation(ctx, s.dbProvider.DB())
+				if err != nil {
+					s.log.Error("location repository get current location", slog.Any("error", err))
+					continue
+				}
+
+				if loc.CurrentLocation == inputs.Location {
+					s.log.Debug("current location is the same as the target location")
+					// Update command status to completed
+					completedAt := time.Now()
+					params := repository.UpdateCommandParams{
+						ID:             command.ID,
+						Status:         model.CommandStatusSucceeded,
+						SetStatus:      true,
+						CompletedAt:    &completedAt,
+						SetCompletedAt: true,
+					}
+					if _, err := s.commandRepo.UpdateCommand(ctx, s.dbProvider.DB(), params); err != nil {
+						s.log.Error("command repository update command", slog.Any("error", err))
+					}
+
+					break
+				}
+
+				time.Sleep(100 * time.Millisecond)
+			}
+		}()
+
+		if err := s.createSerialCommander.CreateSerialCommand(ctx, service.CreateSerialCommandParams{
+			Data: model.PICSerialCommandBatteryDriveMotorData{
+				Direction: model.MoveDirectionForward,
+				Speed:     100,
+				Enable:    true,
+			},
+		}); err != nil {
+			return fmt.Errorf("create serial command: %w", err)
+		}
+	}
+
+	return nil
 }

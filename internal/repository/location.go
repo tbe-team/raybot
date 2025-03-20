@@ -9,4 +9,5 @@ import (
 
 type LocationRepository interface {
 	UpdateLocation(ctx context.Context, db db.SQLDB, location model.Location) error
+	GetCurrentLocation(ctx context.Context, db db.SQLDB) (model.Location, error)
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/storage/db"
@@ -29,6 +30,11 @@ func (r BatteryRepository) GetBattery(ctx context.Context, db db.SQLDB) (model.B
 		return model.Battery{}, fmt.Errorf("unmarshal cell voltages: %w", err)
 	}
 
+	updatedAt, err := time.Parse(time.RFC3339, battery.UpdatedAt)
+	if err != nil {
+		return model.Battery{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
 	//nolint:gosec
 	return model.Battery{
 		Current:      uint16(battery.Current),
@@ -38,7 +44,7 @@ func (r BatteryRepository) GetBattery(ctx context.Context, db db.SQLDB) (model.B
 		Percent:      uint8(battery.Percent),
 		Fault:        uint8(battery.Fault),
 		Health:       uint8(battery.Health),
-		UpdatedAt:    battery.UpdatedAt,
+		UpdatedAt:    updatedAt,
 	}, nil
 }
 
@@ -56,7 +62,7 @@ func (r BatteryRepository) UpdateBattery(ctx context.Context, db db.SQLDB, batte
 		Percent:      int64(battery.Percent),
 		Fault:        int64(battery.Fault),
 		Health:       int64(battery.Health),
-		UpdatedAt:    battery.UpdatedAt,
+		UpdatedAt:    battery.UpdatedAt.Format(time.RFC3339),
 	}
 	if err := r.queries.BatteryUpdate(ctx, db, params); err != nil {
 		return fmt.Errorf("queries update battery: %w", err)
@@ -71,11 +77,16 @@ func (r BatteryRepository) GetBatteryCharge(ctx context.Context, db db.SQLDB) (m
 		return model.BatteryCharge{}, fmt.Errorf("queries get battery charge: %w", err)
 	}
 
+	updatedAt, err := time.Parse(time.RFC3339, batteryCharge.UpdatedAt)
+	if err != nil {
+		return model.BatteryCharge{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
 	//nolint:gosec
 	return model.BatteryCharge{
 		CurrentLimit: uint16(batteryCharge.CurrentLimit),
 		Enabled:      batteryCharge.Enabled == 1,
-		UpdatedAt:    batteryCharge.UpdatedAt,
+		UpdatedAt:    updatedAt,
 	}, nil
 }
 
@@ -83,7 +94,7 @@ func (r BatteryRepository) UpdateBatteryCharge(ctx context.Context, db db.SQLDB,
 	params := sqlc.BatteryChargeUpdateParams{
 		CurrentLimit: int64(batteryCharge.CurrentLimit),
 		Enabled:      boolToInt64(batteryCharge.Enabled),
-		UpdatedAt:    batteryCharge.UpdatedAt,
+		UpdatedAt:    batteryCharge.UpdatedAt.Format(time.RFC3339),
 	}
 	if err := r.queries.BatteryChargeUpdate(ctx, db, params); err != nil {
 		return fmt.Errorf("queries update battery charge: %w", err)
@@ -98,11 +109,16 @@ func (r BatteryRepository) GetBatteryDischarge(ctx context.Context, db db.SQLDB)
 		return model.BatteryDischarge{}, fmt.Errorf("queries get battery discharge: %w", err)
 	}
 
+	updatedAt, err := time.Parse(time.RFC3339, batteryDischarge.UpdatedAt)
+	if err != nil {
+		return model.BatteryDischarge{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
 	//nolint:gosec
 	return model.BatteryDischarge{
 		CurrentLimit: uint16(batteryDischarge.CurrentLimit),
 		Enabled:      batteryDischarge.Enabled == 1,
-		UpdatedAt:    batteryDischarge.UpdatedAt,
+		UpdatedAt:    updatedAt,
 	}, nil
 }
 
@@ -110,7 +126,7 @@ func (r BatteryRepository) UpdateBatteryDischarge(ctx context.Context, db db.SQL
 	params := sqlc.BatteryDischargeUpdateParams{
 		CurrentLimit: int64(batteryDischarge.CurrentLimit),
 		Enabled:      boolToInt64(batteryDischarge.Enabled),
-		UpdatedAt:    batteryDischarge.UpdatedAt,
+		UpdatedAt:    batteryDischarge.UpdatedAt.Format(time.RFC3339),
 	}
 	if err := r.queries.BatteryDischargeUpdate(ctx, db, params); err != nil {
 		return fmt.Errorf("queries update battery discharge: %w", err)

@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	sq "github.com/Masterminds/squirrel"
 
 	"github.com/tbe-team/raybot/internal/model"
+	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/pkg/paging"
@@ -93,6 +95,12 @@ func (r CommandRepository) CreateCommand(ctx context.Context, db db.SQLDB, comma
 		return fmt.Errorf("marshal command inputs: %w", err)
 	}
 
+	var completedAt *string
+	if command.CompletedAt != nil {
+		c := command.CompletedAt.Format(time.RFC3339)
+		completedAt = &c
+	}
+
 	params := sqlc.CommandCreateParams{
 		ID:          command.ID,
 		Type:        int64(command.Type),
@@ -100,8 +108,8 @@ func (r CommandRepository) CreateCommand(ctx context.Context, db db.SQLDB, comma
 		Source:      int64(command.Source),
 		Inputs:      string(inputs),
 		Error:       command.Error,
-		CreatedAt:   command.CreatedAt,
-		CompletedAt: command.CompletedAt,
+		CreatedAt:   command.CreatedAt.Format(time.RFC3339),
+		CompletedAt: completedAt,
 	}
 	if err := r.queries.CommandCreate(ctx, db, params); err != nil {
 		return fmt.Errorf("queries create command: %w", err)
@@ -110,11 +118,40 @@ func (r CommandRepository) CreateCommand(ctx context.Context, db db.SQLDB, comma
 	return nil
 }
 
+func (r CommandRepository) UpdateCommand(ctx context.Context, db db.SQLDB, params repository.UpdateCommandParams) (model.Command, error) {
+	arg := sqlc.CommandUpdateParams{
+		ID:             params.ID,
+		SetStatus:      params.SetStatus,
+		SetError:       params.SetError,
+		SetCompletedAt: params.SetCompletedAt,
+	}
+	row, err := r.queries.CommandUpdate(ctx, db, arg)
+	if err != nil {
+		return model.Command{}, fmt.Errorf("queries update command: %w", err)
+	}
+
+	return r.convertRowToCommand(row)
+}
+
 func (CommandRepository) convertRowToCommand(row sqlc.Command) (model.Command, error) {
 	//nolint:gosec
 	inputs, err := model.UnmarshalCommandInputs(model.CommandType(row.Type), []byte(row.Inputs))
 	if err != nil {
 		return model.Command{}, fmt.Errorf("unmarshal command inputs: %w", err)
+	}
+
+	createdAt, err := time.Parse(time.RFC3339, row.CreatedAt)
+	if err != nil {
+		return model.Command{}, fmt.Errorf("parse created at: %w", err)
+	}
+
+	var completedAt *time.Time
+	if row.CompletedAt != nil {
+		c, err := time.Parse(time.RFC3339, *row.CompletedAt)
+		if err != nil {
+			return model.Command{}, fmt.Errorf("parse completed at: %w", err)
+		}
+		completedAt = &c
 	}
 
 	//nolint:gosec
@@ -125,7 +162,7 @@ func (CommandRepository) convertRowToCommand(row sqlc.Command) (model.Command, e
 		Source:      model.CommandSource(row.Source),
 		Inputs:      inputs,
 		Error:       row.Error,
-		CreatedAt:   row.CreatedAt,
-		CompletedAt: row.CompletedAt,
+		CreatedAt:   createdAt,
+		CompletedAt: completedAt,
 	}, nil
 }

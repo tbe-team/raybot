@@ -23,4 +23,5 @@ type CommandService interface {
 	ListCommands(ctx context.Context, params ListCommandsParams) ([]model.Command, error)
 	GetCurrentProcessingCommand(ctx context.Context) (model.Command, error)
 	CreateCommand(ctx context.Context, params CreateCommandParams) (model.Command, error)
+	ExecuteInProgressCommand(ctx context.Context) error
 }

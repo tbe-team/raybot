@@ -3,6 +3,7 @@ package repoimpl
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/storage/db"
@@ -23,13 +24,18 @@ func (r LiftMotorRepository) GetLiftMotor(ctx context.Context, db db.SQLDB) (mod
 		return model.LiftMotor{}, fmt.Errorf("queries get lift motor: %w", err)
 	}
 
+	updatedAt, err := time.Parse(time.RFC3339, liftMotor.UpdatedAt)
+	if err != nil {
+		return model.LiftMotor{}, fmt.Errorf("parse updated at: %w", err)
+	}
+
 	//nolint:gosec
 	return model.LiftMotor{
 		CurrentPosition: uint16(liftMotor.CurrentPosition),
 		TargetPosition:  uint16(liftMotor.TargetPosition),
 		IsRunning:       liftMotor.IsRunning == 1,
 		Enabled:         liftMotor.Enabled == 1,
-		UpdatedAt:       liftMotor.UpdatedAt,
+		UpdatedAt:       updatedAt,
 	}, nil
 }
 
@@ -39,7 +45,7 @@ func (r LiftMotorRepository) UpdateLiftMotor(ctx context.Context, db db.SQLDB, l
 		TargetPosition:  int64(liftMotor.TargetPosition),
 		IsRunning:       boolToInt64(liftMotor.IsRunning),
 		Enabled:         boolToInt64(liftMotor.Enabled),
-		UpdatedAt:       liftMotor.UpdatedAt,
+		UpdatedAt:       liftMotor.UpdatedAt.Format(time.RFC3339),
 	}
 	if err := r.queries.LiftMotorUpdate(ctx, db, params); err != nil {
 		return fmt.Errorf("queries update lift motor: %w", err)

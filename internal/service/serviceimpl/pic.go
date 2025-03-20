@@ -117,6 +117,7 @@ func (s PICService) ProcessSyncState(ctx context.Context, params service.Process
 
 	return nil
 }
+
 func (s PICService) CreateSerialCommand(ctx context.Context, params service.CreateSerialCommandParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)

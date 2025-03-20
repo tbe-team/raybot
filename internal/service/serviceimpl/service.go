@@ -1,6 +1,8 @@
 package serviceimpl
 
 import (
+	"log/slog"
+
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
 	"github.com/tbe-team/raybot/internal/repository"
@@ -23,24 +25,37 @@ func New(
 	repo repository.Repository,
 	dbProvider db.Provider,
 	validator validator.Validator,
+	log *slog.Logger,
 ) service.Service {
+	robotStateService := NewRobotStateService(repo.RobotState(), dbProvider)
+	systemService := NewSystemService(cfgManager)
+	picService := NewPICService(
+		repo.RobotState(),
+		repo.PICSerialCommand(),
+		repo.Battery(),
+		repo.DistanceSensor(),
+		repo.LiftMotor(),
+		repo.DriveMotor(),
+		repo.Location(),
+		picSerialClient,
+		dbProvider,
+		validator,
+	)
+	locationService := NewLocationService(repo.Location(), dbProvider)
+	commandService := NewCommandService(
+		repo.Command(),
+		repo.Location(),
+		picService,
+		dbProvider,
+		validator,
+		log,
+	)
 	return &serviceImpl{
-		robotStateService: NewRobotStateService(repo.RobotState(), dbProvider),
-		systemService:     NewSystemService(cfgManager),
-		picService: NewPICService(
-			repo.RobotState(),
-			repo.PICSerialCommand(),
-			repo.Battery(),
-			repo.DistanceSensor(),
-			repo.LiftMotor(),
-			repo.DriveMotor(),
-			repo.Location(),
-			picSerialClient,
-			dbProvider,
-			validator,
-		),
-		locationService: NewLocationService(repo.Location(), dbProvider),
-		commandService:  NewCommandService(repo.Command(), dbProvider, validator),
+		robotStateService: robotStateService,
+		systemService:     systemService,
+		picService:        picService,
+		locationService:   locationService,
+		commandService:    commandService,
 	}
 }
 
