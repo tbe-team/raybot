@@ -24,6 +24,177 @@ func (_m *FakeBatteryRepository) EXPECT() *FakeBatteryRepository_Expecter {
 	return &FakeBatteryRepository_Expecter{mock: &_m.Mock}
 }
 
+// GetBattery provides a mock function with given fields: ctx, _a1
+func (_m *FakeBatteryRepository) GetBattery(ctx context.Context, _a1 db.SQLDB) (model.Battery, error) {
+	ret := _m.Called(ctx, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBattery")
+	}
+
+	var r0 model.Battery
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) (model.Battery, error)); ok {
+		return rf(ctx, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) model.Battery); ok {
+		r0 = rf(ctx, _a1)
+	} else {
+		r0 = ret.Get(0).(model.Battery)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, db.SQLDB) error); ok {
+		r1 = rf(ctx, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeBatteryRepository_GetBattery_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBattery'
+type FakeBatteryRepository_GetBattery_Call struct {
+	*mock.Call
+}
+
+// GetBattery is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 db.SQLDB
+func (_e *FakeBatteryRepository_Expecter) GetBattery(ctx interface{}, _a1 interface{}) *FakeBatteryRepository_GetBattery_Call {
+	return &FakeBatteryRepository_GetBattery_Call{Call: _e.mock.On("GetBattery", ctx, _a1)}
+}
+
+func (_c *FakeBatteryRepository_GetBattery_Call) Run(run func(ctx context.Context, _a1 db.SQLDB)) *FakeBatteryRepository_GetBattery_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(db.SQLDB))
+	})
+	return _c
+}
+
+func (_c *FakeBatteryRepository_GetBattery_Call) Return(_a0 model.Battery, _a1 error) *FakeBatteryRepository_GetBattery_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeBatteryRepository_GetBattery_Call) RunAndReturn(run func(context.Context, db.SQLDB) (model.Battery, error)) *FakeBatteryRepository_GetBattery_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetBatteryCharge provides a mock function with given fields: ctx, _a1
+func (_m *FakeBatteryRepository) GetBatteryCharge(ctx context.Context, _a1 db.SQLDB) (model.BatteryCharge, error) {
+	ret := _m.Called(ctx, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBatteryCharge")
+	}
+
+	var r0 model.BatteryCharge
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) (model.BatteryCharge, error)); ok {
+		return rf(ctx, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) model.BatteryCharge); ok {
+		r0 = rf(ctx, _a1)
+	} else {
+		r0 = ret.Get(0).(model.BatteryCharge)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, db.SQLDB) error); ok {
+		r1 = rf(ctx, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeBatteryRepository_GetBatteryCharge_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBatteryCharge'
+type FakeBatteryRepository_GetBatteryCharge_Call struct {
+	*mock.Call
+}
+
+// GetBatteryCharge is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 db.SQLDB
+func (_e *FakeBatteryRepository_Expecter) GetBatteryCharge(ctx interface{}, _a1 interface{}) *FakeBatteryRepository_GetBatteryCharge_Call {
+	return &FakeBatteryRepository_GetBatteryCharge_Call{Call: _e.mock.On("GetBatteryCharge", ctx, _a1)}
+}
+
+func (_c *FakeBatteryRepository_GetBatteryCharge_Call) Run(run func(ctx context.Context, _a1 db.SQLDB)) *FakeBatteryRepository_GetBatteryCharge_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(db.SQLDB))
+	})
+	return _c
+}
+
+func (_c *FakeBatteryRepository_GetBatteryCharge_Call) Return(_a0 model.BatteryCharge, _a1 error) *FakeBatteryRepository_GetBatteryCharge_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeBatteryRepository_GetBatteryCharge_Call) RunAndReturn(run func(context.Context, db.SQLDB) (model.BatteryCharge, error)) *FakeBatteryRepository_GetBatteryCharge_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetBatteryDischarge provides a mock function with given fields: ctx, _a1
+func (_m *FakeBatteryRepository) GetBatteryDischarge(ctx context.Context, _a1 db.SQLDB) (model.BatteryDischarge, error) {
+	ret := _m.Called(ctx, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBatteryDischarge")
+	}
+
+	var r0 model.BatteryDischarge
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) (model.BatteryDischarge, error)); ok {
+		return rf(ctx, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) model.BatteryDischarge); ok {
+		r0 = rf(ctx, _a1)
+	} else {
+		r0 = ret.Get(0).(model.BatteryDischarge)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, db.SQLDB) error); ok {
+		r1 = rf(ctx, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeBatteryRepository_GetBatteryDischarge_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBatteryDischarge'
+type FakeBatteryRepository_GetBatteryDischarge_Call struct {
+	*mock.Call
+}
+
+// GetBatteryDischarge is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 db.SQLDB
+func (_e *FakeBatteryRepository_Expecter) GetBatteryDischarge(ctx interface{}, _a1 interface{}) *FakeBatteryRepository_GetBatteryDischarge_Call {
+	return &FakeBatteryRepository_GetBatteryDischarge_Call{Call: _e.mock.On("GetBatteryDischarge", ctx, _a1)}
+}
+
+func (_c *FakeBatteryRepository_GetBatteryDischarge_Call) Run(run func(ctx context.Context, _a1 db.SQLDB)) *FakeBatteryRepository_GetBatteryDischarge_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(db.SQLDB))
+	})
+	return _c
+}
+
+func (_c *FakeBatteryRepository_GetBatteryDischarge_Call) Return(_a0 model.BatteryDischarge, _a1 error) *FakeBatteryRepository_GetBatteryDischarge_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeBatteryRepository_GetBatteryDischarge_Call) RunAndReturn(run func(context.Context, db.SQLDB) (model.BatteryDischarge, error)) *FakeBatteryRepository_GetBatteryDischarge_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateBattery provides a mock function with given fields: ctx, _a1, battery
 func (_m *FakeBatteryRepository) UpdateBattery(ctx context.Context, _a1 db.SQLDB, battery model.Battery) error {
 	ret := _m.Called(ctx, _a1, battery)

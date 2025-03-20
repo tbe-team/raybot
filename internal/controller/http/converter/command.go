@@ -20,7 +20,7 @@ func ConvertCommandToResponse(command model.Command) (gen.CommandResponse, error
 	}
 
 	return gen.CommandResponse{
-		Id:          int(command.ID),
+		Id:          command.ID,
 		Type:        command.Type.String(),
 		Status:      command.Status.String(),
 		Source:      command.Source.String(),

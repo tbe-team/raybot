@@ -10,8 +10,9 @@ import (
 	"time"
 )
 
-const commandCreate = `-- name: CommandCreate :one
+const commandCreate = `-- name: CommandCreate :exec
 INSERT INTO commands (
+	id,
 	type,
 	status,
 	source,
@@ -20,11 +21,11 @@ INSERT INTO commands (
 	created_at,
 	completed_at
 )
-VALUES (?, ?, ?, ?, ?, ?, ?)
-RETURNING id
+VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 `
 
 type CommandCreateParams struct {
+	ID          string     `json:"id"`
 	Type        int64      `json:"type"`
 	Status      int64      `json:"status"`
 	Source      int64      `json:"source"`
@@ -34,8 +35,9 @@ type CommandCreateParams struct {
 	CompletedAt *time.Time `json:"completed_at"`
 }
 
-func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateParams) (int64, error) {
-	row := db.QueryRowContext(ctx, commandCreate,
+func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateParams) error {
+	_, err := db.ExecContext(ctx, commandCreate,
+		arg.ID,
 		arg.Type,
 		arg.Status,
 		arg.Source,
@@ -44,9 +46,7 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 		arg.CreatedAt,
 		arg.CompletedAt,
 	)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
+	return err
 }
 
 const commandGetByStatusInProgress = `-- name: CommandGetByStatusInProgress :one

@@ -116,6 +116,53 @@ func (_c *FakePICService_ProcessSerialCommandACK_Call) RunAndReturn(run func(con
 	return _c
 }
 
+// ProcessSyncState provides a mock function with given fields: ctx, params
+func (_m *FakePICService) ProcessSyncState(ctx context.Context, params service.ProcessSyncStateParams) error {
+	ret := _m.Called(ctx, params)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessSyncState")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, service.ProcessSyncStateParams) error); ok {
+		r0 = rf(ctx, params)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakePICService_ProcessSyncState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessSyncState'
+type FakePICService_ProcessSyncState_Call struct {
+	*mock.Call
+}
+
+// ProcessSyncState is a helper method to define mock.On call
+//   - ctx context.Context
+//   - params service.ProcessSyncStateParams
+func (_e *FakePICService_Expecter) ProcessSyncState(ctx interface{}, params interface{}) *FakePICService_ProcessSyncState_Call {
+	return &FakePICService_ProcessSyncState_Call{Call: _e.mock.On("ProcessSyncState", ctx, params)}
+}
+
+func (_c *FakePICService_ProcessSyncState_Call) Run(run func(ctx context.Context, params service.ProcessSyncStateParams)) *FakePICService_ProcessSyncState_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(service.ProcessSyncStateParams))
+	})
+	return _c
+}
+
+func (_c *FakePICService_ProcessSyncState_Call) Return(_a0 error) *FakePICService_ProcessSyncState_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakePICService_ProcessSyncState_Call) RunAndReturn(run func(context.Context, service.ProcessSyncStateParams) error) *FakePICService_ProcessSyncState_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewFakePICService creates a new instance of FakePICService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewFakePICService(t interface {

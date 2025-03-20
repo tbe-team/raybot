@@ -8,6 +8,12 @@ import (
 	"github.com/tbe-team/raybot/pkg/sort"
 )
 
+type CreateCommandParams struct {
+	Source      model.CommandSource `validate:"enum"`
+	CommandType model.CommandType   `validate:"enum"`
+	Inputs      model.CommandInputs `validate:"required"`
+}
+
 type ListCommandsParams struct {
 	PagingParams paging.Params `validate:"required"`
 	Sorts        []sort.Sort   `validate:"required"`
@@ -16,4 +22,5 @@ type ListCommandsParams struct {
 type CommandService interface {
 	ListCommands(ctx context.Context, params ListCommandsParams) ([]model.Command, error)
 	GetCurrentProcessingCommand(ctx context.Context) (model.Command, error)
+	CreateCommand(ctx context.Context, params CreateCommandParams) (model.Command, error)
 }

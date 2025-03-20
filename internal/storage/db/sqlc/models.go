@@ -35,7 +35,7 @@ type BatteryDischarge struct {
 }
 
 type Command struct {
-	ID          int64      `json:"id"`
+	ID          string     `json:"id"`
 	Type        int64      `json:"type"`
 	Status      int64      `json:"status"`
 	Source      int64      `json:"source"`

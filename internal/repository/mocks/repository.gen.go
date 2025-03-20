@@ -67,6 +67,53 @@ func (_c *FakeRepository_Battery_Call) RunAndReturn(run func() repository.Batter
 	return _c
 }
 
+// Command provides a mock function with no fields
+func (_m *FakeRepository) Command() repository.CommandRepository {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Command")
+	}
+
+	var r0 repository.CommandRepository
+	if rf, ok := ret.Get(0).(func() repository.CommandRepository); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(repository.CommandRepository)
+		}
+	}
+
+	return r0
+}
+
+// FakeRepository_Command_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Command'
+type FakeRepository_Command_Call struct {
+	*mock.Call
+}
+
+// Command is a helper method to define mock.On call
+func (_e *FakeRepository_Expecter) Command() *FakeRepository_Command_Call {
+	return &FakeRepository_Command_Call{Call: _e.mock.On("Command")}
+}
+
+func (_c *FakeRepository_Command_Call) Run(run func()) *FakeRepository_Command_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *FakeRepository_Command_Call) Return(_a0 repository.CommandRepository) *FakeRepository_Command_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeRepository_Command_Call) RunAndReturn(run func() repository.CommandRepository) *FakeRepository_Command_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DistanceSensor provides a mock function with no fields
 func (_m *FakeRepository) DistanceSensor() repository.DistanceSensorRepository {
 	ret := _m.Called()

@@ -24,6 +24,63 @@ func (_m *FakeDistanceSensorRepository) EXPECT() *FakeDistanceSensorRepository_E
 	return &FakeDistanceSensorRepository_Expecter{mock: &_m.Mock}
 }
 
+// GetDistanceSensor provides a mock function with given fields: ctx, _a1
+func (_m *FakeDistanceSensorRepository) GetDistanceSensor(ctx context.Context, _a1 db.SQLDB) (model.DistanceSensor, error) {
+	ret := _m.Called(ctx, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetDistanceSensor")
+	}
+
+	var r0 model.DistanceSensor
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) (model.DistanceSensor, error)); ok {
+		return rf(ctx, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) model.DistanceSensor); ok {
+		r0 = rf(ctx, _a1)
+	} else {
+		r0 = ret.Get(0).(model.DistanceSensor)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, db.SQLDB) error); ok {
+		r1 = rf(ctx, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeDistanceSensorRepository_GetDistanceSensor_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDistanceSensor'
+type FakeDistanceSensorRepository_GetDistanceSensor_Call struct {
+	*mock.Call
+}
+
+// GetDistanceSensor is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 db.SQLDB
+func (_e *FakeDistanceSensorRepository_Expecter) GetDistanceSensor(ctx interface{}, _a1 interface{}) *FakeDistanceSensorRepository_GetDistanceSensor_Call {
+	return &FakeDistanceSensorRepository_GetDistanceSensor_Call{Call: _e.mock.On("GetDistanceSensor", ctx, _a1)}
+}
+
+func (_c *FakeDistanceSensorRepository_GetDistanceSensor_Call) Run(run func(ctx context.Context, _a1 db.SQLDB)) *FakeDistanceSensorRepository_GetDistanceSensor_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(db.SQLDB))
+	})
+	return _c
+}
+
+func (_c *FakeDistanceSensorRepository_GetDistanceSensor_Call) Return(_a0 model.DistanceSensor, _a1 error) *FakeDistanceSensorRepository_GetDistanceSensor_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeDistanceSensorRepository_GetDistanceSensor_Call) RunAndReturn(run func(context.Context, db.SQLDB) (model.DistanceSensor, error)) *FakeDistanceSensorRepository_GetDistanceSensor_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateDistanceSensor provides a mock function with given fields: ctx, _a1, distanceSensor
 func (_m *FakeDistanceSensorRepository) UpdateDistanceSensor(ctx context.Context, _a1 db.SQLDB, distanceSensor model.DistanceSensor) error {
 	ret := _m.Called(ctx, _a1, distanceSensor)

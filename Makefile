@@ -5,10 +5,14 @@
 gen-openapi:
 	set -eux
 
-	pnpm --package=@redocly/cli dlx redocly bundle ./api/openapi/openapi.yml --output api/openapi/gen/openapi.yml --ext yml
+	pnpm --package=@redocly/cli@1.34 dlx redocly bundle ./api/openapi/openapi.yml --output api/openapi/gen/openapi.yml --ext yml
 	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1 \
 		-config internal/controller/http/oas/gen/oapi-codegen.yml \
 		api/openapi/gen/openapi.yml
+
+.PHONY: gen-proto
+gen-proto:
+	pnpm --package=@bufbuild/buf@1.50.1 dlx buf generate
 
 .PHONY: gen-sqlc
 gen-sqlc:

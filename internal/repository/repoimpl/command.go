@@ -87,13 +87,14 @@ func (r CommandRepository) GetCommandByStatusInProgress(ctx context.Context, sql
 	return r.convertRowToCommand(row)
 }
 
-func (r CommandRepository) CreateCommand(ctx context.Context, db db.SQLDB, command model.Command) (model.Command, error) {
+func (r CommandRepository) CreateCommand(ctx context.Context, db db.SQLDB, command model.Command) error {
 	inputs, err := json.Marshal(command.Inputs)
 	if err != nil {
-		return model.Command{}, fmt.Errorf("marshal command inputs: %w", err)
+		return fmt.Errorf("marshal command inputs: %w", err)
 	}
 
 	params := sqlc.CommandCreateParams{
+		ID:          command.ID,
 		Type:        int64(command.Type),
 		Status:      int64(command.Status),
 		Source:      int64(command.Source),
@@ -102,13 +103,11 @@ func (r CommandRepository) CreateCommand(ctx context.Context, db db.SQLDB, comma
 		CreatedAt:   command.CreatedAt,
 		CompletedAt: command.CompletedAt,
 	}
-	id, err := r.queries.CommandCreate(ctx, db, params)
-	if err != nil {
-		return model.Command{}, fmt.Errorf("queries create command: %w", err)
+	if err := r.queries.CommandCreate(ctx, db, params); err != nil {
+		return fmt.Errorf("queries create command: %w", err)
 	}
 
-	command.ID = id
-	return command, nil
+	return nil
 }
 
 func (CommandRepository) convertRowToCommand(row sqlc.Command) (model.Command, error) {

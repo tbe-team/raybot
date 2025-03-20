@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE commands (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	id TEXT PRIMARY KEY,
 	type INTEGER NOT NULL,
 	status INTEGER NOT NULL,
 	source INTEGER NOT NULL,

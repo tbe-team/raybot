@@ -32,12 +32,10 @@ const (
 type CommandStatus uint8
 
 func (s CommandStatus) Validate() error {
-	switch s {
-	case CommandStatusInProgress, CommandStatusSucceeded, CommandStatusFailed:
-		return nil
-	default:
+	if s < CommandStatusInProgress || s > CommandStatusFailed {
 		return fmt.Errorf("invalid command status: %d", s)
 	}
+	return nil
 }
 
 func (s CommandStatus) String() string {
@@ -50,6 +48,7 @@ func (s CommandStatus) String() string {
 
 const (
 	CommandStatusInProgress CommandStatus = iota + 1
+
 	CommandStatusSucceeded
 	CommandStatusFailed
 )
@@ -80,7 +79,7 @@ func (s CommandSource) String() string {
 
 // Command represents a robot command
 type Command struct {
-	ID          int64
+	ID          string
 	Type        CommandType
 	Status      CommandStatus
 	Source      CommandSource
@@ -96,7 +95,7 @@ type CommandInputs interface {
 }
 
 type CommandMoveToLocationInputs struct {
-	Location string `json:"location"`
+	Location string `validate:"required"`
 }
 
 func (CommandMoveToLocationInputs) isCommandInputs() {}

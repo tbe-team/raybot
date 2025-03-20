@@ -24,6 +24,63 @@ func (_m *FakeLiftMotorRepository) EXPECT() *FakeLiftMotorRepository_Expecter {
 	return &FakeLiftMotorRepository_Expecter{mock: &_m.Mock}
 }
 
+// GetLiftMotor provides a mock function with given fields: ctx, _a1
+func (_m *FakeLiftMotorRepository) GetLiftMotor(ctx context.Context, _a1 db.SQLDB) (model.LiftMotor, error) {
+	ret := _m.Called(ctx, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetLiftMotor")
+	}
+
+	var r0 model.LiftMotor
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) (model.LiftMotor, error)); ok {
+		return rf(ctx, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB) model.LiftMotor); ok {
+		r0 = rf(ctx, _a1)
+	} else {
+		r0 = ret.Get(0).(model.LiftMotor)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, db.SQLDB) error); ok {
+		r1 = rf(ctx, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeLiftMotorRepository_GetLiftMotor_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetLiftMotor'
+type FakeLiftMotorRepository_GetLiftMotor_Call struct {
+	*mock.Call
+}
+
+// GetLiftMotor is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 db.SQLDB
+func (_e *FakeLiftMotorRepository_Expecter) GetLiftMotor(ctx interface{}, _a1 interface{}) *FakeLiftMotorRepository_GetLiftMotor_Call {
+	return &FakeLiftMotorRepository_GetLiftMotor_Call{Call: _e.mock.On("GetLiftMotor", ctx, _a1)}
+}
+
+func (_c *FakeLiftMotorRepository_GetLiftMotor_Call) Run(run func(ctx context.Context, _a1 db.SQLDB)) *FakeLiftMotorRepository_GetLiftMotor_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(db.SQLDB))
+	})
+	return _c
+}
+
+func (_c *FakeLiftMotorRepository_GetLiftMotor_Call) Return(_a0 model.LiftMotor, _a1 error) *FakeLiftMotorRepository_GetLiftMotor_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeLiftMotorRepository_GetLiftMotor_Call) RunAndReturn(run func(context.Context, db.SQLDB) (model.LiftMotor, error)) *FakeLiftMotorRepository_GetLiftMotor_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateLiftMotor provides a mock function with given fields: ctx, _a1, liftMotor
 func (_m *FakeLiftMotorRepository) UpdateLiftMotor(ctx context.Context, _a1 db.SQLDB, liftMotor model.LiftMotor) error {
 	ret := _m.Called(ctx, _a1, liftMotor)
