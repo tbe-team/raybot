@@ -34,6 +34,17 @@ type BatteryDischarge struct {
 	UpdatedAt    time.Time `json:"updated_at"`
 }
 
+type Command struct {
+	ID          int64      `json:"id"`
+	Type        int64      `json:"type"`
+	Status      int64      `json:"status"`
+	Source      int64      `json:"source"`
+	Inputs      string     `json:"inputs"`
+	Error       *string    `json:"error"`
+	CreatedAt   time.Time  `json:"created_at"`
+	CompletedAt *time.Time `json:"completed_at"`
+}
+
 type DistanceSensor struct {
 	ID            int64     `json:"id"`
 	FrontDistance int64     `json:"front_distance"`
