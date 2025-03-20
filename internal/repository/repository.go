@@ -8,4 +8,5 @@ type Repository interface {
 	DriveMotor() DriveMotorRepository
 	LiftMotor() LiftMotorRepository
 	Location() LocationRepository
+	Command() CommandRepository
 }

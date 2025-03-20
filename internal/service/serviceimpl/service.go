@@ -14,6 +14,7 @@ type serviceImpl struct {
 	systemService     *SystemService
 	picService        *PICService
 	locationService   *LocationService
+	commandService    *CommandService
 }
 
 func New(
@@ -39,6 +40,7 @@ func New(
 			validator,
 		),
 		locationService: NewLocationService(repo.Location(), dbProvider),
+		commandService:  NewCommandService(repo.Command(), dbProvider, validator),
 	}
 }
 
@@ -56,4 +58,8 @@ func (s serviceImpl) PICService() service.PICService {
 
 func (s serviceImpl) LocationService() service.LocationService {
 	return s.locationService
+}
+
+func (s serviceImpl) CommandService() service.CommandService {
+	return s.commandService
 }

@@ -5,4 +5,5 @@ type Service interface {
 	SystemService() SystemService
 	PICService() PICService
 	LocationService() LocationService
+	CommandService() CommandService
 }

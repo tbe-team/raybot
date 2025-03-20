@@ -19,5 +19,5 @@ func (h robotStateHandler) GetRobotState(ctx context.Context, _ gen.GetRobotStat
 		return nil, fmt.Errorf("robot state service get robot state: %w", err)
 	}
 
-	return gen.GetRobotState200JSONResponse(converter.ToRobotStateResponse(state)), nil
+	return gen.GetRobotState200JSONResponse(converter.ConvertRobotStateToResponse(state)), nil
 }

@@ -13,6 +13,7 @@ type repo struct {
 	driveMotorRepo       repository.DriveMotorRepository
 	liftMotorRepo        repository.LiftMotorRepository
 	locationRepo         repository.LocationRepository
+	commandRepo          repository.CommandRepository
 }
 
 func New() repository.Repository {
@@ -25,6 +26,7 @@ func New() repository.Repository {
 		driveMotorRepo:       NewDriveMotorRepository(queries),
 		liftMotorRepo:        NewLiftMotorRepository(queries),
 		locationRepo:         NewLocationRepository(queries),
+		commandRepo:          NewCommandRepository(queries),
 	}
 }
 
@@ -54,4 +56,8 @@ func (r *repo) LiftMotor() repository.LiftMotorRepository {
 
 func (r *repo) Location() repository.LocationRepository {
 	return r.locationRepo
+}
+
+func (r *repo) Command() repository.CommandRepository {
+	return r.commandRepo
 }

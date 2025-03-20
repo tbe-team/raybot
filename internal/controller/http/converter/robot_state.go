@@ -5,7 +5,7 @@ import (
 	"github.com/tbe-team/raybot/internal/model"
 )
 
-func ToRobotStateResponse(state model.RobotState) gen.RobotStateResponse {
+func ConvertRobotStateToResponse(state model.RobotState) gen.RobotStateResponse {
 	return gen.RobotStateResponse{
 		Battery: gen.BatteryState{
 			Current:      state.Battery.Current,
