@@ -19,3 +19,7 @@ paths:
     $ref: "./paths/health.yml"
   /robot-state:
     $ref: "./paths/robot-state.yml"
+  /commands:
+    $ref: "./paths/commands.yml"
+  /commands/in-progress:
+    $ref: "./paths/commands@in-progress.yml"
