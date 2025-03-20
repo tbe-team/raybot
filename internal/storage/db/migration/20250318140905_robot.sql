@@ -13,21 +13,21 @@ CREATE TABLE battery (
 	percent INTEGER NOT NULL,
 	fault INTEGER NOT NULL,
 	health INTEGER NOT NULL,
-	updated_at DATETIME NOT NULL
+	updated_at TEXT NOT NULL
 );
 
 CREATE TABLE battery_charge (
 	id INTEGER PRIMARY KEY CHECK (id = 1),
 	current_limit INTEGER NOT NULL,
 	enabled INTEGER NOT NULL,
-	updated_at DATETIME NOT NULL
+	updated_at TEXT NOT NULL
 );
 
 CREATE TABLE battery_discharge (
 	id INTEGER PRIMARY KEY CHECK (id = 1),
 	current_limit INTEGER NOT NULL,
 	enabled INTEGER NOT NULL,
-	updated_at DATETIME NOT NULL
+	updated_at TEXT NOT NULL
 );
 
 CREATE TABLE distance_sensor (
@@ -35,7 +35,7 @@ CREATE TABLE distance_sensor (
 	front_distance INTEGER NOT NULL,
 	back_distance INTEGER NOT NULL,
 	down_distance INTEGER NOT NULL,
-	updated_at DATETIME NOT NULL
+	updated_at TEXT NOT NULL
 );
 
 CREATE TABLE drive_motor (
@@ -44,7 +44,7 @@ CREATE TABLE drive_motor (
 	speed INTEGER NOT NULL,
 	is_running INTEGER NOT NULL,
 	enabled INTEGER NOT NULL,
-	updated_at DATETIME NOT NULL
+	updated_at TEXT NOT NULL
 );
 
 CREATE TABLE lift_motor (
@@ -53,13 +53,13 @@ CREATE TABLE lift_motor (
 	target_position INTEGER NOT NULL,
 	is_running INTEGER NOT NULL,
 	enabled INTEGER NOT NULL,
-	updated_at DATETIME NOT NULL
+	updated_at TEXT NOT NULL
 );
 
 CREATE TABLE location (
 	id INTEGER PRIMARY KEY CHECK (id = 1),
 	current_location TEXT NOT NULL,
-	updated_at DATETIME NOT NULL
+	updated_at TEXT NOT NULL
 );
 
 INSERT INTO robot (id) VALUES (1);

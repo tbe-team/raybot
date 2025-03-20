@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"time"
 )
 
 const distanceSensorGet = `-- name: DistanceSensorGet :one
@@ -38,10 +37,10 @@ WHERE id = 1
 `
 
 type DistanceSensorUpdateParams struct {
-	FrontDistance int64     `json:"front_distance"`
-	BackDistance  int64     `json:"back_distance"`
-	DownDistance  int64     `json:"down_distance"`
-	UpdatedAt     time.Time `json:"updated_at"`
+	FrontDistance int64  `json:"front_distance"`
+	BackDistance  int64  `json:"back_distance"`
+	DownDistance  int64  `json:"down_distance"`
+	UpdatedAt     string `json:"updated_at"`
 }
 
 func (q *Queries) DistanceSensorUpdate(ctx context.Context, db DBTX, arg DistanceSensorUpdateParams) error {

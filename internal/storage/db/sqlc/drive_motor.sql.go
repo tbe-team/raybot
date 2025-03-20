@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"time"
 )
 
 const driveMotorGet = `-- name: DriveMotorGet :one
@@ -40,11 +39,11 @@ WHERE id = 1
 `
 
 type DriveMotorUpdateParams struct {
-	Direction int64     `json:"direction"`
-	Speed     int64     `json:"speed"`
-	IsRunning int64     `json:"is_running"`
-	Enabled   int64     `json:"enabled"`
-	UpdatedAt time.Time `json:"updated_at"`
+	Direction int64  `json:"direction"`
+	Speed     int64  `json:"speed"`
+	IsRunning int64  `json:"is_running"`
+	Enabled   int64  `json:"enabled"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 func (q *Queries) DriveMotorUpdate(ctx context.Context, db DBTX, arg DriveMotorUpdateParams) error {

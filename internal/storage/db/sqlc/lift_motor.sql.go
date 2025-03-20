@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"time"
 )
 
 const liftMotorGet = `-- name: LiftMotorGet :one
@@ -40,11 +39,11 @@ WHERE id = 1
 `
 
 type LiftMotorUpdateParams struct {
-	CurrentPosition int64     `json:"current_position"`
-	TargetPosition  int64     `json:"target_position"`
-	IsRunning       int64     `json:"is_running"`
-	Enabled         int64     `json:"enabled"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	CurrentPosition int64  `json:"current_position"`
+	TargetPosition  int64  `json:"target_position"`
+	IsRunning       int64  `json:"is_running"`
+	Enabled         int64  `json:"enabled"`
+	UpdatedAt       string `json:"updated_at"`
 }
 
 func (q *Queries) LiftMotorUpdate(ctx context.Context, db DBTX, arg LiftMotorUpdateParams) error {

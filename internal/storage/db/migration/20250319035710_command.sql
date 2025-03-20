@@ -7,8 +7,8 @@ CREATE TABLE commands (
 	source INTEGER NOT NULL,
 	inputs TEXT NOT NULL DEFAULT '{}',
 	error TEXT,
-	created_at DATETIME NOT NULL,
-	completed_at DATETIME
+	created_at TEXT NOT NULL,
+	completed_at TEXT
 );
 -- +goose StatementEnd
 

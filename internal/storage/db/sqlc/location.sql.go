@@ -7,8 +7,19 @@ package sqlc
 
 import (
 	"context"
-	"time"
 )
+
+const locationGetCurrent = `-- name: LocationGetCurrent :one
+SELECT id, current_location, updated_at FROM location
+WHERE id = 1
+`
+
+func (q *Queries) LocationGetCurrent(ctx context.Context, db DBTX) (Location, error) {
+	row := db.QueryRowContext(ctx, locationGetCurrent)
+	var i Location
+	err := row.Scan(&i.ID, &i.CurrentLocation, &i.UpdatedAt)
+	return i, err
+}
 
 const locationUpdate = `-- name: LocationUpdate :exec
 UPDATE location
@@ -19,8 +30,8 @@ WHERE id = 1
 `
 
 type LocationUpdateParams struct {
-	CurrentLocation string    `json:"current_location"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	CurrentLocation string `json:"current_location"`
+	UpdatedAt       string `json:"updated_at"`
 }
 
 func (q *Queries) LocationUpdate(ctx context.Context, db DBTX, arg LocationUpdateParams) error {

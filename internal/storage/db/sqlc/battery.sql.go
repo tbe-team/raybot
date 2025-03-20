@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"time"
 )
 
 const batteryChargeGet = `-- name: BatteryChargeGet :one
@@ -36,9 +35,9 @@ WHERE id = 1
 `
 
 type BatteryChargeUpdateParams struct {
-	CurrentLimit int64     `json:"current_limit"`
-	Enabled      int64     `json:"enabled"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	CurrentLimit int64  `json:"current_limit"`
+	Enabled      int64  `json:"enabled"`
+	UpdatedAt    string `json:"updated_at"`
 }
 
 func (q *Queries) BatteryChargeUpdate(ctx context.Context, db DBTX, arg BatteryChargeUpdateParams) error {
@@ -72,9 +71,9 @@ WHERE id = 1
 `
 
 type BatteryDischargeUpdateParams struct {
-	CurrentLimit int64     `json:"current_limit"`
-	Enabled      int64     `json:"enabled"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	CurrentLimit int64  `json:"current_limit"`
+	Enabled      int64  `json:"enabled"`
+	UpdatedAt    string `json:"updated_at"`
 }
 
 func (q *Queries) BatteryDischargeUpdate(ctx context.Context, db DBTX, arg BatteryDischargeUpdateParams) error {
@@ -118,14 +117,14 @@ WHERE id = 1
 `
 
 type BatteryUpdateParams struct {
-	Current      int64     `json:"current"`
-	Temp         int64     `json:"temp"`
-	Voltage      int64     `json:"voltage"`
-	CellVoltages string    `json:"cell_voltages"`
-	Percent      int64     `json:"percent"`
-	Fault        int64     `json:"fault"`
-	Health       int64     `json:"health"`
-	UpdatedAt    time.Time `json:"updated_at"`
+	Current      int64  `json:"current"`
+	Temp         int64  `json:"temp"`
+	Voltage      int64  `json:"voltage"`
+	CellVoltages string `json:"cell_voltages"`
+	Percent      int64  `json:"percent"`
+	Fault        int64  `json:"fault"`
+	Health       int64  `json:"health"`
+	UpdatedAt    string `json:"updated_at"`
 }
 
 func (q *Queries) BatteryUpdate(ctx context.Context, db DBTX, arg BatteryUpdateParams) error {

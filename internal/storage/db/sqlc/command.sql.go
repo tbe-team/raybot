@@ -7,7 +7,6 @@ package sqlc
 
 import (
 	"context"
-	"time"
 )
 
 const commandCreate = `-- name: CommandCreate :exec
@@ -21,18 +20,18 @@ INSERT INTO commands (
 	created_at,
 	completed_at
 )
-VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
 `
 
 type CommandCreateParams struct {
-	ID          string     `json:"id"`
-	Type        int64      `json:"type"`
-	Status      int64      `json:"status"`
-	Source      int64      `json:"source"`
-	Inputs      string     `json:"inputs"`
-	Error       *string    `json:"error"`
-	CreatedAt   time.Time  `json:"created_at"`
-	CompletedAt *time.Time `json:"completed_at"`
+	ID          string  `json:"id"`
+	Type        int64   `json:"type"`
+	Status      int64   `json:"status"`
+	Source      int64   `json:"source"`
+	Inputs      string  `json:"inputs"`
+	Error       *string `json:"error"`
+	CreatedAt   string  `json:"created_at"`
+	CompletedAt *string `json:"completed_at"`
 }
 
 func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateParams) error {
@@ -55,6 +54,50 @@ SELECT id, type, status, source, inputs, error, created_at, completed_at FROM co
 
 func (q *Queries) CommandGetByStatusInProgress(ctx context.Context, db DBTX) (Command, error) {
 	row := db.QueryRowContext(ctx, commandGetByStatusInProgress)
+	var i Command
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Status,
+		&i.Source,
+		&i.Inputs,
+		&i.Error,
+		&i.CreatedAt,
+		&i.CompletedAt,
+	)
+	return i, err
+}
+
+const commandUpdate = `-- name: CommandUpdate :one
+UPDATE commands
+SET
+	status = CASE WHEN ?1 = 1 THEN ?2 ELSE status END,
+	error = CASE WHEN ?3 IS NOT NULL THEN ?4 ELSE error END,
+	completed_at = CASE WHEN ?5 IS NOT NULL THEN ?6 ELSE completed_at END
+WHERE id = ?7
+RETURNING id, type, status, source, inputs, error, created_at, completed_at
+`
+
+type CommandUpdateParams struct {
+	SetStatus      interface{} `json:"set_status"`
+	Status         int64       `json:"status"`
+	SetError       interface{} `json:"set_error"`
+	Error          *string     `json:"error"`
+	SetCompletedAt interface{} `json:"set_completed_at"`
+	CompletedAt    *string     `json:"completed_at"`
+	ID             string      `json:"id"`
+}
+
+func (q *Queries) CommandUpdate(ctx context.Context, db DBTX, arg CommandUpdateParams) (Command, error) {
+	row := db.QueryRowContext(ctx, commandUpdate,
+		arg.SetStatus,
+		arg.Status,
+		arg.SetError,
+		arg.Error,
+		arg.SetCompletedAt,
+		arg.CompletedAt,
+		arg.ID,
+	)
 	var i Command
 	err := row.Scan(
 		&i.ID,
