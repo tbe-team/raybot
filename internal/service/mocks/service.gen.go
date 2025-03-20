@@ -20,100 +20,6 @@ func (_m *FakeService) EXPECT() *FakeService_Expecter {
 	return &FakeService_Expecter{mock: &_m.Mock}
 }
 
-// CommandService provides a mock function with no fields
-func (_m *FakeService) CommandService() service.CommandService {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for CommandService")
-	}
-
-	var r0 service.CommandService
-	if rf, ok := ret.Get(0).(func() service.CommandService); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.CommandService)
-		}
-	}
-
-	return r0
-}
-
-// FakeService_CommandService_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CommandService'
-type FakeService_CommandService_Call struct {
-	*mock.Call
-}
-
-// CommandService is a helper method to define mock.On call
-func (_e *FakeService_Expecter) CommandService() *FakeService_CommandService_Call {
-	return &FakeService_CommandService_Call{Call: _e.mock.On("CommandService")}
-}
-
-func (_c *FakeService_CommandService_Call) Run(run func()) *FakeService_CommandService_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *FakeService_CommandService_Call) Return(_a0 service.CommandService) *FakeService_CommandService_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *FakeService_CommandService_Call) RunAndReturn(run func() service.CommandService) *FakeService_CommandService_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// LocationService provides a mock function with no fields
-func (_m *FakeService) LocationService() service.LocationService {
-	ret := _m.Called()
-
-	if len(ret) == 0 {
-		panic("no return value specified for LocationService")
-	}
-
-	var r0 service.LocationService
-	if rf, ok := ret.Get(0).(func() service.LocationService); ok {
-		r0 = rf()
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.LocationService)
-		}
-	}
-
-	return r0
-}
-
-// FakeService_LocationService_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LocationService'
-type FakeService_LocationService_Call struct {
-	*mock.Call
-}
-
-// LocationService is a helper method to define mock.On call
-func (_e *FakeService_Expecter) LocationService() *FakeService_LocationService_Call {
-	return &FakeService_LocationService_Call{Call: _e.mock.On("LocationService")}
-}
-
-func (_c *FakeService_LocationService_Call) Run(run func()) *FakeService_LocationService_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run()
-	})
-	return _c
-}
-
-func (_c *FakeService_LocationService_Call) Return(_a0 service.LocationService) *FakeService_LocationService_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *FakeService_LocationService_Call) RunAndReturn(run func() service.LocationService) *FakeService_LocationService_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // PICService provides a mock function with no fields
 func (_m *FakeService) PICService() service.PICService {
 	ret := _m.Called()
@@ -161,49 +67,49 @@ func (_c *FakeService_PICService_Call) RunAndReturn(run func() service.PICServic
 	return _c
 }
 
-// RobotStateService provides a mock function with no fields
-func (_m *FakeService) RobotStateService() service.RobotStateService {
+// RobotService provides a mock function with no fields
+func (_m *FakeService) RobotService() service.RobotService {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
-		panic("no return value specified for RobotStateService")
+		panic("no return value specified for RobotService")
 	}
 
-	var r0 service.RobotStateService
-	if rf, ok := ret.Get(0).(func() service.RobotStateService); ok {
+	var r0 service.RobotService
+	if rf, ok := ret.Get(0).(func() service.RobotService); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(service.RobotStateService)
+			r0 = ret.Get(0).(service.RobotService)
 		}
 	}
 
 	return r0
 }
 
-// FakeService_RobotStateService_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RobotStateService'
-type FakeService_RobotStateService_Call struct {
+// FakeService_RobotService_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RobotService'
+type FakeService_RobotService_Call struct {
 	*mock.Call
 }
 
-// RobotStateService is a helper method to define mock.On call
-func (_e *FakeService_Expecter) RobotStateService() *FakeService_RobotStateService_Call {
-	return &FakeService_RobotStateService_Call{Call: _e.mock.On("RobotStateService")}
+// RobotService is a helper method to define mock.On call
+func (_e *FakeService_Expecter) RobotService() *FakeService_RobotService_Call {
+	return &FakeService_RobotService_Call{Call: _e.mock.On("RobotService")}
 }
 
-func (_c *FakeService_RobotStateService_Call) Run(run func()) *FakeService_RobotStateService_Call {
+func (_c *FakeService_RobotService_Call) Run(run func()) *FakeService_RobotService_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run()
 	})
 	return _c
 }
 
-func (_c *FakeService_RobotStateService_Call) Return(_a0 service.RobotStateService) *FakeService_RobotStateService_Call {
+func (_c *FakeService_RobotService_Call) Return(_a0 service.RobotService) *FakeService_RobotService_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *FakeService_RobotStateService_Call) RunAndReturn(run func() service.RobotStateService) *FakeService_RobotStateService_Call {
+func (_c *FakeService_RobotService_Call) RunAndReturn(run func() service.RobotService) *FakeService_RobotService_Call {
 	_c.Call.Return(run)
 	return _c
 }

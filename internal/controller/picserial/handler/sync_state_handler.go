@@ -55,13 +55,13 @@ type SyncStateMessage struct {
 }
 
 type SyncStateHandler struct {
-	picService service.PICService
-	log        *slog.Logger
+	robotService service.RobotService
+	log          *slog.Logger
 }
 
-func NewSyncStateHandler(picService service.PICService, log *slog.Logger) *SyncStateHandler {
+func NewSyncStateHandler(robotService service.RobotService, log *slog.Logger) *SyncStateHandler {
 	return &SyncStateHandler{
-		picService: picService,
+		robotService: robotService,
 		log: log.With(
 			slog.String("handler", "SyncStateHandler"),
 		),
@@ -69,7 +69,7 @@ func NewSyncStateHandler(picService service.PICService, log *slog.Logger) *SyncS
 }
 
 func (h SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
-	params := service.ProcessSyncStateParams{}
+	params := service.UpdateRobotStateParams{}
 	switch msg.StateType {
 	case SyncStateTypeBattery:
 		var temp struct {
@@ -192,7 +192,8 @@ func (h SyncStateHandler) Handle(ctx context.Context, msg SyncStateMessage) {
 		return
 	}
 
-	if err := h.picService.ProcessSyncState(ctx, params); err != nil {
-		h.log.Error("failed to process sync state", slog.Any("error", err))
+	_, err := h.robotService.UpdateRobotState(ctx, params)
+	if err != nil {
+		h.log.Error("failed to update robot state", slog.Any("error", err))
 	}
 }

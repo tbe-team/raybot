@@ -5,7 +5,7 @@ import (
 	"github.com/tbe-team/raybot/internal/service"
 )
 
-func ConvertSystemConfigToResponse(cfg service.GetSystemConfigOutput) gen.SystemConfigResponse {
+func ToSystemConfigResponse(cfg service.GetSystemConfigOutput) gen.SystemConfigResponse {
 	return gen.SystemConfigResponse{
 		Grpc: gen.GRPCConfig{
 			Server: gen.GRPCServerConfig{

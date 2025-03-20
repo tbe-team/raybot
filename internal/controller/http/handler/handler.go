@@ -11,14 +11,12 @@ type APIHandler struct {
 	*systemHandler
 	*healthHandler
 	*robotStateHandler
-	*commandHandler
 }
 
 func NewAPIHandler(service service.Service) *APIHandler {
 	return &APIHandler{
 		systemHandler:     &systemHandler{systemService: service.SystemService()},
 		healthHandler:     &healthHandler{},
-		robotStateHandler: &robotStateHandler{robotStateService: service.RobotStateService()},
-		commandHandler:    &commandHandler{commandService: service.CommandService()},
+		robotStateHandler: &robotStateHandler{robotService: service.RobotService()},
 	}
 }

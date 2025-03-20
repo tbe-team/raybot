@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"time"
 
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/storage/db"
@@ -27,158 +26,99 @@ func (r RobotStateRepository) GetRobotState(ctx context.Context, db db.SQLDB) (m
 		return model.RobotState{}, fmt.Errorf("queries get robot state: %w", err)
 	}
 
-	return r.convertRowToRobotState(row)
+	return r.unmarshalRobotState(row)
 }
 
-func (r RobotStateRepository) convertRowToRobotState(row sqlc.RobotStateGetRow) (model.RobotState, error) {
-	var battery sqlc.Battery
-	d, ok := row.Battery.(string)
-	if !ok {
-		return model.RobotState{}, fmt.Errorf("battery is not a string")
-	}
-	if err := json.Unmarshal([]byte(d), &battery); err != nil {
-		return model.RobotState{}, fmt.Errorf("unmarshal battery: %w", err)
-	}
-
-	var batteryCharge sqlc.BatteryCharge
-	d, ok = row.BatteryCharge.(string)
-	if !ok {
-		return model.RobotState{}, fmt.Errorf("battery charge is not a string")
-	}
-	if err := json.Unmarshal([]byte(d), &batteryCharge); err != nil {
-		return model.RobotState{}, fmt.Errorf("unmarshal battery charge: %w", err)
-	}
-
-	var batteryDischarge sqlc.BatteryDischarge
-	d, ok = row.BatteryDischarge.(string)
-	if !ok {
-		return model.RobotState{}, fmt.Errorf("battery discharge is not a string")
-	}
-	if err := json.Unmarshal([]byte(d), &batteryDischarge); err != nil {
-		return model.RobotState{}, fmt.Errorf("unmarshal battery discharge: %w", err)
-	}
-
-	var distanceSensor sqlc.DistanceSensor
-	d, ok = row.DistanceSensor.(string)
-	if !ok {
-		return model.RobotState{}, fmt.Errorf("distance sensor is not a string")
-	}
-	if err := json.Unmarshal([]byte(d), &distanceSensor); err != nil {
-		return model.RobotState{}, fmt.Errorf("unmarshal distance sensor: %w", err)
-	}
-
-	var driveMotor sqlc.DriveMotor
-	d, ok = row.DriveMotor.(string)
-	if !ok {
-		return model.RobotState{}, fmt.Errorf("drive motor is not a string")
-	}
-	if err := json.Unmarshal([]byte(d), &driveMotor); err != nil {
-		return model.RobotState{}, fmt.Errorf("unmarshal drive motor: %w", err)
-	}
-
-	var liftMotor sqlc.LiftMotor
-	d, ok = row.LiftMotor.(string)
-	if !ok {
-		return model.RobotState{}, fmt.Errorf("lift motor is not a string")
-	}
-	if err := json.Unmarshal([]byte(d), &liftMotor); err != nil {
-		return model.RobotState{}, fmt.Errorf("unmarshal lift motor: %w", err)
-	}
-
-	var location sqlc.Location
-	d, ok = row.Location.(string)
-	if !ok {
-		return model.RobotState{}, fmt.Errorf("location is not a string")
-	}
-	if err := json.Unmarshal([]byte(d), &location); err != nil {
-		return model.RobotState{}, fmt.Errorf("unmarshal location: %w", err)
-	}
-
-	cellVoltages := make([]uint16, 0)
-	if err := json.Unmarshal([]byte(battery.CellVoltages), &cellVoltages); err != nil {
-		return model.RobotState{}, fmt.Errorf("unmarshal cell voltages: %w", err)
-	}
-
-	batteryUpdatedAt, err := time.Parse(time.RFC3339, battery.UpdatedAt)
+func (r RobotStateRepository) UpdateRobotState(ctx context.Context, db db.SQLDB, state model.RobotState) error {
+	batteryState, err := json.Marshal(state.Battery)
 	if err != nil {
-		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+		return fmt.Errorf("marshal battery state: %w", err)
 	}
 
-	batteryChargeUpdatedAt, err := time.Parse(time.RFC3339, batteryCharge.UpdatedAt)
+	chargeState, err := json.Marshal(state.Charge)
 	if err != nil {
-		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+		return fmt.Errorf("marshal charge state: %w", err)
 	}
 
-	batteryDischargeUpdatedAt, err := time.Parse(time.RFC3339, batteryDischarge.UpdatedAt)
+	dischargeState, err := json.Marshal(state.Discharge)
 	if err != nil {
-		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+		return fmt.Errorf("marshal discharge state: %w", err)
 	}
 
-	distanceSensorUpdatedAt, err := time.Parse(time.RFC3339, distanceSensor.UpdatedAt)
+	distanceSensorState, err := json.Marshal(state.DistanceSensor)
 	if err != nil {
-		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+		return fmt.Errorf("marshal distance sensor state: %w", err)
 	}
 
-	driveMotorUpdatedAt, err := time.Parse(time.RFC3339, driveMotor.UpdatedAt)
+	liftMotorState, err := json.Marshal(state.LiftMotor)
 	if err != nil {
-		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+		return fmt.Errorf("marshal lift motor state: %w", err)
 	}
 
-	liftMotorUpdatedAt, err := time.Parse(time.RFC3339, liftMotor.UpdatedAt)
+	driveMotorState, err := json.Marshal(state.DriveMotor)
 	if err != nil {
-		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+		return fmt.Errorf("marshal drive motor state: %w", err)
 	}
 
-	locationUpdatedAt, err := time.Parse(time.RFC3339, location.UpdatedAt)
+	locationState, err := json.Marshal(state.Location)
 	if err != nil {
-		return model.RobotState{}, fmt.Errorf("parse updated at: %w", err)
+		return fmt.Errorf("marshal location state: %w", err)
 	}
 
-	//nolint:gosec
-	return model.RobotState{
-		Battery: model.Battery{
-			Current:      uint16(battery.Current),
-			Temp:         uint8(battery.Temp),
-			Voltage:      uint16(battery.Voltage),
-			CellVoltages: cellVoltages,
-			Percent:      uint8(battery.Percent),
-			Fault:        uint8(battery.Fault),
-			Health:       uint8(battery.Health),
-			UpdatedAt:    batteryUpdatedAt,
-		},
-		Charge: model.BatteryCharge{
-			CurrentLimit: uint16(batteryCharge.CurrentLimit),
-			Enabled:      batteryCharge.Enabled == 1,
-			UpdatedAt:    batteryChargeUpdatedAt,
-		},
-		Discharge: model.BatteryDischarge{
-			CurrentLimit: uint16(batteryDischarge.CurrentLimit),
-			Enabled:      batteryDischarge.Enabled == 1,
-			UpdatedAt:    batteryDischargeUpdatedAt,
-		},
-		DistanceSensor: model.DistanceSensor{
-			FrontDistance: uint16(distanceSensor.FrontDistance),
-			BackDistance:  uint16(distanceSensor.BackDistance),
-			DownDistance:  uint16(distanceSensor.DownDistance),
-			UpdatedAt:     distanceSensorUpdatedAt,
-		},
-		DriveMotor: model.DriveMotor{
-			Direction: model.DriveMotorDirection(driveMotor.Direction),
-			Speed:     uint8(driveMotor.Speed),
-			IsRunning: driveMotor.IsRunning == 1,
-			Enabled:   driveMotor.Enabled == 1,
-			UpdatedAt: driveMotorUpdatedAt,
-		},
-		LiftMotor: model.LiftMotor{
-			CurrentPosition: uint16(liftMotor.CurrentPosition),
-			TargetPosition:  uint16(liftMotor.TargetPosition),
-			IsRunning:       liftMotor.IsRunning == 1,
-			Enabled:         liftMotor.Enabled == 1,
-			UpdatedAt:       liftMotorUpdatedAt,
-		},
-		Location: model.Location{
-			CurrentLocation: location.CurrentLocation,
-			UpdatedAt:       locationUpdatedAt,
-		},
-	}, nil
+	params := sqlc.RobotStateUpdateParams{
+		BatteryState:        string(batteryState),
+		ChargeState:         string(chargeState),
+		DischargeState:      string(dischargeState),
+		DistanceSensorState: string(distanceSensorState),
+		LiftMotorState:      string(liftMotorState),
+		DriveMotorState:     string(driveMotorState),
+		LocationState:       string(locationState),
+	}
+	err = r.queries.RobotStateUpdate(ctx, db, params)
+	if err != nil {
+		return fmt.Errorf("queries update robot state: %w", err)
+	}
+
+	return nil
+}
+
+func (RobotStateRepository) unmarshalRobotState(row sqlc.RobotState) (model.RobotState, error) {
+	var state model.RobotState
+
+	err := json.Unmarshal([]byte(row.BatteryState), &state.Battery)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("unmarshal battery state: %w", err)
+	}
+
+	err = json.Unmarshal([]byte(row.ChargeState), &state.Charge)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("unmarshal charge state: %w", err)
+	}
+
+	err = json.Unmarshal([]byte(row.DischargeState), &state.Discharge)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("unmarshal discharge state: %w", err)
+	}
+
+	err = json.Unmarshal([]byte(row.DistanceSensorState), &state.DistanceSensor)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("unmarshal distance sensor state: %w", err)
+	}
+
+	err = json.Unmarshal([]byte(row.LiftMotorState), &state.LiftMotor)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("unmarshal lift motor state: %w", err)
+	}
+
+	err = json.Unmarshal([]byte(row.DriveMotorState), &state.DriveMotor)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("unmarshal drive motor state: %w", err)
+	}
+
+	err = json.Unmarshal([]byte(row.LocationState), &state.Location)
+	if err != nil {
+		return model.RobotState{}, fmt.Errorf("unmarshal location state: %w", err)
+	}
+
+	return state, nil
 }

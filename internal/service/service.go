@@ -1,9 +1,7 @@
 package service
 
 type Service interface {
-	RobotStateService() RobotStateService
+	RobotService() RobotService
 	SystemService() SystemService
 	PICService() PICService
-	LocationService() LocationService
-	CommandService() CommandService
 }

@@ -17,14 +17,14 @@ func TestRobotStateHandler_GetRobotState(t *testing.T) {
 
 	tests := []struct {
 		name          string
-		mockSetup     func(*mocks.FakeRobotStateService)
+		mockSetup     func(*mocks.FakeRobotService)
 		expectedError bool
 	}{
 		{
 			name: "successful get robot state",
-			mockSetup: func(robotStateService *mocks.FakeRobotStateService) {
-				robotStateService.EXPECT().GetRobotState(ctx).Return(model.RobotState{
-					Battery: model.Battery{
+			mockSetup: func(robotService *mocks.FakeRobotService) {
+				robotService.EXPECT().GetRobotState(ctx).Return(model.RobotState{
+					Battery: model.BatteryState{
 						Current:      100,
 						Temp:         25,
 						Voltage:      12000,
@@ -32,7 +32,7 @@ func TestRobotStateHandler_GetRobotState(t *testing.T) {
 						Percent:      80,
 						Health:       100,
 					},
-					DriveMotor: model.DriveMotor{
+					DriveMotor: model.DriveMotorState{
 						Direction: model.DriveMotorDirectionForward,
 						Speed:     50,
 						IsRunning: true,
@@ -44,8 +44,8 @@ func TestRobotStateHandler_GetRobotState(t *testing.T) {
 		},
 		{
 			name: "robot service returns error",
-			mockSetup: func(robotStateService *mocks.FakeRobotStateService) {
-				robotStateService.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, errors.New("service error"))
+			mockSetup: func(robotService *mocks.FakeRobotService) {
+				robotService.EXPECT().GetRobotState(ctx).Return(model.RobotState{}, errors.New("service error"))
 			},
 			expectedError: true,
 		},
@@ -53,10 +53,10 @@ func TestRobotStateHandler_GetRobotState(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			robotStateService := mocks.NewFakeRobotStateService(t)
-			h := robotStateHandler{robotStateService: robotStateService}
+			robotService := mocks.NewFakeRobotService(t)
+			h := robotStateHandler{robotService: robotService}
 
-			tc.mockSetup(robotStateService)
+			tc.mockSetup(robotService)
 
 			resp, err := h.GetRobotState(ctx, gen.GetRobotStateRequestObject{})
 

@@ -19,11 +19,6 @@ import (
 type PICService struct {
 	robotStateRepo       repository.RobotStateRepository
 	picCommandSerialRepo repository.PICSerialCommandRepository
-	batteryRepo          repository.BatteryRepository
-	distanceSensorRepo   repository.DistanceSensorRepository
-	liftMotorRepo        repository.LiftMotorRepository
-	driveMotorRepo       repository.DriveMotorRepository
-	locationRepo         repository.LocationRepository
 	picSerialClient      serial.Client
 	dbProvider           db.Provider
 	validator            validator.Validator
@@ -32,11 +27,6 @@ type PICService struct {
 func NewPICService(
 	robotStateRepo repository.RobotStateRepository,
 	picCommandSerialRepo repository.PICSerialCommandRepository,
-	batteryRepo repository.BatteryRepository,
-	distanceSensorRepo repository.DistanceSensorRepository,
-	liftMotorRepo repository.LiftMotorRepository,
-	driveMotorRepo repository.DriveMotorRepository,
-	locationRepo repository.LocationRepository,
 	picSerialClient serial.Client,
 	dbProvider db.Provider,
 	validator validator.Validator,
@@ -44,78 +34,10 @@ func NewPICService(
 	return &PICService{
 		robotStateRepo:       robotStateRepo,
 		picCommandSerialRepo: picCommandSerialRepo,
-		batteryRepo:          batteryRepo,
-		distanceSensorRepo:   distanceSensorRepo,
-		liftMotorRepo:        liftMotorRepo,
-		driveMotorRepo:       driveMotorRepo,
-		locationRepo:         locationRepo,
 		picSerialClient:      picSerialClient,
 		dbProvider:           dbProvider,
 		validator:            validator,
 	}
-}
-
-func (s PICService) ProcessSyncState(ctx context.Context, params service.ProcessSyncStateParams) error {
-	if err := s.validator.Validate(params); err != nil {
-		return fmt.Errorf("validate params: %w", err)
-	}
-
-	if params.SetBattery {
-		m := model.Battery{
-			Current:      params.Battery.Current,
-			Temp:         params.Battery.Temp,
-			Voltage:      params.Battery.Voltage,
-			CellVoltages: params.Battery.CellVoltages,
-			Percent:      params.Battery.Percent,
-			Fault:        params.Battery.Fault,
-			Health:       params.Battery.Health,
-		}
-		return s.batteryRepo.UpdateBattery(ctx, s.dbProvider.DB(), m)
-	}
-
-	if params.SetCharge {
-		m := model.BatteryCharge{
-			CurrentLimit: params.Charge.CurrentLimit,
-			Enabled:      params.Charge.Enabled,
-		}
-		return s.batteryRepo.UpdateBatteryCharge(ctx, s.dbProvider.DB(), m)
-	}
-
-	if params.SetDischarge {
-		m := model.BatteryDischarge{
-			CurrentLimit: params.Discharge.CurrentLimit,
-			Enabled:      params.Discharge.Enabled,
-		}
-		return s.batteryRepo.UpdateBatteryDischarge(ctx, s.dbProvider.DB(), m)
-	}
-
-	if params.SetDistanceSensor {
-		m := model.DistanceSensor{
-			FrontDistance: params.DistanceSensor.FrontDistance,
-			BackDistance:  params.DistanceSensor.BackDistance,
-			DownDistance:  params.DistanceSensor.DownDistance,
-		}
-		return s.distanceSensorRepo.UpdateDistanceSensor(ctx, s.dbProvider.DB(), m)
-	}
-
-	if params.SetLiftMotor {
-		m := model.LiftMotor{
-			TargetPosition: params.LiftMotor.TargetPosition,
-			Enabled:        params.LiftMotor.Enabled,
-		}
-		return s.liftMotorRepo.UpdateLiftMotor(ctx, s.dbProvider.DB(), m)
-	}
-
-	if params.SetDriveMotor {
-		m := model.DriveMotor{
-			Direction: params.DriveMotor.Direction,
-			Speed:     params.DriveMotor.Speed,
-			Enabled:   params.DriveMotor.Enabled,
-		}
-		return s.driveMotorRepo.UpdateDriveMotor(ctx, s.dbProvider.DB(), m)
-	}
-
-	return nil
 }
 
 func (s PICService) CreateSerialCommand(ctx context.Context, params service.CreateSerialCommandParams) error {
@@ -187,6 +109,11 @@ func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.
 		return fmt.Errorf("get pic serial command: %w", err)
 	}
 
+	robotState, err := s.robotStateRepo.GetRobotState(ctx, s.dbProvider.DB())
+	if err != nil {
+		return fmt.Errorf("get robot state: %w", err)
+	}
+
 	// Update robot state by command type
 	switch cmd.Type {
 	case model.PICSerialCommandTypeBatteryCharge:
@@ -194,18 +121,9 @@ func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.
 		if !ok {
 			return fmt.Errorf("invalid command data type: %T", cmd.Data)
 		}
-
-		m, err := s.batteryRepo.GetBatteryCharge(ctx, s.dbProvider.DB())
-		if err != nil {
-			return fmt.Errorf("get battery charge: %w", err)
-		}
-
-		m.CurrentLimit = data.CurrentLimit
-		m.Enabled = data.Enable
-		m.UpdatedAt = time.Now()
-		if err := s.batteryRepo.UpdateBatteryCharge(ctx, s.dbProvider.DB(), m); err != nil {
-			return fmt.Errorf("update battery charge: %w", err)
-		}
+		robotState.Charge.CurrentLimit = data.CurrentLimit
+		robotState.Charge.Enabled = data.Enable
+		robotState.Charge.UpdatedAt = time.Now()
 
 	case model.PICSerialCommandTypeBatteryDischarge:
 		data, ok := cmd.Data.(model.PICSerialCommandBatteryDischargeData)
@@ -213,17 +131,9 @@ func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.
 			return fmt.Errorf("invalid command data type: %T", cmd.Data)
 		}
 
-		m, err := s.batteryRepo.GetBatteryDischarge(ctx, s.dbProvider.DB())
-		if err != nil {
-			return fmt.Errorf("get battery discharge: %w", err)
-		}
-
-		m.CurrentLimit = data.CurrentLimit
-		m.Enabled = data.Enable
-		m.UpdatedAt = time.Now()
-		if err := s.batteryRepo.UpdateBatteryDischarge(ctx, s.dbProvider.DB(), m); err != nil {
-			return fmt.Errorf("update battery discharge: %w", err)
-		}
+		robotState.Discharge.CurrentLimit = data.CurrentLimit
+		robotState.Discharge.Enabled = data.Enable
+		robotState.Discharge.UpdatedAt = time.Now()
 
 	case model.PICSerialCommandTypeLiftMotor:
 		data, ok := cmd.Data.(model.PICSerialCommandBatteryLiftMotorData)
@@ -231,17 +141,9 @@ func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.
 			return fmt.Errorf("invalid command data type: %T", cmd.Data)
 		}
 
-		m, err := s.liftMotorRepo.GetLiftMotor(ctx, s.dbProvider.DB())
-		if err != nil {
-			return fmt.Errorf("get lift motor: %w", err)
-		}
-
-		m.TargetPosition = data.TargetPosition
-		m.Enabled = data.Enable
-		m.UpdatedAt = time.Now()
-		if err := s.liftMotorRepo.UpdateLiftMotor(ctx, s.dbProvider.DB(), m); err != nil {
-			return fmt.Errorf("update lift motor: %w", err)
-		}
+		robotState.LiftMotor.TargetPosition = data.TargetPosition
+		robotState.LiftMotor.Enabled = data.Enable
+		robotState.LiftMotor.UpdatedAt = time.Now()
 
 	case model.PICSerialCommandTypeDriveMotor:
 		data, ok := cmd.Data.(model.PICSerialCommandBatteryDriveMotorData)
@@ -249,29 +151,24 @@ func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.
 			return fmt.Errorf("invalid command data type: %T", cmd.Data)
 		}
 
-		m, err := s.driveMotorRepo.GetDriveMotor(ctx, s.dbProvider.DB())
-		if err != nil {
-			return fmt.Errorf("get drive motor: %w", err)
-		}
-
 		switch data.Direction {
 		case model.MoveDirectionForward:
-			m.Direction = model.DriveMotorDirectionForward
+			robotState.DriveMotor.Direction = model.DriveMotorDirectionForward
 		case model.MoveDirectionBackward:
-			m.Direction = model.DriveMotorDirectionBackward
+			robotState.DriveMotor.Direction = model.DriveMotorDirectionBackward
 		default:
 			return fmt.Errorf("invalid move direction: %d", data.Direction)
 		}
-
-		m.Speed = data.Speed
-		m.Enabled = data.Enable
-		m.UpdatedAt = time.Now()
-		if err := s.driveMotorRepo.UpdateDriveMotor(ctx, s.dbProvider.DB(), m); err != nil {
-			return fmt.Errorf("update drive motor: %w", err)
-		}
+		robotState.DriveMotor.Speed = data.Speed
+		robotState.DriveMotor.Enabled = data.Enable
+		robotState.DriveMotor.UpdatedAt = time.Now()
 
 	default:
 		return fmt.Errorf("unknown command type: %d", cmd.Type)
+	}
+
+	if err := s.robotStateRepo.UpdateRobotState(ctx, s.dbProvider.DB(), robotState); err != nil {
+		return fmt.Errorf("update robot state %w", err)
 	}
 
 	if err := s.picCommandSerialRepo.DeletePICSerialCommand(ctx, params.ID); err != nil {

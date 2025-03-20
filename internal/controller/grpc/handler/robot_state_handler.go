@@ -13,17 +13,17 @@ import (
 type RobotStateHandler struct {
 	raybotv1grpc.UnimplementedRobotStateServiceServer
 
-	robotStateService service.RobotStateService
+	robotService service.RobotService
 }
 
-func NewRobotStateHandler(robotStateService service.RobotStateService) *RobotStateHandler {
+func NewRobotStateHandler(robotService service.RobotService) *RobotStateHandler {
 	return &RobotStateHandler{
-		robotStateService: robotStateService,
+		robotService: robotService,
 	}
 }
 
 func (h RobotStateHandler) GetRobotState(ctx context.Context, _ *raybotv1.GetRobotStateRequest) (*raybotv1.GetRobotStateResponse, error) {
-	state, err := h.robotStateService.GetRobotState(ctx)
+	state, err := h.robotService.GetRobotState(ctx)
 	if err != nil {
 		return nil, err
 	}

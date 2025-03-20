@@ -60,6 +60,15 @@ func (e XError) Parent() error {
 	return e.parent
 }
 
+// IsStatus checks if the error is an XError with the given status.
+func IsStatus(err error, status Status) bool {
+	var xErr XError
+	if errors.As(err, &xErr) {
+		return xErr.Status() == status
+	}
+	return false
+}
+
 func Unauthorized(parent error, msgID, msg string) XError {
 	return NewXError(parent, StatusUnauthorized, msgID, msg)
 }
@@ -106,61 +115,4 @@ func NotImplemented(parent error, msgID, msg string) XError {
 
 func BadGateway(parent error, msgID, msg string) XError {
 	return NewXError(parent, StatusBadGateway, msgID, msg)
-}
-
-// checkStatus checks if the error is an XError with the given status.
-func checkStatus(err error, status Status) bool {
-	var xErr XError
-	if errors.As(err, &xErr) {
-		return xErr.Status() == status
-	}
-	return false
-}
-
-func IsNotFound(err error) bool {
-	return checkStatus(err, StatusNotFound)
-}
-
-func IsUnauthorized(err error) bool {
-	return checkStatus(err, StatusUnauthorized)
-}
-
-func IsForbidden(err error) bool {
-	return checkStatus(err, StatusForbidden)
-}
-
-func IsBadRequest(err error) bool {
-	return checkStatus(err, StatusBadRequest)
-}
-
-func IsValidationFailed(err error) bool {
-	return checkStatus(err, StatusValidationFailed)
-}
-
-func IsInternalServerError(err error) bool {
-	return checkStatus(err, StatusInternalServerError)
-}
-
-func IsTimeout(err error) bool {
-	return checkStatus(err, StatusTimeout)
-}
-
-func IsNotImplemented(err error) bool {
-	return checkStatus(err, StatusNotImplemented)
-}
-
-func IsBadGateway(err error) bool {
-	return checkStatus(err, StatusBadGateway)
-}
-
-func IsUnprocessableEntity(err error) bool {
-	return checkStatus(err, StatusUnprocessableEntity)
-}
-
-func IsConflict(err error) bool {
-	return checkStatus(err, StatusConflict)
-}
-
-func IsTooManyRequests(err error) bool {
-	return checkStatus(err, StatusTooManyRequests)
 }

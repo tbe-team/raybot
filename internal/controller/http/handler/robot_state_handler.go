@@ -10,14 +10,14 @@ import (
 )
 
 type robotStateHandler struct {
-	robotStateService service.RobotStateService
+	robotService service.RobotService
 }
 
 func (h robotStateHandler) GetRobotState(ctx context.Context, _ gen.GetRobotStateRequestObject) (gen.GetRobotStateResponseObject, error) {
-	state, err := h.robotStateService.GetRobotState(ctx)
+	state, err := h.robotService.GetRobotState(ctx)
 	if err != nil {
-		return nil, fmt.Errorf("robot state service get robot state: %w", err)
+		return nil, fmt.Errorf("robot service get robot state: %w", err)
 	}
 
-	return gen.GetRobotState200JSONResponse(converter.ConvertRobotStateToResponse(state)), nil
+	return gen.GetRobotState200JSONResponse(converter.ToRobotStateResponse(state)), nil
 }

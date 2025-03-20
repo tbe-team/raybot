@@ -17,7 +17,7 @@ type CleanupFunc func(context.Context) error
 
 func NewRFIDService(service service.Service, log *slog.Logger) (*Service, error) {
 	s := &Service{
-		log: log,
+		log: log.With(slog.String("service", "RFIDService")),
 	}
 
 	rfidClient, err := newClient(log)
@@ -28,17 +28,18 @@ func NewRFIDService(service service.Service, log *slog.Logger) (*Service, error)
 	}
 
 	s.rfidClient = rfidClient
-	s.rfidTagHandler = newRFIDTagHandler(service.LocationService(), log)
+	s.rfidTagHandler = newRFIDTagHandler(service.RobotService(), log)
 	return s, nil
 }
 
 func (s Service) Run(ctx context.Context) (CleanupFunc, error) {
+	s.log.Info("RFID service is running")
+
 	// Only start the read loop if we have a client
 	if s.rfidClient != nil {
-		s.log.Info("RFID service is running")
 		go s.readLoop(ctx)
 	} else {
-		s.log.Error("RFID service running without a reader connected")
+		s.log.Warn("RFID service running without a reader connected")
 	}
 
 	cleanup := func(_ context.Context) error {
