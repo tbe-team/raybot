@@ -1,4 +1,4 @@
-package mq
+package pubsub
 
 import (
 	"log/slog"
@@ -8,12 +8,12 @@ import (
 	"github.com/ThreeDotsLabs/watermill/pubsub/gochannel"
 )
 
-type MessageQueue interface {
+type PubSub interface {
 	message.Publisher
 	message.Subscriber
 }
 
-func New(log *slog.Logger) MessageQueue {
+func New(log *slog.Logger) PubSub {
 	return gochannel.NewGoChannel(
 		gochannel.Config{BlockPublishUntilSubscriberAck: false},
 		watermill.NewSlogLogger(log),

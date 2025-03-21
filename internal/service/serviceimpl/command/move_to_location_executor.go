@@ -11,10 +11,10 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 
 	"github.com/tbe-team/raybot/internal/model"
+	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
 	"github.com/tbe-team/raybot/internal/storage/db"
-	"github.com/tbe-team/raybot/internal/storage/mq"
 )
 
 type CreateSerialCommandServicer interface {
@@ -64,20 +64,20 @@ func (e MoveToLocationExecutor) Execute(ctx context.Context, command model.Comma
 	wg.Add(1)
 	go e.trackingLocationLoop(execCtx, &wg, errChan, command, inputs.Location)
 
-	// // Create serial command, robot move forward with speed 100
-	// params := service.CreateSerialCommandParams{
-	// 	Data: model.PICSerialCommandBatteryDriveMotorData{
-	// 		Direction: model.MoveDirectionForward,
-	// 		Speed:     100,
-	// 		Enable:    true,
-	// 	},
-	// }
-	// if err := e.createSerialServicer.CreateSerialCommand(ctx, params); err != nil {
-	// 	// Create serial command failed, we need to cancel the tracking location loop
-	// 	cancel()
-	// 	e.log.Error("create serial command", slog.Any("error", err))
-	// 	return fmt.Errorf("create serial command: %w", err)
-	// }
+	// Create serial command, robot move forward with speed 100
+	params := service.CreateSerialCommandParams{
+		Data: model.PICSerialCommandBatteryDriveMotorData{
+			Direction: model.MoveDirectionForward,
+			Speed:     100,
+			Enable:    true,
+		},
+	}
+	if err := e.createSerialServicer.CreateSerialCommand(ctx, params); err != nil {
+		// Create serial command failed, we need to cancel the tracking location loop
+		cancel()
+		e.log.Error("create serial command", slog.Any("error", err))
+		return fmt.Errorf("create serial command: %w", err)
+	}
 
 	// Wait for location tracked event
 	wg.Wait()
@@ -88,7 +88,7 @@ func (e MoveToLocationExecutor) Execute(ctx context.Context, command model.Comma
 			Data: model.PICSerialCommandBatteryDriveMotorData{
 				Direction: model.MoveDirectionForward,
 				Speed:     0,
-				Enable:    false,
+				Enable:    true,
 			},
 		}
 		if err := e.createSerialServicer.CreateSerialCommand(ctx, params); err != nil {
@@ -122,7 +122,7 @@ func (e MoveToLocationExecutor) trackingLocationLoop(
 	}()
 
 	e.log.Debug("start tracking location loop")
-	msgChan, err := e.subscriber.Subscribe(ctx, mq.TopicRobotLocationUpdated)
+	msgChan, err := e.subscriber.Subscribe(ctx, pubsub.TopicRobotLocationUpdated)
 	if err != nil {
 		errChan <- fmt.Errorf("subscriber subscribe: %w", err)
 		return
@@ -133,8 +133,7 @@ func (e MoveToLocationExecutor) trackingLocationLoop(
 		case <-ctx.Done():
 			return
 		case msg := <-msgChan:
-			e.log.Debug("received robot location updated event", slog.Any("event", msg))
-			var event mq.RobotLocationUpdatedEvent
+			var event pubsub.RobotLocationUpdatedEvent
 			if err := json.Unmarshal(msg.Payload, &event); err != nil {
 				e.log.Error("unmarshal location tracked event", slog.Any("error", err))
 				continue
@@ -157,6 +156,8 @@ func (e MoveToLocationExecutor) trackingLocationLoop(
 
 				return
 			}
+
+			msg.Ack()
 		}
 	}
 }

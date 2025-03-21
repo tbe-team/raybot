@@ -3,8 +3,8 @@ package event
 import (
 	"context"
 
+	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/service"
-	"github.com/tbe-team/raybot/internal/storage/mq"
 )
 
 type CommandCreatedEventHandler struct {
@@ -15,7 +15,7 @@ func NewCommandCreatedEventHandler(commandService service.CommandService) *Comma
 	return &CommandCreatedEventHandler{commandService: commandService}
 }
 
-func (t CommandCreatedEventHandler) Handle(ctx context.Context, cmdCreatedEvent mq.CommandCreatedEvent) error {
+func (t CommandCreatedEventHandler) Handle(ctx context.Context, cmdCreatedEvent pubsub.CommandCreatedEvent) error {
 	return t.commandService.ExecuteCommand(ctx, service.ExecuteCommandParams{
 		CommandID: cmdCreatedEvent.CommandID,
 	})

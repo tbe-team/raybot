@@ -1,4 +1,4 @@
-package mq
+package pubsub
 
 const (
 	TopicCommandCreated       = "command.created"

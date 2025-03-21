@@ -94,7 +94,7 @@ type CommandInputs interface {
 }
 
 type CommandMoveToLocationInputs struct {
-	Location string `validate:"required"`
+	Location string `json:"location" validate:"required"`
 }
 
 func (CommandMoveToLocationInputs) isCommandInputs() {}

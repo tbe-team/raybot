@@ -11,22 +11,22 @@ import (
 	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/ThreeDotsLabs/watermill/message/router/middleware"
 
+	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/service"
-	"github.com/tbe-team/raybot/internal/storage/mq"
 )
 
 type CleanupFunc func(ctx context.Context) error
 
 type Service struct {
 	service service.Service
-	mq      mq.MessageQueue
+	pubsub  pubsub.PubSub
 	log     *slog.Logger
 }
 
-func New(service service.Service, mq mq.MessageQueue, log *slog.Logger) *Service {
+func New(service service.Service, pubsub pubsub.PubSub, log *slog.Logger) *Service {
 	return &Service{
 		service: service,
-		mq:      mq,
+		pubsub:  pubsub,
 		log:     log.With(slog.String("service", "event")),
 	}
 }
@@ -69,10 +69,10 @@ func (s Service) registerEventRouter(router *message.Router) {
 
 	router.AddNoPublisherHandler(
 		"command-created-event-handler",
-		mq.TopicCommandCreated,
-		s.mq,
+		pubsub.TopicCommandCreated,
+		s.pubsub,
 		func(msg *message.Message) error {
-			var cmdCreatedEvent mq.CommandCreatedEvent
+			var cmdCreatedEvent pubsub.CommandCreatedEvent
 			if err := json.Unmarshal(msg.Payload, &cmdCreatedEvent); err != nil {
 				return fmt.Errorf("unmarshal command created event: %w", err)
 			}

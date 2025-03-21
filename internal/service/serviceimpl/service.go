@@ -5,6 +5,7 @@ import (
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
+	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
 	"github.com/tbe-team/raybot/internal/service/serviceimpl/command"
@@ -13,7 +14,6 @@ import (
 	robotstate "github.com/tbe-team/raybot/internal/service/serviceimpl/robot_state"
 	"github.com/tbe-team/raybot/internal/service/serviceimpl/system"
 	"github.com/tbe-team/raybot/internal/storage/db"
-	"github.com/tbe-team/raybot/internal/storage/mq"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -29,7 +29,7 @@ func New(
 	cfgManager config.Manager,
 	picSerialClient serial.Client,
 	repo repository.Repository,
-	messageQueue mq.MessageQueue,
+	pubSub pubsub.PubSub,
 	dbProvider db.Provider,
 	validator validator.Validator,
 	log *slog.Logger,
@@ -48,13 +48,13 @@ func New(
 		dbProvider,
 		validator,
 	)
-	locationService := location.NewService(repo.Location(), messageQueue, dbProvider)
+	locationService := location.NewService(repo.Location(), pubSub, dbProvider)
 	commandService := command.NewService(
 		repo.Command(),
 		picService,
 		dbProvider,
-		messageQueue,
-		messageQueue,
+		pubSub,
+		pubSub,
 		validator,
 		log,
 	)

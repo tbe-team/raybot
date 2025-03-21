@@ -135,7 +135,7 @@ func runCloud(app *application.Application) error {
 }
 
 func runEvent(app *application.Application) error {
-	eventService := event.New(app.Service, app.MessageQueue, app.Log)
+	eventService := event.New(app.Service, app.PubSub, app.Log)
 
 	cleanup, err := eventService.Run(app.Context())
 	if err != nil {

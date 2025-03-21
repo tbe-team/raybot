@@ -12,10 +12,10 @@ import (
 	"github.com/lithammer/shortuuid/v4"
 
 	"github.com/tbe-team/raybot/internal/model"
+	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
 	"github.com/tbe-team/raybot/internal/storage/db"
-	"github.com/tbe-team/raybot/internal/storage/mq"
 	"github.com/tbe-team/raybot/pkg/paging"
 	"github.com/tbe-team/raybot/pkg/validator"
 	"github.com/tbe-team/raybot/pkg/xerror"
@@ -134,16 +134,16 @@ func (s Service) CreateCommand(ctx context.Context, params service.CreateCommand
 }
 
 func (s Service) publishCommandCreatedEvent(command model.Command) error {
-	cmdCreatedEvent := mq.CommandCreatedEvent{
+	ev := pubsub.CommandCreatedEvent{
 		CommandID: command.ID,
 	}
-	payload, err := json.Marshal(cmdCreatedEvent)
+	payload, err := json.Marshal(ev)
 	if err != nil {
 		return fmt.Errorf("json marshal command created event: %w", err)
 	}
 
 	msg := message.NewMessage(shortuuid.New(), payload)
-	if err := s.publisher.Publish(mq.TopicCommandCreated, msg); err != nil {
+	if err := s.publisher.Publish(pubsub.TopicCommandCreated, msg); err != nil {
 		return fmt.Errorf("publisher publish command created event: %w", err)
 	}
 
@@ -172,7 +172,8 @@ func (s Service) ExecuteCommand(ctx context.Context, params service.ExecuteComma
 	// get executor for command type
 	executor, err := s.commandExecutorRegistry.GetExecutor(command.Type)
 	if err != nil {
-		s.log.Error("no executor found for command type", slog.Any("command_type", command.Type))
+		s.log.Error("no executor found for command type",
+			slog.String("command_type", command.Type.String()))
 		errorMessage := fmt.Sprintf("no executor found for command type: %s", command.Type)
 		params := repository.UpdateCommandParams{
 			ID:        command.ID,

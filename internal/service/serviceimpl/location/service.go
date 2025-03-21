@@ -10,10 +10,10 @@ import (
 	"github.com/lithammer/shortuuid/v4"
 
 	"github.com/tbe-team/raybot/internal/model"
+	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
 	"github.com/tbe-team/raybot/internal/storage/db"
-	"github.com/tbe-team/raybot/internal/storage/mq"
 )
 
 type Service struct {
@@ -42,7 +42,7 @@ func (s Service) UpdateLocation(ctx context.Context, params service.UpdateLocati
 }
 
 func (s Service) publishLocationUpdatedEvent(location string) error {
-	ev := mq.RobotLocationUpdatedEvent{
+	ev := pubsub.RobotLocationUpdatedEvent{
 		Location: location,
 	}
 	payload, err := json.Marshal(ev)
@@ -51,7 +51,7 @@ func (s Service) publishLocationUpdatedEvent(location string) error {
 	}
 
 	msg := message.NewMessage(shortuuid.New(), payload)
-	if err := s.publisher.Publish(mq.TopicRobotLocationUpdated, msg); err != nil {
+	if err := s.publisher.Publish(pubsub.TopicRobotLocationUpdated, msg); err != nil {
 		return fmt.Errorf("publisher publish location updated event: %w", err)
 	}
 
