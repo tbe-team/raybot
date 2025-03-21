@@ -102,6 +102,18 @@ func (r CommandRepository) GetCommandByStatusInProgress(ctx context.Context, sql
 	return r.convertRowToCommand(row)
 }
 
+func (r CommandRepository) GetCommandByID(ctx context.Context, dbSQL db.SQLDB, id string) (model.Command, error) {
+	row, err := r.queries.CommandGetByID(ctx, dbSQL, id)
+	if err != nil {
+		if db.IsNoRowsError(err) {
+			return model.Command{}, ErrCommandNotFound
+		}
+		return model.Command{}, fmt.Errorf("queries get command by id: %w", err)
+	}
+
+	return r.convertRowToCommand(row)
+}
+
 func (r CommandRepository) CreateCommand(ctx context.Context, db db.SQLDB, command model.Command) error {
 	inputs, err := json.Marshal(command.Inputs)
 	if err != nil {

@@ -1,6 +1,9 @@
 -- name: CommandGetByStatusInProgress :one
 SELECT * FROM commands WHERE status = 0 LIMIT 1;
 
+-- name: CommandGetByID :one
+SELECT * FROM commands WHERE id = @id;
+
 -- name: CommandCreate :exec
 INSERT INTO commands (
 	id,

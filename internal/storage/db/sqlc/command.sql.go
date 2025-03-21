@@ -48,6 +48,26 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 	return err
 }
 
+const commandGetByID = `-- name: CommandGetByID :one
+SELECT id, type, status, source, inputs, error, created_at, completed_at FROM commands WHERE id = ?1
+`
+
+func (q *Queries) CommandGetByID(ctx context.Context, db DBTX, id string) (Command, error) {
+	row := db.QueryRowContext(ctx, commandGetByID, id)
+	var i Command
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Status,
+		&i.Source,
+		&i.Inputs,
+		&i.Error,
+		&i.CreatedAt,
+		&i.CompletedAt,
+	)
+	return i, err
+}
+
 const commandGetByStatusInProgress = `-- name: CommandGetByStatusInProgress :one
 SELECT id, type, status, source, inputs, error, created_at, completed_at FROM commands WHERE status = 0 LIMIT 1
 `
