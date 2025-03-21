@@ -7,7 +7,7 @@ require (
 	buf.build/gen/go/tbe-team/raybot-api/protocolbuffers/go v1.36.5-20250310125418-04155442fda5.1
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/ThreeDotsLabs/watermill v1.4.6
-	github.com/getkin/kin-openapi v0.130.0
+	github.com/getkin/kin-openapi v0.131.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-playground/validator/v10 v10.25.0
 	github.com/google/uuid v1.6.0
