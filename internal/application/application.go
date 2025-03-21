@@ -12,6 +12,7 @@ import (
 	"github.com/tbe-team/raybot/internal/service/serviceimpl"
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/file"
+	"github.com/tbe-team/raybot/internal/storage/mq"
 	"github.com/tbe-team/raybot/pkg/log"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
@@ -21,6 +22,7 @@ type Application struct {
 
 	PICSerialClient serial.Client
 	Service         service.Service
+	MessageQueue    mq.MessageQueue
 
 	Log *slog.Logger
 
@@ -70,6 +72,10 @@ func New() (*Application, CleanupFunc, error) {
 		return nil, nil, fmt.Errorf("failed to auto migrate the database: %w", err)
 	}
 
+	// Setup message queue
+	messageQueue := mq.New(logger)
+
+	// Setup repository
 	repo := repoimpl.New()
 
 	// Setup serial client
@@ -80,12 +86,13 @@ func New() (*Application, CleanupFunc, error) {
 
 	// Setup service
 	validator := validator.New()
-	service := serviceimpl.New(cfgManager, picSerialClient, repo, dbProvider, validator, logger)
+	service := serviceimpl.New(cfgManager, picSerialClient, repo, messageQueue, dbProvider, validator, logger)
 
 	// Setup application
 	app := &Application{
 		CfgManager:      cfgManager,
 		PICSerialClient: picSerialClient,
+		MessageQueue:    messageQueue,
 		Service:         service,
 		Log:             logger,
 		CleanupManager:  NewCleanupManager(),

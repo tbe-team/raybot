@@ -3,6 +3,8 @@ package serviceimpl
 import (
 	"log/slog"
 
+	"github.com/ThreeDotsLabs/watermill/message"
+
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
 	"github.com/tbe-team/raybot/internal/repository"
@@ -23,6 +25,7 @@ func New(
 	cfgManager config.Manager,
 	picSerialClient serial.Client,
 	repo repository.Repository,
+	publisher message.Publisher,
 	dbProvider db.Provider,
 	validator validator.Validator,
 	log *slog.Logger,
@@ -47,6 +50,7 @@ func New(
 		repo.Location(),
 		picService,
 		dbProvider,
+		publisher,
 		validator,
 		log,
 	)

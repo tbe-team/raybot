@@ -72,6 +72,9 @@ migrate-reset:
 #########################
 .PHONY: build
 build:
+	CGO_ENABLED=1 \
+	GOOS=linux \
+	GOARCH=amd64 \
 	go build -o bin/raybot cmd/raybot/main.go
 
 .PHONY: build-ui
@@ -80,11 +83,11 @@ build-ui:
 
 .PHONY: build-arm64
 build-arm64:
-	GOOS=linux GOARCH=arm64 go build -o bin/raybot-arm64 cmd/raybot/main.go
-
-.PHONY: build-windows
-build-windows:
-	GOOS=windows GOARCH=amd64 go build -o bin/raybot.exe cmd/raybot/main.go
+	CGO_ENABLED=1 \
+	GOOS=linux \
+	GOARCH=arm64 \
+	CC=aarch64-linux-gnu-gcc \
+	go build -o bin/raybot-arm64 cmd/raybot/main.go
 
 #########################
 # Docker

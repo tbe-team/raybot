@@ -19,9 +19,13 @@ type ListCommandsParams struct {
 	Sorts        []sort.Sort   `validate:"required"`
 }
 
+type ExecuteInProgressCommandParams struct {
+	CommandID string `validate:"required"`
+}
+
 type CommandService interface {
 	ListCommands(ctx context.Context, params ListCommandsParams) (paging.List[model.Command], error)
 	GetCurrentProcessingCommand(ctx context.Context) (model.Command, error)
 	CreateCommand(ctx context.Context, params CreateCommandParams) (model.Command, error)
-	ExecuteInProgressCommand(ctx context.Context) error
+	ExecuteInProgressCommand(ctx context.Context, params ExecuteInProgressCommandParams) error
 }

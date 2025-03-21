@@ -8,9 +8,9 @@ import (
 
 	"github.com/tbe-team/raybot/internal/application"
 	"github.com/tbe-team/raybot/internal/controller/cloud"
+	"github.com/tbe-team/raybot/internal/controller/event"
 	"github.com/tbe-team/raybot/internal/controller/grpc"
 	"github.com/tbe-team/raybot/internal/controller/http"
-	"github.com/tbe-team/raybot/internal/controller/job"
 	"github.com/tbe-team/raybot/internal/controller/picserial"
 	"github.com/tbe-team/raybot/internal/controller/rfid"
 	"github.com/tbe-team/raybot/pkg/cmdutil"
@@ -63,8 +63,8 @@ func Run() {
 	}()
 
 	go func() {
-		if err := runJob(app); err != nil {
-			log.Printf("failed to run job service: %v\n", err)
+		if err := runEvent(app); err != nil {
+			log.Printf("failed to run event service: %v\n", err)
 			os.Exit(1)
 		}
 	}()
@@ -134,12 +134,12 @@ func runCloud(app *application.Application) error {
 	return nil
 }
 
-func runJob(app *application.Application) error {
-	jobService := job.NewService(app.Service, app.Log)
+func runEvent(app *application.Application) error {
+	eventService := event.New(app.Service, app.MessageQueue, app.Log)
 
-	cleanup, err := jobService.Run()
+	cleanup, err := eventService.Run(app.Context())
 	if err != nil {
-		return fmt.Errorf("failed to run job service: %w", err)
+		return fmt.Errorf("failed to run event service: %w", err)
 	}
 
 	app.CleanupManager.Add(cleanup)

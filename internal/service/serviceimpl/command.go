@@ -2,16 +2,20 @@ package serviceimpl
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log/slog"
 	"time"
 
+	"github.com/ThreeDotsLabs/watermill/message"
 	"github.com/google/uuid"
+	"github.com/lithammer/shortuuid/v4"
 
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
 	"github.com/tbe-team/raybot/internal/storage/db"
+	"github.com/tbe-team/raybot/internal/storage/mq"
 	"github.com/tbe-team/raybot/pkg/paging"
 	"github.com/tbe-team/raybot/pkg/validator"
 	"github.com/tbe-team/raybot/pkg/xerror"
@@ -28,6 +32,7 @@ type CommandService struct {
 	locationRepo          repository.LocationRepository
 	createSerialCommander CreateSerialCommander
 	dbProvider            db.Provider
+	publisher             message.Publisher
 	validator             validator.Validator
 	log                   *slog.Logger
 }
@@ -37,6 +42,7 @@ func NewCommandService(
 	locationRepo repository.LocationRepository,
 	createSerialCommander CreateSerialCommander,
 	dbProvider db.Provider,
+	publisher message.Publisher,
 	validator validator.Validator,
 	log *slog.Logger,
 ) *CommandService {
@@ -45,6 +51,7 @@ func NewCommandService(
 		locationRepo:          locationRepo,
 		createSerialCommander: createSerialCommander,
 		dbProvider:            dbProvider,
+		publisher:             publisher,
 		validator:             validator,
 		log:                   log,
 	}
@@ -113,16 +120,38 @@ func (s CommandService) CreateCommand(ctx context.Context, params service.Create
 		return model.Command{}, fmt.Errorf("command repository create command: %w", err)
 	}
 
+	// publish command created event
+	cmdCreatedEvent := mq.CommandCreatedEvent{
+		CommandID: command.ID,
+	}
+	payload, err := json.Marshal(cmdCreatedEvent)
+	if err != nil {
+		return model.Command{}, fmt.Errorf("json marshal command created event: %w", err)
+	}
+
+	msg := message.NewMessage(shortuuid.New(), payload)
+	if err := s.publisher.Publish(mq.TopicCommandCreated, msg); err != nil {
+		return model.Command{}, fmt.Errorf("publisher publish command created event: %w", err)
+	}
+
 	return command, nil
 }
 
-func (s CommandService) ExecuteInProgressCommand(ctx context.Context) error {
-	command, err := s.commandRepo.GetCommandByStatusInProgress(ctx, s.dbProvider.DB())
+func (s CommandService) ExecuteInProgressCommand(ctx context.Context, params service.ExecuteInProgressCommandParams) error {
+	if err := s.validator.Validate(params); err != nil {
+		return fmt.Errorf("validate params: %w", err)
+	}
+
+	command, err := s.commandRepo.GetCommandByID(ctx, s.dbProvider.DB(), params.CommandID)
 	if err != nil {
 		if xerror.IsNotFound(err) {
 			return nil
 		}
 		return fmt.Errorf("command repository get command by status in progress: %w", err)
+	}
+
+	if command.Status != model.CommandStatusInProgress {
+		return nil
 	}
 
 	//nolint:gocritic // it's ok to use switch here we will add more command types in the future
