@@ -1,5 +1,5 @@
 -- name: CommandGetByStatusInProgress :one
-SELECT * FROM commands WHERE status = 1 LIMIT 1;
+SELECT * FROM commands WHERE status = 0 LIMIT 1;
 
 -- name: CommandCreate :exec
 INSERT INTO commands (

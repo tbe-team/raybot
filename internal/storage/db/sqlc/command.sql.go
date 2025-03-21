@@ -49,7 +49,7 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 }
 
 const commandGetByStatusInProgress = `-- name: CommandGetByStatusInProgress :one
-SELECT id, type, status, source, inputs, error, created_at, completed_at FROM commands WHERE status = 1 LIMIT 1
+SELECT id, type, status, source, inputs, error, created_at, completed_at FROM commands WHERE status = 0 LIMIT 1
 `
 
 func (q *Queries) CommandGetByStatusInProgress(ctx context.Context, db DBTX) (Command, error) {
