@@ -144,10 +144,19 @@ func (r CommandRepository) CreateCommand(ctx context.Context, db db.SQLDB, comma
 }
 
 func (r CommandRepository) UpdateCommand(ctx context.Context, db db.SQLDB, params repository.UpdateCommandParams) (model.Command, error) {
+	var completedAt *string
+	if params.CompletedAt != nil {
+		c := params.CompletedAt.Format(time.RFC3339)
+		completedAt = &c
+	}
+
 	arg := sqlc.CommandUpdateParams{
 		ID:             params.ID,
+		Status:         int64(params.Status),
 		SetStatus:      params.SetStatus,
+		Error:          params.Error,
 		SetError:       params.SetError,
+		CompletedAt:    completedAt,
 		SetCompletedAt: params.SetCompletedAt,
 	}
 	row, err := r.queries.CommandUpdate(ctx, db, arg)

@@ -1,4 +1,4 @@
-package serviceimpl
+package pic
 
 import (
 	"context"
@@ -16,7 +16,7 @@ import (
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
-type PICService struct {
+type Service struct {
 	robotStateRepo       repository.RobotStateRepository
 	picCommandSerialRepo repository.PICSerialCommandRepository
 	batteryRepo          repository.BatteryRepository
@@ -29,7 +29,7 @@ type PICService struct {
 	validator            validator.Validator
 }
 
-func NewPICService(
+func NewService(
 	robotStateRepo repository.RobotStateRepository,
 	picCommandSerialRepo repository.PICSerialCommandRepository,
 	batteryRepo repository.BatteryRepository,
@@ -40,8 +40,8 @@ func NewPICService(
 	picSerialClient serial.Client,
 	dbProvider db.Provider,
 	validator validator.Validator,
-) *PICService {
-	return &PICService{
+) *Service {
+	return &Service{
 		robotStateRepo:       robotStateRepo,
 		picCommandSerialRepo: picCommandSerialRepo,
 		batteryRepo:          batteryRepo,
@@ -55,7 +55,7 @@ func NewPICService(
 	}
 }
 
-func (s PICService) ProcessSyncState(ctx context.Context, params service.ProcessSyncStateParams) error {
+func (s Service) ProcessSyncState(ctx context.Context, params service.ProcessSyncStateParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
 	}
@@ -118,7 +118,7 @@ func (s PICService) ProcessSyncState(ctx context.Context, params service.Process
 	return nil
 }
 
-func (s PICService) CreateSerialCommand(ctx context.Context, params service.CreateSerialCommandParams) error {
+func (s Service) CreateSerialCommand(ctx context.Context, params service.CreateSerialCommandParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
 	}
@@ -172,7 +172,7 @@ func (s PICService) CreateSerialCommand(ctx context.Context, params service.Crea
 	return nil
 }
 
-func (s PICService) ProcessSerialCommandACK(ctx context.Context, params service.ProcessSerialCommandACKParams) error {
+func (s Service) ProcessSerialCommandACK(ctx context.Context, params service.ProcessSerialCommandACKParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
 	}

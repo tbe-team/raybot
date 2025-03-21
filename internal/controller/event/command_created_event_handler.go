@@ -16,7 +16,7 @@ func NewCommandCreatedEventHandler(commandService service.CommandService) *Comma
 }
 
 func (t CommandCreatedEventHandler) Handle(ctx context.Context, cmdCreatedEvent mq.CommandCreatedEvent) error {
-	return t.commandService.ExecuteInProgressCommand(ctx, service.ExecuteInProgressCommandParams{
+	return t.commandService.ExecuteCommand(ctx, service.ExecuteCommandParams{
 		CommandID: cmdCreatedEvent.CommandID,
 	})
 }

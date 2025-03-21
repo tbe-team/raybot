@@ -14,10 +14,8 @@ type MessageQueue interface {
 }
 
 func New(log *slog.Logger) MessageQueue {
-	pubsub := gochannel.NewGoChannel(
+	return gochannel.NewGoChannel(
 		gochannel.Config{BlockPublishUntilSubscriberAck: false},
 		watermill.NewSlogLogger(log),
 	)
-
-	return pubsub
 }

@@ -1,4 +1,4 @@
-package serviceimpl
+package command
 
 import (
 	"context"
@@ -23,41 +23,47 @@ import (
 
 var ErrRobotIsProcessingCommand = xerror.Conflict(nil, "command.alreadyProcessing", "robot is already processing another command")
 
-type CreateSerialCommander interface {
+type CreateSerialServicer interface {
 	CreateSerialCommand(ctx context.Context, params service.CreateSerialCommandParams) error
 }
 
-type CommandService struct {
-	commandRepo           repository.CommandRepository
-	locationRepo          repository.LocationRepository
-	createSerialCommander CreateSerialCommander
-	dbProvider            db.Provider
-	publisher             message.Publisher
-	validator             validator.Validator
-	log                   *slog.Logger
+type Service struct {
+	commandRepo             repository.CommandRepository
+	createSerialServicer    CreateSerialServicer
+	dbProvider              db.Provider
+	publisher               message.Publisher
+	subscriber              message.Subscriber
+	validator               validator.Validator
+	commandExecutorRegistry *registry
+	log                     *slog.Logger
 }
 
-func NewCommandService(
+func NewService(
 	commandRepo repository.CommandRepository,
-	locationRepo repository.LocationRepository,
-	createSerialCommander CreateSerialCommander,
+	createSerialCommander CreateSerialServicer,
 	dbProvider db.Provider,
 	publisher message.Publisher,
+	subscriber message.Subscriber,
 	validator validator.Validator,
 	log *slog.Logger,
-) *CommandService {
-	return &CommandService{
-		commandRepo:           commandRepo,
-		locationRepo:          locationRepo,
-		createSerialCommander: createSerialCommander,
-		dbProvider:            dbProvider,
-		publisher:             publisher,
-		validator:             validator,
-		log:                   log,
+) *Service {
+	service := &Service{
+		commandRepo:             commandRepo,
+		createSerialServicer:    createSerialCommander,
+		dbProvider:              dbProvider,
+		publisher:               publisher,
+		subscriber:              subscriber,
+		validator:               validator,
+		commandExecutorRegistry: newRegistry(),
+		log:                     log,
 	}
+
+	service.registerCommandExecutors()
+
+	return service
 }
 
-func (s CommandService) ListCommands(ctx context.Context, params service.ListCommandsParams) (paging.List[model.Command], error) {
+func (s Service) ListCommands(ctx context.Context, params service.ListCommandsParams) (paging.List[model.Command], error) {
 	if err := s.validator.Validate(params); err != nil {
 		return paging.List[model.Command]{}, err
 	}
@@ -70,7 +76,7 @@ func (s CommandService) ListCommands(ctx context.Context, params service.ListCom
 	return ret, nil
 }
 
-func (s CommandService) GetCurrentProcessingCommand(ctx context.Context) (model.Command, error) {
+func (s Service) GetCurrentProcessingCommand(ctx context.Context) (model.Command, error) {
 	command, err := s.commandRepo.GetCommandByStatusInProgress(ctx, s.dbProvider.DB())
 	if err != nil {
 		return model.Command{}, fmt.Errorf("command repository get current processing command: %w", err)
@@ -79,7 +85,7 @@ func (s CommandService) GetCurrentProcessingCommand(ctx context.Context) (model.
 	return command, nil
 }
 
-func (s CommandService) CreateCommand(ctx context.Context, params service.CreateCommandParams) (model.Command, error) {
+func (s Service) CreateCommand(ctx context.Context, params service.CreateCommandParams) (model.Command, error) {
 	if err := s.validator.Validate(params); err != nil {
 		return model.Command{}, err
 	}
@@ -120,24 +126,31 @@ func (s CommandService) CreateCommand(ctx context.Context, params service.Create
 		return model.Command{}, fmt.Errorf("command repository create command: %w", err)
 	}
 
-	// publish command created event
-	cmdCreatedEvent := mq.CommandCreatedEvent{
-		CommandID: command.ID,
-	}
-	payload, err := json.Marshal(cmdCreatedEvent)
-	if err != nil {
-		return model.Command{}, fmt.Errorf("json marshal command created event: %w", err)
-	}
-
-	msg := message.NewMessage(shortuuid.New(), payload)
-	if err := s.publisher.Publish(mq.TopicCommandCreated, msg); err != nil {
-		return model.Command{}, fmt.Errorf("publisher publish command created event: %w", err)
+	if err := s.publishCommandCreatedEvent(command); err != nil {
+		return model.Command{}, fmt.Errorf("publish command created event: %w", err)
 	}
 
 	return command, nil
 }
 
-func (s CommandService) ExecuteInProgressCommand(ctx context.Context, params service.ExecuteInProgressCommandParams) error {
+func (s Service) publishCommandCreatedEvent(command model.Command) error {
+	cmdCreatedEvent := mq.CommandCreatedEvent{
+		CommandID: command.ID,
+	}
+	payload, err := json.Marshal(cmdCreatedEvent)
+	if err != nil {
+		return fmt.Errorf("json marshal command created event: %w", err)
+	}
+
+	msg := message.NewMessage(shortuuid.New(), payload)
+	if err := s.publisher.Publish(mq.TopicCommandCreated, msg); err != nil {
+		return fmt.Errorf("publisher publish command created event: %w", err)
+	}
+
+	return nil
+}
+
+func (s Service) ExecuteCommand(ctx context.Context, params service.ExecuteCommandParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
 	}
@@ -145,63 +158,48 @@ func (s CommandService) ExecuteInProgressCommand(ctx context.Context, params ser
 	command, err := s.commandRepo.GetCommandByID(ctx, s.dbProvider.DB(), params.CommandID)
 	if err != nil {
 		if xerror.IsNotFound(err) {
+			s.log.Error("command not found", slog.Any("command_id", params.CommandID))
 			return nil
 		}
-		return fmt.Errorf("command repository get command by status in progress: %w", err)
+		return fmt.Errorf("command repository get command by id: %w", err)
 	}
 
+	// if command is not in progress, we don't need to execute it
 	if command.Status != model.CommandStatusInProgress {
 		return nil
 	}
 
-	//nolint:gocritic // it's ok to use switch here we will add more command types in the future
-	switch command.Type {
-	case model.CommandTypeMoveToLocation:
-		inputs, ok := command.Inputs.(model.CommandMoveToLocationInputs)
-		if !ok {
-			return fmt.Errorf("command inputs is not model.CommandMoveToLocationInputs")
+	// get executor for command type
+	executor, err := s.commandExecutorRegistry.GetExecutor(command.Type)
+	if err != nil {
+		s.log.Error("no executor found for command type", slog.Any("command_type", command.Type))
+		errorMessage := fmt.Sprintf("no executor found for command type: %s", command.Type)
+		params := repository.UpdateCommandParams{
+			ID:        command.ID,
+			Status:    model.CommandStatusFailed,
+			SetStatus: true,
+			Error:     &errorMessage,
+			SetError:  true,
 		}
-		// We need to start tracking the location
-		go func() {
-			for {
-				loc, err := s.locationRepo.GetCurrentLocation(ctx, s.dbProvider.DB())
-				if err != nil {
-					s.log.Error("location repository get current location", slog.Any("error", err))
-					continue
-				}
-
-				if loc.CurrentLocation == inputs.Location {
-					s.log.Debug("current location is the same as the target location")
-					// Update command status to completed
-					completedAt := time.Now()
-					params := repository.UpdateCommandParams{
-						ID:             command.ID,
-						Status:         model.CommandStatusSucceeded,
-						SetStatus:      true,
-						CompletedAt:    &completedAt,
-						SetCompletedAt: true,
-					}
-					if _, err := s.commandRepo.UpdateCommand(ctx, s.dbProvider.DB(), params); err != nil {
-						s.log.Error("command repository update command", slog.Any("error", err))
-					}
-
-					break
-				}
-
-				time.Sleep(100 * time.Millisecond)
-			}
-		}()
-
-		if err := s.createSerialCommander.CreateSerialCommand(ctx, service.CreateSerialCommandParams{
-			Data: model.PICSerialCommandBatteryDriveMotorData{
-				Direction: model.MoveDirectionForward,
-				Speed:     100,
-				Enable:    true,
-			},
-		}); err != nil {
-			return fmt.Errorf("create serial command: %w", err)
+		if _, err := s.commandRepo.UpdateCommand(ctx, s.dbProvider.DB(), params); err != nil {
+			return fmt.Errorf("command repository update command: %w", err)
 		}
+
+		return nil
 	}
 
-	return nil
+	return executor.Execute(ctx, command)
+}
+
+func (s Service) registerCommandExecutors() {
+	s.commandExecutorRegistry.Register(
+		model.CommandTypeMoveToLocation,
+		NewMoveToLocationExecutor(
+			s.commandRepo,
+			s.subscriber,
+			s.createSerialServicer,
+			s.dbProvider,
+			s.log,
+		),
+	)
 }

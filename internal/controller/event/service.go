@@ -77,7 +77,12 @@ func (s Service) registerEventRouter(router *message.Router) {
 				return fmt.Errorf("unmarshal command created event: %w", err)
 			}
 
-			return commandCreatedEventHandler.Handle(msg.Context(), cmdCreatedEvent)
+			if err := commandCreatedEventHandler.Handle(msg.Context(), cmdCreatedEvent); err != nil {
+				// We don't want to retry the command
+				s.log.Error("command created event handler", slog.Any("error", err))
+			}
+
+			return nil
 		},
 	)
 

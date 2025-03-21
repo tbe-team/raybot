@@ -1,4 +1,4 @@
-package serviceimpl
+package system
 
 import (
 	"context"
@@ -92,7 +92,7 @@ func TestSystemService(t *testing.T) {
 				cfgManager := mocks.NewFakeManager(t)
 				tc.mock(cfgManager)
 
-				systemService := NewSystemService(cfgManager)
+				systemService := NewService(cfgManager)
 				result, err := systemService.GetSystemConfig(ctx)
 
 				if tc.expectedError {
@@ -299,7 +299,7 @@ func TestSystemService(t *testing.T) {
 				cfgManager := mocks.NewFakeManager(t)
 				tc.mock(cfgManager)
 
-				systemService := NewSystemService(cfgManager)
+				systemService := NewService(cfgManager)
 				result, err := systemService.UpdateSystemConfig(ctx, tc.params)
 
 				if tc.expectedError {

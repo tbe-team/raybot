@@ -1,4 +1,4 @@
-package serviceimpl
+package system
 
 import (
 	"context"
@@ -18,22 +18,22 @@ var (
 	ErrInvalidConfig = xerror.ValidationFailed(nil, "invalid config")
 )
 
-type SystemService struct {
+type Service struct {
 	cfgManager config.Manager
 }
 
-func NewSystemService(cfgManager config.Manager) *SystemService {
-	return &SystemService{
+func NewService(cfgManager config.Manager) *Service {
+	return &Service{
 		cfgManager: cfgManager,
 	}
 }
 
-func (s SystemService) GetSystemConfig(_ context.Context) (service.GetSystemConfigOutput, error) {
+func (s Service) GetSystemConfig(_ context.Context) (service.GetSystemConfigOutput, error) {
 	cfg := s.cfgManager.GetConfig()
 	return configToUpdateSystemConfigOutput(cfg), nil
 }
 
-func (s SystemService) UpdateSystemConfig(ctx context.Context, params service.UpdateSystemConfigParams) (service.UpdateSystemConfigOutput, error) {
+func (s Service) UpdateSystemConfig(ctx context.Context, params service.UpdateSystemConfigParams) (service.UpdateSystemConfigOutput, error) {
 	cfg := s.cfgManager.GetConfig()
 
 	cfg.Log.Level = params.LogConfig.Level
@@ -62,7 +62,7 @@ func (s SystemService) UpdateSystemConfig(ctx context.Context, params service.Up
 	return configToUpdateSystemConfigOutput(cfg), nil
 }
 
-func (s SystemService) RestartApplication(_ context.Context) error {
+func (s Service) RestartApplication(_ context.Context) error {
 	go func() {
 		time.Sleep(3 * time.Second)
 

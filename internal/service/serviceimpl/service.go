@@ -3,36 +3,40 @@ package serviceimpl
 import (
 	"log/slog"
 
-	"github.com/ThreeDotsLabs/watermill/message"
-
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
+	"github.com/tbe-team/raybot/internal/service/serviceimpl/command"
+	"github.com/tbe-team/raybot/internal/service/serviceimpl/location"
+	"github.com/tbe-team/raybot/internal/service/serviceimpl/pic"
+	robotstate "github.com/tbe-team/raybot/internal/service/serviceimpl/robot_state"
+	"github.com/tbe-team/raybot/internal/service/serviceimpl/system"
 	"github.com/tbe-team/raybot/internal/storage/db"
+	"github.com/tbe-team/raybot/internal/storage/mq"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
 type serviceImpl struct {
-	robotStateService *RobotStateService
-	systemService     *SystemService
-	picService        *PICService
-	locationService   *LocationService
-	commandService    *CommandService
+	robotStateService *robotstate.Service
+	systemService     *system.Service
+	picService        *pic.Service
+	locationService   *location.Service
+	commandService    *command.Service
 }
 
 func New(
 	cfgManager config.Manager,
 	picSerialClient serial.Client,
 	repo repository.Repository,
-	publisher message.Publisher,
+	messageQueue mq.MessageQueue,
 	dbProvider db.Provider,
 	validator validator.Validator,
 	log *slog.Logger,
 ) service.Service {
-	robotStateService := NewRobotStateService(repo.RobotState(), dbProvider)
-	systemService := NewSystemService(cfgManager)
-	picService := NewPICService(
+	robotStateService := robotstate.NewService(repo.RobotState(), dbProvider)
+	systemService := system.NewService(cfgManager)
+	picService := pic.NewService(
 		repo.RobotState(),
 		repo.PICSerialCommand(),
 		repo.Battery(),
@@ -44,13 +48,13 @@ func New(
 		dbProvider,
 		validator,
 	)
-	locationService := NewLocationService(repo.Location(), dbProvider)
-	commandService := NewCommandService(
+	locationService := location.NewService(repo.Location(), messageQueue, dbProvider)
+	commandService := command.NewService(
 		repo.Command(),
-		repo.Location(),
 		picService,
 		dbProvider,
-		publisher,
+		messageQueue,
+		messageQueue,
 		validator,
 		log,
 	)
