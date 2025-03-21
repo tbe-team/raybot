@@ -83,17 +83,17 @@ func (_c *FakeCommandService_CreateCommand_Call) RunAndReturn(run func(context.C
 	return _c
 }
 
-// ExecuteInProgressCommand provides a mock function with given fields: ctx
-func (_m *FakeCommandService) ExecuteInProgressCommand(ctx context.Context) error {
-	ret := _m.Called(ctx)
+// ExecuteCommand provides a mock function with given fields: ctx, params
+func (_m *FakeCommandService) ExecuteCommand(ctx context.Context, params service.ExecuteCommandParams) error {
+	ret := _m.Called(ctx, params)
 
 	if len(ret) == 0 {
-		panic("no return value specified for ExecuteInProgressCommand")
+		panic("no return value specified for ExecuteCommand")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
-		r0 = rf(ctx)
+	if rf, ok := ret.Get(0).(func(context.Context, service.ExecuteCommandParams) error); ok {
+		r0 = rf(ctx, params)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -101,30 +101,31 @@ func (_m *FakeCommandService) ExecuteInProgressCommand(ctx context.Context) erro
 	return r0
 }
 
-// FakeCommandService_ExecuteInProgressCommand_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ExecuteInProgressCommand'
-type FakeCommandService_ExecuteInProgressCommand_Call struct {
+// FakeCommandService_ExecuteCommand_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ExecuteCommand'
+type FakeCommandService_ExecuteCommand_Call struct {
 	*mock.Call
 }
 
-// ExecuteInProgressCommand is a helper method to define mock.On call
+// ExecuteCommand is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *FakeCommandService_Expecter) ExecuteInProgressCommand(ctx interface{}) *FakeCommandService_ExecuteInProgressCommand_Call {
-	return &FakeCommandService_ExecuteInProgressCommand_Call{Call: _e.mock.On("ExecuteInProgressCommand", ctx)}
+//   - params service.ExecuteCommandParams
+func (_e *FakeCommandService_Expecter) ExecuteCommand(ctx interface{}, params interface{}) *FakeCommandService_ExecuteCommand_Call {
+	return &FakeCommandService_ExecuteCommand_Call{Call: _e.mock.On("ExecuteCommand", ctx, params)}
 }
 
-func (_c *FakeCommandService_ExecuteInProgressCommand_Call) Run(run func(ctx context.Context)) *FakeCommandService_ExecuteInProgressCommand_Call {
+func (_c *FakeCommandService_ExecuteCommand_Call) Run(run func(ctx context.Context, params service.ExecuteCommandParams)) *FakeCommandService_ExecuteCommand_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context))
+		run(args[0].(context.Context), args[1].(service.ExecuteCommandParams))
 	})
 	return _c
 }
 
-func (_c *FakeCommandService_ExecuteInProgressCommand_Call) Return(_a0 error) *FakeCommandService_ExecuteInProgressCommand_Call {
+func (_c *FakeCommandService_ExecuteCommand_Call) Return(_a0 error) *FakeCommandService_ExecuteCommand_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *FakeCommandService_ExecuteInProgressCommand_Call) RunAndReturn(run func(context.Context) error) *FakeCommandService_ExecuteInProgressCommand_Call {
+func (_c *FakeCommandService_ExecuteCommand_Call) RunAndReturn(run func(context.Context, service.ExecuteCommandParams) error) *FakeCommandService_ExecuteCommand_Call {
 	_c.Call.Return(run)
 	return _c
 }

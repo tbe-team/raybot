@@ -78,6 +78,64 @@ func (_c *FakeCommandRepository_CreateCommand_Call) RunAndReturn(run func(contex
 	return _c
 }
 
+// GetCommandByID provides a mock function with given fields: ctx, _a1, id
+func (_m *FakeCommandRepository) GetCommandByID(ctx context.Context, _a1 db.SQLDB, id string) (model.Command, error) {
+	ret := _m.Called(ctx, _a1, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCommandByID")
+	}
+
+	var r0 model.Command
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB, string) (model.Command, error)); ok {
+		return rf(ctx, _a1, id)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB, string) model.Command); ok {
+		r0 = rf(ctx, _a1, id)
+	} else {
+		r0 = ret.Get(0).(model.Command)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, db.SQLDB, string) error); ok {
+		r1 = rf(ctx, _a1, id)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeCommandRepository_GetCommandByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCommandByID'
+type FakeCommandRepository_GetCommandByID_Call struct {
+	*mock.Call
+}
+
+// GetCommandByID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - _a1 db.SQLDB
+//   - id string
+func (_e *FakeCommandRepository_Expecter) GetCommandByID(ctx interface{}, _a1 interface{}, id interface{}) *FakeCommandRepository_GetCommandByID_Call {
+	return &FakeCommandRepository_GetCommandByID_Call{Call: _e.mock.On("GetCommandByID", ctx, _a1, id)}
+}
+
+func (_c *FakeCommandRepository_GetCommandByID_Call) Run(run func(ctx context.Context, _a1 db.SQLDB, id string)) *FakeCommandRepository_GetCommandByID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(db.SQLDB), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *FakeCommandRepository_GetCommandByID_Call) Return(_a0 model.Command, _a1 error) *FakeCommandRepository_GetCommandByID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeCommandRepository_GetCommandByID_Call) RunAndReturn(run func(context.Context, db.SQLDB, string) (model.Command, error)) *FakeCommandRepository_GetCommandByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetCommandByStatusInProgress provides a mock function with given fields: ctx, _a1
 func (_m *FakeCommandRepository) GetCommandByStatusInProgress(ctx context.Context, _a1 db.SQLDB) (model.Command, error) {
 	ret := _m.Called(ctx, _a1)
