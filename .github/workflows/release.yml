@@ -15,7 +15,7 @@ env:
 jobs:
   build-ui:
     name: Build UI
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     defaults:
       run:
         working-directory: ui
@@ -46,7 +46,7 @@ jobs:
     name: Build for Linux amd64
     needs:
       - build-ui
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -78,7 +78,7 @@ jobs:
     name: Build for Linux arm64
     needs:
       - build-ui
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Install build dependencies
         run: |
@@ -115,7 +115,7 @@ jobs:
     name: Build for Windows amd64
     needs:
       - build-ui
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Install build dependencies
         run: |
@@ -154,7 +154,7 @@ jobs:
       - build-linux-amd64
       - build-linux-arm64
       - build-windows-amd64
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
