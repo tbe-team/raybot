@@ -17,31 +17,27 @@ import (
 	"github.com/tbe-team/raybot/internal/storage/db"
 )
 
-type CreateSerialCommandServicer interface {
-	CreateSerialCommand(ctx context.Context, params service.CreateSerialCommandParams) error
-}
-
 type MoveToLocationExecutor struct {
-	commandRepo          repository.CommandRepository
-	subscriber           message.Subscriber
-	createSerialServicer CreateSerialCommandServicer
-	dbProvider           db.Provider
-	log                  *slog.Logger
+	commandRepo repository.CommandRepository
+	subscriber  message.Subscriber
+	picService  service.PICService
+	dbProvider  db.Provider
+	log         *slog.Logger
 }
 
 func NewMoveToLocationExecutor(
 	commandRepo repository.CommandRepository,
 	subscriber message.Subscriber,
-	createSerialCommander CreateSerialCommandServicer,
+	createSerialCommander service.PICService,
 	dbProvider db.Provider,
 	log *slog.Logger,
 ) *MoveToLocationExecutor {
 	return &MoveToLocationExecutor{
-		commandRepo:          commandRepo,
-		subscriber:           subscriber,
-		createSerialServicer: createSerialCommander,
-		dbProvider:           dbProvider,
-		log:                  log,
+		commandRepo: commandRepo,
+		subscriber:  subscriber,
+		picService:  createSerialCommander,
+		dbProvider:  dbProvider,
+		log:         log,
 	}
 }
 
@@ -72,10 +68,9 @@ func (e MoveToLocationExecutor) Execute(ctx context.Context, command model.Comma
 			Enable:    true,
 		},
 	}
-	if err := e.createSerialServicer.CreateSerialCommand(ctx, params); err != nil {
+	if err := e.picService.CreateSerialCommand(ctx, params); err != nil {
 		// Create serial command failed, we need to cancel the tracking location loop
 		cancel()
-		e.log.Error("create serial command", slog.Any("error", err))
 		return fmt.Errorf("create serial command: %w", err)
 	}
 
@@ -91,7 +86,7 @@ func (e MoveToLocationExecutor) Execute(ctx context.Context, command model.Comma
 				Enable:    true,
 			},
 		}
-		if err := e.createSerialServicer.CreateSerialCommand(ctx, params); err != nil {
+		if err := e.picService.CreateSerialCommand(ctx, params); err != nil {
 			e.log.Error(
 				"robot move to location done but can not stop robot: can not create serial command",
 				slog.Any("error", err),

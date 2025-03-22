@@ -23,13 +23,9 @@ import (
 
 var ErrRobotIsProcessingCommand = xerror.Conflict(nil, "command.alreadyProcessing", "robot is already processing another command")
 
-type CreateSerialServicer interface {
-	CreateSerialCommand(ctx context.Context, params service.CreateSerialCommandParams) error
-}
-
 type Service struct {
 	commandRepo             repository.CommandRepository
-	createSerialServicer    CreateSerialServicer
+	picService              service.PICService
 	dbProvider              db.Provider
 	publisher               message.Publisher
 	subscriber              message.Subscriber
@@ -40,7 +36,7 @@ type Service struct {
 
 func NewService(
 	commandRepo repository.CommandRepository,
-	createSerialCommander CreateSerialServicer,
+	picService service.PICService,
 	dbProvider db.Provider,
 	publisher message.Publisher,
 	subscriber message.Subscriber,
@@ -49,7 +45,7 @@ func NewService(
 ) *Service {
 	service := &Service{
 		commandRepo:             commandRepo,
-		createSerialServicer:    createSerialCommander,
+		picService:              picService,
 		dbProvider:              dbProvider,
 		publisher:               publisher,
 		subscriber:              subscriber,
@@ -189,7 +185,23 @@ func (s Service) ExecuteCommand(ctx context.Context, params service.ExecuteComma
 		return nil
 	}
 
-	return executor.Execute(ctx, command)
+	if err := executor.Execute(ctx, command); err != nil {
+		errorMessage := err.Error()
+		params := repository.UpdateCommandParams{
+			ID:        command.ID,
+			Status:    model.CommandStatusFailed,
+			SetStatus: true,
+			Error:     &errorMessage,
+			SetError:  true,
+		}
+		if _, err := s.commandRepo.UpdateCommand(ctx, s.dbProvider.DB(), params); err != nil {
+			return fmt.Errorf("command repository update command: %w", err)
+		}
+
+		return fmt.Errorf("execute command failed: %w: update command status to failed", err)
+	}
+
+	return nil
 }
 
 func (s Service) registerCommandExecutors() {
@@ -198,7 +210,7 @@ func (s Service) registerCommandExecutors() {
 		NewMoveToLocationExecutor(
 			s.commandRepo,
 			s.subscriber,
-			s.createSerialServicer,
+			s.picService,
 			s.dbProvider,
 			s.log,
 		),

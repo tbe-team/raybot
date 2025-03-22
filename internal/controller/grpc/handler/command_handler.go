@@ -52,6 +52,10 @@ func (CommandHandler) convertReqCommandTypeToCommandType(reqCommandType commandv
 	switch reqCommandType {
 	case commandv1.CreateCommandRequest_TYPE_MOVE_TO_LOCATION:
 		return model.CommandTypeMoveToLocation, nil
+	case commandv1.CreateCommandRequest_TYPE_LIFT_BOX:
+		return model.CommandTypeLiftBox, nil
+	case commandv1.CreateCommandRequest_TYPE_DROP_BOX:
+		return model.CommandTypeDropBox, nil
 	default:
 		return 0, xerror.ValidationFailed(nil, fmt.Sprintf("invalid command type: %s", reqCommandType))
 	}
@@ -63,6 +67,10 @@ func (CommandHandler) convertReqPayloadToCommandInputs(payload any) (model.Comma
 		return model.CommandMoveToLocationInputs{
 			Location: payload.MoveToLocation.Location,
 		}, nil
+	case *commandv1.CreateCommandRequest_LiftBox:
+		return model.CommandLiftBoxInputs{}, nil
+	case *commandv1.CreateCommandRequest_DropBox:
+		return model.CommandDropBoxInputs{}, nil
 	default:
 		return nil, xerror.ValidationFailed(nil, fmt.Sprintf("invalid payload: %v", payload))
 	}

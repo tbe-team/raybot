@@ -11,7 +11,7 @@ type CommandType uint16
 
 func (s CommandType) Validate() error {
 	switch s {
-	case CommandTypeMoveToLocation:
+	case CommandTypeMoveToLocation, CommandTypeLiftBox, CommandTypeDropBox:
 		return nil
 	default:
 		return fmt.Errorf("invalid command type: %d", s)
@@ -21,11 +21,15 @@ func (s CommandType) Validate() error {
 func (s CommandType) String() string {
 	return []string{
 		"MOVE_TO_LOCATION",
+		"LIFT_BOX",
+		"DROP_BOX",
 	}[s]
 }
 
 const (
 	CommandTypeMoveToLocation CommandType = iota
+	CommandTypeLiftBox
+	CommandTypeDropBox
 )
 
 // CommandStatus represents the status of the command
@@ -99,6 +103,18 @@ type CommandMoveToLocationInputs struct {
 
 func (CommandMoveToLocationInputs) isCommandInputs() {}
 
+type CommandLiftBoxInputs struct{}
+
+func (CommandLiftBoxInputs) isCommandInputs() {}
+
+type CommandDropBoxInputs struct{}
+
+func (CommandDropBoxInputs) isCommandInputs() {}
+
+type EmptyCommandInputs struct{}
+
+func (EmptyCommandInputs) isCommandInputs() {}
+
 func UnmarshalCommandInputs(cmdType CommandType, data []byte) (CommandInputs, error) {
 	var inputs CommandInputs
 
@@ -109,6 +125,10 @@ func UnmarshalCommandInputs(cmdType CommandType, data []byte) (CommandInputs, er
 			return nil, fmt.Errorf("unmarshal move to location inputs: %w", err)
 		}
 		inputs = moveToLocationInputs
+	case CommandTypeLiftBox:
+		inputs = EmptyCommandInputs{}
+	case CommandTypeDropBox:
+		inputs = EmptyCommandInputs{}
 	default:
 		return nil, fmt.Errorf("invalid command type: %d", cmdType)
 	}
