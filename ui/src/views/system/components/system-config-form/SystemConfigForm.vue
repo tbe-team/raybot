@@ -3,6 +3,7 @@ import type { SystemConfig } from '@/types/system-config'
 import { Button } from '@/components/ui/button'
 import { useMutationSystemConfig } from '@/composables/use-system'
 import { HTTPError, RaybotError } from '@/types/error'
+import ESPConfigForm from '@/views/system/components/system-config-form/ESPConfigForm.vue'
 import GrpcConfigForm from '@/views/system/components/system-config-form/GrpcConfigForm.vue'
 import HttpConfigForm from '@/views/system/components/system-config-form/HttpConfigForm.vue'
 import LogConfigForm from '@/views/system/components/system-config-form/LogConfigForm.vue'
@@ -70,6 +71,7 @@ const onSubmit = form.handleSubmit((values) => {
       <HttpConfigForm />
       <LogConfigForm />
       <PicConfigForm />
+      <ESPConfigForm />
     </div>
   </form>
 </template>

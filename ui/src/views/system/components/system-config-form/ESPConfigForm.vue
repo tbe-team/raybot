@@ -14,11 +14,11 @@ import { serialDataBitsOption, serialParityOption, serialStopBitsOption } from '
 <template>
   <Card>
     <CardHeader>
-      <CardTitle>PIC Configuration</CardTitle>
+      <CardTitle>ESP Configuration</CardTitle>
     </CardHeader>
     <CardContent class="space-y-4">
       <div class="space-y-2">
-        <FormField v-slot="{ componentField }" name="pic.serial.port">
+        <FormField v-slot="{ componentField }" name="esp.serial.port">
           <FormItem>
             <FormLabel>Port</FormLabel>
             <FormControl>
@@ -31,7 +31,7 @@ import { serialDataBitsOption, serialParityOption, serialStopBitsOption } from '
         </FormField>
       </div>
       <div class="space-y-2">
-        <FormField v-slot="{ componentField }" name="pic.serial.baudRate">
+        <FormField v-slot="{ componentField }" name="esp.serial.baudRate">
           <FormItem>
             <FormLabel>Baud Rate</FormLabel>
             <FormControl>
@@ -45,7 +45,7 @@ import { serialDataBitsOption, serialParityOption, serialStopBitsOption } from '
         </FormField>
       </div>
       <div class="space-y-2">
-        <FormField v-slot="{ componentField }" name="pic.serial.dataBits">
+        <FormField v-slot="{ componentField }" name="esp.serial.dataBits">
           <FormItem>
             <FormLabel>Data Bits</FormLabel>
             <Select
@@ -69,7 +69,7 @@ import { serialDataBitsOption, serialParityOption, serialStopBitsOption } from '
         </FormField>
       </div>
       <div class="space-y-2">
-        <FormField v-slot="{ componentField }" name="pic.serial.stopBits">
+        <FormField v-slot="{ componentField }" name="esp.serial.stopBits">
           <FormItem>
             <FormLabel>Stop Bits</FormLabel>
             <Select
@@ -93,7 +93,7 @@ import { serialDataBitsOption, serialParityOption, serialStopBitsOption } from '
         </FormField>
       </div>
       <div class="space-y-2">
-        <FormField v-slot="{ componentField }" name="pic.serial.parity">
+        <FormField v-slot="{ componentField }" name="esp.serial.parity">
           <FormItem>
             <FormLabel>Parity</FormLabel>
             <Select
@@ -117,7 +117,7 @@ import { serialDataBitsOption, serialParityOption, serialStopBitsOption } from '
         </FormField>
       </div>
       <div class="space-y-2">
-        <FormField v-slot="{ componentField }" name="pic.serial.readTimeout">
+        <FormField v-slot="{ componentField }" name="esp.serial.readTimeout">
           <FormItem>
             <FormLabel>Read Timeout</FormLabel>
             <FormControl>
