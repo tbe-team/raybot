@@ -8,4 +8,6 @@ type RobotState struct {
 	LiftMotor      LiftMotor
 	DriveMotor     DriveMotor
 	Location       Location
+	Cargo          Cargo
+	CargoDoorMotor CargoDoorMotor
 }

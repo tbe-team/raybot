@@ -52,6 +52,13 @@ func (s Service) UpdateSystemConfig(ctx context.Context, params service.UpdateSy
 	cfg.PIC.Serial.Parity = params.PICConfig.Serial.Parity
 	cfg.PIC.Serial.ReadTimeout = params.PICConfig.Serial.ReadTimeout
 
+	cfg.ESP.Serial.Port = params.ESPConfig.Serial.Port
+	cfg.ESP.Serial.BaudRate = params.ESPConfig.Serial.BaudRate
+	cfg.ESP.Serial.DataBits = params.ESPConfig.Serial.DataBits
+	cfg.ESP.Serial.StopBits = params.ESPConfig.Serial.StopBits
+	cfg.ESP.Serial.Parity = params.ESPConfig.Serial.Parity
+	cfg.ESP.Serial.ReadTimeout = params.ESPConfig.Serial.ReadTimeout
+
 	if err := s.cfgManager.SaveConfig(ctx, cfg); err != nil {
 		if errors.Is(err, config.ErrInvalidConfig) {
 			return service.UpdateSystemConfigOutput{}, ErrInvalidConfig
@@ -112,6 +119,16 @@ func configToUpdateSystemConfigOutput(cfg config.Config) service.UpdateSystemCon
 				StopBits:    cfg.PIC.Serial.StopBits,
 				Parity:      cfg.PIC.Serial.Parity,
 				ReadTimeout: cfg.PIC.Serial.ReadTimeout,
+			},
+		},
+		ESPConfig: service.ESPConfig{
+			Serial: service.SerialConfig{
+				Port:        cfg.ESP.Serial.Port,
+				BaudRate:    cfg.ESP.Serial.BaudRate,
+				DataBits:    cfg.ESP.Serial.DataBits,
+				StopBits:    cfg.ESP.Serial.StopBits,
+				Parity:      cfg.ESP.Serial.Parity,
+				ReadTimeout: cfg.ESP.Serial.ReadTimeout,
 			},
 		},
 	}

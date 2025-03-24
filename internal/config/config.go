@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/tbe-team/raybot/internal/controller/cloud"
+	"github.com/tbe-team/raybot/internal/controller/espserial"
 	"github.com/tbe-team/raybot/internal/controller/grpc"
 	"github.com/tbe-team/raybot/internal/controller/http"
 	"github.com/tbe-team/raybot/internal/controller/picserial"
@@ -36,6 +37,7 @@ type Config struct {
 	GRPC GRPCConfig       `yaml:"grpc"`
 	HTTP http.Config      `yaml:"http"`
 	PIC  picserial.Config `yaml:"pic"`
+	ESP  espserial.Config `yaml:"esp"`
 }
 
 // Validate validates the application configuration.
@@ -56,21 +58,15 @@ func (cfg *Config) Validate() error {
 		return fmt.Errorf("validate PIC: %w", err)
 	}
 
+	if err := cfg.ESP.Validate(); err != nil {
+		return fmt.Errorf("validate ESP: %w", err)
+	}
+
 	return nil
 }
 
 // DefaultConfig is the default configuration for the application.
 var DefaultConfig = Config{
-	PIC: picserial.Config{
-		Serial: serial.Config{
-			Port:        "/dev/ttyUSB0",
-			BaudRate:    9600,
-			DataBits:    8,
-			Parity:      "none",
-			StopBits:    1,
-			ReadTimeout: 1 * time.Second,
-		},
-	},
 	GRPC: GRPCConfig{
 		Server: grpc.Config{
 			Enable: true,
@@ -86,6 +82,26 @@ var DefaultConfig = Config{
 		Level:     "info",
 		Format:    "text",
 		AddSource: false,
+	},
+	PIC: picserial.Config{
+		Serial: serial.Config{
+			Port:        "/dev/ttyUSB0",
+			BaudRate:    9600,
+			DataBits:    8,
+			Parity:      "none",
+			StopBits:    1,
+			ReadTimeout: 1 * time.Second,
+		},
+	},
+	ESP: espserial.Config{
+		Serial: espserial.SerialConfig{
+			Port:        "/dev/ttyUSB1",
+			BaudRate:    9600,
+			DataBits:    8,
+			Parity:      "none",
+			StopBits:    1,
+			ReadTimeout: 1 * time.Second,
+		},
 	},
 }
 

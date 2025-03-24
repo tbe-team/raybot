@@ -9,4 +9,6 @@ type Repository interface {
 	LiftMotor() LiftMotorRepository
 	Location() LocationRepository
 	Command() CommandRepository
+	Cargo() CargoRepository
+	ESPSerialCommand() ESPSerialCommandRepository
 }

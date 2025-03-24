@@ -295,22 +295,37 @@ components:
           $ref: '#/components/schemas/SerialConfig'
       required:
         - serial
+    ESPConfig:
+      type: object
+      properties:
+        serial:
+          $ref: '#/components/schemas/SerialConfig'
+      required:
+        - serial
     SystemConfigResponse:
       type: object
       properties:
         log:
           $ref: '#/components/schemas/LogConfig'
+          x-order: 1
         grpc:
           $ref: '#/components/schemas/GRPCConfig'
+          x-order: 2
         http:
           $ref: '#/components/schemas/HTTPConfig'
+          x-order: 3
         pic:
           $ref: '#/components/schemas/PicConfig'
+          x-order: 4
+        esp:
+          $ref: '#/components/schemas/ESPConfig'
+          x-order: 5
       required:
         - log
         - grpc
         - http
         - pic
+        - esp
     FieldError:
       type: object
       properties:
@@ -359,11 +374,14 @@ components:
           $ref: '#/components/schemas/HTTPConfig'
         pic:
           $ref: '#/components/schemas/PicConfig'
+        esp:
+          $ref: '#/components/schemas/ESPConfig'
       required:
         - log
         - grpc
         - http
         - pic
+        - esp
     HealthResponse:
       type: object
       properties:
@@ -614,23 +632,106 @@ components:
       required:
         - currentLocation
         - updatedAt
+    CargoState:
+      type: object
+      properties:
+        isOpen:
+          type: boolean
+          example: true
+          description: Whether the cargo is open
+          x-order: 1
+        qrCode:
+          type: string
+          example: ABCxyz
+          description: The QR code read from the cargo QR scanner
+          x-order: 2
+        bottomDistance:
+          type: integer
+          example: 100
+          description: The bottom distance of the cargo
+          x-order: 3
+          x-go-type: uint16
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-01-01T00:00:00Z'
+          description: The updated at time of the cargo
+          x-order: 4
+      required:
+        - isOpen
+        - qrCode
+        - bottomDistance
+        - updatedAt
+    CargoDoorMotorState:
+      type: object
+      properties:
+        direction:
+          type: string
+          enum:
+            - CLOSE
+            - OPEN
+          example: CLOSE
+          description: The direction of the cargo door motor
+          x-order: 1
+          x-go-type: string
+        speed:
+          type: integer
+          example: 100
+          description: The speed of the cargo door motor
+          x-order: 2
+          x-go-type: uint8
+        isRunning:
+          type: boolean
+          example: true
+          description: Whether the cargo door motor is running
+          x-order: 3
+        enabled:
+          type: boolean
+          example: true
+          description: Whether the cargo door motor is enabled
+          x-order: 4
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-01-01T00:00:00Z'
+          description: The updated at time of the cargo door motor
+          x-order: 5
+      required:
+        - direction
+        - speed
+        - isRunning
+        - enabled
+        - updatedAt
     RobotStateResponse:
       type: object
       properties:
         battery:
           $ref: '#/components/schemas/BatteryState'
+          x-order: 1
         charge:
           $ref: '#/components/schemas/ChargeState'
+          x-order: 2
         discharge:
           $ref: '#/components/schemas/DischargeState'
+          x-order: 3
         distanceSensor:
           $ref: '#/components/schemas/DistanceSensorState'
+          x-order: 4
         liftMotor:
           $ref: '#/components/schemas/LiftMotorState'
+          x-order: 5
         driveMotor:
           $ref: '#/components/schemas/DriveMotorState'
+          x-order: 6
         location:
           $ref: '#/components/schemas/LocationState'
+          x-order: 7
+        cargo:
+          $ref: '#/components/schemas/CargoState'
+          x-order: 8
+        cargoDoorMotor:
+          $ref: '#/components/schemas/CargoDoorMotorState'
+          x-order: 9
       required:
         - battery
         - charge
@@ -639,6 +740,8 @@ components:
         - liftMotor
         - driveMotor
         - location
+        - cargo
+        - cargoDoorMotor
     CommandType:
       type: string
       enum:

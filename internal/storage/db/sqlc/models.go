@@ -30,6 +30,23 @@ type BatteryDischarge struct {
 	UpdatedAt    string `json:"updated_at"`
 }
 
+type Cargo struct {
+	ID             int64  `json:"id"`
+	IsOpen         int64  `json:"is_open"`
+	QrCode         string `json:"qr_code"`
+	BottomDistance int64  `json:"bottom_distance"`
+	UpdatedAt      string `json:"updated_at"`
+}
+
+type CargoDoorMotor struct {
+	ID        int64  `json:"id"`
+	Direction int64  `json:"direction"`
+	Speed     int64  `json:"speed"`
+	IsRunning int64  `json:"is_running"`
+	Enabled   int64  `json:"enabled"`
+	UpdatedAt string `json:"updated_at"`
+}
+
 type Command struct {
 	ID          string  `json:"id"`
 	Type        int64   `json:"type"`

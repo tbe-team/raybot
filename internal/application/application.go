@@ -6,6 +6,7 @@ import (
 	"log/slog"
 
 	"github.com/tbe-team/raybot/internal/config"
+	"github.com/tbe-team/raybot/internal/controller/espserial"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
 	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/repository/repoimpl"
@@ -21,8 +22,10 @@ type Application struct {
 	CfgManager config.Manager
 
 	PICSerialClient serial.Client
-	Service         service.Service
-	PubSub          pubsub.PubSub
+	ESPSerialClient espserial.Client
+
+	Service service.Service
+	PubSub  pubsub.PubSub
 
 	Log *slog.Logger
 
@@ -83,15 +86,30 @@ func New() (*Application, CleanupFunc, error) {
 	if err != nil {
 		return nil, nil, fmt.Errorf("failed to create serial client: %w", err)
 	}
+	espSerialClient, err := espserial.NewClient(cfgManager.GetConfig().ESP.Serial, logger)
+	if err != nil {
+		logger.Error("failed to create esp serial client", slog.Any("error", err))
+		// return nil, nil, fmt.Errorf("failed to create esp serial client: %w", err)
+	}
 
 	// Setup service
 	validator := validator.New()
-	service := serviceimpl.New(cfgManager, picSerialClient, repo, pubSub, dbProvider, validator, logger)
+	service := serviceimpl.New(
+		cfgManager,
+		picSerialClient,
+		espSerialClient,
+		repo,
+		pubSub,
+		dbProvider,
+		validator,
+		logger,
+	)
 
 	// Setup application
 	app := &Application{
 		CfgManager:      cfgManager,
 		PICSerialClient: picSerialClient,
+		ESPSerialClient: espSerialClient,
 		PubSub:          pubSub,
 		Service:         service,
 		Log:             logger,

@@ -6,4 +6,5 @@ type Service interface {
 	PICService() PICService
 	LocationService() LocationService
 	CommandService() CommandService
+	CargoControlService() CargoControlService
 }

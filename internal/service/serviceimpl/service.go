@@ -4,10 +4,12 @@ import (
 	"log/slog"
 
 	"github.com/tbe-team/raybot/internal/config"
+	"github.com/tbe-team/raybot/internal/controller/espserial"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
 	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
+	"github.com/tbe-team/raybot/internal/service/serviceimpl/cargocontrol"
 	"github.com/tbe-team/raybot/internal/service/serviceimpl/command"
 	"github.com/tbe-team/raybot/internal/service/serviceimpl/location"
 	"github.com/tbe-team/raybot/internal/service/serviceimpl/pic"
@@ -18,16 +20,18 @@ import (
 )
 
 type serviceImpl struct {
-	robotStateService *robotstate.Service
-	systemService     *system.Service
-	picService        *pic.Service
-	locationService   *location.Service
-	commandService    *command.Service
+	robotStateService   *robotstate.Service
+	systemService       *system.Service
+	picService          *pic.Service
+	locationService     *location.Service
+	commandService      *command.Service
+	cargoControlService *cargocontrol.Service
 }
 
 func New(
 	cfgManager config.Manager,
 	picSerialClient serial.Client,
+	espSerialClient espserial.Client,
 	repo repository.Repository,
 	pubSub pubsub.PubSub,
 	dbProvider db.Provider,
@@ -58,12 +62,20 @@ func New(
 		validator,
 		log,
 	)
+	cargoControlService := cargocontrol.NewService(
+		repo.Cargo(),
+		repo.ESPSerialCommand(),
+		espSerialClient,
+		dbProvider,
+		validator,
+	)
 	return &serviceImpl{
-		robotStateService: robotStateService,
-		systemService:     systemService,
-		picService:        picService,
-		locationService:   locationService,
-		commandService:    commandService,
+		robotStateService:   robotStateService,
+		systemService:       systemService,
+		picService:          picService,
+		locationService:     locationService,
+		commandService:      commandService,
+		cargoControlService: cargoControlService,
 	}
 }
 
@@ -85,4 +97,8 @@ func (s serviceImpl) LocationService() service.LocationService {
 
 func (s serviceImpl) CommandService() service.CommandService {
 	return s.commandService
+}
+
+func (s serviceImpl) CargoControlService() service.CargoControlService {
+	return s.cargoControlService
 }

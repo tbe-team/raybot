@@ -67,6 +67,53 @@ func (_c *FakeRepository_Battery_Call) RunAndReturn(run func() repository.Batter
 	return _c
 }
 
+// Cargo provides a mock function with no fields
+func (_m *FakeRepository) Cargo() repository.CargoRepository {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for Cargo")
+	}
+
+	var r0 repository.CargoRepository
+	if rf, ok := ret.Get(0).(func() repository.CargoRepository); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(repository.CargoRepository)
+		}
+	}
+
+	return r0
+}
+
+// FakeRepository_Cargo_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'Cargo'
+type FakeRepository_Cargo_Call struct {
+	*mock.Call
+}
+
+// Cargo is a helper method to define mock.On call
+func (_e *FakeRepository_Expecter) Cargo() *FakeRepository_Cargo_Call {
+	return &FakeRepository_Cargo_Call{Call: _e.mock.On("Cargo")}
+}
+
+func (_c *FakeRepository_Cargo_Call) Run(run func()) *FakeRepository_Cargo_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *FakeRepository_Cargo_Call) Return(_a0 repository.CargoRepository) *FakeRepository_Cargo_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeRepository_Cargo_Call) RunAndReturn(run func() repository.CargoRepository) *FakeRepository_Cargo_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Command provides a mock function with no fields
 func (_m *FakeRepository) Command() repository.CommandRepository {
 	ret := _m.Called()
@@ -204,6 +251,53 @@ func (_c *FakeRepository_DriveMotor_Call) Return(_a0 repository.DriveMotorReposi
 }
 
 func (_c *FakeRepository_DriveMotor_Call) RunAndReturn(run func() repository.DriveMotorRepository) *FakeRepository_DriveMotor_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ESPSerialCommand provides a mock function with no fields
+func (_m *FakeRepository) ESPSerialCommand() repository.ESPSerialCommandRepository {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for ESPSerialCommand")
+	}
+
+	var r0 repository.ESPSerialCommandRepository
+	if rf, ok := ret.Get(0).(func() repository.ESPSerialCommandRepository); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(repository.ESPSerialCommandRepository)
+		}
+	}
+
+	return r0
+}
+
+// FakeRepository_ESPSerialCommand_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ESPSerialCommand'
+type FakeRepository_ESPSerialCommand_Call struct {
+	*mock.Call
+}
+
+// ESPSerialCommand is a helper method to define mock.On call
+func (_e *FakeRepository_Expecter) ESPSerialCommand() *FakeRepository_ESPSerialCommand_Call {
+	return &FakeRepository_ESPSerialCommand_Call{Call: _e.mock.On("ESPSerialCommand")}
+}
+
+func (_c *FakeRepository_ESPSerialCommand_Call) Run(run func()) *FakeRepository_ESPSerialCommand_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *FakeRepository_ESPSerialCommand_Call) Return(_a0 repository.ESPSerialCommandRepository) *FakeRepository_ESPSerialCommand_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeRepository_ESPSerialCommand_Call) RunAndReturn(run func() repository.ESPSerialCommandRepository) *FakeRepository_ESPSerialCommand_Call {
 	_c.Call.Return(run)
 	return _c
 }

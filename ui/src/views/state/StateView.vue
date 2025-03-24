@@ -217,6 +217,56 @@ function getTemperatureColor(temp: number): string {
             </div>
           </CardContent>
         </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Cargo Door Motor State</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="mx-auto space-x-2">
+              <div class="grid grid-rows-1 gap-2">
+                <p><span class="font-medium">Direction: </span>{{ robotState.cargoDoorMotor.direction }}</p>
+                <p><span class="font-medium">Speed: </span>{{ robotState.cargoDoorMotor.speed }} %</p>
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <p>
+                    <span class="font-medium">Running: </span>
+                    <span :class="robotState.cargoDoorMotor.isRunning ? 'text-green-500' : 'text-red-500'">
+                      {{ robotState.cargoDoorMotor.isRunning ? 'Yes' : 'No' }}
+                    </span>
+                  </p>
+                  <p>
+                    <span class="font-medium">Enabled: </span>
+                    <span :class="robotState.cargoDoorMotor.enabled ? 'text-green-500' : 'text-red-500'">
+                      {{ robotState.cargoDoorMotor.enabled ? 'Yes' : 'No' }}
+                    </span>
+                  </p>
+                </div>
+                <p><span class="font-medium">Last updated:</span> {{ formatDate(robotState.cargoDoorMotor.updatedAt) }}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Cargo State</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="mx-auto space-x-2">
+              <div class="grid grid-rows-1 gap-2">
+                <p>
+                  <span class="font-medium">Door Open: </span>
+                  <span :class="robotState.cargo.isOpen ? 'text-green-500' : 'text-red-500'">
+                    {{ robotState.cargo.isOpen ? 'Yes' : 'No' }}
+                  </span>
+                </p>
+                <p><span class="font-medium">QR Code: </span>{{ robotState.cargo.qrCode || 'None' }}</p>
+                <p><span class="font-medium">Bottom Distance: </span>{{ robotState.cargo.bottomDistance }} cm</p>
+                <p><span class="font-medium">Last updated:</span> {{ formatDate(robotState.cargo.updatedAt) }}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   </PageContainer>
