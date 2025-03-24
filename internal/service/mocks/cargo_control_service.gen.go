@@ -22,6 +22,53 @@ func (_m *FakeCargoControlService) EXPECT() *FakeCargoControlService_Expecter {
 	return &FakeCargoControlService_Expecter{mock: &_m.Mock}
 }
 
+// ProcessESPSerialCommandACK provides a mock function with given fields: ctx, params
+func (_m *FakeCargoControlService) ProcessESPSerialCommandACK(ctx context.Context, params service.ProcessESPSerialCommandACKParams) error {
+	ret := _m.Called(ctx, params)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ProcessESPSerialCommandACK")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, service.ProcessESPSerialCommandACKParams) error); ok {
+		r0 = rf(ctx, params)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeCargoControlService_ProcessESPSerialCommandACK_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ProcessESPSerialCommandACK'
+type FakeCargoControlService_ProcessESPSerialCommandACK_Call struct {
+	*mock.Call
+}
+
+// ProcessESPSerialCommandACK is a helper method to define mock.On call
+//   - ctx context.Context
+//   - params service.ProcessESPSerialCommandACKParams
+func (_e *FakeCargoControlService_Expecter) ProcessESPSerialCommandACK(ctx interface{}, params interface{}) *FakeCargoControlService_ProcessESPSerialCommandACK_Call {
+	return &FakeCargoControlService_ProcessESPSerialCommandACK_Call{Call: _e.mock.On("ProcessESPSerialCommandACK", ctx, params)}
+}
+
+func (_c *FakeCargoControlService_ProcessESPSerialCommandACK_Call) Run(run func(ctx context.Context, params service.ProcessESPSerialCommandACKParams)) *FakeCargoControlService_ProcessESPSerialCommandACK_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(service.ProcessESPSerialCommandACKParams))
+	})
+	return _c
+}
+
+func (_c *FakeCargoControlService_ProcessESPSerialCommandACK_Call) Return(_a0 error) *FakeCargoControlService_ProcessESPSerialCommandACK_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeCargoControlService_ProcessESPSerialCommandACK_Call) RunAndReturn(run func(context.Context, service.ProcessESPSerialCommandACKParams) error) *FakeCargoControlService_ProcessESPSerialCommandACK_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SyncCargoBottomDistance provides a mock function with given fields: ctx, params
 func (_m *FakeCargoControlService) SyncCargoBottomDistance(ctx context.Context, params service.SyncCargoBottomDistanceParams) error {
 	ret := _m.Called(ctx, params)

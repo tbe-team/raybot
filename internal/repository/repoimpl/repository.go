@@ -15,6 +15,7 @@ type repo struct {
 	locationRepo         *LocationRepository
 	commandRepo          *CommandRepository
 	cargoRepo            *CargoRepository
+	espSerialCommandRepo *ESPSerialCommandRepository
 }
 
 func New() repository.Repository {
@@ -29,6 +30,7 @@ func New() repository.Repository {
 		locationRepo:         NewLocationRepository(queries),
 		commandRepo:          NewCommandRepository(queries),
 		cargoRepo:            NewCargoRepository(queries),
+		espSerialCommandRepo: NewESPSerialCommandRepository(),
 	}
 }
 
@@ -66,4 +68,8 @@ func (r *repo) Command() repository.CommandRepository {
 
 func (r *repo) Cargo() repository.CargoRepository {
 	return r.cargoRepo
+}
+
+func (r *repo) ESPSerialCommand() repository.ESPSerialCommandRepository {
+	return r.espSerialCommandRepo
 }

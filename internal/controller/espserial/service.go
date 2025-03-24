@@ -22,7 +22,8 @@ func (cfg *Config) Validate() error {
 type CleanupFunc func(context.Context) error
 
 type Handlers struct {
-	SyncStateHandler *SyncStateHandler
+	SyncStateHandler  *SyncStateHandler
+	CommandACKHandler *CommandACKHandler
 }
 
 type Service struct {
@@ -36,7 +37,8 @@ type Service struct {
 
 func New(cfg Config, client Client, service service.Service, log *slog.Logger) (*Service, error) {
 	handlers := Handlers{
-		SyncStateHandler: NewSyncStateHandler(service.CargoControlService(), log),
+		SyncStateHandler:  NewSyncStateHandler(service.CargoControlService()),
+		CommandACKHandler: NewCommandACKHandler(service.CargoControlService()),
 	}
 
 	return &Service{
@@ -69,7 +71,7 @@ func (s Service) readLoop(ctx context.Context) {
 			msg, err := s.serialClient.Read()
 			if err != nil {
 				s.log.Error("failed to read from serial client", slog.Any("error", err))
-				continue
+				return
 			}
 			s.routeMessage(ctx, msg)
 		}
@@ -92,9 +94,21 @@ func (s Service) routeMessage(ctx context.Context, msg []byte) {
 			s.log.Error("failed to unmarshal sync state message", slog.Any("error", err), slog.Any("message", msg))
 			return
 		}
-		s.handlers.SyncStateHandler.Handle(ctx, syncStateMsg)
-	default:
-		s.log.Error("unknown message type", slog.Any("message", msg))
+
+		if err := s.handlers.SyncStateHandler.Handle(ctx, syncStateMsg); err != nil {
+			s.log.Error("failed to handle sync state message", slog.Any("error", err), slog.Any("message", msg))
+		}
+
+	case messageTypeACK:
+		var commandACKMsg commandACKMessage
+		if err := json.Unmarshal(msg, &commandACKMsg); err != nil {
+			s.log.Error("failed to unmarshal command ack message", slog.Any("error", err), slog.Any("message", msg))
+			return
+		}
+
+		if err := s.handlers.CommandACKHandler.Handle(ctx, commandACKMsg); err != nil {
+			s.log.Error("failed to handle command ack message", slog.Any("error", err), slog.Any("message", msg))
+		}
 	}
 }
 

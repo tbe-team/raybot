@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log/slog"
 	"strconv"
 
 	"github.com/tbe-team/raybot/internal/model"
@@ -13,52 +12,48 @@ import (
 
 type SyncStateHandler struct {
 	cargoService service.CargoControlService
-	log          *slog.Logger
 }
 
-func NewSyncStateHandler(cargoService service.CargoControlService, log *slog.Logger) *SyncStateHandler {
+func NewSyncStateHandler(cargoService service.CargoControlService) *SyncStateHandler {
 	return &SyncStateHandler{
 		cargoService: cargoService,
-		log:          log,
 	}
 }
 
-func (h SyncStateHandler) Handle(ctx context.Context, msg syncStateMessage) {
+func (h SyncStateHandler) Handle(ctx context.Context, msg syncStateMessage) error {
 	switch msg.StateType {
 	case syncStateTypeDoor:
 		var temp struct {
 			IsOpen bool `json:"is_open"`
 		}
 		if err := json.Unmarshal(msg.Data, &temp); err != nil {
-			h.log.Error("failed to unmarshal door state", slog.Any("error", err), slog.Any("data", msg.Data))
-			return
+			return fmt.Errorf("failed to unmarshal door state: %w", err)
 		}
 
 		if err := h.cargoService.SyncCargoDoorState(ctx, service.SyncCargoDoorStateParams{
 			IsOpen: temp.IsOpen,
 		}); err != nil {
-			h.log.Error("failed to sync door state", slog.Any("error", err))
+			return fmt.Errorf("failed to sync door state: %w", err)
 		}
 
 	case syncStateTypeMotor:
 		var temp struct {
-			Direction uint8 `json:"state"` // 0: close, 1: open
+			State     uint8 `json:"state"` // 0: close, 1: open
+			Enabled   uint8 `json:"enabled"`
 			Speed     uint8 `json:"speed"` // 0-100
-			IsRunning bool  `json:"is_running"`
-			Enabled   bool  `json:"enabled"`
+			IsRunning uint8 `json:"is_running"`
 		}
 		if err := json.Unmarshal(msg.Data, &temp); err != nil {
-			h.log.Error("failed to unmarshal motor state", slog.Any("error", err), slog.Any("data", msg.Data))
-			return
+			return fmt.Errorf("failed to unmarshal motor state: %w", err)
 		}
 
 		if err := h.cargoService.SyncCargoDoorMotorState(ctx, service.SyncCargoDoorMotorStateParams{
-			Direction: model.CargoDoorMotorDirection(temp.Direction),
+			Direction: model.CargoDoorMotorDirection(temp.State),
 			Speed:     temp.Speed,
-			IsRunning: temp.IsRunning,
-			Enabled:   temp.Enabled,
+			IsRunning: temp.IsRunning == 1,
+			Enabled:   temp.Enabled == 1,
 		}); err != nil {
-			h.log.Error("failed to sync motor state", slog.Any("error", err))
+			return fmt.Errorf("failed to sync motor state: %w", err)
 		}
 
 	case syncStateTypeQRScanner:
@@ -66,34 +61,34 @@ func (h SyncStateHandler) Handle(ctx context.Context, msg syncStateMessage) {
 			Code string `json:"code"`
 		}
 		if err := json.Unmarshal(msg.Data, &temp); err != nil {
-			h.log.Error("failed to unmarshal qr code", slog.Any("error", err), slog.Any("data", msg.Data))
-			return
+			return fmt.Errorf("failed to unmarshal qr code: %w", err)
 		}
 
 		if err := h.cargoService.SyncCargoQRCode(ctx, service.SyncCargoQRCodeParams{
 			QRCode: temp.Code,
 		}); err != nil {
-			h.log.Error("failed to sync qr code", slog.Any("error", err))
+			return fmt.Errorf("failed to sync qr code: %w", err)
 		}
 
 	case syncStateTypeBottomDistanceSensor:
 		var temp struct {
-			Distance uint16 `json:"under_distance"`
+			Distance uint16 `json:"under"`
 		}
 		if err := json.Unmarshal(msg.Data, &temp); err != nil {
-			h.log.Error("failed to unmarshal bottom distance", slog.Any("error", err), slog.Any("data", msg.Data))
-			return
+			return fmt.Errorf("failed to unmarshal bottom distance: %w", err)
 		}
 
 		if err := h.cargoService.SyncCargoBottomDistance(ctx, service.SyncCargoBottomDistanceParams{
 			BottomDistance: temp.Distance,
 		}); err != nil {
-			h.log.Error("failed to sync bottom distance", slog.Any("error", err))
+			return fmt.Errorf("failed to sync bottom distance: %w", err)
 		}
 
 	default:
-		h.log.Error("invalid sync state type", slog.Any("type", msg.StateType))
+		return fmt.Errorf("invalid sync state type: %d", msg.StateType)
 	}
+
+	return nil
 }
 
 type syncStateMessage struct {

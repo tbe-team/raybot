@@ -10,4 +10,5 @@ type Repository interface {
 	Location() LocationRepository
 	Command() CommandRepository
 	Cargo() CargoRepository
+	ESPSerialCommand() ESPSerialCommandRepository
 }

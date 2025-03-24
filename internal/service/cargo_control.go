@@ -25,9 +25,16 @@ type SyncCargoDoorMotorStateParams struct {
 	Enabled   bool
 }
 
+type ProcessESPSerialCommandACKParams struct {
+	ID      string `validate:"required"`
+	Success bool
+}
+
 type CargoControlService interface {
 	SyncCargoDoorState(ctx context.Context, params SyncCargoDoorStateParams) error
 	SyncCargoQRCode(ctx context.Context, params SyncCargoQRCodeParams) error
 	SyncCargoBottomDistance(ctx context.Context, params SyncCargoBottomDistanceParams) error
 	SyncCargoDoorMotorState(ctx context.Context, params SyncCargoDoorMotorStateParams) error
+
+	ProcessESPSerialCommandACK(ctx context.Context, params ProcessESPSerialCommandACKParams) error
 }
