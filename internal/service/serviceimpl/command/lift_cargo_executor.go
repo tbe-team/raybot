@@ -11,22 +11,22 @@ import (
 	"github.com/tbe-team/raybot/internal/storage/db"
 )
 
-const dropBoxPosition = 100
+const liftCargoPosition = 0
 
-type DropBoxExecutor struct {
+type LiftCargoExecutor struct {
 	commandRepo repository.CommandRepository
 	picService  service.PICService
 	dbProvider  db.Provider
 	log         *slog.Logger
 }
 
-func NewDropBoxExecutor(
+func NewLiftCargoExecutor(
 	commandRepo repository.CommandRepository,
 	picService service.PICService,
 	dbProvider db.Provider,
 	log *slog.Logger,
-) *DropBoxExecutor {
-	return &DropBoxExecutor{
+) *LiftCargoExecutor {
+	return &LiftCargoExecutor{
 		commandRepo: commandRepo,
 		picService:  picService,
 		dbProvider:  dbProvider,
@@ -34,15 +34,16 @@ func NewDropBoxExecutor(
 	}
 }
 
-func (e DropBoxExecutor) Execute(ctx context.Context, command model.Command) error {
-	if command.Type != model.CommandTypeDropBox {
-		return fmt.Errorf("command type is not drop box")
+func (e LiftCargoExecutor) Execute(ctx context.Context, command model.Command) error {
+	if command.Type != model.CommandTypeLiftCargo {
+		return fmt.Errorf("command type is not lift cargo")
 	}
 
+	//nolint:gosec
 	params := service.CreateSerialCommandParams{
 		Data: model.PICSerialCommandBatteryLiftMotorData{
 			Enable:         true,
-			TargetPosition: dropBoxPosition,
+			TargetPosition: liftCargoPosition,
 		},
 	}
 	if err := e.picService.CreateSerialCommand(ctx, params); err != nil {

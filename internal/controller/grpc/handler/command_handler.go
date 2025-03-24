@@ -36,30 +36,30 @@ func (h *CommandHandler) MoveToLocation(ctx context.Context, req *commandv1.Move
 	return &commandv1.MoveToLocationResponse{CommandId: command.ID}, nil
 }
 
-func (h *CommandHandler) LiftBox(ctx context.Context, _ *commandv1.LiftBoxRequest) (*commandv1.LiftBoxResponse, error) {
+func (h *CommandHandler) LiftCargo(ctx context.Context, _ *commandv1.LiftCargoRequest) (*commandv1.LiftCargoResponse, error) {
 	params := service.CreateCommandParams{
 		Source:      model.CommandSourceCloud,
-		CommandType: model.CommandTypeLiftBox,
-		Inputs:      model.CommandLiftBoxInputs{},
+		CommandType: model.CommandTypeLiftCargo,
+		Inputs:      model.CommandLiftCargoInputs{},
 	}
 	command, err := h.commandService.CreateCommand(ctx, params)
 	if err != nil {
 		return nil, err
 	}
 
-	return &commandv1.LiftBoxResponse{CommandId: command.ID}, nil
+	return &commandv1.LiftCargoResponse{CommandId: command.ID}, nil
 }
 
-func (h *CommandHandler) DropBox(ctx context.Context, _ *commandv1.DropBoxRequest) (*commandv1.DropBoxResponse, error) {
+func (h *CommandHandler) DropCargo(ctx context.Context, _ *commandv1.DropCargoRequest) (*commandv1.DropCargoResponse, error) {
 	params := service.CreateCommandParams{
 		Source:      model.CommandSourceCloud,
-		CommandType: model.CommandTypeDropBox,
-		Inputs:      model.CommandDropBoxInputs{},
+		CommandType: model.CommandTypeDropCargo,
+		Inputs:      model.CommandDropCargoInputs{},
 	}
 	command, err := h.commandService.CreateCommand(ctx, params)
 	if err != nil {
 		return nil, err
 	}
 
-	return &commandv1.DropBoxResponse{CommandId: command.ID}, nil
+	return &commandv1.DropCargoResponse{CommandId: command.ID}, nil
 }

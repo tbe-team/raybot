@@ -8,7 +8,6 @@ package commandv1
 
 import (
 	context "context"
-
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
@@ -21,8 +20,8 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	CommandService_MoveToLocation_FullMethodName = "/command.v1.CommandService/MoveToLocation"
-	CommandService_LiftBox_FullMethodName        = "/command.v1.CommandService/LiftBox"
-	CommandService_DropBox_FullMethodName        = "/command.v1.CommandService/DropBox"
+	CommandService_LiftCargo_FullMethodName      = "/command.v1.CommandService/LiftCargo"
+	CommandService_DropCargo_FullMethodName      = "/command.v1.CommandService/DropCargo"
 )
 
 // CommandServiceClient is the client API for CommandService service.
@@ -30,8 +29,8 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type CommandServiceClient interface {
 	MoveToLocation(ctx context.Context, in *MoveToLocationRequest, opts ...grpc.CallOption) (*MoveToLocationResponse, error)
-	LiftBox(ctx context.Context, in *LiftBoxRequest, opts ...grpc.CallOption) (*LiftBoxResponse, error)
-	DropBox(ctx context.Context, in *DropBoxRequest, opts ...grpc.CallOption) (*DropBoxResponse, error)
+	LiftCargo(ctx context.Context, in *LiftCargoRequest, opts ...grpc.CallOption) (*LiftCargoResponse, error)
+	DropCargo(ctx context.Context, in *DropCargoRequest, opts ...grpc.CallOption) (*DropCargoResponse, error)
 }
 
 type commandServiceClient struct {
@@ -52,20 +51,20 @@ func (c *commandServiceClient) MoveToLocation(ctx context.Context, in *MoveToLoc
 	return out, nil
 }
 
-func (c *commandServiceClient) LiftBox(ctx context.Context, in *LiftBoxRequest, opts ...grpc.CallOption) (*LiftBoxResponse, error) {
+func (c *commandServiceClient) LiftCargo(ctx context.Context, in *LiftCargoRequest, opts ...grpc.CallOption) (*LiftCargoResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LiftBoxResponse)
-	err := c.cc.Invoke(ctx, CommandService_LiftBox_FullMethodName, in, out, cOpts...)
+	out := new(LiftCargoResponse)
+	err := c.cc.Invoke(ctx, CommandService_LiftCargo_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *commandServiceClient) DropBox(ctx context.Context, in *DropBoxRequest, opts ...grpc.CallOption) (*DropBoxResponse, error) {
+func (c *commandServiceClient) DropCargo(ctx context.Context, in *DropCargoRequest, opts ...grpc.CallOption) (*DropCargoResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DropBoxResponse)
-	err := c.cc.Invoke(ctx, CommandService_DropBox_FullMethodName, in, out, cOpts...)
+	out := new(DropCargoResponse)
+	err := c.cc.Invoke(ctx, CommandService_DropCargo_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -77,8 +76,8 @@ func (c *commandServiceClient) DropBox(ctx context.Context, in *DropBoxRequest, 
 // for forward compatibility.
 type CommandServiceServer interface {
 	MoveToLocation(context.Context, *MoveToLocationRequest) (*MoveToLocationResponse, error)
-	LiftBox(context.Context, *LiftBoxRequest) (*LiftBoxResponse, error)
-	DropBox(context.Context, *DropBoxRequest) (*DropBoxResponse, error)
+	LiftCargo(context.Context, *LiftCargoRequest) (*LiftCargoResponse, error)
+	DropCargo(context.Context, *DropCargoRequest) (*DropCargoResponse, error)
 	mustEmbedUnimplementedCommandServiceServer()
 }
 
@@ -92,11 +91,11 @@ type UnimplementedCommandServiceServer struct{}
 func (UnimplementedCommandServiceServer) MoveToLocation(context.Context, *MoveToLocationRequest) (*MoveToLocationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method MoveToLocation not implemented")
 }
-func (UnimplementedCommandServiceServer) LiftBox(context.Context, *LiftBoxRequest) (*LiftBoxResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method LiftBox not implemented")
+func (UnimplementedCommandServiceServer) LiftCargo(context.Context, *LiftCargoRequest) (*LiftCargoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method LiftCargo not implemented")
 }
-func (UnimplementedCommandServiceServer) DropBox(context.Context, *DropBoxRequest) (*DropBoxResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method DropBox not implemented")
+func (UnimplementedCommandServiceServer) DropCargo(context.Context, *DropCargoRequest) (*DropCargoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DropCargo not implemented")
 }
 func (UnimplementedCommandServiceServer) mustEmbedUnimplementedCommandServiceServer() {}
 func (UnimplementedCommandServiceServer) testEmbeddedByValue()                        {}
@@ -137,38 +136,38 @@ func _CommandService_MoveToLocation_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CommandService_LiftBox_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LiftBoxRequest)
+func _CommandService_LiftCargo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LiftCargoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CommandServiceServer).LiftBox(ctx, in)
+		return srv.(CommandServiceServer).LiftCargo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CommandService_LiftBox_FullMethodName,
+		FullMethod: CommandService_LiftCargo_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CommandServiceServer).LiftBox(ctx, req.(*LiftBoxRequest))
+		return srv.(CommandServiceServer).LiftCargo(ctx, req.(*LiftCargoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _CommandService_DropBox_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(DropBoxRequest)
+func _CommandService_DropCargo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DropCargoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(CommandServiceServer).DropBox(ctx, in)
+		return srv.(CommandServiceServer).DropCargo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: CommandService_DropBox_FullMethodName,
+		FullMethod: CommandService_DropCargo_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(CommandServiceServer).DropBox(ctx, req.(*DropBoxRequest))
+		return srv.(CommandServiceServer).DropCargo(ctx, req.(*DropCargoRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -185,12 +184,12 @@ var CommandService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _CommandService_MoveToLocation_Handler,
 		},
 		{
-			MethodName: "LiftBox",
-			Handler:    _CommandService_LiftBox_Handler,
+			MethodName: "LiftCargo",
+			Handler:    _CommandService_LiftCargo_Handler,
 		},
 		{
-			MethodName: "DropBox",
-			Handler:    _CommandService_DropBox_Handler,
+			MethodName: "DropCargo",
+			Handler:    _CommandService_DropCargo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

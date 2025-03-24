@@ -6,8 +6,8 @@ option go_package = "github.com/tbe-team/raybot/proto/command/v1;commandv1";
 
 service CommandService {
   rpc MoveToLocation(MoveToLocationRequest) returns (MoveToLocationResponse) {}
-  rpc LiftBox(LiftBoxRequest) returns (LiftBoxResponse) {}
-  rpc DropBox(DropBoxRequest) returns (DropBoxResponse) {}
+  rpc LiftCargo(LiftCargoRequest) returns (LiftCargoResponse) {}
+  rpc DropCargo(DropCargoRequest) returns (DropCargoResponse) {}
 }
 
 message MoveToLocationRequest {
@@ -18,14 +18,14 @@ message MoveToLocationResponse {
   string command_id = 1;
 }
 
-message LiftBoxRequest {}
+message LiftCargoRequest {}
 
-message LiftBoxResponse {
+message LiftCargoResponse {
   string command_id = 1;
 }
 
-message DropBoxRequest {}
+message DropCargoRequest {}
 
-message DropBoxResponse {
+message DropCargoResponse {
   string command_id = 1;
 }

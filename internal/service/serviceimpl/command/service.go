@@ -92,12 +92,12 @@ func (s Service) CreateCommand(ctx context.Context, params service.CreateCommand
 		if _, ok := params.Inputs.(model.CommandMoveToLocationInputs); !ok {
 			return model.Command{}, xerror.ValidationFailed(nil, "invalid command inputs")
 		}
-	case model.CommandTypeLiftBox:
-		if _, ok := params.Inputs.(model.CommandLiftBoxInputs); !ok {
+	case model.CommandTypeLiftCargo:
+		if _, ok := params.Inputs.(model.CommandLiftCargoInputs); !ok {
 			return model.Command{}, xerror.ValidationFailed(nil, "invalid command inputs")
 		}
-	case model.CommandTypeDropBox:
-		if _, ok := params.Inputs.(model.CommandDropBoxInputs); !ok {
+	case model.CommandTypeDropCargo:
+		if _, ok := params.Inputs.(model.CommandDropCargoInputs); !ok {
 			return model.Command{}, xerror.ValidationFailed(nil, "invalid command inputs")
 		}
 	default:
@@ -227,8 +227,8 @@ func (s Service) registerCommandExecutors() {
 	)
 
 	s.commandExecutorRegistry.Register(
-		model.CommandTypeLiftBox,
-		NewLiftBoxExecutor(
+		model.CommandTypeLiftCargo,
+		NewLiftCargoExecutor(
 			s.commandRepo,
 			s.picService,
 			s.dbProvider,
@@ -237,8 +237,8 @@ func (s Service) registerCommandExecutors() {
 	)
 
 	s.commandExecutorRegistry.Register(
-		model.CommandTypeDropBox,
-		NewDropBoxExecutor(
+		model.CommandTypeDropCargo,
+		NewDropCargoExecutor(
 			s.commandRepo,
 			s.picService,
 			s.dbProvider,
