@@ -32,7 +32,7 @@ func (s CargoDoorMotorDirection) Validate() error {
 }
 
 func (s CargoDoorMotorDirection) String() string {
-	return []string{"OPEN", "CLOSE"}[s]
+	return []string{"CLOSE", "OPEN"}[s]
 }
 
 const (

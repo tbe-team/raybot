@@ -54,7 +54,20 @@ SELECT
 	json_object(
 		'current_location', l.current_location,
 		'updated_at', l.updated_at
-	) AS location
+	) AS location,
+	json_object(
+		'is_open', c.is_open,
+		'qr_code', c.qr_code,
+		'bottom_distance', c.bottom_distance,
+		'updated_at', c.updated_at
+	) AS cargo,
+	json_object(
+		'direction', cmd.direction,
+		'speed', cmd.speed,
+		'is_running', cmd.is_running,
+		'enabled', cmd.enabled,
+		'updated_at', cmd.updated_at
+	) AS cargo_door_motor
 FROM robot r
 LEFT JOIN battery b ON r.id = b.id
 LEFT JOIN battery_charge bc ON r.id = bc.id
@@ -63,6 +76,8 @@ LEFT JOIN distance_sensor ds ON r.id = ds.id
 LEFT JOIN drive_motor dm ON r.id = dm.id
 LEFT JOIN lift_motor lm ON r.id = lm.id
 LEFT JOIN location l ON r.id = l.id
+LEFT JOIN cargo c ON r.id = c.id
+LEFT JOIN cargo_door_motor cmd ON r.id = cmd.id
 WHERE r.id = 1
 `
 
@@ -74,6 +89,8 @@ type RobotStateGetRow struct {
 	DriveMotor       interface{} `json:"drive_motor"`
 	LiftMotor        interface{} `json:"lift_motor"`
 	Location         interface{} `json:"location"`
+	Cargo            interface{} `json:"cargo"`
+	CargoDoorMotor   interface{} `json:"cargo_door_motor"`
 }
 
 func (q *Queries) RobotStateGet(ctx context.Context, db DBTX) (RobotStateGetRow, error) {
@@ -87,6 +104,8 @@ func (q *Queries) RobotStateGet(ctx context.Context, db DBTX) (RobotStateGetRow,
 		&i.DriveMotor,
 		&i.LiftMotor,
 		&i.Location,
+		&i.Cargo,
+		&i.CargoDoorMotor,
 	)
 	return i, err
 }
