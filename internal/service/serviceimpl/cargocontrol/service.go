@@ -17,7 +17,7 @@ type Service struct {
 	validator  validator.Validator
 }
 
-func New(repo repository.CargoRepository, dbProvider db.Provider, validator validator.Validator) *Service {
+func NewService(repo repository.CargoRepository, dbProvider db.Provider, validator validator.Validator) *Service {
 	return &Service{repo: repo, dbProvider: dbProvider, validator: validator}
 }
 

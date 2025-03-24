@@ -60,7 +60,7 @@ func New(
 		validator,
 		log,
 	)
-	cargoControlService := cargocontrol.New(repo.Cargo(), dbProvider, validator)
+	cargoControlService := cargocontrol.NewService(repo.Cargo(), dbProvider, validator)
 	return &serviceImpl{
 		robotStateService:   robotStateService,
 		systemService:       systemService,

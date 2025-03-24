@@ -20,6 +20,53 @@ func (_m *FakeService) EXPECT() *FakeService_Expecter {
 	return &FakeService_Expecter{mock: &_m.Mock}
 }
 
+// CargoControlService provides a mock function with no fields
+func (_m *FakeService) CargoControlService() service.CargoControlService {
+	ret := _m.Called()
+
+	if len(ret) == 0 {
+		panic("no return value specified for CargoControlService")
+	}
+
+	var r0 service.CargoControlService
+	if rf, ok := ret.Get(0).(func() service.CargoControlService); ok {
+		r0 = rf()
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(service.CargoControlService)
+		}
+	}
+
+	return r0
+}
+
+// FakeService_CargoControlService_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CargoControlService'
+type FakeService_CargoControlService_Call struct {
+	*mock.Call
+}
+
+// CargoControlService is a helper method to define mock.On call
+func (_e *FakeService_Expecter) CargoControlService() *FakeService_CargoControlService_Call {
+	return &FakeService_CargoControlService_Call{Call: _e.mock.On("CargoControlService")}
+}
+
+func (_c *FakeService_CargoControlService_Call) Run(run func()) *FakeService_CargoControlService_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run()
+	})
+	return _c
+}
+
+func (_c *FakeService_CargoControlService_Call) Return(_a0 service.CargoControlService) *FakeService_CargoControlService_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeService_CargoControlService_Call) RunAndReturn(run func() service.CargoControlService) *FakeService_CargoControlService_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CommandService provides a mock function with no fields
 func (_m *FakeService) CommandService() service.CommandService {
 	ret := _m.Called()
