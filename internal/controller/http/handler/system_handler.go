@@ -40,6 +40,16 @@ func (h systemHandler) UpdateSystemConfig(ctx context.Context, request gen.Updat
 				ReadTimeout: time.Duration(request.Body.Pic.Serial.ReadTimeout) * time.Second,
 			},
 		},
+		ESPConfig: service.ESPConfig{
+			Serial: service.SerialConfig{
+				Port:        request.Body.Esp.Serial.Port,
+				BaudRate:    request.Body.Esp.Serial.BaudRate,
+				DataBits:    request.Body.Esp.Serial.DataBits,
+				StopBits:    request.Body.Esp.Serial.StopBits,
+				Parity:      request.Body.Esp.Serial.Parity,
+				ReadTimeout: time.Duration(request.Body.Esp.Serial.ReadTimeout) * time.Second,
+			},
+		},
 		GRPCConfig: service.GRPCConfig{
 			Server: service.GRPCServerConfig{
 				Enable: request.Body.Grpc.Server.Enable,

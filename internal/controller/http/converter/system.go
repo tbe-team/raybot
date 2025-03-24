@@ -33,5 +33,15 @@ func ConvertSystemConfigToResponse(cfg service.GetSystemConfigOutput) gen.System
 				ReadTimeout: cfg.PICConfig.Serial.ReadTimeout.Seconds(),
 			},
 		},
+		Esp: gen.ESPConfig{
+			Serial: gen.SerialConfig{
+				Port:        cfg.ESPConfig.Serial.Port,
+				BaudRate:    cfg.ESPConfig.Serial.BaudRate,
+				DataBits:    cfg.ESPConfig.Serial.DataBits,
+				StopBits:    cfg.ESPConfig.Serial.StopBits,
+				Parity:      cfg.ESPConfig.Serial.Parity,
+				ReadTimeout: cfg.ESPConfig.Serial.ReadTimeout.Seconds(),
+			},
+		},
 	}
 }

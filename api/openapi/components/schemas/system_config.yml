@@ -3,17 +3,25 @@ SystemConfigResponse:
   properties:
     log:
       $ref: "#/LogConfig"
+      x-order: 1
     grpc:
       $ref: "#/GRPCConfig"
+      x-order: 2
     http:
       $ref: "#/HTTPConfig"
+      x-order: 3
     pic:
       $ref: "#/PicConfig"
+      x-order: 4
+    esp:
+      $ref: "#/ESPConfig"
+      x-order: 5
   required:
     - log
     - grpc
     - http
     - pic
+    - esp
 
 SystemConfigRequest:
   type: object
@@ -26,11 +34,14 @@ SystemConfigRequest:
       $ref: "#/HTTPConfig"
     pic:
       $ref: "#/PicConfig"
+    esp:
+      $ref: "#/ESPConfig"
   required:
     - log
     - grpc
     - http
     - pic
+    - esp
 
 GRPCConfig:
   type: object
@@ -110,6 +121,14 @@ LogConfig:
     - addSource
 
 PicConfig:
+  type: object
+  properties:
+    serial:
+      $ref: "#/SerialConfig"
+  required:
+    - serial
+
+ESPConfig:
   type: object
   properties:
     serial:

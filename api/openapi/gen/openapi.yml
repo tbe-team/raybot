@@ -295,22 +295,37 @@ components:
           $ref: '#/components/schemas/SerialConfig'
       required:
         - serial
+    ESPConfig:
+      type: object
+      properties:
+        serial:
+          $ref: '#/components/schemas/SerialConfig'
+      required:
+        - serial
     SystemConfigResponse:
       type: object
       properties:
         log:
           $ref: '#/components/schemas/LogConfig'
+          x-order: 1
         grpc:
           $ref: '#/components/schemas/GRPCConfig'
+          x-order: 2
         http:
           $ref: '#/components/schemas/HTTPConfig'
+          x-order: 3
         pic:
           $ref: '#/components/schemas/PicConfig'
+          x-order: 4
+        esp:
+          $ref: '#/components/schemas/ESPConfig'
+          x-order: 5
       required:
         - log
         - grpc
         - http
         - pic
+        - esp
     FieldError:
       type: object
       properties:
@@ -359,11 +374,14 @@ components:
           $ref: '#/components/schemas/HTTPConfig'
         pic:
           $ref: '#/components/schemas/PicConfig'
+        esp:
+          $ref: '#/components/schemas/ESPConfig'
       required:
         - log
         - grpc
         - http
         - pic
+        - esp
     HealthResponse:
       type: object
       properties:
