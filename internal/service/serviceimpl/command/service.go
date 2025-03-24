@@ -92,6 +92,14 @@ func (s Service) CreateCommand(ctx context.Context, params service.CreateCommand
 		if _, ok := params.Inputs.(model.CommandMoveToLocationInputs); !ok {
 			return model.Command{}, xerror.ValidationFailed(nil, "invalid command inputs")
 		}
+	case model.CommandTypeLiftBox:
+		if _, ok := params.Inputs.(model.CommandLiftBoxInputs); !ok {
+			return model.Command{}, xerror.ValidationFailed(nil, "invalid command inputs")
+		}
+	case model.CommandTypeDropBox:
+		if _, ok := params.Inputs.(model.CommandDropBoxInputs); !ok {
+			return model.Command{}, xerror.ValidationFailed(nil, "invalid command inputs")
+		}
 	default:
 		return model.Command{}, xerror.ValidationFailed(nil, "invalid command type")
 	}
@@ -194,11 +202,13 @@ func (s Service) ExecuteCommand(ctx context.Context, params service.ExecuteComma
 			Error:     &errorMessage,
 			SetError:  true,
 		}
-		if _, err := s.commandRepo.UpdateCommand(ctx, s.dbProvider.DB(), params); err != nil {
-			return fmt.Errorf("command repository update command: %w", err)
+
+		if _, updateErr := s.commandRepo.UpdateCommand(ctx, s.dbProvider.DB(), params); updateErr != nil {
+			return fmt.Errorf("execution failed and failed to update command status: %w (original error: %v)", updateErr, err)
 		}
 
-		return fmt.Errorf("execute command failed: %w: update command status to failed", err)
+		// We've successfully updated the command status to failed, but the execution itself failed
+		return fmt.Errorf("command execution failed: %w", err)
 	}
 
 	return nil
@@ -210,6 +220,26 @@ func (s Service) registerCommandExecutors() {
 		NewMoveToLocationExecutor(
 			s.commandRepo,
 			s.subscriber,
+			s.picService,
+			s.dbProvider,
+			s.log,
+		),
+	)
+
+	s.commandExecutorRegistry.Register(
+		model.CommandTypeLiftBox,
+		NewLiftBoxExecutor(
+			s.commandRepo,
+			s.picService,
+			s.dbProvider,
+			s.log,
+		),
+	)
+
+	s.commandExecutorRegistry.Register(
+		model.CommandTypeDropBox,
+		NewDropBoxExecutor(
+			s.commandRepo,
 			s.picService,
 			s.dbProvider,
 			s.log,
