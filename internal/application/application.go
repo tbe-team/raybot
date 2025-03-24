@@ -94,7 +94,16 @@ func New() (*Application, CleanupFunc, error) {
 
 	// Setup service
 	validator := validator.New()
-	service := serviceimpl.New(cfgManager, picSerialClient, repo, pubSub, dbProvider, validator, logger)
+	service := serviceimpl.New(
+		cfgManager,
+		picSerialClient,
+		espSerialClient,
+		repo,
+		pubSub,
+		dbProvider,
+		validator,
+		logger,
+	)
 
 	// Setup application
 	app := &Application{

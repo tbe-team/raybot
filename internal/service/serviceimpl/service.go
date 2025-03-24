@@ -4,6 +4,7 @@ import (
 	"log/slog"
 
 	"github.com/tbe-team/raybot/internal/config"
+	"github.com/tbe-team/raybot/internal/controller/espserial"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
 	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/repository"
@@ -30,6 +31,7 @@ type serviceImpl struct {
 func New(
 	cfgManager config.Manager,
 	picSerialClient serial.Client,
+	espSerialClient espserial.Client,
 	repo repository.Repository,
 	pubSub pubsub.PubSub,
 	dbProvider db.Provider,
@@ -63,6 +65,7 @@ func New(
 	cargoControlService := cargocontrol.NewService(
 		repo.Cargo(),
 		repo.ESPSerialCommand(),
+		espSerialClient,
 		dbProvider,
 		validator,
 	)

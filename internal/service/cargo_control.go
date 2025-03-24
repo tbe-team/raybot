@@ -37,4 +37,7 @@ type CargoControlService interface {
 	SyncCargoDoorMotorState(ctx context.Context, params SyncCargoDoorMotorStateParams) error
 
 	ProcessESPSerialCommandACK(ctx context.Context, params ProcessESPSerialCommandACKParams) error
+
+	OpenCargoDoor(ctx context.Context) error
+	CloseCargoDoor(ctx context.Context) error
 }

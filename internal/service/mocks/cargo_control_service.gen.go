@@ -22,6 +22,98 @@ func (_m *FakeCargoControlService) EXPECT() *FakeCargoControlService_Expecter {
 	return &FakeCargoControlService_Expecter{mock: &_m.Mock}
 }
 
+// CloseCargoDoor provides a mock function with given fields: ctx
+func (_m *FakeCargoControlService) CloseCargoDoor(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CloseCargoDoor")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeCargoControlService_CloseCargoDoor_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CloseCargoDoor'
+type FakeCargoControlService_CloseCargoDoor_Call struct {
+	*mock.Call
+}
+
+// CloseCargoDoor is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeCargoControlService_Expecter) CloseCargoDoor(ctx interface{}) *FakeCargoControlService_CloseCargoDoor_Call {
+	return &FakeCargoControlService_CloseCargoDoor_Call{Call: _e.mock.On("CloseCargoDoor", ctx)}
+}
+
+func (_c *FakeCargoControlService_CloseCargoDoor_Call) Run(run func(ctx context.Context)) *FakeCargoControlService_CloseCargoDoor_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeCargoControlService_CloseCargoDoor_Call) Return(_a0 error) *FakeCargoControlService_CloseCargoDoor_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeCargoControlService_CloseCargoDoor_Call) RunAndReturn(run func(context.Context) error) *FakeCargoControlService_CloseCargoDoor_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// OpenCargoDoor provides a mock function with given fields: ctx
+func (_m *FakeCargoControlService) OpenCargoDoor(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for OpenCargoDoor")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeCargoControlService_OpenCargoDoor_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'OpenCargoDoor'
+type FakeCargoControlService_OpenCargoDoor_Call struct {
+	*mock.Call
+}
+
+// OpenCargoDoor is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeCargoControlService_Expecter) OpenCargoDoor(ctx interface{}) *FakeCargoControlService_OpenCargoDoor_Call {
+	return &FakeCargoControlService_OpenCargoDoor_Call{Call: _e.mock.On("OpenCargoDoor", ctx)}
+}
+
+func (_c *FakeCargoControlService_OpenCargoDoor_Call) Run(run func(ctx context.Context)) *FakeCargoControlService_OpenCargoDoor_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeCargoControlService_OpenCargoDoor_Call) Return(_a0 error) *FakeCargoControlService_OpenCargoDoor_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeCargoControlService_OpenCargoDoor_Call) RunAndReturn(run func(context.Context) error) *FakeCargoControlService_OpenCargoDoor_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ProcessESPSerialCommandACK provides a mock function with given fields: ctx, params
 func (_m *FakeCargoControlService) ProcessESPSerialCommandACK(ctx context.Context, params service.ProcessESPSerialCommandACKParams) error {
 	ret := _m.Called(ctx, params)

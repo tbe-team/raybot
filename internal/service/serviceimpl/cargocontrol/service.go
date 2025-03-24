@@ -2,9 +2,13 @@ package cargocontrol
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"time"
 
+	"github.com/lithammer/shortuuid/v4"
+
+	"github.com/tbe-team/raybot/internal/controller/espserial"
 	"github.com/tbe-team/raybot/internal/model"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
@@ -12,9 +16,14 @@ import (
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
+const (
+	cargoDoorMotorSpeed = 100
+)
+
 type Service struct {
 	cargoRepo            repository.CargoRepository
 	espSerialCommandRepo repository.ESPSerialCommandRepository
+	espSerialClient      espserial.Client
 	dbProvider           db.Provider
 	validator            validator.Validator
 }
@@ -22,12 +31,14 @@ type Service struct {
 func NewService(
 	cargoRepo repository.CargoRepository,
 	espSerialCommandRepo repository.ESPSerialCommandRepository,
+	espSerialClient espserial.Client,
 	dbProvider db.Provider,
 	validator validator.Validator,
 ) *Service {
 	return &Service{
 		cargoRepo:            cargoRepo,
 		espSerialCommandRepo: espSerialCommandRepo,
+		espSerialClient:      espSerialClient,
 		dbProvider:           dbProvider,
 		validator:            validator,
 	}
@@ -144,4 +155,102 @@ func (s Service) ProcessESPSerialCommandACK(ctx context.Context, params service.
 	}
 
 	return nil
+}
+
+func (s Service) OpenCargoDoor(ctx context.Context) error {
+	cmdData := model.ESPSerialCommandCargoDoorMotorData{
+		Direction: model.CargoDoorDirectionOpen,
+		Speed:     cargoDoorMotorSpeed,
+		Enable:    true,
+	}
+	cmd := model.ESPSerialCommand{
+		ID:        shortuuid.New(),
+		Type:      model.ESPSerialCommandTypeCargoDoorMotor,
+		Data:      cmdData,
+		CreatedAt: time.Now(),
+	}
+	if err := s.espSerialCommandRepo.CreateESPSerialCommand(ctx, cmd); err != nil {
+		return fmt.Errorf("create esp serial command: %w", err)
+	}
+
+	msg := espMsg{
+		ID:   cmd.ID,
+		Type: cmd.Type,
+		Data: struct {
+			State  uint8 `json:"state"`
+			Speed  uint8 `json:"speed"`
+			Enable uint8 `json:"enable"`
+		}{
+			State:  uint8(cmdData.Direction),
+			Speed:  cmdData.Speed,
+			Enable: boolToUint8(cmdData.Enable),
+		},
+	}
+	if err := s.sendESPCommand(msg); err != nil {
+		return fmt.Errorf("send esp command: %w", err)
+	}
+
+	return nil
+}
+
+func (s Service) CloseCargoDoor(ctx context.Context) error {
+	cmdData := model.ESPSerialCommandCargoDoorMotorData{
+		Direction: model.CargoDoorDirectionClose,
+		Speed:     cargoDoorMotorSpeed,
+		Enable:    true,
+	}
+	cmd := model.ESPSerialCommand{
+		ID:        shortuuid.New(),
+		Type:      model.ESPSerialCommandTypeCargoDoorMotor,
+		Data:      cmdData,
+		CreatedAt: time.Now(),
+	}
+	if err := s.espSerialCommandRepo.CreateESPSerialCommand(ctx, cmd); err != nil {
+		return fmt.Errorf("create esp serial command: %w", err)
+	}
+
+	msg := espMsg{
+		ID:   cmd.ID,
+		Type: cmd.Type,
+		Data: struct {
+			State  uint8 `json:"state"`
+			Speed  uint8 `json:"speed"`
+			Enable uint8 `json:"enable"`
+		}{
+			State:  uint8(cmdData.Direction),
+			Speed:  cmdData.Speed,
+			Enable: boolToUint8(cmdData.Enable),
+		},
+	}
+	if err := s.sendESPCommand(msg); err != nil {
+		return fmt.Errorf("send esp command: %w", err)
+	}
+
+	return nil
+}
+
+type espMsg struct {
+	ID   string
+	Type model.ESPSerialCommandType
+	Data any
+}
+
+func (s Service) sendESPCommand(msg espMsg) error {
+	msgData, err := json.Marshal(msg)
+	if err != nil {
+		return fmt.Errorf("marshal esp command: %w", err)
+	}
+
+	if err := s.espSerialClient.Write(msgData); err != nil {
+		return fmt.Errorf("write esp command: %w", err)
+	}
+
+	return nil
+}
+
+func boolToUint8(b bool) uint8 {
+	if b {
+		return 1
+	}
+	return 0
 }
