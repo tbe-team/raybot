@@ -44,8 +44,8 @@ func New(
 		repo.LiftMotor(),
 		repo.DriveMotor(),
 		repo.Location(),
-		picSerialClient,
 		dbProvider,
+		picSerialClient,
 		validator,
 	)
 	locationService := location.NewService(repo.Location(), pubSub, dbProvider)

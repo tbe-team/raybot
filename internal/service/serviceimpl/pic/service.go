@@ -24,9 +24,10 @@ type Service struct {
 	liftMotorRepo        repository.LiftMotorRepository
 	driveMotorRepo       repository.DriveMotorRepository
 	locationRepo         repository.LocationRepository
-	picSerialClient      serial.Client
 	dbProvider           db.Provider
-	validator            validator.Validator
+
+	picSerialClient serial.Client
+	validator       validator.Validator
 }
 
 func NewService(
@@ -37,8 +38,8 @@ func NewService(
 	liftMotorRepo repository.LiftMotorRepository,
 	driveMotorRepo repository.DriveMotorRepository,
 	locationRepo repository.LocationRepository,
-	picSerialClient serial.Client,
 	dbProvider db.Provider,
+	picSerialClient serial.Client,
 	validator validator.Validator,
 ) *Service {
 	return &Service{
@@ -49,8 +50,8 @@ func NewService(
 		liftMotorRepo:        liftMotorRepo,
 		driveMotorRepo:       driveMotorRepo,
 		locationRepo:         locationRepo,
-		picSerialClient:      picSerialClient,
 		dbProvider:           dbProvider,
+		picSerialClient:      picSerialClient,
 		validator:            validator,
 	}
 }
@@ -69,6 +70,7 @@ func (s Service) ProcessSyncState(ctx context.Context, params service.ProcessSyn
 			Percent:      params.Battery.Percent,
 			Fault:        params.Battery.Fault,
 			Health:       params.Battery.Health,
+			UpdatedAt:    time.Now(),
 		}
 		return s.batteryRepo.UpdateBattery(ctx, s.dbProvider.DB(), m)
 	}
@@ -77,6 +79,7 @@ func (s Service) ProcessSyncState(ctx context.Context, params service.ProcessSyn
 		m := model.BatteryCharge{
 			CurrentLimit: params.Charge.CurrentLimit,
 			Enabled:      params.Charge.Enabled,
+			UpdatedAt:    time.Now(),
 		}
 		return s.batteryRepo.UpdateBatteryCharge(ctx, s.dbProvider.DB(), m)
 	}
@@ -85,6 +88,7 @@ func (s Service) ProcessSyncState(ctx context.Context, params service.ProcessSyn
 		m := model.BatteryDischarge{
 			CurrentLimit: params.Discharge.CurrentLimit,
 			Enabled:      params.Discharge.Enabled,
+			UpdatedAt:    time.Now(),
 		}
 		return s.batteryRepo.UpdateBatteryDischarge(ctx, s.dbProvider.DB(), m)
 	}
@@ -94,6 +98,7 @@ func (s Service) ProcessSyncState(ctx context.Context, params service.ProcessSyn
 			FrontDistance: params.DistanceSensor.FrontDistance,
 			BackDistance:  params.DistanceSensor.BackDistance,
 			DownDistance:  params.DistanceSensor.DownDistance,
+			UpdatedAt:     time.Now(),
 		}
 		return s.distanceSensorRepo.UpdateDistanceSensor(ctx, s.dbProvider.DB(), m)
 	}
@@ -102,6 +107,7 @@ func (s Service) ProcessSyncState(ctx context.Context, params service.ProcessSyn
 		m := model.LiftMotor{
 			TargetPosition: params.LiftMotor.TargetPosition,
 			Enabled:        params.LiftMotor.Enabled,
+			UpdatedAt:      time.Now(),
 		}
 		return s.liftMotorRepo.UpdateLiftMotor(ctx, s.dbProvider.DB(), m)
 	}
@@ -111,6 +117,7 @@ func (s Service) ProcessSyncState(ctx context.Context, params service.ProcessSyn
 			Direction: params.DriveMotor.Direction,
 			Speed:     params.DriveMotor.Speed,
 			Enabled:   params.DriveMotor.Enabled,
+			UpdatedAt: time.Now(),
 		}
 		return s.driveMotorRepo.UpdateDriveMotor(ctx, s.dbProvider.DB(), m)
 	}
