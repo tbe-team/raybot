@@ -71,13 +71,14 @@ Ví dụ phản hồi:
 | Trường | Kiểu dữ liệu | Khóa JSON | Mô tả |
 |-------|-----------|----------|-------------|
 | State | uint8 | state | Trạng thái của động cơ đóng mở (0=Đóng/1=Mở) |
+| Enabled | uint8 | enabled | Cho phép động cơ di chuyển hoạt động hay không (0=false/1=true) |
 | Speed | uint8 | speed | Tốc độ của động cơ di chuyển tính bằng % |
 | IsRunning | uint8 | is_running | Động cơ có đang chạy hay không (0=false/1=true) |
-| Enabled | uint8 | enabled | Cho phép động cơ di chuyển hoạt động hay không (0=false/1=true) |
+
 
 Ví dụ phản hồi:
 ```
->{"type":0,"state_type":1,"data":{"state":0,"speed":50,"is_running":1,"enabled":1}}\r\n
+>{"type":0,"state_type":1,"data":{"state":0,"enabled":1,"speed":50,"is_running":1}}\r\n
 ```
 
 ### 2.3. Trạng thái QR Scanner
@@ -95,12 +96,11 @@ Ví dụ phản hồi:
 
 | Trường | Kiểu dữ liệu | Khóa JSON | Mô tả |
 |-------|-----------|----------|-------------|
-| Under | uint8 | under_1 | Khoảng cách đến vật phía dưới tính bằng cm |
-| Under | uint8 | under_2 | Khoảng cách đến vật phía dưới tính bằng cm |
+| Under | uint8 | under | Khoảng cách đến vật phía dưới tính bằng cm |
 
 Ví dụ phản hồi:
 ```
->{"type":0,"state_type":3,"data":{"under_1":100,"under_2":100}}\r\n
+>{"type":0,"state_type":3,"data":{"under":100}}\r\n
 ```
 
 ## 3. Phản hồi ACK
