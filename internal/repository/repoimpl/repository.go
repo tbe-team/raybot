@@ -6,14 +6,15 @@ import (
 )
 
 type repo struct {
-	robotStateRepo       repository.RobotStateRepository
-	picSerialCommandRepo repository.PICSerialCommandRepository
-	distanceSensorRepo   repository.DistanceSensorRepository
-	batteryRepo          repository.BatteryRepository
-	driveMotorRepo       repository.DriveMotorRepository
-	liftMotorRepo        repository.LiftMotorRepository
-	locationRepo         repository.LocationRepository
-	commandRepo          repository.CommandRepository
+	robotStateRepo       *RobotStateRepository
+	picSerialCommandRepo *PICSerialCommandRepository
+	distanceSensorRepo   *DistanceSensorRepository
+	batteryRepo          *BatteryRepository
+	driveMotorRepo       *DriveMotorRepository
+	liftMotorRepo        *LiftMotorRepository
+	locationRepo         *LocationRepository
+	commandRepo          *CommandRepository
+	cargoRepo            *CargoRepository
 }
 
 func New() repository.Repository {
@@ -27,6 +28,7 @@ func New() repository.Repository {
 		liftMotorRepo:        NewLiftMotorRepository(queries),
 		locationRepo:         NewLocationRepository(queries),
 		commandRepo:          NewCommandRepository(queries),
+		cargoRepo:            NewCargoRepository(queries),
 	}
 }
 
@@ -60,4 +62,8 @@ func (r *repo) Location() repository.LocationRepository {
 
 func (r *repo) Command() repository.CommandRepository {
 	return r.commandRepo
+}
+
+func (r *repo) Cargo() repository.CargoRepository {
+	return r.cargoRepo
 }

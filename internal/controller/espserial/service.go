@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log/slog"
 	"strconv"
+
+	"github.com/tbe-team/raybot/internal/service"
 )
 
 type Config struct {
@@ -19,18 +21,28 @@ func (cfg *Config) Validate() error {
 
 type CleanupFunc func(context.Context) error
 
+type Handlers struct {
+	SyncStateHandler *SyncStateHandler
+}
+
 type Service struct {
 	cfg Config
 
 	serialClient Client
 
-	log *slog.Logger
+	handlers Handlers
+	log      *slog.Logger
 }
 
-func New(cfg Config, client Client, log *slog.Logger) (*Service, error) {
+func New(cfg Config, client Client, service service.Service, log *slog.Logger) (*Service, error) {
+	handlers := Handlers{
+		SyncStateHandler: NewSyncStateHandler(service.CargoControlService(), log),
+	}
+
 	return &Service{
 		cfg:          cfg,
 		serialClient: client,
+		handlers:     handlers,
 		log:          log,
 	}, nil
 }
@@ -69,8 +81,20 @@ func (s Service) routeMessage(ctx context.Context, msg []byte) {
 		Type messageType `json:"type"`
 	}
 	if err := json.Unmarshal(msg, &temp); err != nil {
-		s.log.Error("failed to unmarshal message", slog.Any("error", err), slog.Any("message", msg))
+		s.log.Error("failed to unmarshal message type", slog.Any("error", err), slog.Any("message", msg))
 		return
+	}
+
+	switch temp.Type {
+	case messageTypeSyncState:
+		var syncStateMsg syncStateMessage
+		if err := json.Unmarshal(msg, &syncStateMsg); err != nil {
+			s.log.Error("failed to unmarshal sync state message", slog.Any("error", err), slog.Any("message", msg))
+			return
+		}
+		s.handlers.SyncStateHandler.Handle(ctx, syncStateMsg)
+	default:
+		s.log.Error("unknown message type", slog.Any("message", msg))
 	}
 }
 
