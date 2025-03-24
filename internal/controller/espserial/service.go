@@ -52,7 +52,9 @@ func New(cfg Config, client Client, service service.Service, log *slog.Logger) (
 func (s Service) Run(ctx context.Context) (CleanupFunc, error) {
 	s.log.Info("ESP serial service is running")
 
-	go s.readLoop(ctx)
+	if s.serialClient != nil {
+		go s.readLoop(ctx)
+	}
 
 	cleanup := func(_ context.Context) error {
 		s.log.Debug("ESP serial service shut down complete")

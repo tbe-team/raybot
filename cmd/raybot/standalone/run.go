@@ -8,6 +8,7 @@ import (
 
 	"github.com/tbe-team/raybot/internal/application"
 	"github.com/tbe-team/raybot/internal/controller/cloud"
+	"github.com/tbe-team/raybot/internal/controller/espserial"
 	"github.com/tbe-team/raybot/internal/controller/event"
 	"github.com/tbe-team/raybot/internal/controller/grpc"
 	"github.com/tbe-team/raybot/internal/controller/http"
@@ -32,7 +33,7 @@ func Run() {
 
 	interruptChan := cmdutil.InterruptChan()
 
-	// Ensure PIC serial service and RFID service are started before any other services
+	// Ensure PIC serial service, ESP serial service, and RFID service are started before any other services
 	var wg sync.WaitGroup
 
 	wg.Add(1)
@@ -40,6 +41,15 @@ func Run() {
 		defer wg.Done()
 		if err := runPIC(app); err != nil {
 			log.Printf("failed to run PIC serial service: %v\n", err)
+			os.Exit(1)
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		if err := runESP(app); err != nil {
+			log.Printf("failed to run ESP serial service: %v\n", err)
 			os.Exit(1)
 		}
 	}()
@@ -95,6 +105,22 @@ func runPIC(app *application.Application) error {
 	cleanup, err := picSerialService.Run(app.Context())
 	if err != nil {
 		return fmt.Errorf("failed to run PIC serial service: %w", err)
+	}
+
+	app.CleanupManager.Add(cleanup)
+
+	return nil
+}
+
+func runESP(app *application.Application) error {
+	espSerialService, err := espserial.New(app.CfgManager.GetConfig().ESP, app.ESPSerialClient, app.Service, app.Log)
+	if err != nil {
+		return fmt.Errorf("failed to create ESP serial service: %w", err)
+	}
+
+	cleanup, err := espSerialService.Run(app.Context())
+	if err != nil {
+		return fmt.Errorf("failed to run ESP serial service: %w", err)
 	}
 
 	app.CleanupManager.Add(cleanup)
