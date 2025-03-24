@@ -32,12 +32,12 @@ Cấu trúc JSON:
 
 ### cmd_type
 
-| Loại | Mô tả                      |
-|------|----------------------------|
-| 0    | Cấu hình sạc pin           |
-| 1    | Cấu hình xả pin            |
-| 2    | Cấu hình động cơ nâng hạ   |
-| 3    | Cấu hình động cơ di chuyển |
+| Loại | Kiểu dữ liệu | Mô tả                      |
+|------|--------------|----------------------------|
+| 0    | uint8        | Cấu hình sạc pin           |
+| 1    | uint8        | Cấu hình xả pin            |
+| 2    | uint8        | Cấu hình động cơ nâng hạ   |
+| 3    | uint8        | Cấu hình động cơ di chuyển |
 
 ### cmd_data
 
