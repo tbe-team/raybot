@@ -19,11 +19,19 @@ type PICConfig struct {
 }
 
 type GRPCConfig struct {
-	Port int
+	Server GRPCServerConfig
+	Cloud  CloudConfig
+}
+
+type GRPCServerConfig struct {
+	Enable bool
+}
+
+type CloudConfig struct {
+	Address string
 }
 
 type HTTPConfig struct {
-	Port          int
 	EnableSwagger bool
 }
 
@@ -52,4 +60,7 @@ type UpdateSystemConfigOutput = GetSystemConfigOutput
 type SystemService interface {
 	GetSystemConfig(ctx context.Context) (GetSystemConfigOutput, error)
 	UpdateSystemConfig(ctx context.Context, params UpdateSystemConfigParams) (UpdateSystemConfigOutput, error)
+
+	// RestartApplication restarts the application after 3 second.
+	RestartApplication(ctx context.Context) error
 }

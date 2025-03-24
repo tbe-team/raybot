@@ -1,0 +1,19 @@
+get:
+  summary: Get health status
+  operationId: getHealth
+  description: Get the health status.
+  tags:
+    - health
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/health.yml#/HealthResponse"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

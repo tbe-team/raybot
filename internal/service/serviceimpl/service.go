@@ -1,29 +1,74 @@
 package serviceimpl
 
 import (
+	"log/slog"
+
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
+	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/repository"
 	"github.com/tbe-team/raybot/internal/service"
+	"github.com/tbe-team/raybot/internal/service/serviceimpl/command"
+	"github.com/tbe-team/raybot/internal/service/serviceimpl/location"
+	"github.com/tbe-team/raybot/internal/service/serviceimpl/pic"
+	robotstate "github.com/tbe-team/raybot/internal/service/serviceimpl/robot_state"
+	"github.com/tbe-team/raybot/internal/service/serviceimpl/system"
+	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
 type serviceImpl struct {
-	robotService  *RobotService
-	systemService *SystemService
-	picService    *PICService
+	robotStateService *robotstate.Service
+	systemService     *system.Service
+	picService        *pic.Service
+	locationService   *location.Service
+	commandService    *command.Service
 }
 
-func New(cfgManager config.Manager, picSerialClient serial.Client, repo repository.Repository, validator validator.Validator) service.Service {
+func New(
+	cfgManager config.Manager,
+	picSerialClient serial.Client,
+	repo repository.Repository,
+	pubSub pubsub.PubSub,
+	dbProvider db.Provider,
+	validator validator.Validator,
+	log *slog.Logger,
+) service.Service {
+	robotStateService := robotstate.NewService(repo.RobotState(), dbProvider)
+	systemService := system.NewService(cfgManager)
+	picService := pic.NewService(
+		repo.RobotState(),
+		repo.PICSerialCommand(),
+		repo.Battery(),
+		repo.DistanceSensor(),
+		repo.LiftMotor(),
+		repo.DriveMotor(),
+		repo.Location(),
+		picSerialClient,
+		dbProvider,
+		validator,
+	)
+	locationService := location.NewService(repo.Location(), pubSub, dbProvider)
+	commandService := command.NewService(
+		repo.Command(),
+		picService,
+		dbProvider,
+		pubSub,
+		pubSub,
+		validator,
+		log,
+	)
 	return &serviceImpl{
-		robotService:  NewRobotService(repo.RobotState(), validator),
-		systemService: NewSystemService(cfgManager),
-		picService:    NewPICService(repo.RobotState(), repo.PICSerialCommand(), picSerialClient, validator),
+		robotStateService: robotStateService,
+		systemService:     systemService,
+		picService:        picService,
+		locationService:   locationService,
+		commandService:    commandService,
 	}
 }
 
-func (s serviceImpl) RobotService() service.RobotService {
-	return s.robotService
+func (s serviceImpl) RobotStateService() service.RobotStateService {
+	return s.robotStateService
 }
 
 func (s serviceImpl) SystemService() service.SystemService {
@@ -32,4 +77,12 @@ func (s serviceImpl) SystemService() service.SystemService {
 
 func (s serviceImpl) PICService() service.PICService {
 	return s.picService
+}
+
+func (s serviceImpl) LocationService() service.LocationService {
+	return s.locationService
+}
+
+func (s serviceImpl) CommandService() service.CommandService {
+	return s.commandService
 }

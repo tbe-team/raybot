@@ -13,3 +13,13 @@ security: []
 paths:
   /system/config:
     $ref: "./paths/system@config.yml"
+  /system/restart:
+    $ref: "./paths/system@restart.yml"
+  /health:
+    $ref: "./paths/health.yml"
+  /robot-state:
+    $ref: "./paths/robot-state.yml"
+  /commands:
+    $ref: "./paths/commands.yml"
+  /commands/in-progress:
+    $ref: "./paths/commands@in-progress.yml"

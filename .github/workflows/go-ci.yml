@@ -1,0 +1,80 @@
+name: Go CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'internal/**'
+      - 'pkg/**'
+      - 'cmd/**'
+      - '.golangci.yml'
+      - 'Makefile'
+      - '.github/workflows/go-ci.yml'
+  pull_request:
+    paths:
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'internal/**'
+      - 'pkg/**'
+      - 'cmd/**'
+      - '.golangci.yml'
+      - 'Makefile'
+      - '.github/workflows/go-ci.yml'
+
+jobs:
+  code-gen:
+    name: Code Generation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.x"
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+          run_install: false
+      - name: Generate
+        run: make gen-all
+      - name: Check for diff
+        run: |
+          if ! git diff --exit-code; then
+            echo "⚠️ Code generation is outdated! Please run 'make gen-all' and commit the changes."
+            exit 1
+          fi
+
+  golangci:
+    name: GolangCI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.x"
+      - name: Run golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: v1.64.6
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup go
+        uses: actions/setup-go@v5
+        with:
+          go-version: "1.24.x"
+      - name: Test
+        run: go test ./... -v -failfast

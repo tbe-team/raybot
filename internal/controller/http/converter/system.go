@@ -5,13 +5,17 @@ import (
 	"github.com/tbe-team/raybot/internal/service"
 )
 
-func ToSystemConfigResponse(cfg service.GetSystemConfigOutput) gen.SystemConfigResponse {
+func ConvertSystemConfigToResponse(cfg service.GetSystemConfigOutput) gen.SystemConfigResponse {
 	return gen.SystemConfigResponse{
 		Grpc: gen.GRPCConfig{
-			Port: cfg.GRPCConfig.Port,
+			Server: gen.GRPCServerConfig{
+				Enable: cfg.GRPCConfig.Server.Enable,
+			},
+			Cloud: gen.CloudConfig{
+				Address: cfg.GRPCConfig.Cloud.Address,
+			},
 		},
 		Http: gen.HTTPConfig{
-			Port:          cfg.HTTPConfig.Port,
 			EnableSwagger: cfg.HTTPConfig.EnableSwagger,
 		},
 		Log: gen.LogConfig{

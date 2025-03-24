@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package command.v1;
+
+option go_package = "github.com/tbe-team/raybot/proto/command/v1;commandv1";
+
+service CommandService {
+  rpc CreateCommand(CreateCommandRequest) returns (CreateCommandResponse) {}
+}
+
+message CreateCommandRequest {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    TYPE_MOVE_TO_LOCATION = 1;
+    TYPE_LIFT_BOX = 2;
+    TYPE_DROP_BOX = 3;
+  }
+  Type type = 1;
+
+  oneof payload {
+    MoveToLocationCommand move_to_location = 2;
+    LiftBoxCommand lift_box = 3;
+    DropBoxCommand drop_box = 4;
+  }
+}
+
+message CreateCommandResponse {
+  string id = 1;
+}
+
+message MoveToLocationCommand {
+  string location = 1;
+}
+
+message LiftBoxCommand {}
+
+message DropBoxCommand {}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/tbe-team/raybot/internal/controller/cloud"
 	"github.com/tbe-team/raybot/internal/controller/grpc"
 	"github.com/tbe-team/raybot/internal/controller/http"
 	"github.com/tbe-team/raybot/internal/controller/picserial"
@@ -11,13 +12,30 @@ import (
 	"github.com/tbe-team/raybot/pkg/log"
 )
 
+type GRPCServerConfig = grpc.Config
+
+type GRPCConfig struct {
+	Server GRPCServerConfig `yaml:"server"`
+	Cloud  cloud.Config     `yaml:"cloud"`
+}
+
+func (c *GRPCConfig) Validate() error {
+	if err := c.Server.Validate(); err != nil {
+		return fmt.Errorf("validate GRPC server: %w", err)
+	}
+
+	if err := c.Cloud.Validate(); err != nil {
+		return fmt.Errorf("validate cloud: %w", err)
+	}
+
+	return nil
+}
+
 type Config struct {
 	Log  log.Config       `yaml:"log"`
-	GRPC grpc.Config      `yaml:"grpc"`
+	GRPC GRPCConfig       `yaml:"grpc"`
 	HTTP http.Config      `yaml:"http"`
 	PIC  picserial.Config `yaml:"pic"`
-
-	ConfigPath string `yaml:"-"`
 }
 
 // Validate validates the application configuration.
@@ -53,15 +71,20 @@ var DefaultConfig = Config{
 			ReadTimeout: 1 * time.Second,
 		},
 	},
-	GRPC: grpc.Config{
-		Port: 50051,
+	GRPC: GRPCConfig{
+		Server: grpc.Config{
+			Enable: true,
+		},
+		Cloud: cloud.Config{
+			Address: "localhost:50051",
+		},
 	},
 	HTTP: http.Config{
-		Port: 8080,
+		EnableSwagger: true,
 	},
 	Log: log.Config{
 		Level:     "info",
-		Format:    "json",
+		Format:    "text",
 		AddSource: false,
 	},
 }

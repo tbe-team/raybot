@@ -7,7 +7,7 @@ import 'nprogress/nprogress.css'
 const nprogress = useNProgress()
 
 const instance = axios.create({
-  baseURL: import.meta.env.VITE_BASE_URL,
+  baseURL: '/api/v1',
   timeout: 20000,
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,

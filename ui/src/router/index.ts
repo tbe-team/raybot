@@ -8,15 +8,16 @@ const MainLayout = () => import('@/layouts/main-layout/MainLayout.vue')
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/home',
+    redirect: '/state',
   },
   {
-    path: '/home',
+    path: '/state',
     component: MainLayout,
     children: [
       {
         path: '',
-        component: () => import('@/views/Home.vue'),
+        component: () => import('@/views/state/StateView.vue'),
+        meta: { title: 'State' },
       },
     ],
   },
@@ -26,9 +27,23 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: '',
-        component: () => import('@/views/System.vue'),
+        redirect: '/system/configuration',
+      },
+      {
+        path: 'configuration',
+        component: () => import('@/views/system/ConfigurationView.vue'),
+        meta: { title: 'System Configuration' },
+      },
+      {
+        path: 'restart',
+        component: () => import('@/views/system/RestartView.vue'),
+        meta: { title: 'System Restart' },
       },
     ],
+  },
+  {
+    path: '/404',
+    component: () => import('@/views/NotFoundView.vue'),
   },
 ]
 
@@ -40,12 +55,11 @@ const router = createRouter({
 const nprogress = useNProgress()
 
 router.beforeEach((to, _, next) => {
-  let title = import.meta.env.VITE_APP_NAME
+  let title = 'Raybot UI'
   if (to.meta.title) {
     title = `${to.meta.title} | ${title}`
   }
   document.title = title
-
   nprogress.start()
   next()
 })

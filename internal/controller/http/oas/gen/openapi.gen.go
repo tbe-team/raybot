@@ -14,11 +14,159 @@ import (
 	"net/url"
 	"path"
 	"strings"
+	"time"
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
+	"github.com/oapi-codegen/runtime"
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
+
+// BatteryState defines model for BatteryState.
+type BatteryState struct {
+	// Current The current of the battery
+	Current uint16 `json:"current"`
+
+	// Temp The temperature of the battery
+	Temp uint8 `json:"temp"`
+
+	// Voltage The voltage of the battery
+	Voltage uint16 `json:"voltage"`
+
+	// CellVoltages The cell voltages of the battery
+	CellVoltages []uint16 `json:"cellVoltages"`
+
+	// Percent The percentage of the battery
+	Percent uint8 `json:"percent"`
+
+	// Fault The fault of the battery
+	Fault uint8 `json:"fault"`
+
+	// Health The health of the battery
+	Health uint8 `json:"health"`
+
+	// UpdatedAt The updated at time of the battery
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// ChargeState defines model for ChargeState.
+type ChargeState struct {
+	// CurrentLimit The current limit of the charge
+	CurrentLimit uint16 `json:"currentLimit"`
+
+	// Enabled Whether the charge is enabled
+	Enabled bool `json:"enabled"`
+
+	// UpdatedAt The updated at time of the charge
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// CloudConfig defines model for CloudConfig.
+type CloudConfig struct {
+	// Address The address for the cloud service
+	Address string `json:"address"`
+}
+
+// CommandListResponse defines model for CommandListResponse.
+type CommandListResponse struct {
+	// Items The list of commands
+	Items []CommandResponse `json:"items"`
+
+	// TotalItems The total number of commands
+	TotalItems int `json:"totalItems"`
+}
+
+// CommandMoveToLocationInputs defines model for CommandMoveToLocationInputs.
+type CommandMoveToLocationInputs struct {
+	// Location The location to move to
+	Location string `json:"location"`
+}
+
+// CommandResponse defines model for CommandResponse.
+type CommandResponse struct {
+	// Id The id of the command
+	Id string `json:"id"`
+
+	// Type The type of command
+	Type CommandType `json:"type"`
+
+	// Status The status of the command
+	Status CommandStatus `json:"status"`
+
+	// Source The source of the command
+	Source CommandSource `json:"source"`
+
+	// Inputs The inputs of the command
+	Inputs CommandResponse_Inputs `json:"inputs"`
+
+	// Error The error of the command
+	Error *string `json:"error"`
+
+	// CreatedAt The creation date of the command
+	CreatedAt time.Time `json:"createdAt"`
+
+	// CompletedAt The completion date of the command
+	CompletedAt *time.Time `json:"completedAt"`
+}
+
+// CommandResponse_Inputs The inputs of the command
+type CommandResponse_Inputs struct {
+	union json.RawMessage
+}
+
+// CommandSource The source of the command
+type CommandSource = string
+
+// CommandStatus The status of the command
+type CommandStatus = string
+
+// CommandType The type of command
+type CommandType = string
+
+// DischargeState defines model for DischargeState.
+type DischargeState struct {
+	// CurrentLimit The current limit of the discharge
+	CurrentLimit uint16 `json:"currentLimit"`
+
+	// Enabled Whether the discharge is enabled
+	Enabled bool `json:"enabled"`
+
+	// UpdatedAt The updated at time of the discharge
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// DistanceSensorState defines model for DistanceSensorState.
+type DistanceSensorState struct {
+	// FrontDistance The front distance of the distance sensor
+	FrontDistance uint16 `json:"frontDistance"`
+
+	// BackDistance The back distance of the distance sensor
+	BackDistance uint16 `json:"backDistance"`
+
+	// DownDistance The down distance of the distance sensor
+	DownDistance uint16 `json:"downDistance"`
+
+	// UpdatedAt The updated at time of the distance sensor
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// DriveMotorState defines model for DriveMotorState.
+type DriveMotorState struct {
+	// Direction The direction of the drive motor
+	Direction string `json:"direction"`
+
+	// Speed The speed of the drive motor (0-100)
+	Speed uint8 `json:"speed"`
+
+	// IsRunning Whether the drive motor is running
+	IsRunning bool `json:"isRunning"`
+
+	// Enabled Whether the drive motor is enabled
+	Enabled bool `json:"enabled"`
+
+	// UpdatedAt The updated at time of the drive motor
+	UpdatedAt time.Time `json:"updatedAt"`
+}
 
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
@@ -41,17 +189,53 @@ type FieldError struct {
 
 // GRPCConfig defines model for GRPCConfig.
 type GRPCConfig struct {
-	// Port The port number for the gRPC server
-	Port int `json:"port"`
+	Cloud  CloudConfig      `json:"cloud"`
+	Server GRPCServerConfig `json:"server"`
+}
+
+// GRPCServerConfig defines model for GRPCServerConfig.
+type GRPCServerConfig struct {
+	// Enable Whether to enable the gRPC server
+	Enable bool `json:"enable"`
 }
 
 // HTTPConfig defines model for HTTPConfig.
 type HTTPConfig struct {
-	// Port The port number for the HTTP server
-	Port int `json:"port"`
-
 	// EnableSwagger Whether to enable the Swagger UI
 	EnableSwagger bool `json:"enableSwagger"`
+}
+
+// HealthResponse defines model for HealthResponse.
+type HealthResponse struct {
+	// Status The health status
+	Status string `json:"status"`
+}
+
+// LiftMotorState defines model for LiftMotorState.
+type LiftMotorState struct {
+	// CurrentPosition The current position of the lift motor
+	CurrentPosition uint16 `json:"currentPosition"`
+
+	// TargetPosition The target position of the lift motor
+	TargetPosition uint16 `json:"targetPosition"`
+
+	// IsRunning Whether the lift motor is running
+	IsRunning bool `json:"isRunning"`
+
+	// Enabled Whether the lift motor is enabled
+	Enabled bool `json:"enabled"`
+
+	// UpdatedAt The updated at time of the lift motor
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// LocationState defines model for LocationState.
+type LocationState struct {
+	// CurrentLocation The current location of the robot
+	CurrentLocation string `json:"currentLocation"`
+
+	// UpdatedAt The updated at time of the location
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 // LogConfig defines model for LogConfig.
@@ -69,6 +253,17 @@ type LogConfig struct {
 // PicConfig defines model for PicConfig.
 type PicConfig struct {
 	Serial SerialConfig `json:"serial"`
+}
+
+// RobotStateResponse defines model for RobotStateResponse.
+type RobotStateResponse struct {
+	Battery        BatteryState        `json:"battery"`
+	Charge         ChargeState         `json:"charge"`
+	Discharge      DischargeState      `json:"discharge"`
+	DistanceSensor DistanceSensorState `json:"distanceSensor"`
+	DriveMotor     DriveMotorState     `json:"driveMotor"`
+	LiftMotor      LiftMotorState      `json:"liftMotor"`
+	Location       LocationState       `json:"location"`
 }
 
 // SerialConfig defines model for SerialConfig.
@@ -108,22 +303,120 @@ type SystemConfigResponse struct {
 	Pic  PicConfig  `json:"pic"`
 }
 
+// Page defines model for Page.
+type Page = uint
+
+// PageSize defines model for PageSize.
+type PageSize = uint
+
+// ListCommandsParams defines parameters for ListCommands.
+type ListCommandsParams struct {
+	// Page The page number
+	Page *Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize The number of items per page
+	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Sorts Sort the commands by the given field. Use `-` to sort in descending order. Use `,` to sort by multiple fields. Example: `-createdAt,status` Allowed fields:
+	//   - type
+	//   - status
+	//   - source
+	//   - createdAt
+	//   - completedAt
+	Sorts *string `form:"sorts,omitempty" json:"sorts,omitempty"`
+}
+
 // UpdateSystemConfigJSONRequestBody defines body for UpdateSystemConfig for application/json ContentType.
 type UpdateSystemConfigJSONRequestBody = SystemConfigRequest
 
+// AsCommandMoveToLocationInputs returns the union data inside the CommandResponse_Inputs as a CommandMoveToLocationInputs
+func (t CommandResponse_Inputs) AsCommandMoveToLocationInputs() (CommandMoveToLocationInputs, error) {
+	var body CommandMoveToLocationInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCommandMoveToLocationInputs overwrites any union data inside the CommandResponse_Inputs as the provided CommandMoveToLocationInputs
+func (t *CommandResponse_Inputs) FromCommandMoveToLocationInputs(v CommandMoveToLocationInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCommandMoveToLocationInputs performs a merge with any union data inside the CommandResponse_Inputs, using the provided CommandMoveToLocationInputs
+func (t *CommandResponse_Inputs) MergeCommandMoveToLocationInputs(v CommandMoveToLocationInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t CommandResponse_Inputs) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *CommandResponse_Inputs) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// List all commands
+	// (GET /commands)
+	ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams)
+	// Get current processing command
+	// (GET /commands/in-progress)
+	GetCurrentProcessingCommand(w http.ResponseWriter, r *http.Request)
+	// Get health status
+	// (GET /health)
+	GetHealth(w http.ResponseWriter, r *http.Request)
+	// Get robot state
+	// (GET /robot-state)
+	GetRobotState(w http.ResponseWriter, r *http.Request)
 	// Get system configuration
 	// (GET /system/config)
 	GetSystemConfig(w http.ResponseWriter, r *http.Request)
 	// Update system configuration
 	// (PUT /system/config)
 	UpdateSystemConfig(w http.ResponseWriter, r *http.Request)
+	// Restart the application
+	// (POST /system/restart)
+	RestartApplication(w http.ResponseWriter, r *http.Request)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// List all commands
+// (GET /commands)
+func (_ Unimplemented) ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get current processing command
+// (GET /commands/in-progress)
+func (_ Unimplemented) GetCurrentProcessingCommand(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get health status
+// (GET /health)
+func (_ Unimplemented) GetHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get robot state
+// (GET /robot-state)
+func (_ Unimplemented) GetRobotState(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // Get system configuration
 // (GET /system/config)
@@ -137,6 +430,12 @@ func (_ Unimplemented) UpdateSystemConfig(w http.ResponseWriter, r *http.Request
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Restart the application
+// (POST /system/restart)
+func (_ Unimplemented) RestartApplication(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // ServerInterfaceWrapper converts contexts to parameters.
 type ServerInterfaceWrapper struct {
 	Handler            ServerInterface
@@ -145,6 +444,91 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ListCommands operation middleware
+func (siw *ServerInterfaceWrapper) ListCommands(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListCommandsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "pageSize", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sorts" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sorts", r.URL.Query(), &params.Sorts)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sorts", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListCommands(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCurrentProcessingCommand operation middleware
+func (siw *ServerInterfaceWrapper) GetCurrentProcessingCommand(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCurrentProcessingCommand(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetHealth operation middleware
+func (siw *ServerInterfaceWrapper) GetHealth(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetHealth(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetRobotState operation middleware
+func (siw *ServerInterfaceWrapper) GetRobotState(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetRobotState(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // GetSystemConfig operation middleware
 func (siw *ServerInterfaceWrapper) GetSystemConfig(w http.ResponseWriter, r *http.Request) {
@@ -165,6 +549,20 @@ func (siw *ServerInterfaceWrapper) UpdateSystemConfig(w http.ResponseWriter, r *
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateSystemConfig(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// RestartApplication operation middleware
+func (siw *ServerInterfaceWrapper) RestartApplication(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.RestartApplication(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -288,13 +686,129 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/commands", wrapper.ListCommands)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/commands/in-progress", wrapper.GetCurrentProcessingCommand)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/health", wrapper.GetHealth)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/robot-state", wrapper.GetRobotState)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/system/config", wrapper.GetSystemConfig)
 	})
 	r.Group(func(r chi.Router) {
 		r.Put(options.BaseURL+"/system/config", wrapper.UpdateSystemConfig)
 	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/system/restart", wrapper.RestartApplication)
+	})
 
 	return r
+}
+
+type ListCommandsRequestObject struct {
+	Params ListCommandsParams
+}
+
+type ListCommandsResponseObject interface {
+	VisitListCommandsResponse(w http.ResponseWriter) error
+}
+
+type ListCommands200JSONResponse CommandListResponse
+
+func (response ListCommands200JSONResponse) VisitListCommandsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListCommands400JSONResponse ErrorResponse
+
+func (response ListCommands400JSONResponse) VisitListCommandsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCurrentProcessingCommandRequestObject struct {
+}
+
+type GetCurrentProcessingCommandResponseObject interface {
+	VisitGetCurrentProcessingCommandResponse(w http.ResponseWriter) error
+}
+
+type GetCurrentProcessingCommand200JSONResponse CommandResponse
+
+func (response GetCurrentProcessingCommand200JSONResponse) VisitGetCurrentProcessingCommandResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCurrentProcessingCommand404JSONResponse ErrorResponse
+
+func (response GetCurrentProcessingCommand404JSONResponse) VisitGetCurrentProcessingCommandResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetHealthRequestObject struct {
+}
+
+type GetHealthResponseObject interface {
+	VisitGetHealthResponse(w http.ResponseWriter) error
+}
+
+type GetHealth200JSONResponse HealthResponse
+
+func (response GetHealth200JSONResponse) VisitGetHealthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetHealth400JSONResponse ErrorResponse
+
+func (response GetHealth400JSONResponse) VisitGetHealthResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetRobotStateRequestObject struct {
+}
+
+type GetRobotStateResponseObject interface {
+	VisitGetRobotStateResponse(w http.ResponseWriter) error
+}
+
+type GetRobotState200JSONResponse RobotStateResponse
+
+func (response GetRobotState200JSONResponse) VisitGetRobotStateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetRobotState400JSONResponse ErrorResponse
+
+func (response GetRobotState400JSONResponse) VisitGetRobotStateResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type GetSystemConfigRequestObject struct {
@@ -348,14 +862,53 @@ func (response UpdateSystemConfig400JSONResponse) VisitUpdateSystemConfigRespons
 	return json.NewEncoder(w).Encode(response)
 }
 
+type RestartApplicationRequestObject struct {
+}
+
+type RestartApplicationResponseObject interface {
+	VisitRestartApplicationResponse(w http.ResponseWriter) error
+}
+
+type RestartApplication204Response struct {
+}
+
+func (response RestartApplication204Response) VisitRestartApplicationResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type RestartApplication400JSONResponse ErrorResponse
+
+func (response RestartApplication400JSONResponse) VisitRestartApplicationResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// List all commands
+	// (GET /commands)
+	ListCommands(ctx context.Context, request ListCommandsRequestObject) (ListCommandsResponseObject, error)
+	// Get current processing command
+	// (GET /commands/in-progress)
+	GetCurrentProcessingCommand(ctx context.Context, request GetCurrentProcessingCommandRequestObject) (GetCurrentProcessingCommandResponseObject, error)
+	// Get health status
+	// (GET /health)
+	GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error)
+	// Get robot state
+	// (GET /robot-state)
+	GetRobotState(ctx context.Context, request GetRobotStateRequestObject) (GetRobotStateResponseObject, error)
 	// Get system configuration
 	// (GET /system/config)
 	GetSystemConfig(ctx context.Context, request GetSystemConfigRequestObject) (GetSystemConfigResponseObject, error)
 	// Update system configuration
 	// (PUT /system/config)
 	UpdateSystemConfig(ctx context.Context, request UpdateSystemConfigRequestObject) (UpdateSystemConfigResponseObject, error)
+	// Restart the application
+	// (POST /system/restart)
+	RestartApplication(ctx context.Context, request RestartApplicationRequestObject) (RestartApplicationResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -385,6 +938,104 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// ListCommands operation middleware
+func (sh *strictHandler) ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams) {
+	var request ListCommandsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListCommands(ctx, request.(ListCommandsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListCommands")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListCommandsResponseObject); ok {
+		if err := validResponse.VisitListCommandsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetCurrentProcessingCommand operation middleware
+func (sh *strictHandler) GetCurrentProcessingCommand(w http.ResponseWriter, r *http.Request) {
+	var request GetCurrentProcessingCommandRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetCurrentProcessingCommand(ctx, request.(GetCurrentProcessingCommandRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCurrentProcessingCommand")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCurrentProcessingCommandResponseObject); ok {
+		if err := validResponse.VisitGetCurrentProcessingCommandResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetHealth operation middleware
+func (sh *strictHandler) GetHealth(w http.ResponseWriter, r *http.Request) {
+	var request GetHealthRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetHealth(ctx, request.(GetHealthRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetHealth")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetHealthResponseObject); ok {
+		if err := validResponse.VisitGetHealthResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetRobotState operation middleware
+func (sh *strictHandler) GetRobotState(w http.ResponseWriter, r *http.Request) {
+	var request GetRobotStateRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetRobotState(ctx, request.(GetRobotStateRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetRobotState")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetRobotStateResponseObject); ok {
+		if err := validResponse.VisitGetRobotStateResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // GetSystemConfig operation middleware
@@ -442,27 +1093,79 @@ func (sh *strictHandler) UpdateSystemConfig(w http.ResponseWriter, r *http.Reque
 	}
 }
 
+// RestartApplication operation middleware
+func (sh *strictHandler) RestartApplication(w http.ResponseWriter, r *http.Request) {
+	var request RestartApplicationRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.RestartApplication(ctx, request.(RestartApplicationRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "RestartApplication")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(RestartApplicationResponseObject); ok {
+		if err := validResponse.VisitRestartApplicationResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"H4sIAAAAAAAC/+waa2/jNvKvELz7cAfI8SNOuvU3x5vdBs0mge20wG2DLi3RDltJVEnKu27h/37gQxIl",
+	"UZKdjYsWd0CA2OZw3jOcGfIP6NMooTGOBYeTP2CCGIqwwEx9e0AbLP8HmPuMJILQGE7g8hmDBG0wiNNo",
+	"hRn0IJE//5ZitoMejFGE4QRKCOhB7j/jCGkka5SGAk6GHlxTFiEBJzAlsYAejEhMojRSa2KXyP0kFniD",
+	"GdzvPcXHgvzewItmA9A1IAJHHCSYAUO9iTGFzM3c4Eju9hkapbErJARmu4VAQnGbMJpgJghWqz4Owx9o",
+	"KNBGf6/LIiHA1oBIkcQzBiuNFHoQf0FREmI4+TgcednfkweV4BJjlb2cYcQYkhi+9Da0Z377+CQFHF6q",
+	"nykLMIOT8d6DfsoYjkUDh3qxhbfhYFDTU5lwnexw70FjARdRtdRC8hCCb2x6l3sPPmMUimc3Qb321UKW",
+	"aH6z92CCmd+oWrMoQ6uZ8MXRdC+kF+AocROVK5ghkbI2qqOLY6mO9h5MkwAJHEwb5DXLAAkgSNRGHo4G",
+	"o2FvIP+Wg8FE/f0HWpEqEfUkEpjzyQUj8cZm6c3egya23AyZxTazj4737XOZIxj+LSUMB3DyMY8vY5aC",
+	"Ka+cIQp3yYIjd1pbt085R3T1C/aFjPrZM2Ib3JSGNP1bEpGOIA8lSKYOX+F8jUjHMVqFUhdV2j8+Y/GM",
+	"mUUOEA4ycIuyYCnOSa8oDTGKX8f76lK+jvM1eYG2QqGTTsuGNA1mNF6TTd2yKAgY5g1ni1kEa2oULDEB",
+	"jtmW+GWBQ+qj8JlyMbkYDC6GbWINq2JlLDh5p1GE4uCWcDHHPKExd3hnfpbVJQgJV97oazwyQnLofzK8",
+	"hhP4j35R0PTNwdw3dHOarmPRchxBBQpvmtlQ61bZYbHTGhpVVVl0MkFatPaBbvGS3lIfSVZu4iQ1JVtJ",
+	"e6FZb1CgWQWCgohupSglww/xG8R/qdm7ynhOpIXdZgNLA4W4JTINgORTRkIemRpxU+TFaRjKEKokB/cx",
+	"4DPclhvU8pH0G+nJcx8zRpmbllqq0zhYHFnKkMCNmwR1xJa1R+d4fHH5TQ+/+XbVG46C8x4aX1z2xqPL",
+	"y+F4+M14MBi0x76ssDM/dFBXa3UOaIzv13Dy8aCgdbr9/qlS33CaMh8fmAcWGlhuE0ikh6aPhQbOk8dB",
+	"m5YStBo/JMjUmrOQi5CrNHMa21m9UvC0RN8i10fdLJqQwzFi2eN8hB+md4/TW+jB2e3941uLiuUBxQmf",
+	"pYiCdK5TB2m11kz65u7nh/n9+/n1YgE9uHicza6v316/hR58N725vT6emaWxlCOJ7xJsJW9b/vsfrn9e",
+	"3v98ez+bLm/u7w4n+pZw/wSFV5Ch/dNqr5zin15+OWX9a1VgbwkXKPbxAsecsgZTr5D/awboVoCEkOIq",
+	"EEt8/Z0r5F9rcGmHgH6O2zmREKfm5Fw2+IzGop0VBXJqXoZf451NjLyOj46rPlrWmVf2q4pxOx2XkS3+",
+	"QEWj0waEYb+5esyXc3VIhCCSGK38+e5+/uN0LpP21XT2vfr4ZCuqWD8gq74oexVsvTB/jWVlw+dpHEse",
+	"jiHGzJ4jiMnQ4AnGDTWcWnJoHPxr0BsOBv/+yqnUV6TqsvVfNxAuqoFQ+GamLdtEh2fva1lUtTUngSM1",
+	"+SkXNAIM7VZUmIpdQdpyyw7u7I6KdzSNg666OcACkbDc8LaVk+8IDgPFe1v3Kl0pwpw7J1wuITJgWw7Z",
+	"kYKYCrDuEmRUO1G1TjKsLv1bgtSUv5ZrdcbVz0CN720+zQ+tam5URrP4dyhSZU8u1zEK0BK0a+D9/GHW",
+	"NMBRM5nO1sIaAcncgdkWs65NkupCQWY7K6wbNJ7hoYnzEo4a/zoKWzImNelYZZDN/GEGcroHJ8zazMlQ",
+	"dbH83XL50M7s4jPabDA7lGcDDh5vXoHljLaTczXpbc5UvKXPMtcXeW9ZeDf99ahpnsHg4u+WrEVbMWGq",
+	"6wfKSXNJkfU7iYHKzpaQrEX9aDlpz1OQPH3RUKb1wppByDapQ78a5oTqfXn54ObhRNVD1Rlr2ntZMZGN",
+	"pTr6/daZbN7yZ7NZox9GV1SUVDO9mn3Z/d515L3QGhmPr26LUVPbXVDsUvKm5b6jadJlZW8UBEpGM/gS",
+	"1Ehcirg1CnlnyGWSu2frG6DX8xuWyvlm+qNfuHZA/EWUG6Ns4aiuSAZgiLc4bOZKLXcwFeBVulHDxzWF",
+	"HvyMWJxPIEtMZoDH9m7VKwTFcq5RzzKlywceiN/kAxwzgsKu8mehoJpLH4nCRXguo1CFd/NJnN0Td7BQ",
+	"ehuy96CZc3UVe9ZAUfYN+XysY19lFqm3WnOrA/bXplwSST5D6ERQmTZIP81Khq69ldpCbrVyaOvOUkau",
+	"Grq40c+HjPbAsaIhm+GS5F77DVjJ1xzekgZzc1y4poJpABgSOI9X7ZzAp3GcN8B5OH572XBm2wNAJNAV",
+	"abqkkatgRQQ/jOCbNmoyRSaIEbFrejUm19oJmXwU01i1ZVssf6VBUM5CZvm4JHQh2aOs6fUNZUI1mYcp",
+	"AvYDvO0LsXtcXHXekjGMgiWJME0biEsAdR7TVBxG335FF9BU9j85E/nDPFsf65AicTmuXh1yQZNm75Cr",
+	"R3jHazBVG4Eqk3lF3FgebbGfe15Z28743HGBIx2fc/xbirmoh+mGJf4hPXXRhz8LkXTtsNpRldQ23fls",
+	"U8AnpJOl4qCsX9pLt1RiGV41wm4NNZ17/8Mq2u9NqeSMmrkesU0fbtQZ4mOjPvMC9cPNUha9LIQTRYVP",
+	"+n2ayDNH1j9nlG36ZhPvS1jZ6xGhkk4J8xYzrokOzoZnAwkn0aCEwAk8PxucDVRUiGdlrX7+TEWaDjsS",
+	"0S3hAqAwtB+0UPU4kND4JjAQs2LRfi3ccJtfgPTVa+K9dxCceqArYcscLmSOtq6OOVjtdFFLtjgGavp2",
+	"Bh45Bp96n2Shz+UGEgOJBscBiTdApRkD5BVAqx2I0lCQJMQaDz8D1zqvTcCnXn4H7+mRyCcwDUP6GQcG",
+	"ePJTDEBP3SrrTxrMfFaG1Z9zROZrcZ//U9zwYlnyx0vPlavPc56kH+swVeYdDQZ6mB0L89oUJUlIdM3S",
+	"V32GrJxzfAc8ZCg92lL+XzbNtP46a+/B8SsyUp7cO1i4QgHI8rl6l51GEZJ1udOzBdpwPbM2Pz3JPXmU",
+	"9EncSxjdZO/pnBHzHht3zMZYjPqYc+lm1nOXUgi9x2JmhhE58CyHPbUV29S3bBdEWXP851nzjgqgr1LK",
+	"tpQ6b9V3g2GL596tpiyNTs9c5vsue4J7MmNVRr8O5dx//xeKLqm66sQ5M4LRujaBGmn1eDYsOyikFHR1",
+	"JlazSdGmn9IujmHA38E2SmtakZZlbGNo83BV9fX9vHFtNZCGBho6Zdksr2Yau5Y8pXGcNevfwTwNiszs",
+	"pJfhkyxuXe3joxqeHm4SDV+ziuLuiga7Exkkk17X3P/3gcIHjAEPdQMrUhnmAul5RkK5wzfmGkA5hyUb",
+	"QGuBGTgHHPs0DhzHnNk4LfbUQ3dcp3dHwcxo86+j3wYlOHWbX6frjkb3aH2UkP52CPdP+/8GAAD//xtm",
+	"vhswOQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

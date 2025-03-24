@@ -46,7 +46,7 @@ type client struct {
 
 // NewClient creates a new serial client.
 func NewClient(cfg Config, log *slog.Logger) (Client, error) {
-	clientLog := log.With(
+	log = log.With(
 		slog.Group("serial_client",
 			slog.String("port", cfg.Port),
 			slog.Int("baud_rate", cfg.BaudRate),
@@ -88,7 +88,7 @@ func NewClient(cfg Config, log *slog.Logger) (Client, error) {
 	port, openErr = serial.Open(cfg.Port, mode)
 	if openErr != nil {
 		// Now we just ignore the error
-		clientLog.Error("failed to open serial port", slog.Any("error", openErr))
+		log.Error("failed to open serial port", slog.Any("error", openErr))
 		// return nil, err
 	}
 
@@ -103,7 +103,7 @@ func NewClient(cfg Config, log *slog.Logger) (Client, error) {
 		port:     port,
 		readChan: make(chan []byte, 1),
 		stop:     make(chan struct{}),
-		log:      clientLog,
+		log:      log,
 	}
 
 	if openErr == nil {

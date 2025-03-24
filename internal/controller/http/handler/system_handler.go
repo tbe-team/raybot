@@ -20,7 +20,7 @@ func (h systemHandler) GetSystemConfig(ctx context.Context, _ gen.GetSystemConfi
 		return nil, fmt.Errorf("system service get system config: %w", err)
 	}
 
-	return gen.GetSystemConfig200JSONResponse(converter.ToSystemConfigResponse(cfg)), nil
+	return gen.GetSystemConfig200JSONResponse(converter.ConvertSystemConfigToResponse(cfg)), nil
 }
 
 func (h systemHandler) UpdateSystemConfig(ctx context.Context, request gen.UpdateSystemConfigRequestObject) (gen.UpdateSystemConfigResponseObject, error) {
@@ -41,10 +41,14 @@ func (h systemHandler) UpdateSystemConfig(ctx context.Context, request gen.Updat
 			},
 		},
 		GRPCConfig: service.GRPCConfig{
-			Port: request.Body.Grpc.Port,
+			Server: service.GRPCServerConfig{
+				Enable: request.Body.Grpc.Server.Enable,
+			},
+			Cloud: service.CloudConfig{
+				Address: request.Body.Grpc.Cloud.Address,
+			},
 		},
 		HTTPConfig: service.HTTPConfig{
-			Port:          request.Body.Http.Port,
 			EnableSwagger: request.Body.Http.EnableSwagger,
 		},
 	}
@@ -53,5 +57,13 @@ func (h systemHandler) UpdateSystemConfig(ctx context.Context, request gen.Updat
 		return nil, fmt.Errorf("system service update system config: %w", err)
 	}
 
-	return gen.UpdateSystemConfig200JSONResponse(converter.ToSystemConfigResponse(cfg)), nil
+	return gen.UpdateSystemConfig200JSONResponse(converter.ConvertSystemConfigToResponse(cfg)), nil
+}
+
+func (h systemHandler) RestartApplication(ctx context.Context, _ gen.RestartApplicationRequestObject) (gen.RestartApplicationResponseObject, error) {
+	if err := h.systemService.RestartApplication(ctx); err != nil {
+		return nil, fmt.Errorf("system service restart application: %w", err)
+	}
+
+	return gen.RestartApplication204Response{}, nil
 }

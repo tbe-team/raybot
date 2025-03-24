@@ -38,10 +38,14 @@ func TestSystemHandler(t *testing.T) {
 								AddSource: true,
 							},
 							GRPCConfig: service.GRPCConfig{
-								Port: 50051,
+								Server: service.GRPCServerConfig{
+									Enable: true,
+								},
+								Cloud: service.CloudConfig{
+									Address: "localhost:50051",
+								},
 							},
 							HTTPConfig: service.HTTPConfig{
-								Port:          8080,
 								EnableSwagger: true,
 							},
 							PICConfig: service.PICConfig{
@@ -64,10 +68,14 @@ func TestSystemHandler(t *testing.T) {
 						AddSource: true,
 					},
 					Grpc: gen.GRPCConfig{
-						Port: 50051,
+						Server: gen.GRPCServerConfig{
+							Enable: true,
+						},
+						Cloud: gen.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 					Http: gen.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					Pic: gen.PicConfig{
@@ -156,10 +164,14 @@ func TestSystemHandler(t *testing.T) {
 						AddSource: true,
 					},
 					Grpc: gen.GRPCConfig{
-						Port: 50051,
+						Server: gen.GRPCServerConfig{
+							Enable: true,
+						},
+						Cloud: gen.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 					Http: gen.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					Pic: gen.PicConfig{
@@ -180,8 +192,8 @@ func TestSystemHandler(t *testing.T) {
 							return params.LogConfig.Level == "debug" &&
 								params.LogConfig.Format == "json" &&
 								params.LogConfig.AddSource == true &&
-								params.GRPCConfig.Port == 50051 &&
-								params.HTTPConfig.Port == 8080 &&
+								params.GRPCConfig.Server.Enable == true &&
+								params.GRPCConfig.Cloud.Address == "localhost:50051" &&
 								params.HTTPConfig.EnableSwagger == true &&
 								params.PICConfig.Serial.Port == "/dev/ttyUSB0" &&
 								params.PICConfig.Serial.BaudRate == 115200 &&
@@ -198,10 +210,14 @@ func TestSystemHandler(t *testing.T) {
 								AddSource: true,
 							},
 							GRPCConfig: service.GRPCConfig{
-								Port: 50051,
+								Server: service.GRPCServerConfig{
+									Enable: true,
+								},
+								Cloud: service.CloudConfig{
+									Address: "localhost:50051",
+								},
 							},
 							HTTPConfig: service.HTTPConfig{
-								Port:          8080,
 								EnableSwagger: true,
 							},
 							PICConfig: service.PICConfig{
@@ -224,10 +240,14 @@ func TestSystemHandler(t *testing.T) {
 						AddSource: true,
 					},
 					Grpc: gen.GRPCConfig{
-						Port: 50051,
+						Server: gen.GRPCServerConfig{
+							Enable: true,
+						},
+						Cloud: gen.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 					Http: gen.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					Pic: gen.PicConfig{
@@ -251,10 +271,14 @@ func TestSystemHandler(t *testing.T) {
 						AddSource: true,
 					},
 					Grpc: gen.GRPCConfig{
-						Port: 50051,
+						Server: gen.GRPCServerConfig{
+							Enable: true,
+						},
+						Cloud: gen.CloudConfig{
+							Address: "localhost:50051",
+						},
 					},
 					Http: gen.HTTPConfig{
-						Port:          8080,
 						EnableSwagger: true,
 					},
 					Pic: gen.PicConfig{
@@ -327,6 +351,66 @@ func TestSystemHandler(t *testing.T) {
 					assert.Equal(t, *tc.expectedBody, responseBody)
 				}
 
+				systemSvc.AssertExpectations(t)
+			})
+		}
+	})
+
+	t.Run("test restart application", func(t *testing.T) {
+		tests := []struct {
+			name           string
+			mockSystemSvc  func(_ *mocks.FakeSystemService)
+			expectedStatus int
+		}{
+			{
+				name: "successful restart",
+				mockSystemSvc: func(svc *mocks.FakeSystemService) {
+					svc.EXPECT().
+						RestartApplication(context.Background()).
+						Return(nil)
+				},
+				expectedStatus: http.StatusNoContent,
+			},
+			{
+				name: "restart error",
+				mockSystemSvc: func(svc *mocks.FakeSystemService) {
+					svc.EXPECT().
+						RestartApplication(context.Background()).
+						Return(assert.AnError)
+				},
+				expectedStatus: http.StatusInternalServerError,
+			},
+		}
+
+		for _, tc := range tests {
+			t.Run(tc.name, func(t *testing.T) {
+				// Setup
+				systemSvc := mocks.NewFakeSystemService(t)
+				tc.mockSystemSvc(systemSvc)
+
+				handler := systemHandler{
+					systemService: systemSvc,
+				}
+
+				// Create a new request
+				req := httptest.NewRequest("POST", "/system/restart", nil)
+				rec := httptest.NewRecorder()
+
+				// Call the method directly
+				result, err := handler.RestartApplication(req.Context(), gen.RestartApplicationRequestObject{})
+
+				// Process the result to simulate middleware behavior
+				if err != nil {
+					rec.WriteHeader(http.StatusInternalServerError)
+					if _, err := rec.Write([]byte(err.Error())); err != nil {
+						assert.Fail(t, "failed to write response body")
+					}
+				} else if _, ok := result.(gen.RestartApplication204Response); ok {
+					rec.WriteHeader(http.StatusNoContent)
+				}
+
+				// Assertions
+				assert.Equal(t, tc.expectedStatus, rec.Code)
 				systemSvc.AssertExpectations(t)
 			})
 		}

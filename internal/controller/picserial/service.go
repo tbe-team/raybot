@@ -40,7 +40,7 @@ type CleanupFunc func(context.Context) error
 
 func NewPICSerialService(cfg Config, client serial.Client, service service.Service, log *slog.Logger) (*PICSerialService, error) {
 	handlers := Handlers{
-		SyncStateHandler:  handler.NewSyncStateHandler(service.RobotService(), log),
+		SyncStateHandler:  handler.NewSyncStateHandler(service.PICService(), log),
 		CommandACKHandler: handler.NewCommandACKHandler(service.PICService(), log),
 	}
 
@@ -48,7 +48,7 @@ func NewPICSerialService(cfg Config, client serial.Client, service service.Servi
 		cfg:          cfg,
 		serialClient: client,
 		handlers:     handlers,
-		log:          log.With(slog.String("service", "PICSerialService")),
+		log:          log,
 	}, nil
 }
 

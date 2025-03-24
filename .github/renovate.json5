@@ -7,6 +7,42 @@
     "dependencies"
   ],
   "prHourlyLimit": 4,
+  "baseBranches": [
+    "main"
+  ],
+  "packageRules": [
+    {
+      "matchManagers": ["gomod"],
+      "matchPackageNames": ["go", "toolchain"],
+      "enabled": false
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchPackageNames": ["tailwindcss"],
+      "enabled": false
+    },
+    // NPM: Automerge minor/patch, manual major
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true,
+      "autoApprove": true
+    },
+    {
+      "matchManagers": ["npm"],
+      "matchUpdateTypes": ["major"],
+      "automerge": false,
+      "autoApprove": false
+    },
+    // GitHub Actions: Manual review
+    {
+      "matchManagers": ["github-actions"],
+      "enabled": true,
+      "matchUpdateTypes": ["major", "minor", "patch"],
+      "autoApprove": false,
+      "automerge": false
+    }
+  ],
   "digest": {
     "enabled": false
   },

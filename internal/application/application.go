@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"time"
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
+	"github.com/tbe-team/raybot/internal/pubsub"
 	"github.com/tbe-team/raybot/internal/repository/repoimpl"
 	"github.com/tbe-team/raybot/internal/service"
 	"github.com/tbe-team/raybot/internal/service/serviceimpl"
+	"github.com/tbe-team/raybot/internal/storage/db"
+	"github.com/tbe-team/raybot/internal/storage/file"
 	"github.com/tbe-team/raybot/pkg/log"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
@@ -20,6 +22,7 @@ type Application struct {
 
 	PICSerialClient serial.Client
 	Service         service.Service
+	PubSub          pubsub.PubSub
 
 	Log *slog.Logger
 
@@ -34,14 +37,43 @@ func (a *Application) Context() context.Context {
 
 type CleanupFunc func() error
 
-func New(cfgManager config.Manager) (*Application, CleanupFunc, error) {
-	// Set UTC timezone
-	time.Local = time.UTC
+func New() (*Application, CleanupFunc, error) {
 	// Create context
 	ctx := context.Background()
 
+	path, err := NewPath()
+	if err != nil {
+		return nil, nil, fmt.Errorf("create path: %w", err)
+	}
+
+	fileClient, err := file.NewLocalFileClient(".")
+	if err != nil {
+		return nil, nil, fmt.Errorf("create file client: %w", err)
+	}
+
+	cfgManager, err := config.NewManager(fileClient, path.ConfigPath(), slog.Default())
+	if err != nil {
+		return nil, nil, fmt.Errorf("create config manager: %w", err)
+	}
+
 	logger := log.NewLogger(cfgManager.GetConfig().Log)
 	slog.SetDefault(logger)
+
+	// Setup repository
+	dbProvider, err := db.NewProvider(db.Config{
+		DBPath: path.DBPath(),
+	})
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create db provider: %w", err)
+	}
+
+	// Auto migrate the database
+	if err := dbProvider.AutoMigrate(); err != nil {
+		return nil, nil, fmt.Errorf("failed to auto migrate the database: %w", err)
+	}
+
+	// Setup pubSub
+	pubSub := pubsub.New(logger)
 
 	// Setup repository
 	repo := repoimpl.New()
@@ -54,12 +86,13 @@ func New(cfgManager config.Manager) (*Application, CleanupFunc, error) {
 
 	// Setup service
 	validator := validator.New()
-	service := serviceimpl.New(cfgManager, picSerialClient, repo, validator)
+	service := serviceimpl.New(cfgManager, picSerialClient, repo, pubSub, dbProvider, validator, logger)
 
 	// Setup application
 	app := &Application{
 		CfgManager:      cfgManager,
 		PICSerialClient: picSerialClient,
+		PubSub:          pubSub,
 		Service:         service,
 		Log:             logger,
 		CleanupManager:  NewCleanupManager(),
