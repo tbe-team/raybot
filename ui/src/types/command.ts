@@ -1,4 +1,5 @@
-export type CommandType = 'MOVE_TO_LOCATION'
+export const CommandTypeValues = ['MOVE_TO_LOCATION', 'LIFT_CARGO', 'DROP_CARGO', 'OPEN_CARGO', 'CLOSE_CARGO'] as const
+export type CommandType = typeof CommandTypeValues[number]
 
 export type CommandStatus = 'IN_PROGRESS' | 'SUCCEEDED' | 'FAILED'
 
