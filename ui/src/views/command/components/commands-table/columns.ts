@@ -3,6 +3,7 @@ import type { ColumnDef } from '@tanstack/vue-table'
 import DataTableSortableHeader from '@/components/shared/DataTableSortableHeader.vue'
 import { formatDate } from '@/lib/date'
 import { h } from 'vue'
+import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
 
 export const columns: ColumnDef<Command>[] = [
@@ -23,13 +24,17 @@ export const columns: ColumnDef<Command>[] = [
   {
     accessorKey: 'source',
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Source' }),
+    cell: ({ row }) => h(SourceBadge, { source: row.original.source }),
   },
   {
     accessorKey: 'inputs',
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Inputs' }),
     cell: ({ row }) => {
       const inputs = row.getValue('inputs') as Record<string, unknown>
-      return JSON.stringify(inputs)
+      return h('pre', {
+        class: 'text-xs overflow-auto max-h-32 whitespace-pre-wrap',
+        style: 'max-width: 300px;',
+      }, JSON.stringify(inputs, null, 2))
     },
     enableSorting: false,
   },
