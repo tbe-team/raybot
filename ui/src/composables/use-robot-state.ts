@@ -5,7 +5,7 @@ import { useQuery } from '@tanstack/vue-query'
 export function useQueryRobotState(
   opts?: {
     axiosOpts?: Partial<AxiosRequestConfig>
-    refetchInterval?: number
+    refetchInterval?: Ref<number>
   },
 ) {
   return useQuery({

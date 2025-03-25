@@ -12,7 +12,7 @@ const refetchInterval = ref(REFRESH_INTERVAL)
 
 const { data: robotState, isPending, isError, error } = useQueryRobotState({
   axiosOpts: { doNotShowLoading: true },
-  refetchInterval: refetchInterval.value,
+  refetchInterval,
 })
 
 function getBatteryColor(percent: number): string {
