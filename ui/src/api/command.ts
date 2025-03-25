@@ -4,24 +4,27 @@ import type { Paging } from '@/types/paging'
 import type { AxiosRequestConfig } from 'axios'
 import http from '@/lib/http'
 
-export type CommandSort = 'type' | 'status' | 'source' | 'createdAt' | 'completedAt'
-export const commandSortValues: CommandSort[] = ['type', 'status', 'source', 'createdAt', 'completedAt']
-export interface CommandParams {
+export const COMMAND_SORT_VALUES = ['type', 'status', 'source', 'created_at', 'completed_at'] as const
+export type CommandSort = (typeof COMMAND_SORT_VALUES)[number]
+
+export interface ListCommandsParams {
   page?: number
   pageSize?: number
   sorts?: SortPrefix<CommandSort>[]
 }
+
 const command = {
   getCommandInProgress: (opt?: AxiosRequestConfig): Promise<Command> => {
     return http.get('/commands/in-progress', opt)
   },
-  getCommand: (p: CommandParams): Promise<Paging<Command>> => {
-    const query = new URLSearchParams({
-      page: p.page?.toString() || '1',
-      pageSize: p.pageSize?.toString() || '10',
-      sorts: p.sorts?.join(',') || '',
+  listCommands: (params: ListCommandsParams): Promise<Paging<Command>> => {
+    return http.get('/commands', {
+      params: {
+        page: params.page,
+        pageSize: params.pageSize,
+        sorts: params.sorts?.join(','),
+      },
     })
-    return http.get(`/commands?${query}`)
   },
 }
 export default command

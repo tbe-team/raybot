@@ -4,12 +4,6 @@ type CommandStatus = 'IN_PROGRESS' | 'SUCCEEDED' | 'FAILED'
 
 type CommandSource = 'MANUAL' | 'CLOUD'
 
-export type CommandInputs = CommandMoveToLocationInputs
-
-interface CommandMoveToLocationInputs {
-  Location: string
-}
-
 export interface Command {
   id: string
   type: CommandType

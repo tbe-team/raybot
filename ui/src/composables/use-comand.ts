@@ -9,10 +9,11 @@ export function useComandInProgress(opts?: { axiosOpts?: Partial<AxiosRequestCon
     refetchInterval: opts?.refetchInterval,
   })
 }
+
 export function useComand(page: Ref<number>, pageSize: Ref<number>) {
   return useQuery({
     queryKey: ['comand', page, pageSize],
-    queryFn: () => command.getCommand({ page: page.value, pageSize: pageSize.value }),
+    queryFn: () => command.listCommands({ page: page.value, pageSize: pageSize.value }),
     placeholderData: keepPreviousData,
   })
 }
