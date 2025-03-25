@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
-	"time"
 
 	"github.com/ThreeDotsLabs/watermill/message"
 
@@ -58,7 +57,7 @@ func (e MoveToLocationExecutor) Execute(ctx context.Context, command model.Comma
 	wg := sync.WaitGroup{}
 	errChan := make(chan error)
 	wg.Add(1)
-	go e.trackingLocationLoop(execCtx, &wg, errChan, command, inputs.Location)
+	go e.trackingLocationLoop(execCtx, &wg, errChan, inputs.Location)
 
 	// Create serial command, robot move forward with speed 100
 	params := service.CreateSerialCommandParams{
@@ -108,7 +107,6 @@ func (e MoveToLocationExecutor) trackingLocationLoop(
 	ctx context.Context,
 	wg *sync.WaitGroup,
 	errChan chan<- error,
-	command model.Command,
 	targetLocation string,
 ) {
 	defer func() {
@@ -126,29 +124,19 @@ func (e MoveToLocationExecutor) trackingLocationLoop(
 	for {
 		select {
 		case <-ctx.Done():
+			errChan <- ctx.Err()
 			return
 		case msg := <-msgChan:
 			var event pubsub.RobotLocationUpdatedEvent
 			if err := json.Unmarshal(msg.Payload, &event); err != nil {
-				e.log.Error("unmarshal location tracked event", slog.Any("error", err))
-				continue
+				errChan <- fmt.Errorf("unmarshal location tracked event: %w", err)
+				return
 			}
 
 			if event.Location == targetLocation {
 				e.log.Debug("current location is the same as the target location")
 
-				completedAt := time.Now()
-				params := repository.UpdateCommandParams{
-					ID:             command.ID,
-					Status:         model.CommandStatusSucceeded,
-					SetStatus:      true,
-					CompletedAt:    &completedAt,
-					SetCompletedAt: true,
-				}
-				if _, err := e.commandRepo.UpdateCommand(ctx, e.dbProvider.DB(), params); err != nil {
-					errChan <- fmt.Errorf("command repository update command: %w", err)
-				}
-
+				// command success, we just return without error
 				return
 			}
 
