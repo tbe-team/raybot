@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package command.v1;
+
+option go_package = "github.com/tbe-team/raybot/proto/command/v1;commandv1";
+
+service CommandService {
+  rpc MoveToLocation(MoveToLocationRequest) returns (MoveToLocationResponse) {}
+  rpc LiftCargo(LiftCargoRequest) returns (LiftCargoResponse) {}
+  rpc DropCargo(DropCargoRequest) returns (DropCargoResponse) {}
+  rpc OpenCargo(OpenCargoRequest) returns (OpenCargoResponse) {}
+  rpc CloseCargo(CloseCargoRequest) returns (CloseCargoResponse) {}
+}
+
+message MoveToLocationRequest {
+  string location = 1;
+}
+
+message MoveToLocationResponse {
+  string command_id = 1;
+}
+
+message LiftCargoRequest {}
+
+message LiftCargoResponse {
+  string command_id = 1;
+}
+
+message DropCargoRequest {}
+
+message DropCargoResponse {
+  string command_id = 1;
+}
+
+message OpenCargoRequest {}
+
+message OpenCargoResponse {
+  string command_id = 1;
+}
+
+message CloseCargoRequest {}
+
+message CloseCargoResponse {
+  string command_id = 1;
+}

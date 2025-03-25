@@ -14,6 +14,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	commandv1 "github.com/tbe-team/raybot/internal/controller/grpc/gen/command/v1"
 	"github.com/tbe-team/raybot/internal/controller/grpc/handler"
 	"github.com/tbe-team/raybot/internal/service"
 )
@@ -42,7 +43,7 @@ func NewGRPCService(cfg Config, service service.Service, log *slog.Logger) (*GRP
 	return &GRPCService{
 		cfg:     cfg,
 		service: service,
-		log:     log.With(slog.String("service", "GRPCService")),
+		log:     log,
 	}, nil
 }
 
@@ -96,7 +97,7 @@ func (s GRPCService) Run() (CleanupFunc, error) {
 }
 
 func (s GRPCService) registerHandlers(server *grpc.Server) {
-	robotStateHandler := handler.NewRobotStateHandler(s.service.RobotService())
+	robotStateHandler := handler.NewRobotStateHandler(s.service.RobotStateService())
 	raybotv1grpc.RegisterRobotStateServiceServer(server, robotStateHandler)
 
 	driveMotorHandler := handler.NewDriveMotorHandler(s.service.PICService())
@@ -104,4 +105,7 @@ func (s GRPCService) registerHandlers(server *grpc.Server) {
 
 	liftMotorHandler := handler.NewLiftMotorHandler(s.service.PICService())
 	raybotv1grpc.RegisterLiftMotorServiceServer(server, liftMotorHandler)
+
+	commandHandler := handler.NewCommandHandler(s.service.CommandService())
+	commandv1.RegisterCommandServiceServer(server, commandHandler)
 }

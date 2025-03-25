@@ -5,7 +5,7 @@ import (
 	"github.com/tbe-team/raybot/internal/service"
 )
 
-func ToSystemConfigResponse(cfg service.GetSystemConfigOutput) gen.SystemConfigResponse {
+func ConvertSystemConfigToResponse(cfg service.GetSystemConfigOutput) gen.SystemConfigResponse {
 	return gen.SystemConfigResponse{
 		Grpc: gen.GRPCConfig{
 			Server: gen.GRPCServerConfig{
@@ -31,6 +31,16 @@ func ToSystemConfigResponse(cfg service.GetSystemConfigOutput) gen.SystemConfigR
 				StopBits:    cfg.PICConfig.Serial.StopBits,
 				Parity:      cfg.PICConfig.Serial.Parity,
 				ReadTimeout: cfg.PICConfig.Serial.ReadTimeout.Seconds(),
+			},
+		},
+		Esp: gen.ESPConfig{
+			Serial: gen.SerialConfig{
+				Port:        cfg.ESPConfig.Serial.Port,
+				BaudRate:    cfg.ESPConfig.Serial.BaudRate,
+				DataBits:    cfg.ESPConfig.Serial.DataBits,
+				StopBits:    cfg.ESPConfig.Serial.StopBits,
+				Parity:      cfg.ESPConfig.Serial.Parity,
+				ReadTimeout: cfg.ESPConfig.Serial.ReadTimeout.Seconds(),
 			},
 		},
 	}

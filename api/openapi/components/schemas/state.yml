@@ -3,18 +3,31 @@ RobotStateResponse:
   properties:
     battery:
       $ref: "#/BatteryState"
+      x-order: 1
     charge:
       $ref: "#/ChargeState"
+      x-order: 2
     discharge:
       $ref: "#/DischargeState"
+      x-order: 3
     distanceSensor:
       $ref: "#/DistanceSensorState"
+      x-order: 4
     liftMotor:
       $ref: "#/LiftMotorState"
+      x-order: 5
     driveMotor:
       $ref: "#/DriveMotorState"
+      x-order: 6
     location:
       $ref: "#/LocationState"
+      x-order: 7
+    cargo:
+      $ref: "#/CargoState"
+      x-order: 8
+    cargoDoorMotor:
+      $ref: "#/CargoDoorMotorState"
+      x-order: 9
   required:
     - battery
     - charge
@@ -23,6 +36,8 @@ RobotStateResponse:
     - liftMotor
     - driveMotor
     - location
+    - cargo
+    - cargoDoorMotor
 
 BatteryState:
   type: object
@@ -265,4 +280,76 @@ LocationState:
       x-order: 2
   required:
     - currentLocation
+    - updatedAt
+
+CargoState:
+  type: object
+  properties:
+    isOpen:
+      type: boolean
+      example: true
+      description: Whether the cargo is open
+      x-order: 1
+    qrCode:
+      type: string
+      example: "ABCxyz"
+      description: The QR code read from the cargo QR scanner
+      x-order: 2
+    bottomDistance:
+      type: integer
+      example: 100
+      description: The bottom distance of the cargo
+      x-order: 3
+      x-go-type: uint16
+    updatedAt:
+      type: string
+      format: date-time
+      example: "2025-01-01T00:00:00Z"
+      description: The updated at time of the cargo
+      x-order: 4
+  required:
+    - isOpen
+    - qrCode
+    - bottomDistance
+    - updatedAt
+
+CargoDoorMotorState:
+  type: object
+  properties:
+    direction:
+      type: string
+      enum:
+        - CLOSE
+        - OPEN
+      example: "CLOSE"
+      description: The direction of the cargo door motor
+      x-order: 1
+      x-go-type: string
+    speed:
+      type: integer
+      example: 100
+      description: The speed of the cargo door motor
+      x-order: 2
+      x-go-type: uint8
+    isRunning:
+      type: boolean
+      example: true
+      description: Whether the cargo door motor is running
+      x-order: 3
+    enabled:
+      type: boolean
+      example: true
+      description: Whether the cargo door motor is enabled
+      x-order: 4
+    updatedAt:
+      type: string
+      format: date-time
+      example: "2025-01-01T00:00:00Z"
+      description: The updated at time of the cargo door motor
+      x-order: 5
+  required:
+    - direction
+    - speed
+    - isRunning
+    - enabled
     - updatedAt

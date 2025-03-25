@@ -1,3 +1,5 @@
+import type { Cargo, CargoDoorMotor } from './cargo'
+
 export interface BatteryState {
   current: number
   temp: number
@@ -57,4 +59,6 @@ export interface RobotState {
   liftMotor: LiftMotorState
   driveMotor: DriveMotorState
   location: LocationState
+  cargo: Cargo
+  cargoDoorMotor: CargoDoorMotor
 }

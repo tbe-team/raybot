@@ -39,9 +39,14 @@ interface PicConfig {
   serial: SerialConfig
 }
 
+interface ESPConfig {
+  serial: SerialConfig
+}
+
 export interface SystemConfig {
   grpc: GrpcConfig
   http: HttpConfig
   log: LogConfig
   pic: PicConfig
+  esp: ESPConfig
 }

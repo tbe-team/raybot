@@ -40,7 +40,7 @@ type CleanupFunc func(context.Context) error
 
 func NewPICSerialService(cfg Config, client serial.Client, service service.Service, log *slog.Logger) (*PICSerialService, error) {
 	handlers := Handlers{
-		SyncStateHandler:  handler.NewSyncStateHandler(service.RobotService(), log),
+		SyncStateHandler:  handler.NewSyncStateHandler(service.PICService(), log),
 		CommandACKHandler: handler.NewCommandACKHandler(service.PICService(), log),
 	}
 
@@ -48,7 +48,7 @@ func NewPICSerialService(cfg Config, client serial.Client, service service.Servi
 		cfg:          cfg,
 		serialClient: client,
 		handlers:     handlers,
-		log:          log.With(slog.String("service", "PICSerialService")),
+		log:          log,
 	}, nil
 }
 
@@ -100,7 +100,7 @@ func (s *PICSerialService) routeMessage(ctx context.Context, msg []byte) {
 		}
 		s.handlers.SyncStateHandler.Handle(ctx, syncStateMsg)
 
-	case messageTypeSyncStateACK:
+	case messageTypeACK:
 		var commandACKMsg handler.CommandACKMessage
 		if err := json.Unmarshal(msg, &commandACKMsg); err != nil {
 			s.log.Error("failed to unmarshal command ack message", slog.Any("error", err), slog.Any("message", msg))
@@ -127,7 +127,7 @@ func (m *messageType) UnmarshalJSON(data []byte) error {
 	case 0:
 		*m = messageTypeSyncState
 	case 1:
-		*m = messageTypeSyncStateACK
+		*m = messageTypeACK
 	default:
 		return fmt.Errorf("invalid message type: %s", string(data))
 	}
@@ -136,5 +136,5 @@ func (m *messageType) UnmarshalJSON(data []byte) error {
 
 const (
 	messageTypeSyncState messageType = iota
-	messageTypeSyncStateACK
+	messageTypeACK
 )

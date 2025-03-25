@@ -5,10 +5,14 @@
 gen-openapi:
 	set -eux
 
-	pnpm --package=@redocly/cli dlx redocly bundle ./api/openapi/openapi.yml --output api/openapi/gen/openapi.yml --ext yml
+	pnpm --package=@redocly/cli@1.34 dlx redocly bundle ./api/openapi/openapi.yml --output api/openapi/gen/openapi.yml --ext yml
 	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1 \
 		-config internal/controller/http/oas/gen/oapi-codegen.yml \
 		api/openapi/gen/openapi.yml
+
+.PHONY: gen-proto
+gen-proto:
+	pnpm --package=@bufbuild/buf@1.50.1 dlx buf generate
 
 .PHONY: gen-sqlc
 gen-sqlc:
@@ -68,6 +72,9 @@ migrate-reset:
 #########################
 .PHONY: build
 build:
+	CGO_ENABLED=1 \
+	GOOS=linux \
+	GOARCH=amd64 \
 	go build -o bin/raybot cmd/raybot/main.go
 
 .PHONY: build-ui
@@ -76,22 +83,22 @@ build-ui:
 
 .PHONY: build-arm64
 build-arm64:
-	GOOS=linux GOARCH=arm64 go build -o bin/raybot-arm64 cmd/raybot/main.go
-
-.PHONY: build-windows
-build-windows:
-	GOOS=windows GOARCH=amd64 go build -o bin/raybot.exe cmd/raybot/main.go
+	CGO_ENABLED=1 \
+	GOOS=linux \
+	GOARCH=arm64 \
+	CC=aarch64-linux-gnu-gcc \
+	go build -o bin/raybot-arm64 cmd/raybot/main.go
 
 #########################
 # Docker
 #########################
 .PHONY: docker-build-raybot
 docker-build-raybot:
-	docker build -t raybot -f docker/raybot/Dockerfile .
+	docker build -t raybot -f docker/raybot.dockerfile .
 
 .PHONY: docker-run-raybot
 docker-run-raybot:
-	docker run -p 3000:3000 -v $(PWD)/.raybot:/app/.raybot raybot
+	docker run -p 3000:3000 raybot
 
 #########################
 # Run

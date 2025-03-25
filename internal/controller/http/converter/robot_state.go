@@ -5,7 +5,7 @@ import (
 	"github.com/tbe-team/raybot/internal/model"
 )
 
-func ToRobotStateResponse(state model.RobotState) gen.RobotStateResponse {
+func ConvertRobotStateToResponse(state model.RobotState) gen.RobotStateResponse {
 	return gen.RobotStateResponse{
 		Battery: gen.BatteryState{
 			Current:      state.Battery.Current,
@@ -50,6 +50,19 @@ func ToRobotStateResponse(state model.RobotState) gen.RobotStateResponse {
 		Location: gen.LocationState{
 			CurrentLocation: state.Location.CurrentLocation,
 			UpdatedAt:       state.Location.UpdatedAt,
+		},
+		Cargo: gen.CargoState{
+			IsOpen:         state.Cargo.IsOpen,
+			QrCode:         state.Cargo.QRCode,
+			BottomDistance: state.Cargo.BottomDistance,
+			UpdatedAt:      state.Cargo.UpdatedAt,
+		},
+		CargoDoorMotor: gen.CargoDoorMotorState{
+			Direction: state.CargoDoorMotor.Direction.String(),
+			Speed:     state.CargoDoorMotor.Speed,
+			IsRunning: state.CargoDoorMotor.IsRunning,
+			Enabled:   state.CargoDoorMotor.Enabled,
+			UpdatedAt: state.CargoDoorMotor.UpdatedAt,
 		},
 	}
 }

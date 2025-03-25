@@ -1,15 +1,18 @@
 <script setup lang="ts">
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useQueryRobotState } from '@/composables/use-robot-state'
 import { formatDate } from '@/lib/date'
+
 import { AlertCircle, Loader } from 'lucide-vue-next'
 
 const REFRESH_INTERVAL = 1000
+const refetchInterval = ref(REFRESH_INTERVAL)
 
 const { data: robotState, isPending, isError, error } = useQueryRobotState({
   axiosOpts: { doNotShowLoading: true },
-  refetchInterval: REFRESH_INTERVAL,
+  refetchInterval,
 })
 
 function getBatteryColor(percent: number): string {
@@ -40,7 +43,7 @@ function getTemperatureColor(temp: number): string {
         Loading state...
       </p>
     </div>
-    <div v-else-if="isError" class="flex flex-col items-center justify-center gap-4 pt-20">
+    <div v-else-if="isError " class="flex flex-col items-center justify-center gap-4 pt-20">
       <Card class="flex flex-col items-center gap-4 p-6 text-destructive">
         <AlertCircle class="w-8 h-8" />
         <div class="space-y-2 text-center">
@@ -67,13 +70,31 @@ function getTemperatureColor(temp: number): string {
       </Card>
     </div>
     <div v-else class="flex flex-col w-full">
-      <div class="mb-6">
-        <h1 class="text-xl font-semibold">
-          Robot state
-        </h1>
-        <p class="text-sm text-muted-foreground">
-          The current state of the robot is updated once per second.
-        </p>
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h1 class="text-xl font-semibold">
+            Robot state
+          </h1>
+          <p class="text-sm text-muted-foreground">
+            The current state of the robot is continuously updated.
+          </p>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="whitespace-nowrap">Refresh rate: </span>
+          <Select v-model="refetchInterval">
+            <SelectTrigger>
+              <SelectValue class="w-5" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem v-for="interval in [1000, 3000, 5000, 10000]" :key="interval" :value="interval">
+                  <SelectValue>{{ interval / 1000 }}</SelectValue>
+                </SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          <span>seconds</span>
+        </div>
       </div>
       <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <Card class="col-span-1 sm:col-span-2">
@@ -213,6 +234,56 @@ function getTemperatureColor(temp: number): string {
               <div class="grid grid-rows-1 gap-2">
                 <p><span class="font-medium">Current location: </span>{{ robotState.location.currentLocation }}</p>
                 <p><span class="font-medium">Last updated:</span> {{ formatDate(robotState.location.updatedAt) }}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Cargo Door Motor State</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="mx-auto space-x-2">
+              <div class="grid grid-rows-1 gap-2">
+                <p><span class="font-medium">Direction: </span>{{ robotState.cargoDoorMotor.direction }}</p>
+                <p><span class="font-medium">Speed: </span>{{ robotState.cargoDoorMotor.speed }} %</p>
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <p>
+                    <span class="font-medium">Running: </span>
+                    <span :class="robotState.cargoDoorMotor.isRunning ? 'text-green-500' : 'text-red-500'">
+                      {{ robotState.cargoDoorMotor.isRunning ? 'Yes' : 'No' }}
+                    </span>
+                  </p>
+                  <p>
+                    <span class="font-medium">Enabled: </span>
+                    <span :class="robotState.cargoDoorMotor.enabled ? 'text-green-500' : 'text-red-500'">
+                      {{ robotState.cargoDoorMotor.enabled ? 'Yes' : 'No' }}
+                    </span>
+                  </p>
+                </div>
+                <p><span class="font-medium">Last updated:</span> {{ formatDate(robotState.cargoDoorMotor.updatedAt) }}</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Cargo State</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="mx-auto space-x-2">
+              <div class="grid grid-rows-1 gap-2">
+                <p>
+                  <span class="font-medium">Door Open: </span>
+                  <span :class="robotState.cargo.isOpen ? 'text-green-500' : 'text-red-500'">
+                    {{ robotState.cargo.isOpen ? 'Yes' : 'No' }}
+                  </span>
+                </p>
+                <p><span class="font-medium">QR Code: </span>{{ robotState.cargo.qrCode || 'None' }}</p>
+                <p><span class="font-medium">Bottom Distance: </span>{{ robotState.cargo.bottomDistance }} cm</p>
+                <p><span class="font-medium">Last updated:</span> {{ formatDate(robotState.cargo.updatedAt) }}</p>
               </div>
             </div>
           </CardContent>

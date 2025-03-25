@@ -9,5 +9,4 @@ import (
 
 type RobotStateRepository interface {
 	GetRobotState(ctx context.Context, db db.SQLDB) (model.RobotState, error)
-	UpdateRobotState(ctx context.Context, db db.SQLDB, state model.RobotState) error
 }

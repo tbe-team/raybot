@@ -44,7 +44,7 @@ func NewHTTPService(cfg Config, service service.Service, log *slog.Logger) (*HTT
 	return &HTTPService{
 		cfg:     cfg,
 		service: service,
-		log:     log.With(slog.String("service", "HTTPService")),
+		log:     log,
 	}, nil
 }
 

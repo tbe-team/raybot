@@ -18,6 +18,7 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
+	"github.com/oapi-codegen/runtime"
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
 
@@ -48,6 +49,39 @@ type BatteryState struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// CargoDoorMotorState defines model for CargoDoorMotorState.
+type CargoDoorMotorState struct {
+	// Direction The direction of the cargo door motor
+	Direction string `json:"direction"`
+
+	// Speed The speed of the cargo door motor
+	Speed uint8 `json:"speed"`
+
+	// IsRunning Whether the cargo door motor is running
+	IsRunning bool `json:"isRunning"`
+
+	// Enabled Whether the cargo door motor is enabled
+	Enabled bool `json:"enabled"`
+
+	// UpdatedAt The updated at time of the cargo door motor
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// CargoState defines model for CargoState.
+type CargoState struct {
+	// IsOpen Whether the cargo is open
+	IsOpen bool `json:"isOpen"`
+
+	// QrCode The QR code read from the cargo QR scanner
+	QrCode string `json:"qrCode"`
+
+	// BottomDistance The bottom distance of the cargo
+	BottomDistance uint16 `json:"bottomDistance"`
+
+	// UpdatedAt The updated at time of the cargo
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
 // ChargeState defines model for ChargeState.
 type ChargeState struct {
 	// CurrentLimit The current limit of the charge
@@ -65,6 +99,62 @@ type CloudConfig struct {
 	// Address The address for the cloud service
 	Address string `json:"address"`
 }
+
+// CommandListResponse defines model for CommandListResponse.
+type CommandListResponse struct {
+	// Items The list of commands
+	Items []CommandResponse `json:"items"`
+
+	// TotalItems The total number of commands
+	TotalItems int `json:"totalItems"`
+}
+
+// CommandMoveToLocationInputs defines model for CommandMoveToLocationInputs.
+type CommandMoveToLocationInputs struct {
+	// Location The location to move to
+	Location string `json:"location"`
+}
+
+// CommandResponse defines model for CommandResponse.
+type CommandResponse struct {
+	// Id The id of the command
+	Id string `json:"id"`
+
+	// Type The type of command
+	Type CommandType `json:"type"`
+
+	// Status The status of the command
+	Status CommandStatus `json:"status"`
+
+	// Source The source of the command
+	Source CommandSource `json:"source"`
+
+	// Inputs The inputs of the command
+	Inputs CommandResponse_Inputs `json:"inputs"`
+
+	// Error The error of the command
+	Error *string `json:"error"`
+
+	// CreatedAt The creation date of the command
+	CreatedAt time.Time `json:"createdAt"`
+
+	// CompletedAt The completion date of the command
+	CompletedAt *time.Time `json:"completedAt"`
+}
+
+// CommandResponse_Inputs The inputs of the command
+type CommandResponse_Inputs struct {
+	union json.RawMessage
+}
+
+// CommandSource The source of the command
+type CommandSource = string
+
+// CommandStatus The status of the command
+type CommandStatus = string
+
+// CommandType The type of command
+type CommandType = string
 
 // DischargeState defines model for DischargeState.
 type DischargeState struct {
@@ -109,6 +199,11 @@ type DriveMotorState struct {
 
 	// UpdatedAt The updated at time of the drive motor
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// ESPConfig defines model for ESPConfig.
+type ESPConfig struct {
+	Serial SerialConfig `json:"serial"`
 }
 
 // ErrorResponse defines model for ErrorResponse.
@@ -204,9 +299,11 @@ type RobotStateResponse struct {
 	Charge         ChargeState         `json:"charge"`
 	Discharge      DischargeState      `json:"discharge"`
 	DistanceSensor DistanceSensorState `json:"distanceSensor"`
-	DriveMotor     DriveMotorState     `json:"driveMotor"`
 	LiftMotor      LiftMotorState      `json:"liftMotor"`
+	DriveMotor     DriveMotorState     `json:"driveMotor"`
 	Location       LocationState       `json:"location"`
+	Cargo          CargoState          `json:"cargo"`
+	CargoDoorMotor CargoDoorMotorState `json:"cargoDoorMotor"`
 }
 
 // SerialConfig defines model for SerialConfig.
@@ -232,6 +329,7 @@ type SerialConfig struct {
 
 // SystemConfigRequest defines model for SystemConfigRequest.
 type SystemConfigRequest struct {
+	Esp  ESPConfig  `json:"esp"`
 	Grpc GRPCConfig `json:"grpc"`
 	Http HTTPConfig `json:"http"`
 	Log  LogConfig  `json:"log"`
@@ -240,17 +338,83 @@ type SystemConfigRequest struct {
 
 // SystemConfigResponse defines model for SystemConfigResponse.
 type SystemConfigResponse struct {
+	Log  LogConfig  `json:"log"`
 	Grpc GRPCConfig `json:"grpc"`
 	Http HTTPConfig `json:"http"`
-	Log  LogConfig  `json:"log"`
 	Pic  PicConfig  `json:"pic"`
+	Esp  ESPConfig  `json:"esp"`
+}
+
+// Page defines model for Page.
+type Page = uint
+
+// PageSize defines model for PageSize.
+type PageSize = uint
+
+// ListCommandsParams defines parameters for ListCommands.
+type ListCommandsParams struct {
+	// Page The page number
+	Page *Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize The number of items per page
+	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Sorts Sort the commands by the given field. Use `-` to sort in descending order. Use `,` to sort by multiple fields. Example: `-createdAt,status` Allowed fields:
+	//   - type
+	//   - status
+	//   - source
+	//   - createdAt
+	//   - completedAt
+	Sorts *string `form:"sorts,omitempty" json:"sorts,omitempty"`
 }
 
 // UpdateSystemConfigJSONRequestBody defines body for UpdateSystemConfig for application/json ContentType.
 type UpdateSystemConfigJSONRequestBody = SystemConfigRequest
 
+// AsCommandMoveToLocationInputs returns the union data inside the CommandResponse_Inputs as a CommandMoveToLocationInputs
+func (t CommandResponse_Inputs) AsCommandMoveToLocationInputs() (CommandMoveToLocationInputs, error) {
+	var body CommandMoveToLocationInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCommandMoveToLocationInputs overwrites any union data inside the CommandResponse_Inputs as the provided CommandMoveToLocationInputs
+func (t *CommandResponse_Inputs) FromCommandMoveToLocationInputs(v CommandMoveToLocationInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCommandMoveToLocationInputs performs a merge with any union data inside the CommandResponse_Inputs, using the provided CommandMoveToLocationInputs
+func (t *CommandResponse_Inputs) MergeCommandMoveToLocationInputs(v CommandMoveToLocationInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t CommandResponse_Inputs) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *CommandResponse_Inputs) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// List all commands
+	// (GET /commands)
+	ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams)
+	// Get current processing command
+	// (GET /commands/in-progress)
+	GetCurrentProcessingCommand(w http.ResponseWriter, r *http.Request)
 	// Get health status
 	// (GET /health)
 	GetHealth(w http.ResponseWriter, r *http.Request)
@@ -271,6 +435,18 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// List all commands
+// (GET /commands)
+func (_ Unimplemented) ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get current processing command
+// (GET /commands/in-progress)
+func (_ Unimplemented) GetCurrentProcessingCommand(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // Get health status
 // (GET /health)
@@ -310,6 +486,63 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ListCommands operation middleware
+func (siw *ServerInterfaceWrapper) ListCommands(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListCommandsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "pageSize", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sorts" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sorts", r.URL.Query(), &params.Sorts)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sorts", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListCommands(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCurrentProcessingCommand operation middleware
+func (siw *ServerInterfaceWrapper) GetCurrentProcessingCommand(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCurrentProcessingCommand(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // GetHealth operation middleware
 func (siw *ServerInterfaceWrapper) GetHealth(w http.ResponseWriter, r *http.Request) {
@@ -495,6 +728,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/commands", wrapper.ListCommands)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/commands/in-progress", wrapper.GetCurrentProcessingCommand)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/health", wrapper.GetHealth)
 	})
 	r.Group(func(r chi.Router) {
@@ -511,6 +750,57 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 
 	return r
+}
+
+type ListCommandsRequestObject struct {
+	Params ListCommandsParams
+}
+
+type ListCommandsResponseObject interface {
+	VisitListCommandsResponse(w http.ResponseWriter) error
+}
+
+type ListCommands200JSONResponse CommandListResponse
+
+func (response ListCommands200JSONResponse) VisitListCommandsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListCommands400JSONResponse ErrorResponse
+
+func (response ListCommands400JSONResponse) VisitListCommandsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCurrentProcessingCommandRequestObject struct {
+}
+
+type GetCurrentProcessingCommandResponseObject interface {
+	VisitGetCurrentProcessingCommandResponse(w http.ResponseWriter) error
+}
+
+type GetCurrentProcessingCommand200JSONResponse CommandResponse
+
+func (response GetCurrentProcessingCommand200JSONResponse) VisitGetCurrentProcessingCommandResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCurrentProcessingCommand404JSONResponse ErrorResponse
+
+func (response GetCurrentProcessingCommand404JSONResponse) VisitGetCurrentProcessingCommandResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type GetHealthRequestObject struct {
@@ -640,6 +930,12 @@ func (response RestartApplication400JSONResponse) VisitRestartApplicationRespons
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// List all commands
+	// (GET /commands)
+	ListCommands(ctx context.Context, request ListCommandsRequestObject) (ListCommandsResponseObject, error)
+	// Get current processing command
+	// (GET /commands/in-progress)
+	GetCurrentProcessingCommand(ctx context.Context, request GetCurrentProcessingCommandRequestObject) (GetCurrentProcessingCommandResponseObject, error)
 	// Get health status
 	// (GET /health)
 	GetHealth(ctx context.Context, request GetHealthRequestObject) (GetHealthResponseObject, error)
@@ -684,6 +980,56 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// ListCommands operation middleware
+func (sh *strictHandler) ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams) {
+	var request ListCommandsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListCommands(ctx, request.(ListCommandsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListCommands")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListCommandsResponseObject); ok {
+		if err := validResponse.VisitListCommandsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetCurrentProcessingCommand operation middleware
+func (sh *strictHandler) GetCurrentProcessingCommand(w http.ResponseWriter, r *http.Request) {
+	var request GetCurrentProcessingCommandRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetCurrentProcessingCommand(ctx, request.(GetCurrentProcessingCommandRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCurrentProcessingCommand")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCurrentProcessingCommandResponseObject); ok {
+		if err := validResponse.VisitGetCurrentProcessingCommandResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // GetHealth operation middleware
@@ -816,40 +1162,55 @@ func (sh *strictHandler) RestartApplication(w http.ResponseWriter, r *http.Reque
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"e0wcLAAA",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

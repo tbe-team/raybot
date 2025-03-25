@@ -18,6 +18,10 @@ type PICConfig struct {
 	Serial SerialConfig
 }
 
+type ESPConfig struct {
+	Serial SerialConfig
+}
+
 type GRPCConfig struct {
 	Server GRPCServerConfig
 	Cloud  CloudConfig
@@ -44,6 +48,7 @@ type LogConfig struct {
 type GetSystemConfigOutput struct {
 	LogConfig  LogConfig
 	PICConfig  PICConfig
+	ESPConfig  ESPConfig
 	GRPCConfig GRPCConfig
 	HTTPConfig HTTPConfig
 }
@@ -51,6 +56,7 @@ type GetSystemConfigOutput struct {
 type UpdateSystemConfigParams struct {
 	LogConfig  LogConfig
 	PICConfig  PICConfig
+	ESPConfig  ESPConfig
 	GRPCConfig GRPCConfig
 	HTTPConfig HTTPConfig
 }

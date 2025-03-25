@@ -8,23 +8,20 @@ import (
 )
 
 type rfidTagHandler struct {
-	robotService service.RobotService
-	log          *slog.Logger
+	locationService service.LocationService
+	log             *slog.Logger
 }
 
-func newRFIDTagHandler(robotService service.RobotService, log *slog.Logger) *rfidTagHandler {
-	return &rfidTagHandler{robotService: robotService, log: log}
+func newRFIDTagHandler(locationService service.LocationService, log *slog.Logger) *rfidTagHandler {
+	return &rfidTagHandler{locationService: locationService, log: log}
 }
 
 func (h rfidTagHandler) Handle(ctx context.Context, tag string) {
 	h.log.Debug("RFID tag detected", slog.String("tag", tag))
-	params := service.UpdateRobotStateParams{
-		Location: service.LocationParams{
-			CurrentLocation: tag,
-		},
-		SetLocation: true,
+	params := service.UpdateLocationParams{
+		CurrentLocation: tag,
 	}
-	if _, err := h.robotService.UpdateRobotState(ctx, params); err != nil {
-		h.log.Error("failed to update robot state", "error", err)
+	if err := h.locationService.UpdateLocation(ctx, params); err != nil {
+		h.log.Error("failed to update location", "error", err)
 	}
 }

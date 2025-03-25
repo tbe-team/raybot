@@ -81,54 +81,6 @@ func (_c *FakeRobotStateRepository_GetRobotState_Call) RunAndReturn(run func(con
 	return _c
 }
 
-// UpdateRobotState provides a mock function with given fields: ctx, _a1, state
-func (_m *FakeRobotStateRepository) UpdateRobotState(ctx context.Context, _a1 db.SQLDB, state model.RobotState) error {
-	ret := _m.Called(ctx, _a1, state)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateRobotState")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, db.SQLDB, model.RobotState) error); ok {
-		r0 = rf(ctx, _a1, state)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// FakeRobotStateRepository_UpdateRobotState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateRobotState'
-type FakeRobotStateRepository_UpdateRobotState_Call struct {
-	*mock.Call
-}
-
-// UpdateRobotState is a helper method to define mock.On call
-//   - ctx context.Context
-//   - _a1 db.SQLDB
-//   - state model.RobotState
-func (_e *FakeRobotStateRepository_Expecter) UpdateRobotState(ctx interface{}, _a1 interface{}, state interface{}) *FakeRobotStateRepository_UpdateRobotState_Call {
-	return &FakeRobotStateRepository_UpdateRobotState_Call{Call: _e.mock.On("UpdateRobotState", ctx, _a1, state)}
-}
-
-func (_c *FakeRobotStateRepository_UpdateRobotState_Call) Run(run func(ctx context.Context, _a1 db.SQLDB, state model.RobotState)) *FakeRobotStateRepository_UpdateRobotState_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(db.SQLDB), args[2].(model.RobotState))
-	})
-	return _c
-}
-
-func (_c *FakeRobotStateRepository_UpdateRobotState_Call) Return(_a0 error) *FakeRobotStateRepository_UpdateRobotState_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *FakeRobotStateRepository_UpdateRobotState_Call) RunAndReturn(run func(context.Context, db.SQLDB, model.RobotState) error) *FakeRobotStateRepository_UpdateRobotState_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // NewFakeRobotStateRepository creates a new instance of FakeRobotStateRepository. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewFakeRobotStateRepository(t interface {

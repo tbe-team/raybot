@@ -20,7 +20,7 @@ func (h systemHandler) GetSystemConfig(ctx context.Context, _ gen.GetSystemConfi
 		return nil, fmt.Errorf("system service get system config: %w", err)
 	}
 
-	return gen.GetSystemConfig200JSONResponse(converter.ToSystemConfigResponse(cfg)), nil
+	return gen.GetSystemConfig200JSONResponse(converter.ConvertSystemConfigToResponse(cfg)), nil
 }
 
 func (h systemHandler) UpdateSystemConfig(ctx context.Context, request gen.UpdateSystemConfigRequestObject) (gen.UpdateSystemConfigResponseObject, error) {
@@ -40,6 +40,16 @@ func (h systemHandler) UpdateSystemConfig(ctx context.Context, request gen.Updat
 				ReadTimeout: time.Duration(request.Body.Pic.Serial.ReadTimeout) * time.Second,
 			},
 		},
+		ESPConfig: service.ESPConfig{
+			Serial: service.SerialConfig{
+				Port:        request.Body.Esp.Serial.Port,
+				BaudRate:    request.Body.Esp.Serial.BaudRate,
+				DataBits:    request.Body.Esp.Serial.DataBits,
+				StopBits:    request.Body.Esp.Serial.StopBits,
+				Parity:      request.Body.Esp.Serial.Parity,
+				ReadTimeout: time.Duration(request.Body.Esp.Serial.ReadTimeout) * time.Second,
+			},
+		},
 		GRPCConfig: service.GRPCConfig{
 			Server: service.GRPCServerConfig{
 				Enable: request.Body.Grpc.Server.Enable,
@@ -57,7 +67,7 @@ func (h systemHandler) UpdateSystemConfig(ctx context.Context, request gen.Updat
 		return nil, fmt.Errorf("system service update system config: %w", err)
 	}
 
-	return gen.UpdateSystemConfig200JSONResponse(converter.ToSystemConfigResponse(cfg)), nil
+	return gen.UpdateSystemConfig200JSONResponse(converter.ConvertSystemConfigToResponse(cfg)), nil
 }
 
 func (h systemHandler) RestartApplication(ctx context.Context, _ gen.RestartApplicationRequestObject) (gen.RestartApplicationResponseObject, error) {

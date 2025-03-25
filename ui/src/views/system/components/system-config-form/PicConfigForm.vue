@@ -8,24 +8,7 @@ import {
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-
-const picSerialParityOption = [
-  { label: 'None', value: 'none' },
-  { label: 'Even', value: 'even' },
-  { label: 'Odd', value: 'odd' },
-]
-
-const dataBitsOption = [
-  { label: '5', value: 5 },
-  { label: '6', value: 6 },
-  { label: '7', value: 7 },
-  { label: '8', value: 8 },
-]
-const stopBitsOption = [
-  { label: '1', value: 1 },
-  { label: '1.5', value: 1.5 },
-  { label: '2', value: 2 },
-]
+import { serialDataBitsOption, serialParityOption, serialStopBitsOption } from './serial-option'
 </script>
 
 <template>
@@ -75,7 +58,7 @@ const stopBitsOption = [
               </FormControl>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem v-for="option in dataBitsOption" :key="option.value" :value="option.value">
+                  <SelectItem v-for="option in serialDataBitsOption" :key="option.value" :value="option.value">
                     {{ option.label }}
                   </SelectItem>
                 </SelectGroup>
@@ -99,7 +82,7 @@ const stopBitsOption = [
               </FormControl>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem v-for="option in stopBitsOption" :key="option.value" :value="option.value">
+                  <SelectItem v-for="option in serialStopBitsOption" :key="option.value" :value="option.value">
                     {{ option.label }}
                   </SelectItem>
                 </SelectGroup>
@@ -123,7 +106,7 @@ const stopBitsOption = [
               </FormControl>
               <SelectContent>
                 <SelectGroup>
-                  <SelectItem v-for="option in picSerialParityOption" :key="option.value" :value="option.value">
+                  <SelectItem v-for="option in serialParityOption" :key="option.value" :value="option.value">
                     {{ option.label }}
                   </SelectItem>
                 </SelectGroup>
