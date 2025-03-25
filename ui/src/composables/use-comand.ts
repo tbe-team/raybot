@@ -1,3 +1,5 @@
+import type { CommandSort } from '@/api/command'
+import type { SortPrefix } from '@/lib/sort'
 import type { AxiosRequestConfig } from 'axios'
 import command from '@/api/command'
 import { keepPreviousData, useQuery } from '@tanstack/vue-query'
@@ -10,10 +12,10 @@ export function useComandInProgress(opts?: { axiosOpts?: Partial<AxiosRequestCon
   })
 }
 
-export function useComand(page: Ref<number>, pageSize: Ref<number>) {
+export function useListComands(page: Ref<number>, pageSize: Ref<number>, sorts: Ref<SortPrefix<CommandSort>[]>) {
   return useQuery({
-    queryKey: ['comand', page, pageSize],
-    queryFn: () => command.listCommands({ page: page.value, pageSize: pageSize.value }),
+    queryKey: ['comands', page, pageSize, sorts],
+    queryFn: () => command.listCommands({ page: page.value, pageSize: pageSize.value, sorts: sorts.value }),
     placeholderData: keepPreviousData,
   })
 }

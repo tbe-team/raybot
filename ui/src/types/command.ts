@@ -1,8 +1,8 @@
-type CommandType = 'MOVE_TO_LOCATION'
+export type CommandType = 'MOVE_TO_LOCATION'
 
-type CommandStatus = 'IN_PROGRESS' | 'SUCCEEDED' | 'FAILED'
+export type CommandStatus = 'IN_PROGRESS' | 'SUCCEEDED' | 'FAILED'
 
-type CommandSource = 'MANUAL' | 'CLOUD'
+export type CommandSource = 'MANUAL' | 'CLOUD'
 
 export interface Command {
   id: string

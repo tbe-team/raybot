@@ -22,6 +22,17 @@ const routes: RouteRecordRaw[] = [
     ],
   },
   {
+    path: '/commands',
+    component: MainLayout,
+    children: [
+      {
+        path: '',
+        component: () => import('@/views/command/CommandsView.vue'),
+        meta: { title: 'Commands' },
+      },
+    ],
+  },
+  {
     path: '/system',
     component: MainLayout,
     children: [
