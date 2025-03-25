@@ -94,11 +94,11 @@ build-arm64:
 #########################
 .PHONY: docker-build-raybot
 docker-build-raybot:
-	docker build -t raybot -f docker/raybot/Dockerfile .
+	docker build -t raybot -f docker/raybot.dockerfile .
 
 .PHONY: docker-run-raybot
 docker-run-raybot:
-	docker run -p 3000:3000 -v $(PWD)/.raybot:/app/.raybot raybot
+	docker run -p 3000:3000 raybot
 
 #########################
 # Run
