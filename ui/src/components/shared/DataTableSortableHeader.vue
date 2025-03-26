@@ -23,8 +23,13 @@ function getSortIcon(isSorted: false | 'asc' | 'desc') {
   }
 }
 
-function handleSort() {
-  props.column.toggleSorting(props.column.getIsSorted() === 'asc')
+function handleSort(event: MouseEvent) {
+  if (event.shiftKey) {
+    props.column.toggleSorting(props.column.getIsSorted() === 'asc', true)
+  }
+  else {
+    props.column.toggleSorting(props.column.getIsSorted() === 'asc', false)
+  }
 }
 </script>
 
