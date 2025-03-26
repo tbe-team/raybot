@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
-	"net/url"
+	"time"
 
 	"buf.build/gen/go/tbe-team/raybot-api/grpc/go/raybot/v1/raybotv1grpc"
 	"github.com/jhump/grpctunnel"
@@ -26,35 +26,25 @@ func (c *Config) Validate() error {
 		return fmt.Errorf("address is required")
 	}
 
-	// Validate address format
-	if _, err := url.Parse(c.Address); err != nil {
-		return fmt.Errorf("invalid address: %w", err)
-	}
-
 	return nil
 }
 
 type CleanupFunc func(context.Context) error
 
-//nolint:revive
-type CloudService struct {
+type Service struct {
 	cfg Config
 
 	service service.Service
-	log     *slog.Logger
+
+	conn                *grpc.ClientConn
+	reverseTunnelServer *grpctunnel.ReverseTunnelServer
+
+	log *slog.Logger
 }
 
-func NewCloudService(cfg Config, service service.Service, log *slog.Logger) (*CloudService, error) {
-	return &CloudService{
-		cfg:     cfg,
-		service: service,
-		log:     log,
-	}, nil
-}
-
-func (s CloudService) Run() (CleanupFunc, error) {
+func NewService(cfg Config, service service.Service, log *slog.Logger) (*Service, error) {
 	conn, err := grpc.NewClient(
-		s.cfg.Address,
+		cfg.Address,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
 	)
 	if err != nil {
@@ -63,23 +53,53 @@ func (s CloudService) Run() (CleanupFunc, error) {
 
 	tunnel := tunnelpb.NewTunnelServiceClient(conn)
 	reverseTunnel := grpctunnel.NewReverseTunnelServer(tunnel)
-	s.registerHandlers(reverseTunnel)
+
+	return &Service{
+		cfg:                 cfg,
+		conn:                conn,
+		reverseTunnelServer: reverseTunnel,
+		service:             service,
+		log:                 log,
+	}, nil
+}
+
+func (s Service) Run() (CleanupFunc, error) {
+	s.registerHandlers()
 
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
 		s.log.Info(fmt.Sprintf("serving reverse tunnel on %s", s.cfg.Address))
-		if started, err := reverseTunnel.Serve(ctx); !started {
-			s.log.Error("failed to serve reverse tunnel", slog.Any("error", err))
+
+		attempts := 0
+		for {
+			started, err := s.reverseTunnelServer.Serve(ctx)
+
+			if ctx.Err() != nil {
+				// Context cancelled, exit loop
+				return
+			}
+
+			if !started || err != nil {
+				s.log.Error("serving reverse tunnel failed, retry after 5 seconds",
+					slog.Any("error", err),
+					slog.Bool("started", started),
+					slog.Int("attempts", attempts),
+				)
+
+				time.Sleep(5 * time.Second)
+				attempts++
+				continue
+			}
 		}
 	}()
 
 	return func(_ context.Context) error {
 		s.log.Debug("closing cloud service")
-		reverseTunnel.GracefulStop()
+		s.reverseTunnelServer.GracefulStop()
 		cancel()
 
-		if err := conn.Close(); err != nil {
+		if err := s.conn.Close(); err != nil {
 			return fmt.Errorf("failed to close grpc client: %w", err)
 		}
 		s.log.Debug("cloud service closed")
@@ -87,13 +107,13 @@ func (s CloudService) Run() (CleanupFunc, error) {
 	}, nil
 }
 
-func (s CloudService) registerHandlers(server *grpctunnel.ReverseTunnelServer) {
+func (s Service) registerHandlers() {
 	robotStateHandler := handler.NewRobotStateHandler(s.service.RobotStateService())
-	raybotv1grpc.RegisterRobotStateServiceServer(server, robotStateHandler)
+	raybotv1grpc.RegisterRobotStateServiceServer(s.reverseTunnelServer, robotStateHandler)
 
 	driveMotorHandler := handler.NewDriveMotorHandler(s.service.PICService())
-	raybotv1grpc.RegisterDriveMotorServiceServer(server, driveMotorHandler)
+	raybotv1grpc.RegisterDriveMotorServiceServer(s.reverseTunnelServer, driveMotorHandler)
 
 	liftMotorHandler := handler.NewLiftMotorHandler(s.service.PICService())
-	raybotv1grpc.RegisterLiftMotorServiceServer(server, liftMotorHandler)
+	raybotv1grpc.RegisterLiftMotorServiceServer(s.reverseTunnelServer, liftMotorHandler)
 }
