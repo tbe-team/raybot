@@ -101,6 +101,13 @@ function handlePageSizeChange(ps: number) {
           />
           <Button
             variant="outline"
+            :disabled="isFetching || !sorts.length"
+            @click="() => tableRef?.table?.resetSorting()"
+          >
+            Clear Sort
+          </Button>
+          <Button
+            variant="outline"
             :disabled="isFetching"
             @click="() => refetch()"
           >
