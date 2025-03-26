@@ -116,7 +116,7 @@ jobs:
     name: Build for Windows amd64
     needs:
       - build-ui
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - name: Install build dependencies
         run: |
@@ -183,9 +183,6 @@ jobs:
     steps:
       - name: Download artifacts
         uses: actions/download-artifact@v4
-        with:
-          pattern: dist-*
-          merge-multiple: true
       - name: Draft Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
