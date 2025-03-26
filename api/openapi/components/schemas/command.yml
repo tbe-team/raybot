@@ -70,6 +70,10 @@ CommandType:
   type: string
   enum:
     - MOVE_TO_LOCATION
+    - LIFT_CARGO
+    - DROP_CARGO
+    - OPEN_CARGO
+    - CLOSE_CARGO
   description: The type of command
   x-go-type: string
 

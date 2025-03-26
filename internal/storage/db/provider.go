@@ -20,6 +20,9 @@ type Provider interface {
 	// WithTX runs a function in a new transaction and rolls back if the function returns an error
 	// otherwise it commits the transaction
 	WithTX(ctx context.Context, fn func(SQLDB) error) error
+
+	// Close closes the database
+	Close() error
 }
 
 type DefaultProvider struct {
@@ -46,6 +49,10 @@ func NewProvider(cfg Config) (*DefaultProvider, error) {
 
 func (p *DefaultProvider) DB() SQLDB {
 	return p.db
+}
+
+func (p *DefaultProvider) Close() error {
+	return p.db.Close()
 }
 
 func (p *DefaultProvider) WithTX(ctx context.Context, fn func(SQLDB) error) (err error) {
