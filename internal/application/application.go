@@ -127,6 +127,10 @@ func New() (*Application, CleanupFunc, error) {
 			return fmt.Errorf("failed to close pic serial client: %w", err)
 		}
 
+		if err := app.ESPSerialClient.Stop(); err != nil {
+			return fmt.Errorf("failed to close esp serial client: %w", err)
+		}
+
 		return nil
 	}
 
