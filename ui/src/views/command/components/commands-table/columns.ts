@@ -19,12 +19,12 @@ export const columns: ColumnDef<Command>[] = [
   {
     accessorKey: 'status',
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Status' }),
-    cell: ({ row }) => h(StatusBadge, { status: row.original.status }),
+    cell: ({ row }) => h(StatusBadge, { key: row.original.id + row.original.status, status: row.original.status }),
   },
   {
     accessorKey: 'source',
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Source' }),
-    cell: ({ row }) => h(SourceBadge, { source: row.original.source }),
+    cell: ({ row }) => h(SourceBadge, { key: row.original.id + row.original.source, source: row.original.source }),
   },
   {
     accessorKey: 'inputs',
