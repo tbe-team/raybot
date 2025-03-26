@@ -194,5 +194,4 @@ jobs:
           name: ${{ env.VERSION }}
           draft: true
           generate_release_notes: true
-          overwrite: true
-          files: dist-*/raybot*.*
+          files: dist/raybot*.*
