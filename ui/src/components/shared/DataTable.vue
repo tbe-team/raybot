@@ -20,6 +20,7 @@ import {
 } from '@tanstack/vue-table'
 
 import DataTablePagination from './DataTablePagination.vue'
+import { LoaderCircleIcon } from 'lucide-vue-next'
 
 interface Props {
   isLoading: boolean
