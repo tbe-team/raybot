@@ -150,7 +150,7 @@ func runCloud(app *application.Application) error {
 		return fmt.Errorf("failed to create cloud service: %w", err)
 	}
 
-	cleanup, err := cloudService.Run()
+	cleanup, err := cloudService.Run(app.Context())
 	if err != nil {
 		return fmt.Errorf("failed to run cloud service: %w", err)
 	}

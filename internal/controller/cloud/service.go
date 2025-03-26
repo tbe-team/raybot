@@ -63,10 +63,10 @@ func NewService(cfg Config, service service.Service, log *slog.Logger) (*Service
 	}, nil
 }
 
-func (s Service) Run() (CleanupFunc, error) {
+func (s Service) Run(ctx context.Context) (CleanupFunc, error) {
 	s.registerHandlers()
 
-	ctx, cancel := context.WithCancel(context.Background())
+	ctx, cancel := context.WithCancel(ctx)
 
 	go func() {
 		s.log.Info(fmt.Sprintf("serving reverse tunnel on %s", s.cfg.Address))
@@ -96,7 +96,7 @@ func (s Service) Run() (CleanupFunc, error) {
 
 	return func(_ context.Context) error {
 		s.log.Debug("closing cloud service")
-		s.reverseTunnelServer.GracefulStop()
+		s.reverseTunnelServer.Stop()
 		cancel()
 
 		if err := s.conn.Close(); err != nil {
