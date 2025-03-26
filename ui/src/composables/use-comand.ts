@@ -16,7 +16,6 @@ export function useListComands(page: Ref<number>, pageSize: Ref<number>, sorts: 
   return useQuery({
     queryKey: ['comands', page, pageSize, sorts],
     queryFn: () => command.listCommands({ page: page.value, pageSize: pageSize.value, sorts: sorts.value }),
-    staleTime: 0,
-    // placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData,
   })
 }

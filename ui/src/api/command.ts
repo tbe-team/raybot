@@ -22,7 +22,7 @@ const command = {
       params: {
         page: params.page,
         pageSize: params.pageSize,
-        sorts: params.sorts?.join(','),
+        sorts: params.sorts?.length !== 0 ? params.sorts?.join(',') : undefined,
       },
     })
   },
