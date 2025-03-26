@@ -1,6 +1,7 @@
 <script setup lang="ts" generic="TData, TValue, TSort extends string">
 import type { SortPrefix } from '@/lib/sort'
-import type { ColumnDef, SortingState } from '@tanstack/vue-table'
+import type { ColumnDef, SortingState, VisibilityState } from '@tanstack/vue-table'
+
 import {
   Table,
   TableBody,
@@ -9,14 +10,17 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
+
 import { convertParamsToSorting, convertSortingToParams } from '@/lib/sort'
+import { valueUpdater } from '@/lib/utils'
 import {
   FlexRender,
   getCoreRowModel,
   useVueTable,
 } from '@tanstack/vue-table'
-import { LoaderCircleIcon } from 'lucide-vue-next'
+
 import DataTablePagination from './DataTablePagination.vue'
+import { LoaderCircleIcon } from 'lucide-vue-next'
 
 interface Props {
   isLoading: boolean
@@ -30,11 +34,10 @@ const props = withDefaults(defineProps<Props>(), {
   pageSizeOptions: () => [10, 20, 30],
   sorts: () => [],
 })
-
 const emit = defineEmits<{
   (e: 'sorts', sorts: SortPrefix<TSort>[]): void
 }>()
-
+const columnVisibility = ref<VisibilityState>({})
 const page = defineModel<number>('page', { required: true })
 const pageSize = defineModel<number>('pageSize', { required: true })
 
@@ -50,11 +53,13 @@ const table = useVueTable({
   state: {
     get pagination() { return { pageIndex: page.value - 1, pageSize: pageSize.value } },
     get sorting() { return sorting.value },
+    get columnVisibility() { return columnVisibility.value },
   },
   getCoreRowModel: getCoreRowModel(),
 
   // Server-side pagination
   manualPagination: true,
+  onColumnVisibilityChange: updaterOrValue => valueUpdater(updaterOrValue, columnVisibility),
   onPaginationChange: (updaterOrValue) => {
     const newState = typeof updaterOrValue === 'function'
       ? updaterOrValue(table.getState().pagination)
@@ -74,6 +79,10 @@ const table = useVueTable({
 
     sorting.value = newState
   },
+})
+
+defineExpose({
+  table,
 })
 </script>
 

@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { CommandSort } from '@/api/command'
 import type { SortPrefix } from '@/lib/sort'
+import type { Command } from '@/types/command'
+import type { Table } from '@tanstack/vue-table'
 import DataTable from '@/components/shared/DataTable.vue'
+import DataTableColumnVisibility from '@/components/shared/DataTableColumnVisibility.vue'
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Button } from '@/components/ui/button'
 import { useListComands } from '@/composables/use-comand'
@@ -10,6 +13,7 @@ import { columns } from './components/commands-table'
 
 const route = useRoute()
 const router = useRouter()
+const tableRef = useTemplateRef<{ table: Table<Command> } | null>('table')
 
 const page = ref(Number(route.query.page) || 1)
 const pageSize = ref(Number(route.query.pageSize) || 10)
@@ -90,20 +94,27 @@ function handlePageSizeChange(ps: number) {
             View and manage robot commands
           </p>
         </div>
-        <Button
-          variant="outline"
-          :disabled="isFetching"
-          @click="() => refetch()"
-        >
-          <RefreshCw
-            class="w-4 h-4 mr-2"
-            :class="{ 'animate-spin': isFetching }"
+        <div class="flex items-center gap-2">
+          <DataTableColumnVisibility
+            v-if="tableRef?.table"
+            :table="tableRef.table"
           />
-          Refresh
-        </Button>
+          <Button
+            variant="outline"
+            :disabled="isFetching"
+            @click="() => refetch()"
+          >
+            <RefreshCw
+              class="w-4 h-4 mr-2"
+              :class="{ 'animate-spin': isFetching }"
+            />
+            Refresh
+          </Button>
+        </div>
       </div>
 
       <DataTable
+        ref="table"
         :page="page"
         :page-size="pageSize"
         :columns="columns"
