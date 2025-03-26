@@ -131,6 +131,10 @@ func New() (*Application, CleanupFunc, error) {
 			return fmt.Errorf("failed to close esp serial client: %w", err)
 		}
 
+		if err := dbProvider.Close(); err != nil {
+			return fmt.Errorf("failed to close db provider: %w", err)
+		}
+
 		return nil
 	}
 
