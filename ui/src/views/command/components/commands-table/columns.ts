@@ -30,7 +30,7 @@ export const columns: ColumnDef<Command>[] = [
     accessorKey: 'inputs',
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Inputs' }),
     cell: ({ row }) => {
-      const inputs = row.getValue('inputs') as Record<string, unknown>
+      const inputs = row.original.inputs
       return h('pre', {
         class: 'text-xs overflow-auto max-h-32 whitespace-pre-wrap',
         style: 'max-width: 300px;',
@@ -42,7 +42,7 @@ export const columns: ColumnDef<Command>[] = [
     accessorKey: 'error',
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Error' }),
     cell: ({ row }) => {
-      const error = row.getValue('error') as string | null
+      const error = row.original.error
       return error || '-'
     },
     enableSorting: false,
@@ -50,13 +50,13 @@ export const columns: ColumnDef<Command>[] = [
   {
     accessorKey: 'createdAt',
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Created At' }),
-    cell: ({ row }) => formatDate(row.getValue('createdAt')),
+    cell: ({ row }) => formatDate(row.original.createdAt),
   },
   {
     accessorKey: 'completedAt',
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Completed At' }),
     cell: ({ row }) => {
-      const completedAt = row.getValue('completedAt') as string | null
+      const completedAt = row.original.completedAt
       return completedAt ? formatDate(completedAt) : '-'
     },
   },
