@@ -184,7 +184,8 @@ jobs:
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
-          name: dist-*
+          pattern: dist-*
+          merge-multiple: true
       - name: Draft Release
         uses: softprops/action-gh-release@v2
         if: startsWith(github.ref, 'refs/tags/')
