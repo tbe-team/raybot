@@ -19,8 +19,8 @@ import {
   useVueTable,
 } from '@tanstack/vue-table'
 
-import DataTablePagination from './DataTablePagination.vue'
 import { LoaderCircleIcon } from 'lucide-vue-next'
+import DataTablePagination from './DataTablePagination.vue'
 
 interface Props {
   isLoading: boolean
@@ -71,7 +71,8 @@ const table = useVueTable({
 
   // Server-side sorting
   manualSorting: true,
-  enableMultiSort: false,
+  enableMultiSort: true,
+  isMultiSortEvent: (event: unknown) => (event as MouseEvent).shiftKey,
   onSortingChange: (updaterOrValue) => {
     const newState = typeof updaterOrValue === 'function'
       ? updaterOrValue(table.getState().sorting)
