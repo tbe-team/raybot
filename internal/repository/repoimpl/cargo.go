@@ -21,10 +21,13 @@ func NewCargoRepository(queries *sqlc.Queries) *CargoRepository {
 
 func (r CargoRepository) UpdateCargo(ctx context.Context, db db.SQLDB, params repository.UpdateCargoParams) (model.Cargo, error) {
 	arg := sqlc.CargoUpdateParams{
-		IsOpen:         boolToInt64(params.IsOpen),
-		QrCode:         params.QRCode,
-		BottomDistance: int64(params.BottomDistance),
-		UpdatedAt:      params.UpdatedAt.Format(time.RFC3339),
+		IsOpen:            boolToInt64(params.IsOpen),
+		SetIsOpen:         params.SetIsOpen,
+		QrCode:            params.QRCode,
+		SetQrCode:         params.SetQRCode,
+		BottomDistance:    int64(params.BottomDistance),
+		SetBottomDistance: params.SetBottomDistance,
+		UpdatedAt:         params.UpdatedAt.Format(time.RFC3339),
 	}
 	row, err := r.queries.CargoUpdate(ctx, db, arg)
 	if err != nil {
