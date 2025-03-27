@@ -16,7 +16,7 @@ type CreateCommandParams struct {
 
 type ListCommandsParams struct {
 	PagingParams paging.Params `validate:"required"`
-	Sorts        []sort.Sort   `validate:"required"`
+	Sorts        []sort.Sort   `validate:"sort=type status source created_at completed_at"`
 }
 
 type ExecuteCommandParams struct {

@@ -22,5 +22,12 @@ func New() Validator {
 }
 
 func (v *defaultValidator) Validate(s any) error {
+	type Validatable interface {
+		Validate() error
+	}
+
+	if validatable, ok := s.(Validatable); ok {
+		return validatable.Validate()
+	}
 	return v.v10.Struct(s)
 }
