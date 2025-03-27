@@ -45,7 +45,7 @@ func New(cfg Config, client Client, service service.Service, log *slog.Logger) (
 		cfg:          cfg,
 		serialClient: client,
 		handlers:     handlers,
-		log:          log,
+		log:          log.With("service", "espserial"),
 	}, nil
 }
 
@@ -81,6 +81,7 @@ func (s Service) readLoop(ctx context.Context) {
 }
 
 func (s Service) routeMessage(ctx context.Context, msg []byte) {
+	s.log.Debug("routing message", slog.Any("message", msg))
 	var temp struct {
 		Type messageType `json:"type"`
 	}
