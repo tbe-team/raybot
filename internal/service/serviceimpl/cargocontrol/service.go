@@ -175,7 +175,7 @@ func (s Service) OpenCargoDoor(ctx context.Context) error {
 
 	msg := espMsg{
 		ID:   cmd.ID,
-		Type: cmd.Type,
+		Type: uint8(cmd.Type),
 		Data: struct {
 			State  uint8 `json:"state"`
 			Speed  uint8 `json:"speed"`
@@ -211,7 +211,7 @@ func (s Service) CloseCargoDoor(ctx context.Context) error {
 
 	msg := espMsg{
 		ID:   cmd.ID,
-		Type: cmd.Type,
+		Type: uint8(cmd.Type),
 		Data: struct {
 			State  uint8 `json:"state"`
 			Speed  uint8 `json:"speed"`
@@ -230,9 +230,9 @@ func (s Service) CloseCargoDoor(ctx context.Context) error {
 }
 
 type espMsg struct {
-	ID   string
-	Type model.ESPSerialCommandType
-	Data any
+	ID   string `json:"id"`
+	Type uint8  `json:"type"`
+	Data any    `json:"data"`
 }
 
 func (s Service) sendESPCommand(msg espMsg) error {
