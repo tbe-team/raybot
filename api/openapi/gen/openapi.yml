@@ -123,12 +123,12 @@ paths:
         - name: sorts
           in: query
           description: |
-            Sort the commands by the given field. Use `-` to sort in descending order. Use `,` to sort by multiple fields. Example: `-createdAt,status` Allowed fields:
+            Sort the commands by the given field. Use `-` to sort in descending order. Use `,` to sort by multiple fields. Example: `-created_at,status` Allowed fields:
               - type
               - status
               - source
-              - createdAt
-              - completedAt
+              - created_at
+              - completed_at
           required: false
           schema:
             type: string
