@@ -59,7 +59,45 @@ func NewService(
 
 	service.registerCommandExecutors()
 
+	// Handle any stale commands on startup
+	if err := service.handleStaleCommands(context.Background()); err != nil {
+		log.Error("failed to handle stale commands", slog.Any("error", err))
+	}
+
 	return service
+}
+
+func (s Service) handleStaleCommands(ctx context.Context) error {
+	// Get any command that's in progress
+	cmd, err := s.commandRepo.GetCommandByStatusInProgress(ctx, s.dbProvider.DB())
+	if err != nil {
+		if xerror.IsNotFound(err) {
+			return nil // No stale commands
+		}
+		return fmt.Errorf("get command by status in progress: %w", err)
+	}
+
+	// Mark it as failed with appropriate error message
+	errorMsg := "Command failed due to system restart"
+	completedAt := time.Now()
+	params := repository.UpdateCommandParams{
+		ID:             cmd.ID,
+		Status:         model.CommandStatusFailed,
+		SetStatus:      true,
+		Error:          &errorMsg,
+		SetError:       true,
+		CompletedAt:    &completedAt,
+		SetCompletedAt: true,
+	}
+	if _, err := s.commandRepo.UpdateCommand(ctx, s.dbProvider.DB(), params); err != nil {
+		return fmt.Errorf("update command: %w", err)
+	}
+
+	s.log.Info("marked stale command as failed",
+		slog.String("command_id", cmd.ID),
+		slog.String("command_type", cmd.Type.String()))
+
+	return nil
 }
 
 func (s Service) ListCommands(ctx context.Context, params service.ListCommandsParams) (paging.List[model.Command], error) {
