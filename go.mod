@@ -9,7 +9,7 @@ require (
 	github.com/ThreeDotsLabs/watermill v1.4.6
 	github.com/getkin/kin-openapi v0.130.0
 	github.com/go-chi/chi/v5 v5.2.1
-	github.com/go-playground/validator/v10 v10.25.0
+	github.com/go-playground/validator/v10 v10.26.0
 	github.com/google/uuid v1.6.0
 	github.com/grpc-ecosystem/go-grpc-middleware/v2 v2.3.1
 	github.com/jhump/grpctunnel v0.3.0
