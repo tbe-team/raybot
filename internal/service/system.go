@@ -33,6 +33,7 @@ type GRPCServerConfig struct {
 
 type CloudConfig struct {
 	Address string
+	Token   string
 }
 
 type HTTPConfig struct {

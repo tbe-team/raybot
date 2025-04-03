@@ -42,6 +42,7 @@ func (s Service) UpdateSystemConfig(ctx context.Context, params service.UpdateSy
 
 	cfg.GRPC.Server.Enable = params.GRPCConfig.Server.Enable
 	cfg.GRPC.Cloud.Address = params.GRPCConfig.Cloud.Address
+	cfg.GRPC.Cloud.Token = params.GRPCConfig.Cloud.Token
 
 	cfg.HTTP.EnableSwagger = params.HTTPConfig.EnableSwagger
 
@@ -106,6 +107,7 @@ func configToUpdateSystemConfigOutput(cfg config.Config) service.UpdateSystemCon
 			},
 			Cloud: service.CloudConfig{
 				Address: cfg.GRPC.Cloud.Address,
+				Token:   cfg.GRPC.Cloud.Token,
 			},
 		},
 		HTTPConfig: service.HTTPConfig{

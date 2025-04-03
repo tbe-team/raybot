@@ -56,6 +56,7 @@ func (h systemHandler) UpdateSystemConfig(ctx context.Context, request gen.Updat
 			},
 			Cloud: service.CloudConfig{
 				Address: request.Body.Grpc.Cloud.Address,
+				Token:   request.Body.Grpc.Cloud.Token,
 			},
 		},
 		HTTPConfig: service.HTTPConfig{

@@ -13,6 +13,7 @@ func ConvertSystemConfigToResponse(cfg service.GetSystemConfigOutput) gen.System
 			},
 			Cloud: gen.CloudConfig{
 				Address: cfg.GRPCConfig.Cloud.Address,
+				Token:   cfg.GRPCConfig.Cloud.Token,
 			},
 		},
 		Http: gen.HTTPConfig{

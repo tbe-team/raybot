@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"sync/atomic"
 	"time"
 
 	"buf.build/gen/go/tbe-team/raybot-api/grpc/go/raybot/v1/raybotv1grpc"
@@ -12,12 +13,14 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	"github.com/tbe-team/raybot/internal/controller/cloud/interceptor"
 	"github.com/tbe-team/raybot/internal/controller/grpc/handler"
 	"github.com/tbe-team/raybot/internal/service"
 )
 
 type Config struct {
 	Address string `yaml:"address"`
+	Token   string `yaml:"token"`
 }
 
 func (c *Config) Validate() error {
@@ -38,6 +41,7 @@ type Service struct {
 
 	conn                *grpc.ClientConn
 	reverseTunnelServer *grpctunnel.ReverseTunnelServer
+	closing             atomic.Bool
 
 	log *slog.Logger
 }
@@ -46,6 +50,7 @@ func NewService(cfg Config, service service.Service, log *slog.Logger) (*Service
 	conn, err := grpc.NewClient(
 		cfg.Address,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithStreamInterceptor(interceptor.ReverseCredentialsInterceptor(cfg.Token)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create grpc client: %w", err)
@@ -63,7 +68,7 @@ func NewService(cfg Config, service service.Service, log *slog.Logger) (*Service
 	}, nil
 }
 
-func (s Service) Run(ctx context.Context) (CleanupFunc, error) {
+func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
 	s.registerHandlers()
 
 	ctx, cancel := context.WithCancel(ctx)
@@ -73,6 +78,10 @@ func (s Service) Run(ctx context.Context) (CleanupFunc, error) {
 
 		attempts := 0
 		for {
+			if s.closing.Load() {
+				return
+			}
+
 			started, err := s.reverseTunnelServer.Serve(ctx)
 
 			if ctx.Err() != nil {
@@ -96,6 +105,9 @@ func (s Service) Run(ctx context.Context) (CleanupFunc, error) {
 
 	return func(_ context.Context) error {
 		s.log.Debug("closing cloud service")
+
+		s.closing.Store(true)
+
 		s.reverseTunnelServer.Stop()
 		cancel()
 
@@ -107,7 +119,7 @@ func (s Service) Run(ctx context.Context) (CleanupFunc, error) {
 	}, nil
 }
 
-func (s Service) registerHandlers() {
+func (s *Service) registerHandlers() {
 	robotStateHandler := handler.NewRobotStateHandler(s.service.RobotStateService())
 	raybotv1grpc.RegisterRobotStateServiceServer(s.reverseTunnelServer, robotStateHandler)
 

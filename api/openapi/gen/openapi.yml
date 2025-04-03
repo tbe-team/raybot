@@ -217,8 +217,14 @@ components:
           example: localhost:50051
           description: The address for the cloud service
           x-order: 1
+        token:
+          type: string
+          example: 4d24e88b41374b34a54806c0124b4052
+          description: The token for the cloud service
+          x-order: 2
       required:
         - address
+        - token
     GRPCConfig:
       type: object
       properties:

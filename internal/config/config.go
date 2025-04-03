@@ -73,6 +73,7 @@ var DefaultConfig = Config{
 		},
 		Cloud: cloud.Config{
 			Address: "localhost:50051",
+			Token:   "add token here",
 		},
 	},
 	HTTP: http.Config{
