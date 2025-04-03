@@ -16,6 +16,7 @@ export const systemConfigSchema = z.object({
     }),
     cloud: z.object({
       address: z.string(),
+      token: z.string(),
     }),
   }),
   http: z.object({

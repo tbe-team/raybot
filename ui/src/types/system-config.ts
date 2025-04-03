@@ -9,6 +9,7 @@ interface GrpcServerConfig {
 }
 interface GrpcCloudConfig {
   address: string
+  token: string
 }
 
 interface GrpcConfig {

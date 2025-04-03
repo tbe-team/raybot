@@ -50,6 +50,15 @@ import { Switch } from '@/components/ui/switch'
               <FormMessage />
             </FormItem>
           </FormField>
+          <FormField v-slot="{ componentField }" name="grpc.cloud.token">
+            <FormItem>
+              <FormLabel>Token</FormLabel>
+              <FormControl>
+                <Input v-bind="componentField" />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          </FormField>
         </div>
       </section>
     </CardContent>
