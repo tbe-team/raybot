@@ -15,6 +15,7 @@ import (
 	"github.com/tbe-team/raybot/internal/handlers/http/swagger"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/services/dashboarddata"
+	"github.com/tbe-team/raybot/internal/services/peripheral"
 	"github.com/tbe-team/raybot/internal/services/system"
 )
 
@@ -25,6 +26,7 @@ type Service struct {
 	configService        configsvc.Service
 	systemService        system.Service
 	dashboardDataService dashboarddata.Service
+	peripheralService    peripheral.Service
 }
 
 type CleanupFunc func(ctx context.Context) error
@@ -35,6 +37,7 @@ func New(
 	configService configsvc.Service,
 	systemService system.Service,
 	dashboardDataService dashboarddata.Service,
+	peripheralService peripheral.Service,
 ) *Service {
 	return &Service{
 		cfg:                  cfg,
@@ -42,6 +45,7 @@ func New(
 		configService:        configService,
 		systemService:        systemService,
 		dashboardDataService: dashboardDataService,
+		peripheralService:    peripheralService,
 	}
 }
 
@@ -111,6 +115,7 @@ type handler struct {
 	*configHandler
 	*systemHandler
 	*dashboardDataHandler
+	*peripheralHandler
 }
 
 func (s *Service) newHandler() *handler {
@@ -118,5 +123,6 @@ func (s *Service) newHandler() *handler {
 		configHandler:        newConfigHandler(s.configService),
 		systemHandler:        newSystemHandler(s.systemService),
 		dashboardDataHandler: newDashboardDataHandler(s.dashboardDataService),
+		peripheralHandler:    newPeripheralHandler(s.peripheralService),
 	}
 }

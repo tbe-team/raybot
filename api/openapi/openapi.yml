@@ -25,6 +25,8 @@ paths:
     $ref: "./paths/system@restart.yml"
   /robot-state:
     $ref: "./paths/robot-state.yml"
+  /peripherals/serials:
+    $ref: "./paths/peripherals@serials.yml"
   # /commands:
   #   $ref: "./paths/commands.yml"
   # /commands/in-progress:

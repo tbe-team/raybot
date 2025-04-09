@@ -1,0 +1,22 @@
+SerialPort:
+  type: object
+  properties:
+    port:
+      type: string
+      description: The port of the serial port
+      example: /dev/ttyUSB0
+      x-order: 1
+  required:
+    - port
+
+SerialPortListResponse:
+  type: object
+  properties:
+    items:
+      type: array
+      description: The list of serial ports
+      items:
+        $ref: "#/SerialPort"
+      x-order: 1
+  required:
+    - items

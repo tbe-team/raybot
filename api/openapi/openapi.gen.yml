@@ -271,6 +271,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /peripherals/serials:
+    get:
+      summary: List available serial ports
+      operationId: listAvailableSerialPorts
+      description: List all available serial ports
+      tags:
+        - peripherals
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SerialPortListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
     LogConfig:
@@ -918,3 +938,24 @@ components:
         - cargo
         - cargoDoorMotor
         - appConnection
+    SerialPort:
+      type: object
+      properties:
+        port:
+          type: string
+          description: The port of the serial port
+          example: /dev/ttyUSB0
+          x-order: 1
+      required:
+        - port
+    SerialPortListResponse:
+      type: object
+      properties:
+        items:
+          type: array
+          description: The list of serial ports
+          items:
+            $ref: '#/components/schemas/SerialPort'
+          x-order: 1
+      required:
+        - items
