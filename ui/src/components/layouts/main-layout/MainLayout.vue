@@ -2,6 +2,7 @@
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { useLocalStorage } from '@vueuse/core'
+import { Notification, Notivue } from 'notivue'
 import AppSidebar from './AppSidebar.vue'
 import HeaderActions from './HeaderActions.vue'
 
@@ -9,6 +10,9 @@ const open = useLocalStorage('sidebar', true)
 </script>
 
 <template>
+  <Notivue v-slot="item">
+    <Notification :item="item" />
+  </Notivue>
   <SidebarProvider v-model:open="open">
     <AppSidebar />
     <SidebarInset>

@@ -1,4 +1,4 @@
-import type { CloudConfig, GRPCConfig, HardwareConfig, HTTPConfig, LogConfig } from '@/types/config'
+import type { CloudConfig, GRPCConfig, HardwareConfig, HTTPConfig, LogConfig, SerialPort } from '@/types/config'
 import http from '@/lib/http'
 
 const configAPI = {
@@ -12,6 +12,7 @@ const configAPI = {
   updateHttpConfig: (config: HTTPConfig): Promise<void> => http.put('/configs/http', config),
   getGrpcConfig: (): Promise<GRPCConfig> => http.get('/configs/grpc'),
   updateGrpcConfig: (config: GRPCConfig): Promise<void> => http.put('/configs/grpc', config),
+  getPorts: (): Promise<SerialPort> => http.get('/peripherals/serials', { doNotShowLoading: true }),
 }
 
 export default configAPI
