@@ -6,137 +6,132 @@ import (
 	"log/slog"
 
 	"github.com/tbe-team/raybot/internal/config"
-	"github.com/tbe-team/raybot/internal/controller/espserial"
-	"github.com/tbe-team/raybot/internal/controller/picserial/serial"
-	"github.com/tbe-team/raybot/internal/pubsub"
-	"github.com/tbe-team/raybot/internal/repository/repoimpl"
-	"github.com/tbe-team/raybot/internal/service"
-	"github.com/tbe-team/raybot/internal/service/serviceimpl"
+	"github.com/tbe-team/raybot/internal/services/appconnection"
+	"github.com/tbe-team/raybot/internal/services/appconnection/appconnectionimpl"
+	"github.com/tbe-team/raybot/internal/services/battery"
+	"github.com/tbe-team/raybot/internal/services/battery/batteryimpl"
+	"github.com/tbe-team/raybot/internal/services/cargo"
+	"github.com/tbe-team/raybot/internal/services/cargo/cargoimpl"
+	configsvc "github.com/tbe-team/raybot/internal/services/config"
+	"github.com/tbe-team/raybot/internal/services/config/configimpl"
+	"github.com/tbe-team/raybot/internal/services/dashboarddata"
+	"github.com/tbe-team/raybot/internal/services/dashboarddata/dashboarddataimpl"
+	"github.com/tbe-team/raybot/internal/services/distancesensor"
+	"github.com/tbe-team/raybot/internal/services/distancesensor/distancesensorimpl"
+	"github.com/tbe-team/raybot/internal/services/drivemotor"
+	"github.com/tbe-team/raybot/internal/services/drivemotor/drivemotorimpl"
+	"github.com/tbe-team/raybot/internal/services/liftmotor"
+	"github.com/tbe-team/raybot/internal/services/liftmotor/liftmotorimpl"
+	"github.com/tbe-team/raybot/internal/services/location"
+	"github.com/tbe-team/raybot/internal/services/location/locationimpl"
+	"github.com/tbe-team/raybot/internal/services/system"
+	"github.com/tbe-team/raybot/internal/services/system/systemimpl"
 	"github.com/tbe-team/raybot/internal/storage/db"
+	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/internal/storage/file"
 	"github.com/tbe-team/raybot/pkg/log"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
 type Application struct {
-	CfgManager config.Manager
+	Cfg     *config.Config
+	Log     *slog.Logger
+	Context context.Context
 
-	PICSerialClient serial.Client
-	ESPSerialClient espserial.Client
-
-	Service service.Service
-	PubSub  pubsub.PubSub
-
-	Log *slog.Logger
-
-	CleanupManager *CleanupManager
-
-	ctx context.Context
-}
-
-func (a *Application) Context() context.Context {
-	return a.ctx
+	BatteryService        battery.Service
+	DistanceSensorService distancesensor.Service
+	DriveMotorService     drivemotor.Service
+	LiftMotorService      liftmotor.Service
+	CargoService          cargo.Service
+	LocationService       location.Service
+	ConfigService         configsvc.Service
+	SystemService         system.Service
+	DashboardDataService  dashboarddata.Service
+	AppConnectionService  appconnection.Service
 }
 
 type CleanupFunc func() error
 
-func New() (*Application, CleanupFunc, error) {
-	// Create context
+func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	ctx := context.Background()
 
-	path, err := NewPath()
+	cfg, err := config.NewConfig(configFilePath, dbPath)
 	if err != nil {
-		return nil, nil, fmt.Errorf("create path: %w", err)
+		return nil, nil, fmt.Errorf("failed to create config: %w", err)
 	}
 
-	fileClient, err := file.NewLocalFileClient(".")
-	if err != nil {
-		return nil, nil, fmt.Errorf("create file client: %w", err)
-	}
-
-	cfgManager, err := config.NewManager(fileClient, path.ConfigPath(), slog.Default())
-	if err != nil {
-		return nil, nil, fmt.Errorf("create config manager: %w", err)
-	}
-
-	logger := log.NewLogger(cfgManager.GetConfig().Log)
-	slog.SetDefault(logger)
-
-	// Setup repository
-	dbProvider, err := db.NewProvider(db.Config{
-		DBPath: path.DBPath(),
+	// Initialize logger
+	log := log.NewSlogLogger(log.Config{
+		Level:     cfg.Log.Level,
+		Format:    cfg.Log.Format,
+		AddSource: cfg.Log.AddSource,
 	})
+
+	// Initialize file client
+	fileClient := file.NewLocalFileClient()
+
+	// Initialize db
+	db, err := db.NewSQLiteDB(dbPath)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create db provider: %w", err)
+		return nil, nil, fmt.Errorf("failed to create db: %w", err)
 	}
 
-	// Auto migrate the database
-	if err := dbProvider.AutoMigrate(); err != nil {
-		return nil, nil, fmt.Errorf("failed to auto migrate the database: %w", err)
+	// Migrate db
+	if err := db.AutoMigrate(); err != nil {
+		return nil, nil, fmt.Errorf("failed to migrate db: %w", err)
 	}
 
-	// Setup pubSub
-	pubSub := pubsub.New(logger)
-
-	// Setup repository
-	repo := repoimpl.New()
-
-	// Setup serial client
-	picSerialClient, err := serial.NewClient(cfgManager.GetConfig().PIC.Serial, logger)
-	if err != nil {
-		return nil, nil, fmt.Errorf("failed to create serial client: %w", err)
-	}
-	espSerialClient, err := espserial.NewClient(cfgManager.GetConfig().ESP.Serial, logger)
-	if err != nil {
-		logger.Error("failed to create esp serial client", slog.Any("error", err))
-		// return nil, nil, fmt.Errorf("failed to create esp serial client: %w", err)
-	}
-
-	// Setup service
+	queries := sqlc.New()
 	validator := validator.New()
-	service := serviceimpl.New(
-		cfgManager,
-		picSerialClient,
-		espSerialClient,
-		repo,
-		pubSub,
-		dbProvider,
-		validator,
-		logger,
+
+	// Initialize repositories
+	batteryStateRepository := batteryimpl.NewBatteryStateRepository()
+	batterySettingRepository := batteryimpl.NewBatterySettingRepository(db, queries)
+	driveMotorStateRepository := drivemotorimpl.NewDriveMotorStateRepository()
+	liftMotorStateRepository := liftmotorimpl.NewLiftMotorStateRepository()
+	cargoRepository := cargoimpl.NewCargoRepository(db, queries)
+	locationRepository := locationimpl.NewLocationRepository(db, queries)
+	distanceSensorStateRepository := distancesensorimpl.NewDistanceSensorStateRepository()
+	appConnectionRepository := appconnectionimpl.NewRepository()
+
+	// Initialize services
+	batteryService := batteryimpl.NewService(validator, batteryStateRepository, batterySettingRepository)
+	distanceSensorService := distancesensorimpl.NewService(validator, distanceSensorStateRepository)
+	driveMotorService := drivemotorimpl.NewService(validator, driveMotorStateRepository)
+	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository)
+	cargoService := cargoimpl.NewService(validator, cargoRepository)
+	locationService := locationimpl.NewService(validator, locationRepository)
+	configService := configimpl.New(cfg, fileClient)
+	systemService := systemimpl.NewService(log)
+	dashboardDataService := dashboarddataimpl.NewService(
+		batteryStateRepository,
+		batterySettingRepository,
+		distanceSensorStateRepository,
+		liftMotorStateRepository,
+		driveMotorStateRepository,
+		locationRepository,
+		cargoRepository,
+		appConnectionRepository,
 	)
+	appConnectionService := appconnectionimpl.NewService(appConnectionRepository)
 
-	// Setup application
-	app := &Application{
-		CfgManager:      cfgManager,
-		PICSerialClient: picSerialClient,
-		ESPSerialClient: espSerialClient,
-		PubSub:          pubSub,
-		Service:         service,
-		Log:             logger,
-		CleanupManager:  NewCleanupManager(),
-		ctx:             ctx,
-	}
-
-	// cleanup function
 	cleanup := func() error {
-		if err := app.CleanupManager.Cleanup(app.ctx); err != nil {
-			return fmt.Errorf("cleanup manager cleanup failed: %w", err)
-		}
-
-		if err := app.PICSerialClient.Stop(); err != nil {
-			return fmt.Errorf("failed to close pic serial client: %w", err)
-		}
-
-		if err := app.ESPSerialClient.Stop(); err != nil {
-			return fmt.Errorf("failed to close esp serial client: %w", err)
-		}
-
-		if err := dbProvider.Close(); err != nil {
-			return fmt.Errorf("failed to close db provider: %w", err)
-		}
-
-		return nil
+		return db.Close()
 	}
 
-	return app, cleanup, nil
+	return &Application{
+		Cfg:                   cfg,
+		Log:                   log,
+		Context:               ctx,
+		BatteryService:        batteryService,
+		DistanceSensorService: distanceSensorService,
+		DriveMotorService:     driveMotorService,
+		LiftMotorService:      liftMotorService,
+		CargoService:          cargoService,
+		LocationService:       locationService,
+		ConfigService:         configService,
+		SystemService:         systemService,
+		DashboardDataService:  dashboardDataService,
+		AppConnectionService:  appConnectionService,
+	}, cleanup, nil
 }

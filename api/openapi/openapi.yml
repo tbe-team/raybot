@@ -11,15 +11,21 @@ servers:
   - url: /api/v1
 security: []
 paths:
-  /system/config:
-    $ref: "./paths/system@config.yml"
+  /configs/log:
+    $ref: "./paths/configs@log.yml"
+  /configs/hardware:
+    $ref: "./paths/configs@hardware.yml"
+  /configs/cloud:
+    $ref: "./paths/configs@cloud.yml"
+  /configs/grpc:
+    $ref: "./paths/configs@grpc.yml"
+  /configs/http:
+    $ref: "./paths/configs@http.yml"
   /system/restart:
     $ref: "./paths/system@restart.yml"
-  /health:
-    $ref: "./paths/health.yml"
   /robot-state:
     $ref: "./paths/robot-state.yml"
-  /commands:
-    $ref: "./paths/commands.yml"
-  /commands/in-progress:
-    $ref: "./paths/commands@in-progress.yml"
+  # /commands:
+  #   $ref: "./paths/commands.yml"
+  # /commands/in-progress:
+  #   $ref: "./paths/commands@in-progress.yml"

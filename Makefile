@@ -5,10 +5,10 @@
 gen-openapi:
 	set -eux
 
-	pnpm --package=@redocly/cli@1.34 dlx redocly bundle ./api/openapi/openapi.yml --output api/openapi/gen/openapi.yml --ext yml
+	pnpm --package=@redocly/cli@1.34 dlx redocly bundle ./api/openapi/openapi.yml --output api/openapi/openapi.gen.yml --ext yml
 	go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen@v2.4.1 \
-		-config internal/controller/http/oas/gen/oapi-codegen.yml \
-		api/openapi/gen/openapi.yml
+		-config internal/handlers/http/gen/oapi-codegen.yml \
+		api/openapi/openapi.gen.yml
 
 .PHONY: gen-proto
 gen-proto:
@@ -105,7 +105,7 @@ docker-run-raybot:
 #########################
 .PHONY: run
 run:
-	go run cmd/raybot/main.go
+	go run cmd/raybot/main.go -config bin/config.yml -db bin/raybot.db
 
 #########################
 # Testing

@@ -1,0 +1,45 @@
+get:
+  summary: Get the cloud configuration
+  operationId: getCloudConfig
+  description: Get the cloud configuration
+  tags:
+    - config
+  responses:
+    "200":
+      description: The cloud configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/CloudConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
+
+put:
+  summary: Update the cloud configuration
+  operationId: updateCloudConfig
+  description: Update the cloud configuration
+  tags:
+    - config
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/config.yml#/CloudConfig"
+  responses:
+    "200":
+      description: The updated cloud configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/CloudConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

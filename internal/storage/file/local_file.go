@@ -3,11 +3,9 @@ package file
 import (
 	"bufio"
 	"context"
-	"errors"
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 )
 
 // Writer is a client for writing to a file.
@@ -30,22 +28,15 @@ var _ Client = (*LocalFileClient)(nil)
 
 // LocalFileClient is a client for reading and writing to a local file system.
 type LocalFileClient struct {
-	dir string
 }
 
 // NewLocalFileClient creates a new LocalFileClient.
-func NewLocalFileClient(dir string) (*LocalFileClient, error) {
-	if err := os.MkdirAll(dir, os.ModeDir); err != nil {
-		if !errors.Is(err, os.ErrExist) {
-			return nil, fmt.Errorf("failed to create directory: %w", err)
-		}
-	}
-	return &LocalFileClient{dir: dir}, nil
+func NewLocalFileClient() *LocalFileClient {
+	return &LocalFileClient{}
 }
 
 func (c LocalFileClient) Write(_ context.Context, filePath string) (io.WriteCloser, error) {
-	fullPath := filepath.Join(c.dir, filePath)
-	file, err := os.Create(fullPath)
+	file, err := os.Create(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create file: %w", err)
 	}
@@ -54,8 +45,7 @@ func (c LocalFileClient) Write(_ context.Context, filePath string) (io.WriteClos
 }
 
 func (c LocalFileClient) Read(_ context.Context, filePath string) (io.ReadCloser, error) {
-	fullPath := filepath.Join(c.dir, filePath)
-	file, err := os.Open(fullPath)
+	file, err := os.Open(filePath)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file: %w", err)
 	}

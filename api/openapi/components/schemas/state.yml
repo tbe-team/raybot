@@ -28,6 +28,9 @@ RobotStateResponse:
     cargoDoorMotor:
       $ref: "#/CargoDoorMotorState"
       x-order: 9
+    appConnection:
+      $ref: "./app-connection.yml#/AppConnection"
+      x-order: 10
   required:
     - battery
     - charge
@@ -38,7 +41,7 @@ RobotStateResponse:
     - location
     - cargo
     - cargoDoorMotor
-
+    - appConnection
 BatteryState:
   type: object
   properties:

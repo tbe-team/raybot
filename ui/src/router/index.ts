@@ -1,53 +1,37 @@
 import type { RouteRecordRaw } from 'vue-router'
 import { useNProgress } from '@/lib/nprogress'
 import { createRouter, createWebHistory } from 'vue-router'
-import 'nprogress/nprogress.css'
 
-const MainLayout = () => import('@/layouts/main-layout/MainLayout.vue')
+const MainLayout = () => import('@/components/layouts/main-layout/MainLayout.vue')
 
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/state',
-  },
-  {
-    path: '/state',
+    redirect: { name: 'settings' },
     component: MainLayout,
     children: [
       {
-        path: '',
-        component: () => import('@/views/state/StateView.vue'),
+        path: 'state',
+        name: 'state',
+        component: () => import('@/views/StateView.vue'),
         meta: { title: 'State' },
       },
-    ],
-  },
-  {
-    path: '/commands',
-    component: MainLayout,
-    children: [
       {
-        path: '',
+        path: 'commands',
+        name: 'commands',
         component: () => import('@/views/command/CommandsView.vue'),
         meta: { title: 'Commands' },
       },
-    ],
-  },
-  {
-    path: '/system',
-    component: MainLayout,
-    children: [
       {
-        path: '',
-        redirect: '/system/configuration',
-      },
-      {
-        path: 'configuration',
-        component: () => import('@/views/system/ConfigurationView.vue'),
-        meta: { title: 'System Configuration' },
+        path: 'settings',
+        name: 'settings',
+        component: () => import('@/views/SettingsView.vue'),
+        meta: { title: 'Settings' },
       },
       {
         path: 'restart',
-        component: () => import('@/views/system/RestartView.vue'),
+        name: 'restart',
+        component: () => import('@/views/RestartView.vue'),
         meta: { title: 'System Restart' },
       },
     ],
@@ -66,12 +50,8 @@ const router = createRouter({
 const nprogress = useNProgress()
 
 router.beforeEach((to, _, next) => {
-  let title = 'Raybot UI'
-  if (to.meta.title) {
-    title = `${to.meta.title} | ${title}`
-  }
-  document.title = title
   nprogress.start()
+  document.title = to.meta.title ? `${to.meta.title} | Raybot UI` : 'Raybot UI'
   next()
 })
 

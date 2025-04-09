@@ -1,0 +1,45 @@
+get:
+  summary: Get the log configuration
+  operationId: getLogConfig
+  description: Get the log configuration
+  tags:
+    - config
+  responses:
+    "200":
+      description: The log configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/LogConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
+
+put:
+  summary: Update the log configuration
+  operationId: updateLogConfig
+  description: Update the log configuration
+  tags:
+    - config
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/config.yml#/LogConfig"
+  responses:
+    "200":
+      description: The updated log configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/LogConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

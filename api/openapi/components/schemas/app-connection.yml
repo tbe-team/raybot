@@ -1,0 +1,104 @@
+AppConnection:
+  type: object
+  properties:
+    cloudConnection:
+      $ref: "#/CloudConnection"
+      x-order: 1
+    espSerialConnection:
+      $ref: "#/ESPSerialConnection"
+      x-order: 2
+    picSerialConnection:
+      $ref: "#/PICSerialConnection"
+      x-order: 3
+    rfidUsbConnection:
+      $ref: "#/RFIDUSBConnection"
+      x-order: 4
+  required:
+    - cloudConnection
+    - espSerialConnection
+    - picSerialConnection
+    - rfidUsbConnection
+
+CloudConnection:
+  type: object
+  properties:
+    connected:
+      type: boolean
+      x-order: 1
+    lastConnectedAt:
+      type: string
+      format: date-time
+      nullable: true
+      x-order: 2
+    uptime:
+      type: number
+      description: The uptime of the cloud connection in seconds
+      x-order: 3
+    error:
+      type: string
+      nullable: true
+      x-order: 4
+  required:
+    - connected
+    - lastConnectedAt
+    - uptime
+    - error
+
+ESPSerialConnection:
+  type: object
+  properties:
+    connected:
+      type: boolean
+      x-order: 1
+    lastConnectedAt:
+      type: string
+      format: date-time
+      nullable: true
+      x-order: 2
+    error:
+      type: string
+      nullable: true
+      x-order: 3
+  required:
+    - connected
+    - lastConnectedAt
+    - error
+PICSerialConnection:
+  type: object
+  properties:
+    connected:
+      type: boolean
+      x-order: 1
+    lastConnectedAt:
+      type: string
+      format: date-time
+      nullable: true
+      x-order: 2
+    error:
+      type: string
+      nullable: true
+      x-order: 3
+  required:
+    - connected
+    - lastConnectedAt
+    - error
+
+RFIDUSBConnection:
+  type: object
+  properties:
+    connected:
+      type: boolean
+      x-order: 1
+    lastConnectedAt:
+      type: string
+      format: date-time
+      nullable: true
+      x-order: 2
+    error:
+      type: string
+      nullable: true
+      x-order: 3
+  required:
+    - connected
+    - lastConnectedAt
+    - error

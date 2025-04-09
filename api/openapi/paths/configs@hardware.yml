@@ -1,0 +1,45 @@
+get:
+  summary: Get the hardware configuration
+  operationId: getHardwareConfig
+  description: Get the hardware configuration
+  tags:
+    - config
+  responses:
+    "200":
+      description: The hardware configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/HardwareConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
+
+put:
+  summary: Update the hardware configuration
+  operationId: updateHardwareConfig
+  description: Update the hardware configuration
+  tags:
+    - config
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/config.yml#/HardwareConfig"
+  responses:
+    "200":
+      description: The updated hardware configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/HardwareConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

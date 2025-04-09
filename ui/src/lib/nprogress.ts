@@ -1,5 +1,6 @@
 import { debounce } from 'lodash-es'
 import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
 
 NProgress.configure({ showSpinner: false, trickleSpeed: 300 })
 

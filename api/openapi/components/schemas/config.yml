@@ -1,0 +1,160 @@
+LogConfig:
+  type: object
+  properties:
+    level:
+      type: string
+      enum:
+        - DEBUG
+        - INFO
+        - WARN
+        - ERROR
+      example: "DEBUG"
+      description: The global log level for the application
+      x-order: 1
+      x-go-type: string
+    format:
+      type: string
+      enum:
+        - JSON
+        - TEXT
+      example: "JSON"
+      description: The log format for the application
+      x-order: 2
+      x-go-type: string
+    addSource:
+      type: boolean
+      example: false
+      description: Whether to add the source to the log
+      x-order: 3
+  required:
+    - level
+    - format
+    - addSource
+
+HardwareConfig:
+  type: object
+  properties:
+    esp:
+      $ref: "#/ESPConfig"
+    pic:
+      $ref: "#/PICConfig"
+  required:
+    - esp
+    - pic
+
+PICConfig:
+  type: object
+  properties:
+    serial:
+      $ref: "#/SerialConfig"
+  required:
+    - serial
+
+ESPConfig:
+  type: object
+  properties:
+    serial:
+      $ref: "#/SerialConfig"
+  required:
+    - serial
+
+SerialConfig:
+  type: object
+  properties:
+    port:
+      type: string
+      example: "/dev/ttyUSB0"
+      description: The port name for the serial connection
+      x-order: 1
+    baudRate:
+      type: integer
+      example: 9600
+      description: The baud rate for the serial connection
+      x-order: 2
+    dataBits:
+      type: integer
+      example: 8
+      description: The data bits for the serial connection
+      x-order: 3
+    stopBits:
+      type: number
+      format: double
+      example: 1
+      description: The stop bits for the serial connection
+      x-order: 4
+      x-go-type: float64
+    parity:
+      type: string
+      enum:
+        - NONE
+        - EVEN
+        - ODD
+      example: "NONE"
+      description: The parity for the serial connection
+      x-order: 5
+      x-go-type: string
+    readTimeout:
+      type: number
+      example: 1
+      description: The read timeout for the serial connection in seconds
+      x-order: 6
+      minimum: 0
+      x-go-type: int
+  required:
+    - port
+    - baudRate
+    - dataBits
+    - stopBits
+    - parity
+    - readTimeout
+
+CloudConfig:
+  type: object
+  properties:
+    address:
+      type: string
+      example: "localhost:50051"
+      description: The address for the cloud service
+      x-order: 1
+    token:
+      type: string
+      example: "4d24e88b41374b34a54806c0124b4052"
+      description: The token for the cloud service
+      x-order: 2
+  required:
+    - address
+    - token
+
+GRPCConfig:
+  type: object
+  properties:
+    port:
+      type: integer
+      example: 50051
+      description: The port for the gRPC server
+      x-order: 1
+    enable:
+      type: boolean
+      example: true
+      description: Whether to enable the gRPC server
+      x-order: 2
+  required:
+    - port
+    - enable
+
+HTTPConfig:
+  type: object
+  properties:
+    port:
+      type: integer
+      example: 8000
+      description: The port for the HTTP server
+      x-order: 1
+    swagger:
+      type: boolean
+      example: true
+      description: Whether to enable the Swagger UI
+      x-order: 2
+  required:
+    - port
+    - swagger

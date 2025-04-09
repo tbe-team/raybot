@@ -2,27 +2,43 @@ package log
 
 import (
 	"fmt"
+	"log/slog"
 	"strings"
+)
+
+// Format represents the logging format (JSON or Text).
+type Format uint8
+
+func (f Format) String() string {
+	return []string{"JSON", "TEXT"}[f]
+}
+
+const (
+	FormatJSON Format = iota
+	FormatText
 )
 
 // Config holds configuration for the logger.
 type Config struct {
-	Level     string `yaml:"level"`
-	Format    string `yaml:"format"`
-	AddSource bool   `yaml:"add_source"`
+	Level     slog.Level
+	Format    Format
+	AddSource bool
 }
 
-// Validate validates the logger configuration.
-func (c *Config) Validate() error {
-	level := strings.ToLower(c.Level)
-	if level != "debug" && level != "info" && level != "warn" && level != "error" {
-		return fmt.Errorf("invalid log level: %s", c.Level)
+// UnmarshalText implements [encoding.TextUnmarshaler].
+// It unmarshals the text to a log format.
+func (f *Format) UnmarshalText(text []byte) error {
+	switch strings.ToUpper(string(text)) {
+	case "JSON":
+		*f = FormatJSON
+	case "TEXT":
+		*f = FormatText
+	default:
+		return fmt.Errorf("unknown log format: %s", text)
 	}
-
-	format := strings.ToLower(c.Format)
-	if format != "json" && format != "text" {
-		return fmt.Errorf("invalid log format: %s", c.Format)
-	}
-
 	return nil
+}
+
+func (f Format) MarshalText() ([]byte, error) {
+	return []byte(f.String()), nil
 }

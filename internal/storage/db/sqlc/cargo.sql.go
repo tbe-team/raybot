@@ -9,39 +9,50 @@ import (
 	"context"
 )
 
+const cargoDoorMotorGet = `-- name: CargoDoorMotorGet :one
+SELECT id, direction, speed, is_running, enabled, updated_at FROM cargo_door_motor
+WHERE id = 1
+`
+
+func (q *Queries) CargoDoorMotorGet(ctx context.Context, db DBTX) (CargoDoorMotor, error) {
+	row := db.QueryRowContext(ctx, cargoDoorMotorGet)
+	var i CargoDoorMotor
+	err := row.Scan(
+		&i.ID,
+		&i.Direction,
+		&i.Speed,
+		&i.IsRunning,
+		&i.Enabled,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const cargoDoorMotorUpdate = `-- name: CargoDoorMotorUpdate :one
 UPDATE cargo_door_motor
 SET
-	direction = CASE WHEN ?1 IS NOT NULL THEN ?2 ELSE direction END,
-	speed = CASE WHEN ?3 IS NOT NULL THEN ?4 ELSE speed END,
-	is_running = CASE WHEN ?5 IS NOT NULL THEN ?6 ELSE is_running END,
-	enabled = CASE WHEN ?7 IS NOT NULL THEN ?8 ELSE enabled END,
-	updated_at = ?9
+	direction = ?1,
+	speed = ?2,
+	is_running = ?3,
+	enabled = ?4,
+	updated_at = ?5
 WHERE id = 1
 RETURNING id, direction, speed, is_running, enabled, updated_at
 `
 
 type CargoDoorMotorUpdateParams struct {
-	SetDirection interface{} `json:"set_direction"`
-	Direction    int64       `json:"direction"`
-	SetSpeed     interface{} `json:"set_speed"`
-	Speed        int64       `json:"speed"`
-	SetIsRunning interface{} `json:"set_is_running"`
-	IsRunning    int64       `json:"is_running"`
-	SetEnabled   interface{} `json:"set_enabled"`
-	Enabled      int64       `json:"enabled"`
-	UpdatedAt    string      `json:"updated_at"`
+	Direction int64  `json:"direction"`
+	Speed     int64  `json:"speed"`
+	IsRunning int64  `json:"is_running"`
+	Enabled   int64  `json:"enabled"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 func (q *Queries) CargoDoorMotorUpdate(ctx context.Context, db DBTX, arg CargoDoorMotorUpdateParams) (CargoDoorMotor, error) {
 	row := db.QueryRowContext(ctx, cargoDoorMotorUpdate,
-		arg.SetDirection,
 		arg.Direction,
-		arg.SetSpeed,
 		arg.Speed,
-		arg.SetIsRunning,
 		arg.IsRunning,
-		arg.SetEnabled,
 		arg.Enabled,
 		arg.UpdatedAt,
 	)
@@ -57,37 +68,94 @@ func (q *Queries) CargoDoorMotorUpdate(ctx context.Context, db DBTX, arg CargoDo
 	return i, err
 }
 
-const cargoUpdate = `-- name: CargoUpdate :one
+const cargoGet = `-- name: CargoGet :one
+SELECT id, is_open, qr_code, bottom_distance, updated_at FROM cargo
+WHERE id = 1
+`
+
+func (q *Queries) CargoGet(ctx context.Context, db DBTX) (Cargo, error) {
+	row := db.QueryRowContext(ctx, cargoGet)
+	var i Cargo
+	err := row.Scan(
+		&i.ID,
+		&i.IsOpen,
+		&i.QrCode,
+		&i.BottomDistance,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const cargoUpdateBottomDistance = `-- name: CargoUpdateBottomDistance :one
 UPDATE cargo
 SET
-	is_open = CASE WHEN ?1 IS NOT NULL THEN ?2 ELSE is_open END,
-	qr_code = CASE WHEN ?3 IS NOT NULL THEN ?4 ELSE qr_code END,
-	bottom_distance = CASE WHEN ?5 IS NOT NULL THEN ?6 ELSE bottom_distance END,
-	updated_at = ?7
+	bottom_distance = ?1,
+	updated_at = ?2
 WHERE id = 1
 RETURNING id, is_open, qr_code, bottom_distance, updated_at
 `
 
-type CargoUpdateParams struct {
-	SetIsOpen         interface{} `json:"set_is_open"`
-	IsOpen            int64       `json:"is_open"`
-	SetQrCode         interface{} `json:"set_qr_code"`
-	QrCode            string      `json:"qr_code"`
-	SetBottomDistance interface{} `json:"set_bottom_distance"`
-	BottomDistance    int64       `json:"bottom_distance"`
-	UpdatedAt         string      `json:"updated_at"`
+type CargoUpdateBottomDistanceParams struct {
+	BottomDistance int64  `json:"bottom_distance"`
+	UpdatedAt      string `json:"updated_at"`
 }
 
-func (q *Queries) CargoUpdate(ctx context.Context, db DBTX, arg CargoUpdateParams) (Cargo, error) {
-	row := db.QueryRowContext(ctx, cargoUpdate,
-		arg.SetIsOpen,
-		arg.IsOpen,
-		arg.SetQrCode,
-		arg.QrCode,
-		arg.SetBottomDistance,
-		arg.BottomDistance,
-		arg.UpdatedAt,
+func (q *Queries) CargoUpdateBottomDistance(ctx context.Context, db DBTX, arg CargoUpdateBottomDistanceParams) (Cargo, error) {
+	row := db.QueryRowContext(ctx, cargoUpdateBottomDistance, arg.BottomDistance, arg.UpdatedAt)
+	var i Cargo
+	err := row.Scan(
+		&i.ID,
+		&i.IsOpen,
+		&i.QrCode,
+		&i.BottomDistance,
+		&i.UpdatedAt,
 	)
+	return i, err
+}
+
+const cargoUpdateIsOpen = `-- name: CargoUpdateIsOpen :one
+UPDATE cargo
+SET
+	is_open = ?1,
+	updated_at = ?2
+WHERE id = 1
+RETURNING id, is_open, qr_code, bottom_distance, updated_at
+`
+
+type CargoUpdateIsOpenParams struct {
+	IsOpen    int64  `json:"is_open"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+func (q *Queries) CargoUpdateIsOpen(ctx context.Context, db DBTX, arg CargoUpdateIsOpenParams) (Cargo, error) {
+	row := db.QueryRowContext(ctx, cargoUpdateIsOpen, arg.IsOpen, arg.UpdatedAt)
+	var i Cargo
+	err := row.Scan(
+		&i.ID,
+		&i.IsOpen,
+		&i.QrCode,
+		&i.BottomDistance,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const cargoUpdateQRCode = `-- name: CargoUpdateQRCode :one
+UPDATE cargo
+SET
+	qr_code = ?1,
+	updated_at = ?2
+WHERE id = 1
+RETURNING id, is_open, qr_code, bottom_distance, updated_at
+`
+
+type CargoUpdateQRCodeParams struct {
+	QrCode    string `json:"qr_code"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+func (q *Queries) CargoUpdateQRCode(ctx context.Context, db DBTX, arg CargoUpdateQRCodeParams) (Cargo, error) {
+	row := db.QueryRowContext(ctx, cargoUpdateQRCode, arg.QrCode, arg.UpdatedAt)
 	var i Cargo
 	err := row.Scan(
 		&i.ID,

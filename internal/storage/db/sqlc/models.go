@@ -4,26 +4,14 @@
 
 package sqlc
 
-type Battery struct {
-	ID           int64  `json:"id"`
-	Current      int64  `json:"current"`
-	Temp         int64  `json:"temp"`
-	Voltage      int64  `json:"voltage"`
-	CellVoltages string `json:"cell_voltages"`
-	Percent      int64  `json:"percent"`
-	Fault        int64  `json:"fault"`
-	Health       int64  `json:"health"`
-	UpdatedAt    string `json:"updated_at"`
-}
-
-type BatteryCharge struct {
+type BatteryChargeSetting struct {
 	ID           int64  `json:"id"`
 	CurrentLimit int64  `json:"current_limit"`
 	Enabled      int64  `json:"enabled"`
 	UpdatedAt    string `json:"updated_at"`
 }
 
-type BatteryDischarge struct {
+type BatteryDischargeSetting struct {
 	ID           int64  `json:"id"`
 	CurrentLimit int64  `json:"current_limit"`
 	Enabled      int64  `json:"enabled"`
@@ -56,32 +44,6 @@ type Command struct {
 	Error       *string `json:"error"`
 	CreatedAt   string  `json:"created_at"`
 	CompletedAt *string `json:"completed_at"`
-}
-
-type DistanceSensor struct {
-	ID            int64  `json:"id"`
-	FrontDistance int64  `json:"front_distance"`
-	BackDistance  int64  `json:"back_distance"`
-	DownDistance  int64  `json:"down_distance"`
-	UpdatedAt     string `json:"updated_at"`
-}
-
-type DriveMotor struct {
-	ID        int64  `json:"id"`
-	Direction int64  `json:"direction"`
-	Speed     int64  `json:"speed"`
-	IsRunning int64  `json:"is_running"`
-	Enabled   int64  `json:"enabled"`
-	UpdatedAt string `json:"updated_at"`
-}
-
-type LiftMotor struct {
-	ID              int64  `json:"id"`
-	CurrentPosition int64  `json:"current_position"`
-	TargetPosition  int64  `json:"target_position"`
-	IsRunning       int64  `json:"is_running"`
-	Enabled         int64  `json:"enabled"`
-	UpdatedAt       string `json:"updated_at"`
 }
 
 type Location struct {

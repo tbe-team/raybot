@@ -24,19 +24,19 @@ func (_m *FakeProvider) EXPECT() *FakeProvider_Expecter {
 }
 
 // DB provides a mock function with no fields
-func (_m *FakeProvider) DB() db.SQLDB {
+func (_m *FakeProvider) DB() db.Provider {
 	ret := _m.Called()
 
 	if len(ret) == 0 {
 		panic("no return value specified for DB")
 	}
 
-	var r0 db.SQLDB
-	if rf, ok := ret.Get(0).(func() db.SQLDB); ok {
+	var r0 db.Provider
+	if rf, ok := ret.Get(0).(func() db.Provider); ok {
 		r0 = rf()
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(db.SQLDB)
+			r0 = ret.Get(0).(db.Provider)
 		}
 	}
 
@@ -60,18 +60,18 @@ func (_c *FakeProvider_DB_Call) Run(run func()) *FakeProvider_DB_Call {
 	return _c
 }
 
-func (_c *FakeProvider_DB_Call) Return(_a0 db.SQLDB) *FakeProvider_DB_Call {
+func (_c *FakeProvider_DB_Call) Return(_a0 db.Provider) *FakeProvider_DB_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *FakeProvider_DB_Call) RunAndReturn(run func() db.SQLDB) *FakeProvider_DB_Call {
+func (_c *FakeProvider_DB_Call) RunAndReturn(run func() db.Provider) *FakeProvider_DB_Call {
 	_c.Call.Return(run)
 	return _c
 }
 
 // WithTX provides a mock function with given fields: ctx, fn
-func (_m *FakeProvider) WithTX(ctx context.Context, fn func(db.SQLDB) error) error {
+func (_m *FakeProvider) WithTX(ctx context.Context, fn func(db.Provider) error) error {
 	ret := _m.Called(ctx, fn)
 
 	if len(ret) == 0 {
@@ -79,7 +79,7 @@ func (_m *FakeProvider) WithTX(ctx context.Context, fn func(db.SQLDB) error) err
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, func(db.SQLDB) error) error); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, func(db.Provider) error) error); ok {
 		r0 = rf(ctx, fn)
 	} else {
 		r0 = ret.Error(0)
@@ -100,9 +100,9 @@ func (_e *FakeProvider_Expecter) WithTX(ctx interface{}, fn interface{}) *FakePr
 	return &FakeProvider_WithTX_Call{Call: _e.mock.On("WithTX", ctx, fn)}
 }
 
-func (_c *FakeProvider_WithTX_Call) Run(run func(ctx context.Context, fn func(db.SQLDB) error)) *FakeProvider_WithTX_Call {
+func (_c *FakeProvider_WithTX_Call) Run(run func(ctx context.Context, fn func(db.Provider) error)) *FakeProvider_WithTX_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(func(db.SQLDB) error))
+		run(args[0].(context.Context), args[1].(func(db.Provider) error))
 	})
 	return _c
 }
@@ -112,7 +112,7 @@ func (_c *FakeProvider_WithTX_Call) Return(_a0 error) *FakeProvider_WithTX_Call 
 	return _c
 }
 
-func (_c *FakeProvider_WithTX_Call) RunAndReturn(run func(context.Context, func(db.SQLDB) error) error) *FakeProvider_WithTX_Call {
+func (_c *FakeProvider_WithTX_Call) RunAndReturn(run func(context.Context, func(db.Provider) error) error) *FakeProvider_WithTX_Call {
 	_c.Call.Return(run)
 	return _c
 }

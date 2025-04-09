@@ -5,7 +5,7 @@ export interface Cargo {
   updatedAt: string
 }
 
-export interface CargoDoorMotor {
+export interface CargoDoorMotorState {
   direction: 'CLOSE' | 'OPEN'
   speed: number
   isRunning: boolean

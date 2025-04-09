@@ -1,0 +1,30 @@
+log:
+  format: TEXT
+  level: DEBUG
+  add_source: false
+hardware:
+  esp:
+    serial:
+      port: /dev/ttyUSB0
+      baud_rate: 9600
+      data_bits: 8
+      stop_bits: 1
+      parity: NONE
+      read_timeout: 1s
+  pic:
+    serial:
+      port: /dev/ttyUSB1
+      baud_rate: 9600
+      data_bits: 8
+      stop_bits: 1
+      parity: NONE
+      read_timeout: 1s
+cloud:
+  address: localhost:50051
+  token: 4d24e88b41374b34a54806c0124b4052
+grpc:
+  port: 50051
+  enable: true
+http:
+  swagger: true
+  port: 3000

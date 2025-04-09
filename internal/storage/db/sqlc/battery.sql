@@ -1,37 +1,23 @@
--- name: BatteryGet :one
-SELECT * FROM battery;
-
--- name: BatteryUpdate :exec
-UPDATE battery
-SET
-	current = ?,
-	temp = ?,
-	voltage = ?,
-	cell_voltages = ?,
-	percent = ?,
-	fault = ?,
-	health = ?,
-	updated_at = ?
+-- name: BatteryChargeSettingGet :one
+SELECT * FROM battery_charge_setting
 WHERE id = 1;
 
--- name: BatteryChargeGet :one
-SELECT * FROM battery_charge;
-
--- name: BatteryChargeUpdate :exec
-UPDATE battery_charge
-SET
-	current_limit = ?,
-	enabled = ?,
-	updated_at = ?
+-- name: BatteryDischargeSettingGet :one
+SELECT * FROM battery_discharge_setting
 WHERE id = 1;
 
--- name: BatteryDischargeGet :one
-SELECT * FROM battery_discharge;
-
--- name: BatteryDischargeUpdate :exec
-UPDATE battery_discharge
+-- name: BatteryChargeSettingUpdate :exec
+UPDATE battery_charge_setting
 SET
-	current_limit = ?,
-	enabled = ?,
-	updated_at = ?
+	current_limit = @current_limit,
+	enabled = @enabled,
+	updated_at = @updated_at
+WHERE id = 1;
+
+-- name: BatteryDischargeSettingUpdate :exec
+UPDATE battery_discharge_setting
+SET
+	current_limit = @current_limit,
+	enabled = @enabled,
+	updated_at = @updated_at
 WHERE id = 1;

@@ -1,4 +1,5 @@
-import type { Cargo, CargoDoorMotor } from './cargo'
+import type { AppConnection } from './app-connection'
+import type { Cargo, CargoDoorMotorState } from './cargo'
 
 export interface BatteryState {
   current: number
@@ -60,5 +61,6 @@ export interface RobotState {
   driveMotor: DriveMotorState
   location: LocationState
   cargo: Cargo
-  cargoDoorMotor: CargoDoorMotor
+  cargoDoorMotor: CargoDoorMotorState
+  appConnection: AppConnection
 }

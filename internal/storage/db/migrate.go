@@ -11,14 +11,14 @@ import (
 var migrationFS embed.FS
 
 // AutoMigrate auto migrates the database
-func (p *DefaultProvider) AutoMigrate() error {
+func (p *SQLiteDB) AutoMigrate() error {
 	goose.SetBaseFS(migrationFS)
 
 	if err := goose.SetDialect("sqlite3"); err != nil {
 		return fmt.Errorf("set dialect: %w", err)
 	}
 
-	if err := goose.Up(p.db, "migration"); err != nil {
+	if err := goose.Up(p.DB, "migration"); err != nil {
 		return fmt.Errorf("migrate: %w", err)
 	}
 

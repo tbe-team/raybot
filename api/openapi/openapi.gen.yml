@@ -1,0 +1,920 @@
+openapi: 3.0.0
+info:
+  version: 0.1.0
+  title: Raybot API
+  description: The Raybot API
+  license:
+    url: https://opensource.org/licenses/MIT
+    name: MIT
+servers:
+  - url: /api/v1
+security: []
+paths:
+  /configs/log:
+    get:
+      summary: Get the log configuration
+      operationId: getLogConfig
+      description: Get the log configuration
+      tags:
+        - config
+      responses:
+        '200':
+          description: The log configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update the log configuration
+      operationId: updateLogConfig
+      description: Update the log configuration
+      tags:
+        - config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LogConfig'
+      responses:
+        '200':
+          description: The updated log configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LogConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /configs/hardware:
+    get:
+      summary: Get the hardware configuration
+      operationId: getHardwareConfig
+      description: Get the hardware configuration
+      tags:
+        - config
+      responses:
+        '200':
+          description: The hardware configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HardwareConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update the hardware configuration
+      operationId: updateHardwareConfig
+      description: Update the hardware configuration
+      tags:
+        - config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HardwareConfig'
+      responses:
+        '200':
+          description: The updated hardware configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HardwareConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /configs/cloud:
+    get:
+      summary: Get the cloud configuration
+      operationId: getCloudConfig
+      description: Get the cloud configuration
+      tags:
+        - config
+      responses:
+        '200':
+          description: The cloud configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update the cloud configuration
+      operationId: updateCloudConfig
+      description: Update the cloud configuration
+      tags:
+        - config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CloudConfig'
+      responses:
+        '200':
+          description: The updated cloud configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CloudConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /configs/grpc:
+    get:
+      summary: Get the gRPC configuration
+      operationId: getGRPCConfig
+      description: Get the gRPC configuration
+      tags:
+        - config
+      responses:
+        '200':
+          description: The gRPC configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GRPCConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update the gRPC configuration
+      operationId: updateGRPCConfig
+      description: Update the gRPC configuration
+      tags:
+        - config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GRPCConfig'
+      responses:
+        '200':
+          description: The updated gRPC configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GRPCConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /configs/http:
+    get:
+      summary: Get the HTTP configuration
+      operationId: getHTTPConfig
+      description: Get the HTTP configuration
+      tags:
+        - config
+      responses:
+        '200':
+          description: The HTTP configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update the HTTP configuration
+      operationId: updateHTTPConfig
+      description: Update the HTTP configuration
+      tags:
+        - config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/HTTPConfig'
+      responses:
+        '200':
+          description: The updated HTTP configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /system/restart:
+    post:
+      summary: Restart the application
+      operationId: restartApplication
+      description: Restart the application after 3 seconds.
+      tags:
+        - system
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /robot-state:
+    get:
+      summary: Get robot state
+      operationId: getRobotState
+      description: Get the current state of the robot
+      tags:
+        - robot-state
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RobotStateResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    LogConfig:
+      type: object
+      properties:
+        level:
+          type: string
+          enum:
+            - DEBUG
+            - INFO
+            - WARN
+            - ERROR
+          example: DEBUG
+          description: The global log level for the application
+          x-order: 1
+          x-go-type: string
+        format:
+          type: string
+          enum:
+            - JSON
+            - TEXT
+          example: JSON
+          description: The log format for the application
+          x-order: 2
+          x-go-type: string
+        addSource:
+          type: boolean
+          example: false
+          description: Whether to add the source to the log
+          x-order: 3
+      required:
+        - level
+        - format
+        - addSource
+    FieldError:
+      type: object
+      properties:
+        field:
+          type: string
+          description: field name
+          example: name
+          x-order: 1
+        message:
+          type: string
+          description: error message
+          example: Name is required
+          x-order: 2
+      required:
+        - field
+        - message
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+          description: custom raybot error code
+          example: item.NotFound
+          x-order: 1
+        message:
+          type: string
+          description: custom raybot error message
+          example: Item not found
+          x-order: 2
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldError'
+          x-order: 3
+      required:
+        - code
+        - message
+    SerialConfig:
+      type: object
+      properties:
+        port:
+          type: string
+          example: /dev/ttyUSB0
+          description: The port name for the serial connection
+          x-order: 1
+        baudRate:
+          type: integer
+          example: 9600
+          description: The baud rate for the serial connection
+          x-order: 2
+        dataBits:
+          type: integer
+          example: 8
+          description: The data bits for the serial connection
+          x-order: 3
+        stopBits:
+          type: number
+          format: double
+          example: 1
+          description: The stop bits for the serial connection
+          x-order: 4
+          x-go-type: float64
+        parity:
+          type: string
+          enum:
+            - NONE
+            - EVEN
+            - ODD
+          example: NONE
+          description: The parity for the serial connection
+          x-order: 5
+          x-go-type: string
+        readTimeout:
+          type: number
+          example: 1
+          description: The read timeout for the serial connection in seconds
+          x-order: 6
+          minimum: 0
+          x-go-type: int
+      required:
+        - port
+        - baudRate
+        - dataBits
+        - stopBits
+        - parity
+        - readTimeout
+    ESPConfig:
+      type: object
+      properties:
+        serial:
+          $ref: '#/components/schemas/SerialConfig'
+      required:
+        - serial
+    PICConfig:
+      type: object
+      properties:
+        serial:
+          $ref: '#/components/schemas/SerialConfig'
+      required:
+        - serial
+    HardwareConfig:
+      type: object
+      properties:
+        esp:
+          $ref: '#/components/schemas/ESPConfig'
+        pic:
+          $ref: '#/components/schemas/PICConfig'
+      required:
+        - esp
+        - pic
+    CloudConfig:
+      type: object
+      properties:
+        address:
+          type: string
+          example: localhost:50051
+          description: The address for the cloud service
+          x-order: 1
+        token:
+          type: string
+          example: 4d24e88b41374b34a54806c0124b4052
+          description: The token for the cloud service
+          x-order: 2
+      required:
+        - address
+        - token
+    GRPCConfig:
+      type: object
+      properties:
+        port:
+          type: integer
+          example: 50051
+          description: The port for the gRPC server
+          x-order: 1
+        enable:
+          type: boolean
+          example: true
+          description: Whether to enable the gRPC server
+          x-order: 2
+      required:
+        - port
+        - enable
+    HTTPConfig:
+      type: object
+      properties:
+        port:
+          type: integer
+          example: 8000
+          description: The port for the HTTP server
+          x-order: 1
+        swagger:
+          type: boolean
+          example: true
+          description: Whether to enable the Swagger UI
+          x-order: 2
+      required:
+        - port
+        - swagger
+    BatteryState:
+      type: object
+      properties:
+        current:
+          type: integer
+          example: 100
+          description: The current of the battery
+          x-order: 1
+          x-go-type: uint16
+        temp:
+          type: integer
+          example: 25
+          description: The temperature of the battery
+          x-order: 2
+          x-go-type: uint8
+        voltage:
+          type: integer
+          example: 120
+          description: The voltage of the battery
+          x-order: 3
+          x-go-type: uint16
+        cellVoltages:
+          type: array
+          items:
+            type: integer
+          example:
+            - 12
+            - 12
+            - 12
+            - 12
+          description: The cell voltages of the battery
+          x-order: 4
+          x-go-type: '[]uint16'
+        percent:
+          type: integer
+          example: 50
+          description: The percentage of the battery
+          x-order: 5
+          x-go-type: uint8
+        fault:
+          type: integer
+          example: 0
+          description: The fault of the battery
+          x-order: 6
+          x-go-type: uint8
+        health:
+          type: integer
+          example: 100
+          description: The health of the battery
+          x-order: 7
+          x-go-type: uint8
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the battery
+          x-order: 8
+      required:
+        - current
+        - temp
+        - voltage
+        - cellVoltages
+        - percent
+        - fault
+        - health
+        - updatedAt
+    ChargeState:
+      type: object
+      properties:
+        currentLimit:
+          type: integer
+          example: 100
+          description: The current limit of the charge
+          x-order: 1
+          x-go-type: uint16
+        enabled:
+          type: boolean
+          example: true
+          description: Whether the charge is enabled
+          x-order: 2
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the charge
+          x-order: 3
+      required:
+        - currentLimit
+        - enabled
+        - updatedAt
+    DischargeState:
+      type: object
+      properties:
+        currentLimit:
+          type: integer
+          example: 100
+          description: The current limit of the discharge
+          x-order: 1
+          x-go-type: uint16
+        enabled:
+          type: boolean
+          example: true
+          description: Whether the discharge is enabled
+          x-order: 2
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the discharge
+          x-order: 3
+      required:
+        - currentLimit
+        - enabled
+        - updatedAt
+    DistanceSensorState:
+      type: object
+      properties:
+        frontDistance:
+          type: integer
+          example: 100
+          description: The front distance of the distance sensor
+          x-order: 1
+          x-go-type: uint16
+        backDistance:
+          type: integer
+          example: 100
+          description: The back distance of the distance sensor
+          x-order: 2
+          x-go-type: uint16
+        downDistance:
+          type: integer
+          example: 100
+          description: The down distance of the distance sensor
+          x-order: 3
+          x-go-type: uint16
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the distance sensor
+          x-order: 4
+      required:
+        - frontDistance
+        - backDistance
+        - downDistance
+        - updatedAt
+    LiftMotorState:
+      type: object
+      properties:
+        currentPosition:
+          type: integer
+          example: 100
+          description: The current position of the lift motor
+          x-order: 1
+          x-go-type: uint16
+        targetPosition:
+          type: integer
+          example: 100
+          description: The target position of the lift motor
+          x-order: 2
+          x-go-type: uint16
+        isRunning:
+          type: boolean
+          example: true
+          description: Whether the lift motor is running
+          x-order: 3
+        enabled:
+          type: boolean
+          example: true
+          description: Whether the lift motor is enabled
+          x-order: 4
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the lift motor
+          x-order: 5
+      required:
+        - currentPosition
+        - targetPosition
+        - isRunning
+        - enabled
+        - updatedAt
+    DriveMotorState:
+      type: object
+      properties:
+        direction:
+          type: string
+          enum:
+            - FORWARD
+            - BACKWARD
+          example: FORWARD
+          description: The direction of the drive motor
+          x-order: 1
+          x-go-type: string
+        speed:
+          type: integer
+          example: 100
+          description: The speed of the drive motor (0-100)
+          x-order: 2
+          x-go-type: uint8
+        isRunning:
+          type: boolean
+          example: true
+          description: Whether the drive motor is running
+          x-order: 3
+        enabled:
+          type: boolean
+          example: true
+          description: Whether the drive motor is enabled
+          x-order: 4
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the drive motor
+          x-order: 5
+      required:
+        - direction
+        - speed
+        - isRunning
+        - enabled
+        - updatedAt
+    LocationState:
+      type: object
+      properties:
+        currentLocation:
+          type: string
+          example: ABCxyz
+          description: The current location of the robot
+          x-order: 1
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2021-01-01T00:00:00Z'
+          description: The updated at time of the location
+          x-order: 2
+      required:
+        - currentLocation
+        - updatedAt
+    CargoState:
+      type: object
+      properties:
+        isOpen:
+          type: boolean
+          example: true
+          description: Whether the cargo is open
+          x-order: 1
+        qrCode:
+          type: string
+          example: ABCxyz
+          description: The QR code read from the cargo QR scanner
+          x-order: 2
+        bottomDistance:
+          type: integer
+          example: 100
+          description: The bottom distance of the cargo
+          x-order: 3
+          x-go-type: uint16
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-01-01T00:00:00Z'
+          description: The updated at time of the cargo
+          x-order: 4
+      required:
+        - isOpen
+        - qrCode
+        - bottomDistance
+        - updatedAt
+    CargoDoorMotorState:
+      type: object
+      properties:
+        direction:
+          type: string
+          enum:
+            - CLOSE
+            - OPEN
+          example: CLOSE
+          description: The direction of the cargo door motor
+          x-order: 1
+          x-go-type: string
+        speed:
+          type: integer
+          example: 100
+          description: The speed of the cargo door motor
+          x-order: 2
+          x-go-type: uint8
+        isRunning:
+          type: boolean
+          example: true
+          description: Whether the cargo door motor is running
+          x-order: 3
+        enabled:
+          type: boolean
+          example: true
+          description: Whether the cargo door motor is enabled
+          x-order: 4
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-01-01T00:00:00Z'
+          description: The updated at time of the cargo door motor
+          x-order: 5
+      required:
+        - direction
+        - speed
+        - isRunning
+        - enabled
+        - updatedAt
+    CloudConnection:
+      type: object
+      properties:
+        connected:
+          type: boolean
+          x-order: 1
+        lastConnectedAt:
+          type: string
+          format: date-time
+          nullable: true
+          x-order: 2
+        uptime:
+          type: number
+          description: The uptime of the cloud connection in seconds
+          x-order: 3
+        error:
+          type: string
+          nullable: true
+          x-order: 4
+      required:
+        - connected
+        - lastConnectedAt
+        - uptime
+        - error
+    ESPSerialConnection:
+      type: object
+      properties:
+        connected:
+          type: boolean
+          x-order: 1
+        lastConnectedAt:
+          type: string
+          format: date-time
+          nullable: true
+          x-order: 2
+        error:
+          type: string
+          nullable: true
+          x-order: 3
+      required:
+        - connected
+        - lastConnectedAt
+        - error
+    PICSerialConnection:
+      type: object
+      properties:
+        connected:
+          type: boolean
+          x-order: 1
+        lastConnectedAt:
+          type: string
+          format: date-time
+          nullable: true
+          x-order: 2
+        error:
+          type: string
+          nullable: true
+          x-order: 3
+      required:
+        - connected
+        - lastConnectedAt
+        - error
+    RFIDUSBConnection:
+      type: object
+      properties:
+        connected:
+          type: boolean
+          x-order: 1
+        lastConnectedAt:
+          type: string
+          format: date-time
+          nullable: true
+          x-order: 2
+        error:
+          type: string
+          nullable: true
+          x-order: 3
+      required:
+        - connected
+        - lastConnectedAt
+        - error
+    AppConnection:
+      type: object
+      properties:
+        cloudConnection:
+          $ref: '#/components/schemas/CloudConnection'
+          x-order: 1
+        espSerialConnection:
+          $ref: '#/components/schemas/ESPSerialConnection'
+          x-order: 2
+        picSerialConnection:
+          $ref: '#/components/schemas/PICSerialConnection'
+          x-order: 3
+        rfidUsbConnection:
+          $ref: '#/components/schemas/RFIDUSBConnection'
+          x-order: 4
+      required:
+        - cloudConnection
+        - espSerialConnection
+        - picSerialConnection
+        - rfidUsbConnection
+    RobotStateResponse:
+      type: object
+      properties:
+        battery:
+          $ref: '#/components/schemas/BatteryState'
+          x-order: 1
+        charge:
+          $ref: '#/components/schemas/ChargeState'
+          x-order: 2
+        discharge:
+          $ref: '#/components/schemas/DischargeState'
+          x-order: 3
+        distanceSensor:
+          $ref: '#/components/schemas/DistanceSensorState'
+          x-order: 4
+        liftMotor:
+          $ref: '#/components/schemas/LiftMotorState'
+          x-order: 5
+        driveMotor:
+          $ref: '#/components/schemas/DriveMotorState'
+          x-order: 6
+        location:
+          $ref: '#/components/schemas/LocationState'
+          x-order: 7
+        cargo:
+          $ref: '#/components/schemas/CargoState'
+          x-order: 8
+        cargoDoorMotor:
+          $ref: '#/components/schemas/CargoDoorMotorState'
+          x-order: 9
+        appConnection:
+          $ref: '#/components/schemas/AppConnection'
+          x-order: 10
+      required:
+        - battery
+        - charge
+        - discharge
+        - distanceSensor
+        - liftMotor
+        - driveMotor
+        - location
+        - cargo
+        - cargoDoorMotor
+        - appConnection

@@ -12,7 +12,15 @@ export default defineConfig({
     vue(),
     vueDevTools(),
     AutoImport({
-      imports: ['vue', 'vue-router'],
+      imports: [
+        'vue',
+        'vue-router',
+        {
+          notivue: [
+            ['push', 'notification'],
+          ],
+        },
+      ],
       dts: 'src/auto-imports.d.ts',
       vueTemplate: true,
     }),

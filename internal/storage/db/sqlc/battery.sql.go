@@ -9,13 +9,14 @@ import (
 	"context"
 )
 
-const batteryChargeGet = `-- name: BatteryChargeGet :one
-SELECT id, current_limit, enabled, updated_at FROM battery_charge
+const batteryChargeSettingGet = `-- name: BatteryChargeSettingGet :one
+SELECT id, current_limit, enabled, updated_at FROM battery_charge_setting
+WHERE id = 1
 `
 
-func (q *Queries) BatteryChargeGet(ctx context.Context, db DBTX) (BatteryCharge, error) {
-	row := db.QueryRowContext(ctx, batteryChargeGet)
-	var i BatteryCharge
+func (q *Queries) BatteryChargeSettingGet(ctx context.Context, db DBTX) (BatteryChargeSetting, error) {
+	row := db.QueryRowContext(ctx, batteryChargeSettingGet)
+	var i BatteryChargeSetting
 	err := row.Scan(
 		&i.ID,
 		&i.CurrentLimit,
@@ -25,33 +26,34 @@ func (q *Queries) BatteryChargeGet(ctx context.Context, db DBTX) (BatteryCharge,
 	return i, err
 }
 
-const batteryChargeUpdate = `-- name: BatteryChargeUpdate :exec
-UPDATE battery_charge
+const batteryChargeSettingUpdate = `-- name: BatteryChargeSettingUpdate :exec
+UPDATE battery_charge_setting
 SET
-	current_limit = ?,
-	enabled = ?,
-	updated_at = ?
+	current_limit = ?1,
+	enabled = ?2,
+	updated_at = ?3
 WHERE id = 1
 `
 
-type BatteryChargeUpdateParams struct {
+type BatteryChargeSettingUpdateParams struct {
 	CurrentLimit int64  `json:"current_limit"`
 	Enabled      int64  `json:"enabled"`
 	UpdatedAt    string `json:"updated_at"`
 }
 
-func (q *Queries) BatteryChargeUpdate(ctx context.Context, db DBTX, arg BatteryChargeUpdateParams) error {
-	_, err := db.ExecContext(ctx, batteryChargeUpdate, arg.CurrentLimit, arg.Enabled, arg.UpdatedAt)
+func (q *Queries) BatteryChargeSettingUpdate(ctx context.Context, db DBTX, arg BatteryChargeSettingUpdateParams) error {
+	_, err := db.ExecContext(ctx, batteryChargeSettingUpdate, arg.CurrentLimit, arg.Enabled, arg.UpdatedAt)
 	return err
 }
 
-const batteryDischargeGet = `-- name: BatteryDischargeGet :one
-SELECT id, current_limit, enabled, updated_at FROM battery_discharge
+const batteryDischargeSettingGet = `-- name: BatteryDischargeSettingGet :one
+SELECT id, current_limit, enabled, updated_at FROM battery_discharge_setting
+WHERE id = 1
 `
 
-func (q *Queries) BatteryDischargeGet(ctx context.Context, db DBTX) (BatteryDischarge, error) {
-	row := db.QueryRowContext(ctx, batteryDischargeGet)
-	var i BatteryDischarge
+func (q *Queries) BatteryDischargeSettingGet(ctx context.Context, db DBTX) (BatteryDischargeSetting, error) {
+	row := db.QueryRowContext(ctx, batteryDischargeSettingGet)
+	var i BatteryDischargeSetting
 	err := row.Scan(
 		&i.ID,
 		&i.CurrentLimit,
@@ -61,82 +63,22 @@ func (q *Queries) BatteryDischargeGet(ctx context.Context, db DBTX) (BatteryDisc
 	return i, err
 }
 
-const batteryDischargeUpdate = `-- name: BatteryDischargeUpdate :exec
-UPDATE battery_discharge
+const batteryDischargeSettingUpdate = `-- name: BatteryDischargeSettingUpdate :exec
+UPDATE battery_discharge_setting
 SET
-	current_limit = ?,
-	enabled = ?,
-	updated_at = ?
+	current_limit = ?1,
+	enabled = ?2,
+	updated_at = ?3
 WHERE id = 1
 `
 
-type BatteryDischargeUpdateParams struct {
+type BatteryDischargeSettingUpdateParams struct {
 	CurrentLimit int64  `json:"current_limit"`
 	Enabled      int64  `json:"enabled"`
 	UpdatedAt    string `json:"updated_at"`
 }
 
-func (q *Queries) BatteryDischargeUpdate(ctx context.Context, db DBTX, arg BatteryDischargeUpdateParams) error {
-	_, err := db.ExecContext(ctx, batteryDischargeUpdate, arg.CurrentLimit, arg.Enabled, arg.UpdatedAt)
-	return err
-}
-
-const batteryGet = `-- name: BatteryGet :one
-SELECT id, "current", "temp", voltage, cell_voltages, percent, fault, health, updated_at FROM battery
-`
-
-func (q *Queries) BatteryGet(ctx context.Context, db DBTX) (Battery, error) {
-	row := db.QueryRowContext(ctx, batteryGet)
-	var i Battery
-	err := row.Scan(
-		&i.ID,
-		&i.Current,
-		&i.Temp,
-		&i.Voltage,
-		&i.CellVoltages,
-		&i.Percent,
-		&i.Fault,
-		&i.Health,
-		&i.UpdatedAt,
-	)
-	return i, err
-}
-
-const batteryUpdate = `-- name: BatteryUpdate :exec
-UPDATE battery
-SET
-	current = ?,
-	temp = ?,
-	voltage = ?,
-	cell_voltages = ?,
-	percent = ?,
-	fault = ?,
-	health = ?,
-	updated_at = ?
-WHERE id = 1
-`
-
-type BatteryUpdateParams struct {
-	Current      int64  `json:"current"`
-	Temp         int64  `json:"temp"`
-	Voltage      int64  `json:"voltage"`
-	CellVoltages string `json:"cell_voltages"`
-	Percent      int64  `json:"percent"`
-	Fault        int64  `json:"fault"`
-	Health       int64  `json:"health"`
-	UpdatedAt    string `json:"updated_at"`
-}
-
-func (q *Queries) BatteryUpdate(ctx context.Context, db DBTX, arg BatteryUpdateParams) error {
-	_, err := db.ExecContext(ctx, batteryUpdate,
-		arg.Current,
-		arg.Temp,
-		arg.Voltage,
-		arg.CellVoltages,
-		arg.Percent,
-		arg.Fault,
-		arg.Health,
-		arg.UpdatedAt,
-	)
+func (q *Queries) BatteryDischargeSettingUpdate(ctx context.Context, db DBTX, arg BatteryDischargeSettingUpdateParams) error {
+	_, err := db.ExecContext(ctx, batteryDischargeSettingUpdate, arg.CurrentLimit, arg.Enabled, arg.UpdatedAt)
 	return err
 }
