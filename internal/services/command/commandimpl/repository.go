@@ -29,7 +29,8 @@ func NewCommandRepository(db db.DB, queries *sqlc.Queries) command.Repository {
 }
 
 func (r repository) ListCommands(ctx context.Context, params command.ListCommandsParams) (paging.List[command.Command], error) {
-	query := sq.Select("*").
+	query := sq.
+		Select("*").
 		From("commands").
 		Limit(uint64(params.PagingParams.Limit())).
 		Offset(uint64(params.PagingParams.Offset()))
@@ -38,13 +39,26 @@ func (r repository) ListCommands(ctx context.Context, params command.ListCommand
 		query = s.Attach(query)
 	}
 
+	statuses := []string{}
+	for _, s := range params.Statuses {
+		statuses = append(statuses, s.String())
+	}
+	if len(statuses) > 0 {
+		query = query.Where(sq.Eq{"status": statuses})
+	}
+
 	sql, args, err := query.ToSql()
 	if err != nil {
 		return paging.List[command.Command]{}, fmt.Errorf("failed to build query: %w", err)
 	}
 
-	countQuery := sq.Select("COUNT(*)").
+	countQuery := sq.
+		Select("COUNT(*)").
 		From("commands")
+
+	if len(statuses) > 0 {
+		countQuery = countQuery.Where(sq.Eq{"status": statuses})
+	}
 
 	countSQL, countArgs, err := countQuery.ToSql()
 	if err != nil {

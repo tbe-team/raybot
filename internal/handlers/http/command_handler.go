@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/tbe-team/raybot/internal/handlers/http/gen"
 	"github.com/tbe-team/raybot/internal/services/command"
@@ -37,13 +38,26 @@ func (h commandHandler) ListCommands(ctx context.Context, req gen.ListCommandsRe
 	if req.Params.Sorts != nil {
 		sorts, err = sort.NewListFromString(*req.Params.Sorts)
 		if err != nil {
-			return nil, fmt.Errorf("invalid sort: %w", err)
+			return nil, xerror.ValidationFailed(err, "invalid sort")
+		}
+	}
+
+	statuses := []command.Status{}
+	if req.Params.Statuses != nil && len(*req.Params.Statuses) > 0 {
+		stripped := strings.TrimSpace(*req.Params.Statuses)
+		if stripped == "" {
+			return nil, xerror.ValidationFailed(nil, "invalid statuses")
+		}
+		ss := strings.Split(stripped, ",")
+		for _, s := range ss {
+			statuses = append(statuses, command.Status(s))
 		}
 	}
 
 	commands, err := h.commandService.ListCommands(ctx, command.ListCommandsParams{
 		PagingParams: paging.NewParams(paging.Page(page), paging.PageSize(pageSize)),
 		Sorts:        sorts,
+		Statuses:     statuses,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("list commands: %w", err)

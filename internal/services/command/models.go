@@ -57,6 +57,14 @@ const (
 
 type Status string
 
+func (s Status) Validate() error {
+	switch s {
+	case StatusQueued, StatusProcessing, StatusSucceeded, StatusFailed, StatusCanceled:
+		return nil
+	}
+	return fmt.Errorf("invalid status: %s", s)
+}
+
 func (s Status) String() string {
 	return string(s)
 }

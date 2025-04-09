@@ -24,6 +24,21 @@ get:
       required: false
       schema:
         type: string
+    - name: statuses
+      in: query
+      description: >
+        Filter the commands by the given statuses.
+        Use `,` to filter by multiple statuses.
+        Example: `QUEUED,PROCESSING`
+        Allowed values:
+          - QUEUED
+          - PROCESSING
+          - SUCCEEDED
+          - FAILED
+          - CANCELED
+      required: false
+      schema:
+        type: string
   responses:
     "200":
       description: A list of commands
