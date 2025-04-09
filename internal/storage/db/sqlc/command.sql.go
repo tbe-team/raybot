@@ -9,83 +9,55 @@ import (
 	"context"
 )
 
-const commandCreate = `-- name: CommandCreate :exec
+const commandCreate = `-- name: CommandCreate :one
 INSERT INTO commands (
-	id,
 	type,
 	status,
 	source,
 	inputs,
 	error,
 	created_at,
+	updated_at,
 	completed_at
 )
-VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8)
+VALUES (
+	?1,
+	?2,
+	?3,
+	?4,
+	?5,
+	?6,
+	?7,
+	?8
+)
+RETURNING id
 `
 
 type CommandCreateParams struct {
-	ID          string  `json:"id"`
-	Type        int64   `json:"type"`
-	Status      int64   `json:"status"`
-	Source      int64   `json:"source"`
+	Type        string  `json:"type"`
+	Status      string  `json:"status"`
+	Source      string  `json:"source"`
 	Inputs      string  `json:"inputs"`
 	Error       *string `json:"error"`
 	CreatedAt   string  `json:"created_at"`
+	UpdatedAt   string  `json:"updated_at"`
 	CompletedAt *string `json:"completed_at"`
 }
 
-func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateParams) error {
-	_, err := db.ExecContext(ctx, commandCreate,
-		arg.ID,
+func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateParams) (int64, error) {
+	row := db.QueryRowContext(ctx, commandCreate,
 		arg.Type,
 		arg.Status,
 		arg.Source,
 		arg.Inputs,
 		arg.Error,
 		arg.CreatedAt,
+		arg.UpdatedAt,
 		arg.CompletedAt,
 	)
-	return err
-}
-
-const commandGetByID = `-- name: CommandGetByID :one
-SELECT id, type, status, source, inputs, error, created_at, completed_at FROM commands WHERE id = ?1
-`
-
-func (q *Queries) CommandGetByID(ctx context.Context, db DBTX, id string) (Command, error) {
-	row := db.QueryRowContext(ctx, commandGetByID, id)
-	var i Command
-	err := row.Scan(
-		&i.ID,
-		&i.Type,
-		&i.Status,
-		&i.Source,
-		&i.Inputs,
-		&i.Error,
-		&i.CreatedAt,
-		&i.CompletedAt,
-	)
-	return i, err
-}
-
-const commandGetByStatusInProgress = `-- name: CommandGetByStatusInProgress :one
-SELECT id, type, status, source, inputs, error, created_at, completed_at FROM commands WHERE status = 0 LIMIT 1
-`
-
-func (q *Queries) CommandGetByStatusInProgress(ctx context.Context, db DBTX) (Command, error) {
-	row := db.QueryRowContext(ctx, commandGetByStatusInProgress)
-	var i Command
-	err := row.Scan(
-		&i.ID,
-		&i.Type,
-		&i.Status,
-		&i.Source,
-		&i.Inputs,
-		&i.Error,
-		&i.CreatedAt,
-		&i.CompletedAt,
-	)
-	return i, err
+	var id int64
+	err := row.Scan(&id)
+	return id, err
 }
 
 const commandUpdate = `-- name: CommandUpdate :one
@@ -95,17 +67,17 @@ SET
 	error = CASE WHEN ?3 IS NOT NULL THEN ?4 ELSE error END,
 	completed_at = CASE WHEN ?5 IS NOT NULL THEN ?6 ELSE completed_at END
 WHERE id = ?7
-RETURNING id, type, status, source, inputs, error, created_at, completed_at
+RETURNING id, type, status, source, inputs, error, completed_at, created_at, updated_at
 `
 
 type CommandUpdateParams struct {
 	SetStatus      interface{} `json:"set_status"`
-	Status         int64       `json:"status"`
+	Status         string      `json:"status"`
 	SetError       interface{} `json:"set_error"`
 	Error          *string     `json:"error"`
 	SetCompletedAt interface{} `json:"set_completed_at"`
 	CompletedAt    *string     `json:"completed_at"`
-	ID             string      `json:"id"`
+	ID             int64       `json:"id"`
 }
 
 func (q *Queries) CommandUpdate(ctx context.Context, db DBTX, arg CommandUpdateParams) (Command, error) {
@@ -126,8 +98,9 @@ func (q *Queries) CommandUpdate(ctx context.Context, db DBTX, arg CommandUpdateP
 		&i.Source,
 		&i.Inputs,
 		&i.Error,
-		&i.CreatedAt,
 		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
 	)
 	return i, err
 }

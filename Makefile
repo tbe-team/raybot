@@ -29,7 +29,7 @@ gen-all: gen-openapi gen-proto gen-mock gen-sqlc
 # Database
 #########################
 GOOSE_DRIVER=sqlite3
-GOOSE_DBSTRING="file:./.raybot/data/raybot.db"
+GOOSE_DBSTRING="file:./bin/raybot.db"
 GOOSE_MIGRATION_DIR=internal/storage/db/migration
 
 .PHONY: migrate-up

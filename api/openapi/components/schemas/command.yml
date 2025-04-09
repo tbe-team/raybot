@@ -2,8 +2,8 @@ CommandResponse:
   type: object
   properties:
     id:
-      type: string
-      example: "123e4567-e89b-12d3-a456-426614174000"
+      type: integer
+      example: 1
       description: The id of the command
       x-order: 1
     type:
@@ -19,8 +19,7 @@ CommandResponse:
       description: The source of the command
       x-order: 4
     inputs:
-      oneOf:
-        - $ref: "#/CommandMoveToLocationInputs"
+      $ref: "#/CommandInputs"
       description: The inputs of the command
       x-order: 5
     error:
@@ -28,17 +27,22 @@ CommandResponse:
       nullable: true
       description: The error of the command
       x-order: 6
-    createdAt:
-      type: string
-      format: date-time
-      description: The creation date of the command
-      x-order: 7
     completedAt:
       type: string
       nullable: true
       format: date-time
       description: The completion date of the command
+      x-order: 7
+    createdAt:
+      type: string
+      format: date-time
+      description: The creation date of the command
       x-order: 8
+    updatedAt:
+      type: string
+      format: date-time
+      description: The update date of the command
+      x-order: 9
   required:
     - id
     - type
@@ -47,9 +51,10 @@ CommandResponse:
     - inputs
     - error
     - createdAt
+    - updatedAt
     - completedAt
 
-CommandListResponse:
+CommandsListResponse:
   type: object
   properties:
     totalItems:
@@ -66,34 +71,75 @@ CommandListResponse:
     - totalItems
     - items
 
+CreateCommandRequest:
+  type: object
+  properties:
+    type:
+      $ref: "#/CommandType"
+      description: The type of command
+      x-order: 1
+    inputs:
+      $ref: "#/CommandInputs"
+      description: The inputs of the command
+      x-order: 2
+  required:
+    - type
+    - inputs
+
 CommandType:
   type: string
   enum:
-    - MOVE_TO_LOCATION
-    - LIFT_CARGO
-    - DROP_CARGO
-    - OPEN_CARGO
-    - CLOSE_CARGO
+    - MOVE_FORWARD
+    - MOVE_BACKWARD
+    - MOVE_TO
+    - CARGO_OPEN
+    - CARGO_CLOSE
+    - CARGO_LIFT
+    - CARGO_LOWER
+    - CARGO_CHECK_QR
   description: The type of command
   x-go-type: string
 
 CommandStatus:
   type: string
   enum:
-    - IN_PROGRESS
+    - QUEUED
+    - PROCESSING
     - SUCCEEDED
     - FAILED
+    - CANCELED
   description: The status of the command
   x-go-type: string
 
 CommandSource:
   type: string
   enum:
-    - MANUAL
     - CLOUD
   description: The source of the command
   x-go-type: string
-CommandMoveToLocationInputs:
+
+CommandInputs:
+  oneOf:
+    - $ref: "#/StopInputs"
+    - $ref: "#/MoveForwardInputs"
+    - $ref: "#/MoveBackwardInputs"
+    - $ref: "#/MoveToInputs"
+    - $ref: "#/CargoOpenInputs"
+    - $ref: "#/CargoCloseInputs"
+    - $ref: "#/CargoLiftInputs"
+    - $ref: "#/CargoLowerInputs"
+    - $ref: "#/CargoCheckQRInputs"
+
+StopInputs:
+  type: object
+
+MoveForwardInputs:
+  type: object
+
+MoveBackwardInputs:
+  type: object
+
+MoveToInputs:
   type: object
   properties:
     location:
@@ -102,3 +148,25 @@ CommandMoveToLocationInputs:
       example: "1e8asj"
   required:
     - location
+
+CargoOpenInputs:
+  type: object
+
+CargoCloseInputs:
+  type: object
+
+CargoLiftInputs:
+  type: object
+
+CargoLowerInputs:
+  type: object
+
+CargoCheckQRInputs:
+  type: object
+  properties:
+    qrCode:
+      type: string
+      description: The QR code to check
+      example: "1e8asj"
+  required:
+    - qrCode

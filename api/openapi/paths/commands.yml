@@ -19,6 +19,7 @@ get:
           - status
           - source
           - created_at
+          - updated_at
           - completed_at
       required: false
       schema:
@@ -29,7 +30,33 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/command.yml#/CommandListResponse"
+            $ref: "../components/schemas/command.yml#/CommandsListResponse"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
+
+post:
+  summary: Create a command
+  operationId: createCommand
+  description: Create a command
+  tags:
+    - commands
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/command.yml#/CreateCommandRequest"
+  responses:
+    "201":
+      description: The created command
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/command.yml#/CommandResponse"
     "400":
       description: Bad Request
       content:

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/services/appconnection"
@@ -12,6 +13,8 @@ import (
 	"github.com/tbe-team/raybot/internal/services/battery/batteryimpl"
 	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/cargo/cargoimpl"
+	"github.com/tbe-team/raybot/internal/services/command"
+	"github.com/tbe-team/raybot/internal/services/command/commandimpl"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/services/config/configimpl"
 	"github.com/tbe-team/raybot/internal/services/dashboarddata"
@@ -51,12 +54,16 @@ type Application struct {
 	DashboardDataService  dashboarddata.Service
 	AppConnectionService  appconnection.Service
 	PeripheralService     peripheral.Service
+	CommandService        command.Service
 }
 
 type CleanupFunc func() error
 
 func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	ctx := context.Background()
+
+	// Set UTC timezone
+	time.Local = time.UTC
 
 	cfg, err := config.NewConfig(configFilePath, dbPath)
 	if err != nil {
@@ -96,6 +103,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	locationRepository := locationimpl.NewLocationRepository(db, queries)
 	distanceSensorStateRepository := distancesensorimpl.NewDistanceSensorStateRepository()
 	appConnectionRepository := appconnectionimpl.NewAppConnectionRepository()
+	commandRepository := commandimpl.NewCommandRepository(db, queries)
 
 	// Initialize services
 	batteryService := batteryimpl.NewService(validator, batteryStateRepository, batterySettingRepository)
@@ -118,6 +126,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	)
 	appConnectionService := appconnectionimpl.NewService(appConnectionRepository)
 	peripheralService := peripheralimpl.NewService()
+	commandService := commandimpl.NewService(validator, commandRepository)
 
 	cleanup := func() error {
 		return db.Close()
@@ -138,5 +147,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		DashboardDataService:  dashboardDataService,
 		AppConnectionService:  appConnectionService,
 		PeripheralService:     peripheralService,
+		CommandService:        commandService,
 	}, cleanup, nil
 }

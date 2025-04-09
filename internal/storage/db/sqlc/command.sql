@@ -1,21 +1,25 @@
--- name: CommandGetByStatusInProgress :one
-SELECT * FROM commands WHERE status = 0 LIMIT 1;
-
--- name: CommandGetByID :one
-SELECT * FROM commands WHERE id = @id;
-
--- name: CommandCreate :exec
+-- name: CommandCreate :one
 INSERT INTO commands (
-	id,
 	type,
 	status,
 	source,
 	inputs,
 	error,
 	created_at,
+	updated_at,
 	completed_at
 )
-VALUES (@id, @type, @status, @source, @inputs, @error, @created_at, @completed_at);
+VALUES (
+	@type,
+	@status,
+	@source,
+	@inputs,
+	@error,
+	@created_at,
+	@updated_at,
+	@completed_at
+)
+RETURNING id;
 
 -- name: CommandUpdate :one
 UPDATE commands
