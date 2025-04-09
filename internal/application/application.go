@@ -24,6 +24,8 @@ import (
 	"github.com/tbe-team/raybot/internal/services/liftmotor/liftmotorimpl"
 	"github.com/tbe-team/raybot/internal/services/location"
 	"github.com/tbe-team/raybot/internal/services/location/locationimpl"
+	"github.com/tbe-team/raybot/internal/services/peripheral"
+	"github.com/tbe-team/raybot/internal/services/peripheral/peripheralimpl"
 	"github.com/tbe-team/raybot/internal/services/system"
 	"github.com/tbe-team/raybot/internal/services/system/systemimpl"
 	"github.com/tbe-team/raybot/internal/storage/db"
@@ -48,6 +50,7 @@ type Application struct {
 	SystemService         system.Service
 	DashboardDataService  dashboarddata.Service
 	AppConnectionService  appconnection.Service
+	PeripheralService     peripheral.Service
 }
 
 type CleanupFunc func() error
@@ -92,7 +95,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	cargoRepository := cargoimpl.NewCargoRepository(db, queries)
 	locationRepository := locationimpl.NewLocationRepository(db, queries)
 	distanceSensorStateRepository := distancesensorimpl.NewDistanceSensorStateRepository()
-	appConnectionRepository := appconnectionimpl.NewRepository()
+	appConnectionRepository := appconnectionimpl.NewAppConnectionRepository()
 
 	// Initialize services
 	batteryService := batteryimpl.NewService(validator, batteryStateRepository, batterySettingRepository)
@@ -101,7 +104,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository)
 	cargoService := cargoimpl.NewService(validator, cargoRepository)
 	locationService := locationimpl.NewService(validator, locationRepository)
-	configService := configimpl.New(cfg, fileClient)
+	configService := configimpl.NewService(cfg, fileClient)
 	systemService := systemimpl.NewService(log)
 	dashboardDataService := dashboarddataimpl.NewService(
 		batteryStateRepository,
@@ -114,6 +117,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		appConnectionRepository,
 	)
 	appConnectionService := appconnectionimpl.NewService(appConnectionRepository)
+	peripheralService := peripheralimpl.NewService()
 
 	cleanup := func() error {
 		return db.Close()
@@ -133,5 +137,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		SystemService:         systemService,
 		DashboardDataService:  dashboardDataService,
 		AppConnectionService:  appConnectionService,
+		PeripheralService:     peripheralService,
 	}, cleanup, nil
 }

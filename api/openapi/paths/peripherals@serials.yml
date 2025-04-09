@@ -1,0 +1,19 @@
+get:
+  summary: List available serial ports
+  operationId: listAvailableSerialPorts
+  description: List all available serial ports
+  tags:
+    - peripherals
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/peripheral.yml#/SerialPortListResponse"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

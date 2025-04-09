@@ -55,7 +55,8 @@
   },
   "pnpm": {
     "onlyBuiltDependencies": [
-      "esbuild"
+      "esbuild",
+      "vue-demi"
     ]
   }
 }

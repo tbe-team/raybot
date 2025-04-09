@@ -12,7 +12,7 @@ type repository struct {
 	mu            sync.RWMutex
 }
 
-func NewRepository() appconnection.Repository {
+func NewAppConnectionRepository() appconnection.Repository {
 	return &repository{}
 }
 

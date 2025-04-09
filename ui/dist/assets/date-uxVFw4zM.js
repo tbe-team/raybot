@@ -1,1 +1,0 @@
-function r(e){if(!e)return"N/A";const t=new Date(e);return Number.isNaN(t.getTime())?"Invalid date":new Intl.DateTimeFormat("en-US",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:!1,year:"numeric",month:"short",day:"numeric"}).format(t)}export{r as f};

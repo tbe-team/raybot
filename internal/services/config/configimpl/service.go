@@ -20,7 +20,7 @@ type service struct {
 	fileClient file.Client
 }
 
-func New(cfg *config.Config, fileClient file.Client) configsvc.Service {
+func NewService(cfg *config.Config, fileClient file.Client) configsvc.Service {
 	return &service{
 		cfg:        cfg,
 		fileClient: fileClient,
