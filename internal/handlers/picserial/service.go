@@ -43,7 +43,7 @@ func New(
 	s := &Service{
 		cfg:                   cfg,
 		client:                newClient(cfg.Serial),
-		log:                   log,
+		log:                   log.With("service", "picserial"),
 		batteryService:        batteryService,
 		distanceSensorService: distanceSensorService,
 		liftMotorService:      liftMotorService,

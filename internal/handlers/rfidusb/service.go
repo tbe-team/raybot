@@ -23,7 +23,7 @@ func New(
 ) *Service {
 	return &Service{
 		client:          newClient(),
-		log:             log,
+		log:             log.With("service", "rfidusb"),
 		locationService: locationService,
 	}
 }

@@ -21,7 +21,7 @@ func New(
 	appConnectionService appconnection.Service,
 ) *Service {
 	return &Service{
-		log:                  log,
+		log:                  log.With("service", "event"),
 		appConnectionService: appConnectionService,
 	}
 }

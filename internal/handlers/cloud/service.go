@@ -46,7 +46,7 @@ func New(cfg config.Cloud, log *slog.Logger) (*Service, error) {
 		cfg:                 cfg,
 		conn:                conn,
 		reverseTunnelServer: reverseTunnel,
-		log:                 log,
+		log:                 log.With("service", "cloud"),
 	}, nil
 }
 
