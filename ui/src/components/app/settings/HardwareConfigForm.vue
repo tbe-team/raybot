@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { HardwareConfig } from '@/types/config'
-import configAPI from '@/api/config'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { HARDWARE_CONFIG_QUERY_KEY, useHardwareConfigMutation } from '@/composables/use-config'
+import { useSerialPort } from '@/composables/use-serial-port'
 import { useQueryClient } from '@tanstack/vue-query'
 import { toTypedSchema } from '@vee-validate/zod'
 import { Loader } from 'lucide-vue-next'
@@ -15,9 +15,10 @@ import { z } from 'zod'
 interface Props {
   initialValues: HardwareConfig
 }
+
 const props = defineProps<Props>()
-const ports = ref<string[]>([])
-const baudRates = ref<number[]>([9600, 19200, 38400, 57600, 115200])
+const BAUD_RATES = [9600, 19200, 38400, 57600, 115200]
+
 const serialConfigSchema = z.object({
   port: z.string().min(1, 'Port is required'),
   baudRate: z.number().int().positive('Baud rate must be positive'),
@@ -34,22 +35,29 @@ const hardwareConfigSchema = z.object({
   pic: z.object({
     serial: serialConfigSchema,
   }),
-})
+}).refine(
+  data => data.esp.serial.port !== data.pic.serial.port,
+  {
+    message: 'ESP and PIC cannot use the same port',
+    path: ['esp.serial.port'],
+  },
+).refine(
+  data => data.esp.serial.port !== data.pic.serial.port,
+  {
+    message: 'ESP and PIC cannot use the same port',
+    path: ['pic.serial.port'],
+  },
+)
 
 const queryClient = useQueryClient()
 const { mutate, isPending } = useHardwareConfigMutation()
-
+const { data: ports, refetch: refetchPorts } = useSerialPort({ doNotShowLoading: true })
 const form = useForm({
   validationSchema: toTypedSchema(hardwareConfigSchema),
   initialValues: props.initialValues,
 })
 
 const onSubmit = form.handleSubmit((values) => {
-  if (values.pic.serial.port === values.esp.serial.port) {
-    notification.error('Port cannot be the same for both ESP and PIC')
-    return
-  }
-
   mutate(values, {
     onSuccess: () => {
       queryClient.setQueryData([HARDWARE_CONFIG_QUERY_KEY], values)
@@ -61,19 +69,11 @@ const onSubmit = form.handleSubmit((values) => {
   })
 })
 
-async function fetchPorts() {
-  try {
-    const response = await configAPI.getPorts()
-    ports.value = response.items.map(item => item.port)
-  }
-  catch (error) {
-    console.error(error)
-    notification.error('Failed to load ports')
+function fetchPorts(newValue: boolean) {
+  if (newValue) {
+    refetchPorts()
   }
 }
-onMounted(() => {
-  fetchPorts()
-})
 </script>
 
 <template>
@@ -87,18 +87,18 @@ onMounted(() => {
 
         <!-- Port and Timeout in same row -->
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField v-slot="{ componentField }" name="esp.serial.port">
+          <FormField v-slot="{ componentField, value }" name="esp.serial.port">
             <FormItem>
               <FormLabel>Port</FormLabel>
               <Select v-bind="componentField" required @update:open="fetchPorts">
                 <FormControl>
                   <SelectTrigger :disabled="isPending">
-                    <SelectValue placeholder="Select port" />
+                    <SelectValue :placeholder="value" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  <SelectItem v-for="port in ports" :key="port" :value="port">
-                    {{ port }}
+                <SelectContent v-if="ports">
+                  <SelectItem v-for="port in ports" :key="port.port" :value="port.port">
+                    {{ port.port }}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -134,7 +134,7 @@ onMounted(() => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem v-for="baudRate in baudRates" :key="baudRate" :value="baudRate">
+                  <SelectItem v-for="baudRate in BAUD_RATES" :key="baudRate" :value="baudRate">
                     {{ baudRate }}
                   </SelectItem>
                 </SelectContent>
@@ -231,18 +231,18 @@ onMounted(() => {
 
         <!-- Port and Timeout in same row -->
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField v-slot="{ componentField }" name="pic.serial.port">
+          <FormField v-slot="{ componentField, value }" name="pic.serial.port">
             <FormItem>
               <FormLabel>Port</FormLabel>
               <Select v-bind="componentField" required @update:open="fetchPorts">
                 <FormControl>
                   <SelectTrigger :disabled="isPending">
-                    <SelectValue placeholder="Select port" />
+                    <SelectValue :placeholder="value" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem v-for="port in ports" :key="port" :value="port">
-                    {{ port }}
+                  <SelectItem v-for="port in ports" :key="port.port" :value="port.port">
+                    {{ port.port }}
                   </SelectItem>
                 </SelectContent>
               </Select>
@@ -278,7 +278,7 @@ onMounted(() => {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem v-for="baudRate in baudRates" :key="baudRate" :value="baudRate">
+                  <SelectItem v-for="baudRate in BAUD_RATES" :key="baudRate" :value="baudRate">
                     {{ baudRate }}
                   </SelectItem>
                 </SelectContent>
