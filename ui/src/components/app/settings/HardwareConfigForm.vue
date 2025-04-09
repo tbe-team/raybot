@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import type { HardwareConfig } from '@/types/config'
 import { Button } from '@/components/ui/button'
-import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { HARDWARE_CONFIG_QUERY_KEY, useHardwareConfigMutation } from '@/composables/use-config'
+import { useListAvailableSerialPortsQuery } from '@/composables/use-peripheral'
 import { useQueryClient } from '@tanstack/vue-query'
 import { toTypedSchema } from '@vee-validate/zod'
 import { Loader } from 'lucide-vue-next'
@@ -14,7 +15,9 @@ import { z } from 'zod'
 interface Props {
   initialValues: HardwareConfig
 }
+
 const props = defineProps<Props>()
+const BAUD_RATES = [9600, 19200, 38400, 57600, 115200]
 
 const serialConfigSchema = z.object({
   port: z.string().min(1, 'Port is required'),
@@ -32,11 +35,23 @@ const hardwareConfigSchema = z.object({
   pic: z.object({
     serial: serialConfigSchema,
   }),
-})
+}).refine(
+  data => data.esp.serial.port !== data.pic.serial.port,
+  {
+    message: 'ESP and PIC cannot use the same port',
+    path: ['esp.serial.port'],
+  },
+).refine(
+  data => data.esp.serial.port !== data.pic.serial.port,
+  {
+    message: 'ESP and PIC cannot use the same port',
+    path: ['pic.serial.port'],
+  },
+)
 
 const queryClient = useQueryClient()
 const { mutate, isPending } = useHardwareConfigMutation()
-
+const { data: ports, refetch: refetchPorts } = useListAvailableSerialPortsQuery({ doNotShowLoading: true })
 const form = useForm({
   validationSchema: toTypedSchema(hardwareConfigSchema),
   initialValues: props.initialValues,
@@ -53,6 +68,12 @@ const onSubmit = form.handleSubmit((values) => {
     },
   })
 })
+
+function fetchPorts(newValue: boolean) {
+  if (newValue) {
+    refetchPorts()
+  }
+}
 </script>
 
 <template>
@@ -66,15 +87,21 @@ const onSubmit = form.handleSubmit((values) => {
 
         <!-- Port and Timeout in same row -->
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField v-slot="{ field }" name="esp.serial.port">
+          <FormField v-slot="{ componentField, value }" name="esp.serial.port">
             <FormItem>
               <FormLabel>Port</FormLabel>
-              <FormControl>
-                <Input v-model="field.value" :disabled="isPending" placeholder="e.g. /dev/ttyUSB0" />
-              </FormControl>
-              <FormDescription>
-                Serial port for ESP
-              </FormDescription>
+              <Select v-bind="componentField" required @update:open="fetchPorts">
+                <FormControl>
+                  <SelectTrigger :disabled="isPending">
+                    <SelectValue :placeholder="value" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent v-if="ports">
+                  <SelectItem v-for="port in ports" :key="port.port" :value="port.port">
+                    {{ port.port }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           </FormField>
@@ -97,17 +124,21 @@ const onSubmit = form.handleSubmit((values) => {
 
         <!-- Other settings in a 4-column grid -->
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <FormField v-slot="{ field }" name="esp.serial.baudRate">
+          <FormField v-slot="{ componentField }" name="esp.serial.baudRate">
             <FormItem>
               <FormLabel>Baud Rate</FormLabel>
-              <FormControl>
-                <Input
-                  v-model="field.value"
-                  type="number"
-                  :disabled="isPending"
-                  placeholder="e.g. 115200"
-                />
-              </FormControl>
+              <Select v-bind="componentField">
+                <FormControl>
+                  <SelectTrigger :disabled="isPending">
+                    <SelectValue placeholder="Select baud rate" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem v-for="baudRate in BAUD_RATES" :key="baudRate" :value="baudRate">
+                    {{ baudRate }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           </FormField>
@@ -200,15 +231,21 @@ const onSubmit = form.handleSubmit((values) => {
 
         <!-- Port and Timeout in same row -->
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField v-slot="{ field }" name="pic.serial.port">
+          <FormField v-slot="{ componentField, value }" name="pic.serial.port">
             <FormItem>
               <FormLabel>Port</FormLabel>
-              <FormControl>
-                <Input v-model="field.value" :disabled="isPending" placeholder="e.g. /dev/ttyUSB1" />
-              </FormControl>
-              <FormDescription>
-                Serial port for PIC
-              </FormDescription>
+              <Select v-bind="componentField" required @update:open="fetchPorts">
+                <FormControl>
+                  <SelectTrigger :disabled="isPending">
+                    <SelectValue :placeholder="value" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem v-for="port in ports" :key="port.port" :value="port.port">
+                    {{ port.port }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           </FormField>
@@ -231,17 +268,21 @@ const onSubmit = form.handleSubmit((values) => {
 
         <!-- Other settings in a 4-column grid -->
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <FormField v-slot="{ field }" name="pic.serial.baudRate">
+          <FormField v-slot="{ componentField }" name="pic.serial.baudRate">
             <FormItem>
               <FormLabel>Baud Rate</FormLabel>
-              <FormControl>
-                <Input
-                  v-model="field.value"
-                  type="number"
-                  :disabled="isPending"
-                  placeholder="e.g. 115200"
-                />
-              </FormControl>
+              <Select v-bind="componentField">
+                <FormControl>
+                  <SelectTrigger :disabled="isPending">
+                    <SelectValue placeholder="Select baud rate" />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  <SelectItem v-for="baudRate in BAUD_RATES" :key="baudRate" :value="baudRate">
+                    {{ baudRate }}
+                  </SelectItem>
+                </SelectContent>
+              </Select>
               <FormMessage />
             </FormItem>
           </FormField>
