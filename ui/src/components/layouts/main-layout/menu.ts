@@ -1,7 +1,6 @@
 import type { Item } from './Navigation.vue'
 import {
   ChartBarBig,
-  Command,
   Power,
   Settings2,
 } from 'lucide-vue-next'
