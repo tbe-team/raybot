@@ -3,7 +3,7 @@ import type { AxiosRequestConfig } from 'axios'
 import http from '@/lib/http'
 
 const peripheralsAPI = {
-  getPorts: (axiosOpts?: Partial<AxiosRequestConfig>): Promise<{ items: SerialPort[] }> =>
+  listAvailableSerialPorts: (axiosOpts?: Partial<AxiosRequestConfig>): Promise<{ items: SerialPort[] }> =>
     http.get('/peripherals/serials', axiosOpts),
 }
 
