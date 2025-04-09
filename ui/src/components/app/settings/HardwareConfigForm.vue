@@ -5,7 +5,7 @@ import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/comp
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { HARDWARE_CONFIG_QUERY_KEY, useHardwareConfigMutation } from '@/composables/use-config'
-import { useListAvailableSerialPorts } from '@/composables/use-peripheral'
+import { useListAvailableSerialPortsQuery } from '@/composables/use-peripheral'
 import { useQueryClient } from '@tanstack/vue-query'
 import { toTypedSchema } from '@vee-validate/zod'
 import { Loader } from 'lucide-vue-next'
@@ -51,7 +51,7 @@ const hardwareConfigSchema = z.object({
 
 const queryClient = useQueryClient()
 const { mutate, isPending } = useHardwareConfigMutation()
-const { data: ports, refetch: refetchPorts } = useListAvailableSerialPorts({ doNotShowLoading: true })
+const { data: ports, refetch: refetchPorts } = useListAvailableSerialPortsQuery({ doNotShowLoading: true })
 const form = useForm({
   validationSchema: toTypedSchema(hardwareConfigSchema),
   initialValues: props.initialValues,
