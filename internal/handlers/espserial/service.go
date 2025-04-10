@@ -11,11 +11,15 @@ import (
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/hardware/espserial"
 	"github.com/tbe-team/raybot/internal/services/cargo"
+	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
 type Service struct {
-	cfg    config.ESP
-	log    *slog.Logger
+	cfg config.ESP
+	log *slog.Logger
+
+	publisher eventbus.Publisher
+
 	client espserial.Client
 
 	cargoService cargo.Service
@@ -26,11 +30,13 @@ type CleanupFunc func(context.Context) error
 func New(
 	cfg config.ESP,
 	log *slog.Logger,
+	publisher eventbus.Publisher,
 	client espserial.Client,
 	cargoService cargo.Service,
 ) *Service {
 	s := &Service{
 		cfg:          cfg,
+		publisher:    publisher,
 		client:       client,
 		log:          log.With("service", "espserial"),
 		cargoService: cargoService,
@@ -65,9 +71,12 @@ func (s *Service) readLoop(ctx context.Context) {
 			msg, err := s.client.Read()
 			if err != nil {
 				s.log.Error("failed to read from serial client", slog.Any("error", err))
-				events.ESPSerialDisconnectedSignal.Emit(ctx, events.ESPSerialDisconnectedEvent{
-					Error: err,
-				})
+				s.publisher.Publish(
+					events.ESPSerialDisconnectedTopic,
+					eventbus.NewMessage(events.ESPSerialDisconnectedEvent{
+						Error: err,
+					}),
+				)
 				return
 			}
 			s.routeMessage(ctx, msg)

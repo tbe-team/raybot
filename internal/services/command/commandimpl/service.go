@@ -11,6 +11,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/command/executor"
+	"github.com/tbe-team/raybot/pkg/eventbus"
 	"github.com/tbe-team/raybot/pkg/paging"
 	"github.com/tbe-team/raybot/pkg/ptr"
 	"github.com/tbe-team/raybot/pkg/validator"
@@ -20,6 +21,8 @@ type service struct {
 	log       *slog.Logger
 	validator validator.Validator
 
+	publisher eventbus.Publisher
+
 	commandRepository command.Repository
 	appStateRepo      appstate.Repository
 	dispatcher        executor.Dispatcher
@@ -28,6 +31,7 @@ type service struct {
 func NewService(
 	log *slog.Logger,
 	validator validator.Validator,
+	publisher eventbus.Publisher,
 	commandRepository command.Repository,
 	appStateRepo appstate.Repository,
 	dispatcher executor.Dispatcher,
@@ -35,12 +39,13 @@ func NewService(
 	s := &service{
 		log:               log.With("service", "command"),
 		validator:         validator,
+		publisher:         publisher,
 		commandRepository: commandRepository,
 		appStateRepo:      appStateRepo,
 		dispatcher:        dispatcher,
 	}
 
-	go s.runExecutableCommand(context.Background())
+	go s.startCheckingForExecutableCommand(context.Background())
 
 	return s
 }
@@ -58,18 +63,18 @@ func (s service) CreateCommand(ctx context.Context, params command.CreateCommand
 		return command.Command{}, fmt.Errorf("validate params: %w", err)
 	}
 
-	slog.Error("before create command", "params", params)
 	cmd := command.NewCommand(params.Source, params.Inputs)
 	cmd, err := s.commandRepository.CreateCommand(ctx, cmd)
 	if err != nil {
 		return command.Command{}, fmt.Errorf("create command: %w", err)
 	}
-	slog.Error("after create command", "cmd", cmd)
 
-	events.CommandCreatedSignal.Emit(ctx, events.CommandCreatedEvent{
-		CommandID: cmd.ID,
-	})
-	slog.Error("after emit command created signal", "cmd", cmd)
+	s.publisher.Publish(
+		events.CommandCreatedTopic,
+		eventbus.NewMessage(events.CommandCreatedEvent{
+			CommandID: cmd.ID,
+		}),
+	)
 
 	return cmd, nil
 }
@@ -108,10 +113,14 @@ func (s service) ExecuteCreatedCommand(ctx context.Context, params command.Execu
 	return nil
 }
 
-func (s service) runExecutableCommand(ctx context.Context) {
+func (s service) startCheckingForExecutableCommand(ctx context.Context) {
 	s.log.Debug("waiting for hardware components to be initialized then resuming executable command")
 	s.waitForHardwareComponentsInitialized(ctx)
 
+	go s.runNextExecutableCommand(ctx)
+}
+
+func (s service) runNextExecutableCommand(ctx context.Context) {
 	cmd, err := s.commandRepository.GetNextExecutableCommand(ctx)
 	if err != nil {
 		if errors.Is(err, command.ErrNoNextExecutableCommand) {
@@ -187,5 +196,5 @@ func (s service) executeCommand(ctx context.Context, cmd command.Command) {
 		}
 	}
 
-	// TODO: publish command completed event
+	go s.runNextExecutableCommand(ctx)
 }

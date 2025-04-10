@@ -10,6 +10,7 @@ import (
 func startEventService(app *application.Application, interruptChan <-chan any) error {
 	service := event.New(
 		app.Log,
+		app.EventBus,
 		app.AppStateService,
 		app.CommandService,
 	)

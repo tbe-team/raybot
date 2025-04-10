@@ -8,21 +8,24 @@ import (
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
+	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
-const locationTrackingKey = "location:tracking"
-
 type moveToExecutor struct {
-	log               *slog.Logger
+	log *slog.Logger
+
+	subscriber        eventbus.Subscriber
 	driveMotorService drivemotor.Service
 }
 
 func newMoveToExecutor(
 	log *slog.Logger,
+	subscriber eventbus.Subscriber,
 	driveMotorService drivemotor.Service,
 ) moveToExecutor {
 	return moveToExecutor{
 		log:               log,
+		subscriber:        subscriber,
 		driveMotorService: driveMotorService,
 	}
 }
@@ -57,29 +60,29 @@ func (e moveToExecutor) Execute(ctx context.Context, inputs command.MoveToInputs
 }
 
 func (e moveToExecutor) trackingLocation(ctx context.Context, location string) {
-	e.log.Debug("start tracking location", slog.String("location", location))
-
-	doneCh := make(chan struct{})
-
+	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
 		e.log.Debug("stop tracking location", slog.String("location", location))
-		events.UpdateLocationSignal.RemoveListener(locationTrackingKey)
+		cancel() // cancel the context to stop the subscriber
 	}()
 
-	// var once sync.Once
-
-	fn := func(_ context.Context, ev events.UpdateLocationEvent) {
-		if ev.CurrentLocation == location {
-			e.log.Info("location reached", slog.String("location", ev.CurrentLocation))
-			close(doneCh)
-
+	reachCh := make(chan struct{})
+	e.log.Debug("start tracking location", slog.String("target_location", location))
+	e.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(ctx context.Context, msg *eventbus.Message) {
+		ev, ok := msg.Payload.(events.UpdateLocationEvent)
+		if !ok {
+			e.log.Error("invalid event", slog.Any("event", msg.Payload))
+			return
 		}
-	}
 
-	events.UpdateLocationSignal.AddListener(fn, locationTrackingKey)
+		if ev.Location == location {
+			e.log.Info("location reached", slog.String("location", ev.Location))
+			close(reachCh)
+		}
+	})
 
 	select {
-	case <-doneCh:
+	case <-reachCh:
 		return
 	case <-ctx.Done():
 		return

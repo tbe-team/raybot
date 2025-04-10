@@ -37,6 +37,7 @@ import (
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/internal/storage/file"
+	"github.com/tbe-team/raybot/pkg/eventbus"
 	"github.com/tbe-team/raybot/pkg/log"
 	"github.com/tbe-team/raybot/pkg/ptr"
 	"github.com/tbe-team/raybot/pkg/validator"
@@ -46,6 +47,8 @@ type Application struct {
 	Cfg     *config.Config
 	Log     *slog.Logger
 	Context context.Context
+
+	EventBus eventbus.EventBus
 
 	ESPSerialClient espserial.Client
 	PICSerialClient picserial.Client
@@ -97,6 +100,9 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	if err := db.AutoMigrate(); err != nil {
 		return nil, nil, fmt.Errorf("failed to migrate db: %w", err)
 	}
+
+	// Initialize event bus
+	eventBus := eventbus.NewInProcEventBus(log)
 
 	// Initialize repositories
 	queries := sqlc.New()
@@ -170,7 +176,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	driveMotorService := drivemotorimpl.NewService(validator, driveMotorStateRepository, picSerialClient)
 	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, picSerialClient)
 	cargoService := cargoimpl.NewService(validator, cargoRepository, espSerialClient)
-	locationService := locationimpl.NewService(validator, locationRepository)
+	locationService := locationimpl.NewService(validator, eventBus, locationRepository)
 	configService := configimpl.NewService(cfg, fileClient)
 	systemService := systemimpl.NewService(log)
 	dashboardDataService := dashboarddataimpl.NewService(
@@ -186,8 +192,14 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	appStateService := appstateimpl.NewService(appStateRepository)
 	peripheralService := peripheralimpl.NewService()
 
-	dispatcher := executor.NewDispatcher(log, driveMotorService)
-	commandService := commandimpl.NewService(log, validator, commandRepository, appStateRepository, dispatcher)
+	commandService := commandimpl.NewService(
+		log,
+		validator,
+		eventBus,
+		commandRepository,
+		appStateRepository,
+		executor.NewDispatcher(log, eventBus, driveMotorService),
+	)
 
 	cleanup := func() error {
 		var err error
@@ -214,6 +226,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		Cfg:                   cfg,
 		Log:                   log,
 		Context:               ctx,
+		EventBus:              eventBus,
 		ESPSerialClient:       espSerialClient,
 		PICSerialClient:       picSerialClient,
 		BatteryService:        batteryService,

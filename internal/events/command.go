@@ -1,9 +1,9 @@
 package events
 
-import "github.com/maniartech/signals"
+const (
+	CommandCreatedTopic = "command:created"
+)
 
 type CommandCreatedEvent struct {
 	CommandID int64
 }
-
-var CommandCreatedSignal = signals.New[CommandCreatedEvent]()

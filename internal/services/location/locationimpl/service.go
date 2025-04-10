@@ -6,21 +6,25 @@ import (
 
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/location"
+	"github.com/tbe-team/raybot/pkg/eventbus"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
 type service struct {
 	validator validator.Validator
 
+	publisher    eventbus.Publisher
 	locationRepo location.Repository
 }
 
 func NewService(
 	validator validator.Validator,
+	publisher eventbus.Publisher,
 	locationRepo location.Repository,
 ) location.Service {
 	return &service{
 		validator:    validator,
+		publisher:    publisher,
 		locationRepo: locationRepo,
 	}
 }
@@ -34,9 +38,12 @@ func (s *service) UpdateLocation(ctx context.Context, params location.UpdateLoca
 		return fmt.Errorf("update location: %w", err)
 	}
 
-	events.UpdateLocationSignal.Emit(ctx, events.UpdateLocationEvent{
-		CurrentLocation: params.CurrentLocation,
-	})
+	s.publisher.Publish(
+		events.LocationUpdatedTopic,
+		eventbus.NewMessage(events.UpdateLocationEvent{
+			Location: params.CurrentLocation,
+		}),
+	)
 
 	return nil
 }

@@ -7,6 +7,7 @@ import (
 
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
+	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
 type Dispatcher interface {
@@ -21,10 +22,11 @@ type dispatcher struct {
 
 func NewDispatcher(
 	log *slog.Logger,
+	subscriber eventbus.Subscriber,
 	driveMotorService drivemotor.Service,
 ) Dispatcher {
 	return dispatcher{
-		moveToExecutor:       newMoveToExecutor(log, driveMotorService),
+		moveToExecutor:       newMoveToExecutor(log, subscriber, driveMotorService),
 		moveForwardExecutor:  newMoveForwardExecutor(driveMotorService),
 		moveBackwardExecutor: newMoveBackwardExecutor(driveMotorService),
 	}

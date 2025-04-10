@@ -15,12 +15,15 @@ import (
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
+	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
 type Service struct {
 	cfg    config.PIC
 	log    *slog.Logger
 	client picserial.Client
+
+	publisher eventbus.Publisher
 
 	batteryService        battery.Service
 	distanceSensorService distancesensor.Service
@@ -35,6 +38,7 @@ func New(
 	cfg config.PIC,
 	log *slog.Logger,
 	client picserial.Client,
+	publisher eventbus.Publisher,
 	batteryService battery.Service,
 	distanceSensorService distancesensor.Service,
 	liftMotorService liftmotor.Service,
@@ -44,6 +48,7 @@ func New(
 	s := &Service{
 		cfg:                   cfg,
 		client:                client,
+		publisher:             publisher,
 		log:                   log.With("service", "picserial"),
 		batteryService:        batteryService,
 		distanceSensorService: distanceSensorService,
@@ -81,9 +86,12 @@ func (s *Service) readLoop(ctx context.Context) {
 			msg, err := s.client.Read()
 			if err != nil {
 				s.log.Error("failed to read from serial client", slog.Any("error", err))
-				events.PICSerialDisconnectedSignal.Emit(ctx, events.PICSerialDisconnectedEvent{
-					Error: err,
-				})
+				s.publisher.Publish(
+					events.PICSerialDisconnectedTopic,
+					eventbus.NewMessage(events.PICSerialDisconnectedEvent{
+						Error: err,
+					}),
+				)
 				return
 			}
 			s.routeMessage(ctx, msg)

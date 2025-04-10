@@ -2,78 +2,75 @@ package eventbus
 
 import (
 	"context"
+	"log/slog"
 	"sync"
 )
 
 var _ EventBus = (*InProcEventBus)(nil)
 
 type InProcEventBus struct {
-	subscribers map[string][]chan *Message
+	log *slog.Logger
+
+	subscribers map[string][]*subscriber
 	mu          sync.RWMutex
 }
 
-func NewInProcEventBus() *InProcEventBus {
+func NewInProcEventBus(log *slog.Logger) *InProcEventBus {
 	return &InProcEventBus{
-		subscribers: make(map[string][]chan *Message),
+		log:         log.With("component", "inproc_event_bus"),
+		subscribers: make(map[string][]*subscriber),
 	}
 }
 
-func (e *InProcEventBus) Subscribe(ctx context.Context, topic string) (<-chan *Message, error) {
-	ch := make(chan *Message)
+func (e *InProcEventBus) Subscribe(ctx context.Context, topic string, handler HandlerFunc) {
+	sub := &subscriber{
+		handler: handler,
+	}
 
 	e.mu.Lock()
-	e.subscribers[topic] = append(e.subscribers[topic], ch)
+	e.subscribers[topic] = append(e.subscribers[topic], sub)
 	e.mu.Unlock()
 
 	go func() {
 		<-ctx.Done()
 
-		close(ch)
-
-		e.removeSubscriber(topic, ch)
+		e.removeSubscriber(topic, sub)
 	}()
-
-	return ch, nil
 }
 
-func (e *InProcEventBus) Unsubscribe(topic string, ch chan *Message) error {
-	e.mu.Lock()
-	e.removeSubscriber(topic, ch)
-	e.mu.Unlock()
-	return nil
-}
-
-func (e *InProcEventBus) Publish(topic string, message *Message) error {
+func (e *InProcEventBus) Publish(topic string, message *Message) {
 	e.mu.RLock()
 	defer e.mu.RUnlock()
 
-	for _, ch := range e.subscribers[topic] {
-		ch <- message
-	}
+	for _, sub := range e.subscribers[topic] {
+		go func(sub *subscriber) {
+			defer func() {
+				if r := recover(); r != nil {
+					e.log.Error("recovered panic in subscriber", slog.Any("error", r))
+				}
+			}()
 
-	return nil
+			sub.handle(context.TODO(), message)
+		}(sub)
+	}
 }
 
-func (e *InProcEventBus) PublishAsync(topic string, message *Message) error {
-	e.mu.RLock()
-	defer e.mu.RUnlock()
-
-	for _, ch := range e.subscribers[topic] {
-		go func(ch chan *Message) {
-			ch <- message
-		}(ch)
-	}
-
-	return nil
-}
-
-func (e *InProcEventBus) removeSubscriber(topic string, toRemove chan *Message) {
+func (e *InProcEventBus) removeSubscriber(topic string, toRemove *subscriber) {
 	e.mu.Lock()
 	defer e.mu.Unlock()
+
 	for i, c := range e.subscribers[topic] {
 		if c == toRemove {
 			e.subscribers[topic] = append(e.subscribers[topic][:i], e.subscribers[topic][i+1:]...)
 			break
 		}
 	}
+}
+
+type subscriber struct {
+	handler HandlerFunc
+}
+
+func (s subscriber) handle(ctx context.Context, msg *Message) {
+	s.handler(ctx, msg)
 }
