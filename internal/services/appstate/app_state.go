@@ -54,4 +54,9 @@ type Repository interface {
 	UpdateESPSerialConnection(ctx context.Context, params UpdateESPSerialConnectionParams) error
 	UpdatePICSerialConnection(ctx context.Context, params UpdatePICSerialConnectionParams) error
 	UpdateRFIDUSBConnection(ctx context.Context, params UpdateRFIDUSBConnectionParams) error
+
+	// ListenForAppStateChanges returns a channel that will receive the AppState when it changes.
+	// The channel is buffered and will not block the caller.
+	// The channel will be closed when the context is done.
+	ListenForAppStateChanges(ctx context.Context) <-chan AppState
 }
