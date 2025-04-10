@@ -1,0 +1,1 @@
+import{a as o}from"./createLucideIcon--oNMgtbN.js";import{d as r,B as t,o as n,b as c,F as l,j as p}from"./index-Qb-K-lGR.js";const d=r({__name:"CardFooter",props:{class:{}},setup(s){const e=s;return(a,m)=>(n(),t("div",{class:l(p(o)("flex items-center p-6 pt-0",e.class))},[c(a.$slots,"default")],2))}});export{d as _};

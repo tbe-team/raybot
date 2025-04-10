@@ -26,7 +26,7 @@ const router = useRouter()
 const page = ref(Number(route.query.page) || 1)
 const pageSize = ref(Number(route.query.pageSize) || 10)
 const { data, isPending, isError, error, refetch } = useQueuedComandQuery(page, pageSize, { axiosOpts: { doNotShowLoading: true } })
-const { data: processingCommand, isPending: isProcessingCommandPending, isError: isProcessingCommandError } = useProcessingComandQuery({ axiosOpts: { doNotShowLoading: true }, refetchInterval: 1000 })
+const { data: processingCommand } = useProcessingComandQuery({ axiosOpts: { doNotShowLoading: true }, refetchInterval: 1000 })
 
 function handlePageChange(p: number) {
   page.value = p
