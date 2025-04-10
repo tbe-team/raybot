@@ -1,11 +1,11 @@
-package appconnection
+package appstate
 
 import (
 	"context"
 	"time"
 )
 
-type UpdateConnectionParams struct {
+type UpdateCloudConnectionParams struct {
 	Connected          bool
 	SetConnected       bool
 	LastConnectedAt    *time.Time
@@ -42,16 +42,16 @@ type UpdateRFIDUSBConnectionParams struct {
 }
 
 type Service interface {
-	UpdateCloudConnection(ctx context.Context, params UpdateConnectionParams) error
-	UpdateESPSerialConnection(ctx context.Context, params UpdateConnectionParams) error
-	UpdatePICSerialConnection(ctx context.Context, params UpdateConnectionParams) error
-	UpdateRFIDUSBConnection(ctx context.Context, params UpdateConnectionParams) error
+	UpdateCloudConnection(ctx context.Context, params UpdateCloudConnectionParams) error
+	UpdateESPSerialConnection(ctx context.Context, params UpdateESPSerialConnectionParams) error
+	UpdatePICSerialConnection(ctx context.Context, params UpdatePICSerialConnectionParams) error
+	UpdateRFIDUSBConnection(ctx context.Context, params UpdateRFIDUSBConnectionParams) error
 }
 
 type Repository interface {
-	GetAppConnection(ctx context.Context) (AppConnection, error)
-	UpdateCloudConnection(ctx context.Context, params UpdateConnectionParams) error
-	UpdateESPSerialConnection(ctx context.Context, params UpdateConnectionParams) error
-	UpdatePICSerialConnection(ctx context.Context, params UpdateConnectionParams) error
-	UpdateRFIDUSBConnection(ctx context.Context, params UpdateConnectionParams) error
+	GetAppState(ctx context.Context) (AppState, error)
+	UpdateCloudConnection(ctx context.Context, params UpdateCloudConnectionParams) error
+	UpdateESPSerialConnection(ctx context.Context, params UpdateESPSerialConnectionParams) error
+	UpdatePICSerialConnection(ctx context.Context, params UpdatePICSerialConnectionParams) error
+	UpdateRFIDUSBConnection(ctx context.Context, params UpdateRFIDUSBConnectionParams) error
 }

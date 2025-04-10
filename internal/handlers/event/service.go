@@ -5,24 +5,24 @@ import (
 	"log/slog"
 
 	"github.com/tbe-team/raybot/internal/events"
-	"github.com/tbe-team/raybot/internal/services/appconnection"
+	"github.com/tbe-team/raybot/internal/services/appstate"
 )
 
 type Service struct {
 	log *slog.Logger
 
-	appConnectionService appconnection.Service
+	appStateService appstate.Service
 }
 
 type CleanupFunc func(context.Context) error
 
 func New(
 	log *slog.Logger,
-	appConnectionService appconnection.Service,
+	appStateService appstate.Service,
 ) *Service {
 	return &Service{
-		log:                  log.With("service", "event"),
-		appConnectionService: appConnectionService,
+		log:             log.With("service", "event"),
+		appStateService: appStateService,
 	}
 }
 

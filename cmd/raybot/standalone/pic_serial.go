@@ -16,7 +16,7 @@ func startPICSerial(app *application.Application, interruptChan <-chan any, read
 		app.DistanceSensorService,
 		app.LiftMotorService,
 		app.DriveMotorService,
-		app.AppConnectionService,
+		app.AppStateService,
 	)
 
 	cleanup, err := service.Run(app.Context)

@@ -1,8 +1,8 @@
-package appconnection
+package appstate
 
 import "time"
 
-type AppConnection struct {
+type AppState struct {
 	CloudConnection     CloudConnection
 	ESPSerialConnection ESPSerialConnection
 	PICSerialConnection PICSerialConnection

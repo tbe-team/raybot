@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/tbe-team/raybot/internal/events"
-	"github.com/tbe-team/raybot/internal/services/appconnection"
+	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/pkg/ptr"
 )
 
 func (s *Service) HandleRFIDUSBConnectedEvent(ctx context.Context, _ events.RFIDUSBConnectedEvent) {
-	if err := s.appConnectionService.UpdateRFIDUSBConnection(ctx, appconnection.UpdateConnectionParams{
+	if err := s.appStateService.UpdateRFIDUSBConnection(ctx, appstate.UpdateRFIDUSBConnectionParams{
 		Connected:          true,
 		SetConnected:       true,
 		LastConnectedAt:    ptr.New(time.Now()),
@@ -27,7 +27,7 @@ func (s *Service) HandleRFIDUSBDisconnectedEvent(ctx context.Context, event even
 		errStr = event.Error.Error()
 	}
 
-	if err := s.appConnectionService.UpdateRFIDUSBConnection(ctx, appconnection.UpdateConnectionParams{
+	if err := s.appStateService.UpdateRFIDUSBConnection(ctx, appstate.UpdateRFIDUSBConnectionParams{
 		Connected:    false,
 		SetConnected: true,
 		Error:        &errStr,

@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/tbe-team/raybot/internal/config"
-	"github.com/tbe-team/raybot/internal/services/appconnection"
-	"github.com/tbe-team/raybot/internal/services/appconnection/appconnectionimpl"
+	"github.com/tbe-team/raybot/internal/services/appstate"
+	"github.com/tbe-team/raybot/internal/services/appstate/appstateimpl"
 	"github.com/tbe-team/raybot/internal/services/battery"
 	"github.com/tbe-team/raybot/internal/services/battery/batteryimpl"
 	"github.com/tbe-team/raybot/internal/services/cargo"
@@ -52,7 +52,7 @@ type Application struct {
 	ConfigService         configsvc.Service
 	SystemService         system.Service
 	DashboardDataService  dashboarddata.Service
-	AppConnectionService  appconnection.Service
+	AppStateService       appstate.Service
 	PeripheralService     peripheral.Service
 	CommandService        command.Service
 }
@@ -102,7 +102,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	cargoRepository := cargoimpl.NewCargoRepository(db, queries)
 	locationRepository := locationimpl.NewLocationRepository(db, queries)
 	distanceSensorStateRepository := distancesensorimpl.NewDistanceSensorStateRepository()
-	appConnectionRepository := appconnectionimpl.NewAppConnectionRepository()
+	appStateRepository := appstateimpl.NewAppStateRepository()
 	commandRepository := commandimpl.NewCommandRepository(db, queries)
 
 	// Initialize services
@@ -122,9 +122,9 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		driveMotorStateRepository,
 		locationRepository,
 		cargoRepository,
-		appConnectionRepository,
+		appStateRepository,
 	)
-	appConnectionService := appconnectionimpl.NewService(appConnectionRepository)
+	appStateService := appstateimpl.NewService(appStateRepository)
 	peripheralService := peripheralimpl.NewService()
 	commandService := commandimpl.NewService(validator, commandRepository)
 
@@ -145,7 +145,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		ConfigService:         configService,
 		SystemService:         systemService,
 		DashboardDataService:  dashboardDataService,
-		AppConnectionService:  appConnectionService,
+		AppStateService:       appStateService,
 		PeripheralService:     peripheralService,
 		CommandService:        commandService,
 	}, cleanup, nil

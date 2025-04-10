@@ -8,7 +8,7 @@ import (
 )
 
 func startEventService(app *application.Application, interruptChan <-chan any) error {
-	service := event.New(app.Log, app.AppConnectionService)
+	service := event.New(app.Log, app.AppStateService)
 
 	cleanup, err := service.Run(app.Context)
 	if err != nil {

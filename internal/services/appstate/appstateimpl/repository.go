@@ -1,32 +1,32 @@
-package appconnectionimpl
+package appstateimpl
 
 import (
 	"context"
 	"sync"
 
-	"github.com/tbe-team/raybot/internal/services/appconnection"
+	"github.com/tbe-team/raybot/internal/services/appstate"
 )
 
 type repository struct {
-	appConnection appconnection.AppConnection
-	mu            sync.RWMutex
+	appState appstate.AppState
+	mu       sync.RWMutex
 }
 
-func NewAppConnectionRepository() appconnection.Repository {
+func NewAppStateRepository() appstate.Repository {
 	return &repository{}
 }
 
-func (r *repository) GetAppConnection(_ context.Context) (appconnection.AppConnection, error) {
+func (r *repository) GetAppState(_ context.Context) (appstate.AppState, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	return r.appConnection, nil
+	return r.appState, nil
 }
 
-func (r *repository) UpdateCloudConnection(_ context.Context, params appconnection.UpdateConnectionParams) error {
+func (r *repository) UpdateCloudConnection(_ context.Context, params appstate.UpdateCloudConnectionParams) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	cloudConnection := r.appConnection.CloudConnection
+	cloudConnection := r.appState.CloudConnection
 	if params.SetConnected {
 		cloudConnection.Connected = params.Connected
 	}
@@ -36,16 +36,16 @@ func (r *repository) UpdateCloudConnection(_ context.Context, params appconnecti
 	if params.SetError {
 		cloudConnection.Error = params.Error
 	}
-	r.appConnection.CloudConnection = cloudConnection
+	r.appState.CloudConnection = cloudConnection
 
 	return nil
 }
 
-func (r *repository) UpdateESPSerialConnection(_ context.Context, params appconnection.UpdateConnectionParams) error {
+func (r *repository) UpdateESPSerialConnection(_ context.Context, params appstate.UpdateESPSerialConnectionParams) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	espSerialConnection := r.appConnection.ESPSerialConnection
+	espSerialConnection := r.appState.ESPSerialConnection
 	if params.SetConnected {
 		espSerialConnection.Connected = params.Connected
 	}
@@ -55,16 +55,16 @@ func (r *repository) UpdateESPSerialConnection(_ context.Context, params appconn
 	if params.SetError {
 		espSerialConnection.Error = params.Error
 	}
-	r.appConnection.ESPSerialConnection = espSerialConnection
+	r.appState.ESPSerialConnection = espSerialConnection
 
 	return nil
 }
 
-func (r *repository) UpdatePICSerialConnection(_ context.Context, params appconnection.UpdateConnectionParams) error {
+func (r *repository) UpdatePICSerialConnection(_ context.Context, params appstate.UpdatePICSerialConnectionParams) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	picSerialConnection := r.appConnection.PICSerialConnection
+	picSerialConnection := r.appState.PICSerialConnection
 	if params.SetConnected {
 		picSerialConnection.Connected = params.Connected
 	}
@@ -74,16 +74,16 @@ func (r *repository) UpdatePICSerialConnection(_ context.Context, params appconn
 	if params.SetError {
 		picSerialConnection.Error = params.Error
 	}
-	r.appConnection.PICSerialConnection = picSerialConnection
+	r.appState.PICSerialConnection = picSerialConnection
 
 	return nil
 }
 
-func (r *repository) UpdateRFIDUSBConnection(_ context.Context, params appconnection.UpdateConnectionParams) error {
+func (r *repository) UpdateRFIDUSBConnection(_ context.Context, params appstate.UpdateRFIDUSBConnectionParams) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	rfidUsbConnection := r.appConnection.RFIDUSBConnection
+	rfidUsbConnection := r.appState.RFIDUSBConnection
 	if params.SetConnected {
 		rfidUsbConnection.Connected = params.Connected
 	}
@@ -93,7 +93,7 @@ func (r *repository) UpdateRFIDUSBConnection(_ context.Context, params appconnec
 	if params.SetError {
 		rfidUsbConnection.Error = params.Error
 	}
-	r.appConnection.RFIDUSBConnection = rfidUsbConnection
+	r.appState.RFIDUSBConnection = rfidUsbConnection
 
 	return nil
 }

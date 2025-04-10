@@ -9,7 +9,7 @@ import (
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
-	"github.com/tbe-team/raybot/internal/services/appconnection"
+	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/battery"
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
@@ -25,7 +25,7 @@ type Service struct {
 	distanceSensorService distancesensor.Service
 	liftMotorService      liftmotor.Service
 	driveMotorService     drivemotor.Service
-	appConnectionService  appconnection.Service
+	appStateService       appstate.Service
 	commandStore          *commandStore
 }
 
@@ -38,7 +38,7 @@ func New(
 	distanceSensorService distancesensor.Service,
 	liftMotorService liftmotor.Service,
 	driveMotorService drivemotor.Service,
-	appConnectionService appconnection.Service,
+	appStateService appstate.Service,
 ) *Service {
 	s := &Service{
 		cfg:                   cfg,
@@ -48,7 +48,7 @@ func New(
 		distanceSensorService: distanceSensorService,
 		liftMotorService:      liftMotorService,
 		driveMotorService:     driveMotorService,
-		appConnectionService:  appConnectionService,
+		appStateService:       appStateService,
 		commandStore:          newCommandStore(),
 	}
 
