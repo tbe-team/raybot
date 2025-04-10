@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CommandSort } from '@/api/command'
+import type { CommandSort } from '@/api/commands'
 import type { SortPrefix } from '@/lib/sort'
 import type { Command } from '@/types/command'
 import type { Table } from '@tanstack/vue-table'
@@ -7,7 +7,7 @@ import DataTable from '@/components/shared/DataTable.vue'
 import DataTableColumnVisibility from '@/components/shared/DataTableColumnVisibility.vue'
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Button } from '@/components/ui/button'
-import { useListComands } from '@/composables/use-comand'
+import { useListComandsQuery } from '@/composables/use-command'
 import { AlertCircle, Loader, RefreshCw } from 'lucide-vue-next'
 import { columns } from './components/commands-table'
 
@@ -21,7 +21,7 @@ const sorts = ref<SortPrefix<CommandSort>[]>(
   route.query.sorts ? (route.query.sorts as string).split(',') as SortPrefix<CommandSort>[] : [],
 )
 
-const { data, isPending, isFetching, isError, error, refetch } = useListComands(page, pageSize, sorts)
+const { data, isPending, isFetching, isError, error, refetch } = useListComandsQuery(page, pageSize, sorts)
 
 function handleSortingChange(s: SortPrefix<CommandSort>[]) {
   sorts.value = s

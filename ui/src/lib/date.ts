@@ -1,3 +1,8 @@
+import dayjs from 'dayjs'
+import relativeTime from 'dayjs/plugin/relativeTime'
+
+dayjs.extend(relativeTime)
+
 /**
  * Formats a date string into a human-readable string.
  * @param dateString - The date string to format.
@@ -39,4 +44,9 @@ export function formatUptime(seconds: number): string {
     parts.push(`${remainingSeconds.toFixed(0)} second${remainingSeconds !== 1 ? 's' : ''}`)
 
   return parts.join(' ')
+}
+
+export function formatTimeAgo(dateStr: string) {
+  const date = dayjs(dateStr)
+  return date.isValid() ? date.fromNow() : 'Invalid date'
 }

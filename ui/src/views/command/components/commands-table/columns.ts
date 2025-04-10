@@ -2,6 +2,7 @@ import type { Command } from '@/types/command'
 import type { ColumnDef } from '@tanstack/vue-table'
 import DataTableSortableHeader from '@/components/shared/DataTableSortableHeader.vue'
 import { formatDate } from '@/lib/date'
+import { AlertCircle } from 'lucide-vue-next'
 import { h } from 'vue'
 import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
@@ -43,7 +44,14 @@ export const columns: ColumnDef<Command>[] = [
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Error' }),
     cell: ({ row }) => {
       const error = row.original.error
-      return error || '-'
+      if (!error)
+        return '-'
+
+      return h('div', { class: 'flex items-center gap-1' }, [
+        h('div', { class: 'flex-shrink-0 text-red-500' }, h(AlertCircle, { size: 18 }),
+        ),
+        h('div', { class: 'text-red-500 whitespace-pre-wrap' }, error),
+      ])
     },
     enableSorting: false,
   },

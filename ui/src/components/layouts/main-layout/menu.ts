@@ -1,6 +1,8 @@
 import type { Item } from './Navigation.vue'
 import {
   ChartBarBig,
+  Command,
+  LayoutList,
   Power,
   Settings2,
 } from 'lucide-vue-next'
@@ -11,11 +13,16 @@ export const menus: Item[] = [
     path: '/state',
     icon: ChartBarBig,
   },
-  // {
-  //   title: 'Commands',
-  //   path: '/commands',
-  //   icon: Command,
-  // },
+  {
+    title: 'Command queue',
+    path: '/command-queue',
+    icon: LayoutList,
+  },
+  {
+    title: 'Commands history',
+    path: '/command-history',
+    icon: Command,
+  },
   {
     title: 'Settings',
     path: '/settings',
