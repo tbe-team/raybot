@@ -115,6 +115,36 @@ func (r repository) ListCommands(ctx context.Context, params command.ListCommand
 	return ret, nil
 }
 
+func (r repository) GetNextExecutableCommand(ctx context.Context) (command.Command, error) {
+	row, err := r.queries.CommandGetNextExecutable(ctx, r.db)
+	if err != nil {
+		if db.IsNoRowsError(err) {
+			return command.Command{}, command.ErrNoNextExecutableCommand
+		}
+		return command.Command{}, fmt.Errorf("failed to get next executable command: %w", err)
+	}
+	return r.convertRowToCommand(row)
+}
+
+func (r repository) GetCommandByID(ctx context.Context, id int64) (command.Command, error) {
+	row, err := r.queries.CommandGetByID(ctx, r.db, id)
+	if err != nil {
+		if db.IsNoRowsError(err) {
+			return command.Command{}, command.ErrCommandNotFound
+		}
+		return command.Command{}, fmt.Errorf("failed to get command by id: %w", err)
+	}
+	return r.convertRowToCommand(row)
+}
+
+func (r repository) CommandProcessingExists(ctx context.Context) (bool, error) {
+	exists, err := r.queries.CommandProcessingExists(ctx, r.db)
+	if err != nil {
+		return false, fmt.Errorf("failed to check if command processing exists: %w", err)
+	}
+	return exists == 1, nil
+}
+
 func (r repository) CreateCommand(ctx context.Context, commandArg command.Command) (command.Command, error) {
 	inputsBytes, err := json.Marshal(commandArg.Inputs)
 	if err != nil {
@@ -143,6 +173,29 @@ func (r repository) CreateCommand(ctx context.Context, commandArg command.Comman
 	commandArg.ID = id
 
 	return commandArg, nil
+}
+
+func (r repository) UpdateCommand(ctx context.Context, params command.UpdateCommandParams) (command.Command, error) {
+	var completedAt *string
+	if params.CompletedAt != nil {
+		completedAt = ptr.New(params.CompletedAt.Format(time.RFC3339))
+	}
+
+	row, err := r.queries.CommandUpdate(ctx, r.db, sqlc.CommandUpdateParams{
+		ID:             params.ID,
+		Status:         params.Status.String(),
+		SetStatus:      params.SetStatus,
+		Error:          params.Error,
+		SetError:       params.SetError,
+		CompletedAt:    completedAt,
+		SetCompletedAt: params.SetCompletedAt,
+		UpdatedAt:      params.UpdatedAt.Format(time.RFC3339),
+	})
+	if err != nil {
+		return command.Command{}, fmt.Errorf("queries update command: %w", err)
+	}
+
+	return r.convertRowToCommand(row)
 }
 
 func (repository) convertRowToCommand(row sqlc.Command) (command.Command, error) {

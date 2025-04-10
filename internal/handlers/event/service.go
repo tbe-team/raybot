@@ -6,12 +6,14 @@ import (
 
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/appstate"
+	"github.com/tbe-team/raybot/internal/services/command"
 )
 
 type Service struct {
 	log *slog.Logger
 
 	appStateService appstate.Service
+	commandService  command.Service
 }
 
 type CleanupFunc func(context.Context) error
@@ -19,10 +21,12 @@ type CleanupFunc func(context.Context) error
 func New(
 	log *slog.Logger,
 	appStateService appstate.Service,
+	commandService command.Service,
 ) *Service {
 	return &Service{
 		log:             log.With("service", "event"),
 		appStateService: appStateService,
+		commandService:  commandService,
 	}
 }
 
@@ -35,6 +39,7 @@ func (s *Service) Run(_ context.Context) (CleanupFunc, error) {
 	events.PICSerialDisconnectedSignal.AddListener(s.HandlePICSerialDisconnectedEvent)
 	events.RFIDUSBConnectedSignal.AddListener(s.HandleRFIDUSBConnectedEvent)
 	events.RFIDUSBDisconnectedSignal.AddListener(s.HandleRFIDUSBDisconnectedEvent)
+	events.CommandCreatedSignal.AddListener(s.HandleCommandCreatedEvent)
 
 	cleanup := func(_ context.Context) error {
 		return nil

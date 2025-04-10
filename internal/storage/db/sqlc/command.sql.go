@@ -60,13 +60,80 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 	return id, err
 }
 
+const commandGetByID = `-- name: CommandGetByID :one
+SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at FROM commands
+WHERE id = ?1
+`
+
+func (q *Queries) CommandGetByID(ctx context.Context, db DBTX, id int64) (Command, error) {
+	row := db.QueryRowContext(ctx, commandGetByID, id)
+	var i Command
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Status,
+		&i.Source,
+		&i.Inputs,
+		&i.Error,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const commandGetNextExecutable = `-- name: CommandGetNextExecutable :one
+SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at FROM commands
+WHERE
+	status IN ('QUEUED', 'PROCESSING')
+ORDER BY
+	CASE status
+		WHEN 'PROCESSING' THEN 0
+		WHEN 'QUEUED' THEN 1
+	END ASC,
+	created_at ASC
+LIMIT 1
+`
+
+func (q *Queries) CommandGetNextExecutable(ctx context.Context, db DBTX) (Command, error) {
+	row := db.QueryRowContext(ctx, commandGetNextExecutable)
+	var i Command
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Status,
+		&i.Source,
+		&i.Inputs,
+		&i.Error,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
+const commandProcessingExists = `-- name: CommandProcessingExists :one
+SELECT EXISTS (
+	SELECT 1 FROM commands
+	WHERE status = 'PROCESSING'
+)
+`
+
+func (q *Queries) CommandProcessingExists(ctx context.Context, db DBTX) (int64, error) {
+	row := db.QueryRowContext(ctx, commandProcessingExists)
+	var column_1 int64
+	err := row.Scan(&column_1)
+	return column_1, err
+}
+
 const commandUpdate = `-- name: CommandUpdate :one
 UPDATE commands
 SET
 	status = CASE WHEN ?1 = 1 THEN ?2 ELSE status END,
 	error = CASE WHEN ?3 IS NOT NULL THEN ?4 ELSE error END,
-	completed_at = CASE WHEN ?5 IS NOT NULL THEN ?6 ELSE completed_at END
-WHERE id = ?7
+	completed_at = CASE WHEN ?5 IS NOT NULL THEN ?6 ELSE completed_at END,
+	updated_at = ?7
+WHERE id = ?8
 RETURNING id, type, status, source, inputs, error, completed_at, created_at, updated_at
 `
 
@@ -77,6 +144,7 @@ type CommandUpdateParams struct {
 	Error          *string     `json:"error"`
 	SetCompletedAt interface{} `json:"set_completed_at"`
 	CompletedAt    *string     `json:"completed_at"`
+	UpdatedAt      string      `json:"updated_at"`
 	ID             int64       `json:"id"`
 }
 
@@ -88,6 +156,7 @@ func (q *Queries) CommandUpdate(ctx context.Context, db DBTX, arg CommandUpdateP
 		arg.Error,
 		arg.SetCompletedAt,
 		arg.CompletedAt,
+		arg.UpdatedAt,
 		arg.ID,
 	)
 	var i Command

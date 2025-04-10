@@ -15,6 +15,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/cargo/cargoimpl"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/command/commandimpl"
+	"github.com/tbe-team/raybot/internal/services/command/executor"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/services/config/configimpl"
 	"github.com/tbe-team/raybot/internal/services/dashboarddata"
@@ -126,7 +127,9 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	)
 	appStateService := appstateimpl.NewService(appStateRepository)
 	peripheralService := peripheralimpl.NewService()
-	commandService := commandimpl.NewService(validator, commandRepository)
+
+	dispatcher := executor.NewDispatcher(log, driveMotorService)
+	commandService := commandimpl.NewService(log, validator, commandRepository, appStateRepository, dispatcher)
 
 	cleanup := func() error {
 		return db.Close()
