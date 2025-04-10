@@ -12,6 +12,7 @@ func startPICSerial(app *application.Application, interruptChan <-chan any, read
 	service := picserial.New(
 		app.Cfg.Hardware.PIC,
 		app.Log,
+		app.PICSerialClient,
 		app.BatteryService,
 		app.DistanceSensorService,
 		app.LiftMotorService,

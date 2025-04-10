@@ -3,7 +3,6 @@ package drivemotorimpl
 import (
 	"context"
 	"sync"
-	"time"
 
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 )
@@ -27,15 +26,29 @@ func (r *driveMotorStateRepository) GetDriveMotorState(_ context.Context) (drive
 }
 
 func (r *driveMotorStateRepository) UpdateDriveMotorState(_ context.Context, params drivemotor.UpdateDriveMotorStateParams) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	r.mu.RLock()
+	state := r.driveMotor
+	r.mu.RUnlock()
 
-	r.driveMotor = drivemotor.DriveMotorState{
-		Direction: params.Direction,
-		Speed:     params.Speed,
-		IsRunning: params.IsRunning,
-		Enabled:   params.Enabled,
-		UpdatedAt: time.Now(),
+	if params.SetDirection {
+		state.Direction = params.Direction
 	}
+
+	if params.SetSpeed {
+		state.Speed = params.Speed
+	}
+
+	if params.SetIsRunning {
+		state.IsRunning = params.IsRunning
+	}
+
+	if params.SetEnabled {
+		state.Enabled = params.Enabled
+	}
+
+	r.mu.Lock()
+	r.driveMotor = state
+	r.mu.Unlock()
+
 	return nil
 }

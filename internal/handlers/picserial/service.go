@@ -9,6 +9,7 @@ import (
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
+	"github.com/tbe-team/raybot/internal/hardware/picserial"
 	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/battery"
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
@@ -18,15 +19,14 @@ import (
 
 type Service struct {
 	cfg    config.PIC
-	client *client
 	log    *slog.Logger
+	client picserial.Client
 
 	batteryService        battery.Service
 	distanceSensorService distancesensor.Service
 	liftMotorService      liftmotor.Service
 	driveMotorService     drivemotor.Service
 	appStateService       appstate.Service
-	commandStore          *commandStore
 }
 
 type CleanupFunc func(context.Context) error
@@ -34,6 +34,7 @@ type CleanupFunc func(context.Context) error
 func New(
 	cfg config.PIC,
 	log *slog.Logger,
+	client picserial.Client,
 	batteryService battery.Service,
 	distanceSensorService distancesensor.Service,
 	liftMotorService liftmotor.Service,
@@ -42,39 +43,22 @@ func New(
 ) *Service {
 	s := &Service{
 		cfg:                   cfg,
-		client:                newClient(cfg.Serial),
+		client:                client,
 		log:                   log.With("service", "picserial"),
 		batteryService:        batteryService,
 		distanceSensorService: distanceSensorService,
 		liftMotorService:      liftMotorService,
 		driveMotorService:     driveMotorService,
 		appStateService:       appStateService,
-		commandStore:          newCommandStore(),
 	}
-
-	events.UpdateBatteryChargeSettingSignal.AddListener(s.HandleUpdateBatteryChargeSettingEvent)
-	events.UpdateBatteryDischargeSettingSignal.AddListener(s.HandleUpdateBatteryDischargeSettingEvent)
-	events.UpdateLiftMotorStateSignal.AddListener(s.HandleUpdateLiftMotorStateEvent)
-	events.UpdateDriveMotorStateSignal.AddListener(s.HandleUpdateDriveMotorStateEvent)
 
 	return s
 }
 
 func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
-	if err := s.client.Open(); err != nil {
-		// We don't want to fail the service if the serial client fails to open
-		s.log.Error("failed to open PIC serial client",
-			slog.Any("serial_cfg", s.client.cfg),
-			slog.Any("error", err),
-		)
-		events.PICSerialDisconnectedSignal.Emit(ctx, events.PICSerialDisconnectedEvent{
-			Error: err,
-		})
-
+	if !s.client.Connected() {
 		return func(_ context.Context) error { return nil }, nil
 	}
-
-	events.PICSerialConnectedSignal.Emit(ctx, events.PICSerialConnectedEvent{})
 
 	ctx, cancel := context.WithCancel(ctx)
 	go s.readLoop(ctx)
@@ -129,14 +113,6 @@ func (s *Service) routeMessage(ctx context.Context, msg []byte) {
 		}
 
 	case messageTypeACK:
-		var commandACKMsg commandACKMessage
-		if err := json.Unmarshal(msg, &commandACKMsg); err != nil {
-			s.log.Error("failed to unmarshal command ack message", slog.Any("error", err), slog.Any("message", msg))
-			return
-		}
-		if err := s.HandleCommandACK(ctx, commandACKMsg); err != nil {
-			s.log.Error("failed to handle command ack message", slog.Any("error", err), slog.Any("message", msg))
-		}
 
 	default:
 		s.log.Error("unknown message type", slog.Any("type", temp.Type))

@@ -47,10 +47,14 @@ func (s *Service) HandleSyncState(ctx context.Context, msg syncStateMessage) err
 		}
 
 		if err := s.cargoService.UpdateCargoDoorMotorState(ctx, cargo.UpdateCargoDoorMotorStateParams{
-			Direction: direction,
-			Speed:     temp.Speed,
-			IsRunning: temp.IsRunning == 1,
-			Enabled:   temp.Enabled == 1,
+			Direction:    direction,
+			SetDirection: true,
+			Speed:        temp.Speed,
+			SetSpeed:     true,
+			IsRunning:    temp.IsRunning == 1,
+			SetIsRunning: true,
+			Enabled:      temp.Enabled == 1,
+			SetEnabled:   true,
 		}); err != nil {
 			return fmt.Errorf("failed to sync motor state: %w", err)
 		}

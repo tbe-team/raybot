@@ -9,16 +9,16 @@ import (
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
+	"github.com/tbe-team/raybot/internal/hardware/espserial"
 	"github.com/tbe-team/raybot/internal/services/cargo"
 )
 
 type Service struct {
 	cfg    config.ESP
-	client *client
 	log    *slog.Logger
+	client espserial.Client
 
 	cargoService cargo.Service
-	commandStore *commandStore
 }
 
 type CleanupFunc func(context.Context) error
@@ -26,36 +26,23 @@ type CleanupFunc func(context.Context) error
 func New(
 	cfg config.ESP,
 	log *slog.Logger,
+	client espserial.Client,
 	cargoService cargo.Service,
 ) *Service {
 	s := &Service{
 		cfg:          cfg,
-		client:       newClient(cfg.Serial),
+		client:       client,
 		log:          log.With("service", "espserial"),
 		cargoService: cargoService,
-		commandStore: newCommandStore(),
 	}
-
-	events.CloseCargoDoorSignal.AddListener(s.HandleCloseCargoDoorEvent)
-	events.OpenCargoDoorSignal.AddListener(s.HandleOpenCargoDoorEvent)
 
 	return s
 }
 
 func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
-	if err := s.client.Open(); err != nil {
-		// We don't want to fail the service if the serial client fails to open
-		s.log.Error("failed to open ESP serial client",
-			slog.Any("serial_cfg", s.client.cfg),
-			slog.Any("error", err),
-		)
-		events.ESPSerialDisconnectedSignal.Emit(ctx, events.ESPSerialDisconnectedEvent{
-			Error: err,
-		})
+	if !s.client.Connected() {
 		return func(_ context.Context) error { return nil }, nil
 	}
-
-	events.ESPSerialConnectedSignal.Emit(ctx, events.ESPSerialConnectedEvent{})
 
 	ctx, cancel := context.WithCancel(ctx)
 	go s.readLoop(ctx)
@@ -63,7 +50,7 @@ func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
 	cleanup := func(_ context.Context) error {
 		// Cancel read loop before closing the serial client
 		cancel()
-		return s.client.Close()
+		return nil
 	}
 
 	return cleanup, nil
@@ -111,15 +98,6 @@ func (s *Service) routeMessage(ctx context.Context, msg []byte) {
 		}
 
 	case messageTypeACK:
-		var commandACKMsg commandACKMessage
-		if err := json.Unmarshal(msg, &commandACKMsg); err != nil {
-			s.log.Error("failed to unmarshal command ack message", slog.Any("error", err), slog.Any("message", msg))
-			return
-		}
-
-		if err := s.HandleCommandACK(ctx, commandACKMsg); err != nil {
-			s.log.Error("failed to handle command ack message", slog.Any("error", err), slog.Any("message", msg))
-		}
 	}
 }
 

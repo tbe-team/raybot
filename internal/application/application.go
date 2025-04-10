@@ -7,6 +7,8 @@ import (
 	"time"
 
 	"github.com/tbe-team/raybot/internal/config"
+	"github.com/tbe-team/raybot/internal/hardware/espserial"
+	"github.com/tbe-team/raybot/internal/hardware/picserial"
 	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/appstate/appstateimpl"
 	"github.com/tbe-team/raybot/internal/services/battery"
@@ -36,6 +38,7 @@ import (
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/internal/storage/file"
 	"github.com/tbe-team/raybot/pkg/log"
+	"github.com/tbe-team/raybot/pkg/ptr"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -43,6 +46,9 @@ type Application struct {
 	Cfg     *config.Config
 	Log     *slog.Logger
 	Context context.Context
+
+	ESPSerialClient espserial.Client
+	PICSerialClient picserial.Client
 
 	BatteryService        battery.Service
 	DistanceSensorService distancesensor.Service
@@ -92,10 +98,9 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		return nil, nil, fmt.Errorf("failed to migrate db: %w", err)
 	}
 
+	// Initialize repositories
 	queries := sqlc.New()
 	validator := validator.New()
-
-	// Initialize repositories
 	batteryStateRepository := batteryimpl.NewBatteryStateRepository()
 	batterySettingRepository := batteryimpl.NewBatterySettingRepository(db, queries)
 	driveMotorStateRepository := drivemotorimpl.NewDriveMotorStateRepository()
@@ -106,12 +111,65 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	appStateRepository := appstateimpl.NewAppStateRepository()
 	commandRepository := commandimpl.NewCommandRepository(db, queries)
 
+	// Initialize hardware components
+	espSerialClient := espserial.NewClient(cfg.Hardware.ESP.Serial)
+	if err := espSerialClient.Open(); err != nil {
+		log.Error("failed to open ESP serial client",
+			slog.Any("serial_cfg", cfg.Hardware.ESP.Serial),
+			slog.Any("error", err),
+		)
+
+		if err := appStateRepository.UpdateESPSerialConnection(ctx, appstate.UpdateESPSerialConnectionParams{
+			Connected:    false,
+			SetConnected: true,
+			Error:        ptr.New(err.Error()),
+			SetError:     true,
+		}); err != nil {
+			log.Error("failed to update ESP serial connection", slog.Any("error", err))
+		}
+	} else {
+		if err := appStateRepository.UpdateESPSerialConnection(ctx, appstate.UpdateESPSerialConnectionParams{
+			Connected:          true,
+			SetConnected:       true,
+			LastConnectedAt:    ptr.New(time.Now()),
+			SetLastConnectedAt: true,
+		}); err != nil {
+			log.Error("failed to update ESP serial connection", slog.Any("error", err))
+		}
+	}
+
+	picSerialClient := picserial.NewClient(cfg.Hardware.PIC.Serial)
+	if err := picSerialClient.Open(); err != nil {
+		log.Error("failed to open PIC serial client",
+			slog.Any("serial_cfg", cfg.Hardware.PIC.Serial),
+			slog.Any("error", err),
+		)
+
+		if err := appStateRepository.UpdatePICSerialConnection(ctx, appstate.UpdatePICSerialConnectionParams{
+			Connected:    false,
+			SetConnected: true,
+			Error:        ptr.New(err.Error()),
+			SetError:     true,
+		}); err != nil {
+			log.Error("failed to update PIC serial connection", slog.Any("error", err))
+		}
+	} else {
+		if err := appStateRepository.UpdatePICSerialConnection(ctx, appstate.UpdatePICSerialConnectionParams{
+			Connected:          true,
+			SetConnected:       true,
+			LastConnectedAt:    ptr.New(time.Now()),
+			SetLastConnectedAt: true,
+		}); err != nil {
+			log.Error("failed to update PIC serial connection", slog.Any("error", err))
+		}
+	}
+
 	// Initialize services
 	batteryService := batteryimpl.NewService(validator, batteryStateRepository, batterySettingRepository)
 	distanceSensorService := distancesensorimpl.NewService(validator, distanceSensorStateRepository)
-	driveMotorService := drivemotorimpl.NewService(validator, driveMotorStateRepository)
-	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository)
-	cargoService := cargoimpl.NewService(validator, cargoRepository)
+	driveMotorService := drivemotorimpl.NewService(validator, driveMotorStateRepository, picSerialClient)
+	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, picSerialClient)
+	cargoService := cargoimpl.NewService(validator, cargoRepository, espSerialClient)
 	locationService := locationimpl.NewService(validator, locationRepository)
 	configService := configimpl.NewService(cfg, fileClient)
 	systemService := systemimpl.NewService(log)
@@ -132,13 +190,32 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	commandService := commandimpl.NewService(log, validator, commandRepository, appStateRepository, dispatcher)
 
 	cleanup := func() error {
-		return db.Close()
+		var err error
+		if espSerialClient.Connected() {
+			if espErr := espSerialClient.Close(); espErr != nil {
+				err = fmt.Errorf("failed to close ESP serial client: %w", espErr)
+			}
+		}
+
+		if picSerialClient.Connected() {
+			if picErr := picSerialClient.Close(); picErr != nil {
+				err = fmt.Errorf("failed to close PIC serial client: %w", picErr)
+			}
+		}
+
+		if dbErr := db.Close(); dbErr != nil {
+			err = fmt.Errorf("failed to close db: %w", dbErr)
+		}
+
+		return err
 	}
 
 	return &Application{
 		Cfg:                   cfg,
 		Log:                   log,
 		Context:               ctx,
+		ESPSerialClient:       espSerialClient,
+		PICSerialClient:       picSerialClient,
 		BatteryService:        batteryService,
 		DistanceSensorService: distanceSensorService,
 		DriveMotorService:     driveMotorService,

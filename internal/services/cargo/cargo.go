@@ -15,10 +15,14 @@ type UpdateCargoBottomDistanceParams struct {
 }
 
 type UpdateCargoDoorMotorStateParams struct {
-	Direction DoorDirection `validate:"enum"`
-	Speed     uint8         `validate:"min=0,max=100"`
-	IsRunning bool
-	Enabled   bool
+	Direction    DoorDirection `validate:"enum"`
+	SetDirection bool
+	Speed        uint8 `validate:"min=0,max=100"`
+	SetSpeed     bool
+	IsRunning    bool
+	SetIsRunning bool
+	Enabled      bool
+	SetEnabled   bool
 }
 
 type Service interface {
@@ -26,6 +30,9 @@ type Service interface {
 	UpdateCargoQRCode(ctx context.Context, params UpdateCargoQRCodeParams) error
 	UpdateCargoBottomDistance(ctx context.Context, params UpdateCargoBottomDistanceParams) error
 	UpdateCargoDoorMotorState(ctx context.Context, params UpdateCargoDoorMotorStateParams) error
+
+	OpenCargoDoor(ctx context.Context) error
+	CloseCargoDoor(ctx context.Context) error
 }
 
 type Repository interface {
