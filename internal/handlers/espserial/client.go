@@ -8,7 +8,10 @@ import (
 	"go.bug.st/serial"
 
 	"github.com/tbe-team/raybot/internal/config"
+	"github.com/tbe-team/raybot/pkg/xerror"
 )
+
+var ErrESPSerialNotConnected = xerror.NotFound(nil, "espserial.notConnected", "ESP serial not connected")
 
 const readBufferSize = 64
 
@@ -70,6 +73,10 @@ func (c *client) Close() error {
 }
 
 func (c *client) Write(data []byte) error {
+	if c.port == nil {
+		return ErrESPSerialNotConnected
+	}
+
 	data = append([]byte(">"), data...)
 	data = append(data, '\r', '\n')
 
@@ -82,6 +89,10 @@ func (c *client) Write(data []byte) error {
 
 // Read reads data from the serial port.
 func (c *client) Read() ([]byte, error) {
+	if c.port == nil {
+		return nil, ErrESPSerialNotConnected
+	}
+
 	return c.read()
 }
 

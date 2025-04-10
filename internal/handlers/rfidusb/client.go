@@ -4,7 +4,11 @@ import (
 	"fmt"
 
 	"github.com/karalabe/hid"
+
+	"github.com/tbe-team/raybot/pkg/xerror"
 )
+
+var ErrRFIDUSBNotConnected = xerror.NotFound(nil, "rfidusb.notConnected", "RFID USB not connected")
 
 const (
 	vendorID  = 0x1a86
@@ -52,6 +56,10 @@ func (c *client) Open() error {
 }
 
 func (c *client) Read() (string, error) {
+	if c.device == nil {
+		return "", ErrRFIDUSBNotConnected
+	}
+
 	tag := []byte{}
 
 	for {
@@ -75,5 +83,9 @@ func (c *client) Read() (string, error) {
 }
 
 func (c *client) Close() error {
+	if c.device == nil {
+		return nil
+	}
+
 	return c.device.Close()
 }
