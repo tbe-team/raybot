@@ -40,7 +40,7 @@ func NewService(
 		dispatcher:        dispatcher,
 	}
 
-	go s.resumeExecutableCommand(context.Background())
+	go s.runExecutableCommand(context.Background())
 
 	return s
 }
@@ -58,15 +58,18 @@ func (s service) CreateCommand(ctx context.Context, params command.CreateCommand
 		return command.Command{}, fmt.Errorf("validate params: %w", err)
 	}
 
+	slog.Error("before create command", "params", params)
 	cmd := command.NewCommand(params.Source, params.Inputs)
 	cmd, err := s.commandRepository.CreateCommand(ctx, cmd)
 	if err != nil {
 		return command.Command{}, fmt.Errorf("create command: %w", err)
 	}
+	slog.Error("after create command", "cmd", cmd)
 
 	events.CommandCreatedSignal.Emit(ctx, events.CommandCreatedEvent{
 		CommandID: cmd.ID,
 	})
+	slog.Error("after emit command created signal", "cmd", cmd)
 
 	return cmd, nil
 }
@@ -105,7 +108,7 @@ func (s service) ExecuteCreatedCommand(ctx context.Context, params command.Execu
 	return nil
 }
 
-func (s service) resumeExecutableCommand(ctx context.Context) {
+func (s service) runExecutableCommand(ctx context.Context) {
 	s.log.Debug("waiting for hardware components to be initialized then resuming executable command")
 	s.waitForHardwareComponentsInitialized(ctx)
 
@@ -183,4 +186,6 @@ func (s service) executeCommand(ctx context.Context, cmd command.Command) {
 			s.log.Error("failed to update command status to succeeded", slog.Any("error", err))
 		}
 	}
+
+	// TODO: publish command completed event
 }

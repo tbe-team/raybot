@@ -33,25 +33,25 @@ func NewDispatcher(
 func (d dispatcher) Dispatch(ctx context.Context, cmd command.Command) error {
 	switch cmd.Type {
 	case command.CommandTypeMoveTo:
-		i, ok := cmd.Inputs.(command.MoveToInputs)
+		i, ok := cmd.Inputs.(*command.MoveToInputs)
 		if !ok {
 			return fmt.Errorf("invalid move to inputs: %v", cmd.Inputs)
 		}
-		return d.moveToExecutor.Execute(ctx, i)
+		return d.moveToExecutor.Execute(ctx, *i)
 
 	case command.CommandTypeMoveForward:
-		i, ok := cmd.Inputs.(command.MoveForwardInputs)
+		i, ok := cmd.Inputs.(*command.MoveForwardInputs)
 		if !ok {
 			return fmt.Errorf("invalid move forward inputs: %v", cmd.Inputs)
 		}
-		return d.moveForwardExecutor.Execute(ctx, i)
+		return d.moveForwardExecutor.Execute(ctx, *i)
 
 	case command.CommandTypeMoveBackward:
-		i, ok := cmd.Inputs.(command.MoveBackwardInputs)
+		i, ok := cmd.Inputs.(*command.MoveBackwardInputs)
 		if !ok {
 			return fmt.Errorf("invalid move backward inputs: %v", cmd.Inputs)
 		}
-		return d.moveBackwardExecutor.Execute(ctx, i)
+		return d.moveBackwardExecutor.Execute(ctx, *i)
 
 	default:
 		return fmt.Errorf("unknown command type: %s", cmd.Type)

@@ -20,12 +20,10 @@ func newMoveForwardExecutor(
 }
 
 func (e moveForwardExecutor) Execute(ctx context.Context, _ command.MoveForwardInputs) error {
-	if err := e.driveMotorService.UpdateDriveMotorState(ctx, drivemotor.UpdateDriveMotorStateParams{
-		Direction: drivemotor.DirectionForward,
-		Speed:     100,
-		Enabled:   true,
+	if err := e.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
+		Speed: 100,
 	}); err != nil {
-		return NewExecutorError(err, "failed to update drive motor state, (start driving forward)")
+		return NewExecutorError(err, "failed to move forward")
 	}
 	return nil
 }

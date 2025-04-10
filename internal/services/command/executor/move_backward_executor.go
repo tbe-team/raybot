@@ -20,12 +20,10 @@ func newMoveBackwardExecutor(
 }
 
 func (e moveBackwardExecutor) Execute(ctx context.Context, _ command.MoveBackwardInputs) error {
-	if err := e.driveMotorService.UpdateDriveMotorState(ctx, drivemotor.UpdateDriveMotorStateParams{
-		Direction: drivemotor.DirectionBackward,
-		Speed:     100,
-		Enabled:   true,
+	if err := e.driveMotorService.MoveBackward(ctx, drivemotor.MoveBackwardParams{
+		Speed: 100,
 	}); err != nil {
-		return NewExecutorError(err, "failed to update drive motor state, (start driving backward)")
+		return NewExecutorError(err, "failed to move backward")
 	}
 	return nil
 }

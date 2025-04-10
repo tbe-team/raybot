@@ -10,6 +10,8 @@ import (
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 )
 
+const locationTrackingKey = "location:tracking"
+
 type moveToExecutor struct {
 	log               *slog.Logger
 	driveMotorService drivemotor.Service
@@ -37,42 +39,40 @@ func (e moveToExecutor) Execute(ctx context.Context, inputs command.MoveToInputs
 	}()
 
 	// start driving
-	if err := e.driveMotorService.UpdateDriveMotorState(ctx, drivemotor.UpdateDriveMotorStateParams{
-		Direction: drivemotor.DirectionForward,
-		Speed:     100,
-		Enabled:   true,
+	if err := e.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
+		Speed: 100,
 	}); err != nil {
-		return NewExecutorError(err, "failed to update drive motor state, (start driving)")
+		return NewExecutorError(err, "failed to move forward")
 	}
 
 	// wait for location tracking to finish
 	wg.Wait()
 
 	// stop driving
-	if err := e.driveMotorService.UpdateDriveMotorState(ctx, drivemotor.UpdateDriveMotorStateParams{
-		Direction: drivemotor.DirectionForward,
-		Speed:     0,
-		Enabled:   true,
-	}); err != nil {
-		return NewExecutorError(err, "failed to update drive motor state, (stop driving)")
+	if err := e.driveMotorService.Stop(ctx); err != nil {
+		return NewExecutorError(err, "failed to stop driving")
 	}
 
 	return nil
 }
 
 func (e moveToExecutor) trackingLocation(ctx context.Context, location string) {
-	locationTrackingKey := "location:tracking"
-	doneCh := make(chan struct{})
-	defer events.UpdateLocationSignal.RemoveListener(locationTrackingKey)
+	e.log.Debug("start tracking location", slog.String("location", location))
 
-	var once sync.Once
+	doneCh := make(chan struct{})
+
+	defer func() {
+		e.log.Debug("stop tracking location", slog.String("location", location))
+		events.UpdateLocationSignal.RemoveListener(locationTrackingKey)
+	}()
+
+	// var once sync.Once
 
 	fn := func(_ context.Context, ev events.UpdateLocationEvent) {
 		if ev.CurrentLocation == location {
 			e.log.Info("location reached", slog.String("location", ev.CurrentLocation))
-			once.Do(func() {
-				close(doneCh)
-			})
+			close(doneCh)
+
 		}
 	}
 

@@ -91,8 +91,8 @@ func UnmarshalInputs(cmdType CommandType, inputsBytes []byte) (Inputs, error) {
 		inputs = &MoveBackwardInputs{}
 
 	case CommandTypeMoveTo:
-		var i MoveToInputs
-		if err := json.Unmarshal(inputsBytes, &i); err != nil {
+		i := &MoveToInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal move to inputs: %w", err)
 		}
 		inputs = i
@@ -110,8 +110,8 @@ func UnmarshalInputs(cmdType CommandType, inputsBytes []byte) (Inputs, error) {
 		inputs = &CargoLowerInputs{}
 
 	case CommandTypeCargoCheckQR:
-		var i CargoCheckQRInputs
-		if err := json.Unmarshal(inputsBytes, &i); err != nil {
+		i := &CargoCheckQRInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
 			return nil, fmt.Errorf("failed to unmarshal cargo check qr inputs: %w", err)
 		}
 		inputs = i
