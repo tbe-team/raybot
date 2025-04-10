@@ -1,4 +1,4 @@
-FROM node:20 AS ui-builder
+FROM node:22 AS ui-builder
 
 WORKDIR /app/ui
 
