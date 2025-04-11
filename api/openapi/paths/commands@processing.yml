@@ -1,0 +1,21 @@
+get:
+  summary: Get current processing command
+  operationId: getCurrentProcessingCommand
+  description: Get the command that is currently being processed
+  tags:
+    - commands
+  responses:
+    '200':
+      description: The command
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/command.yml#/CommandResponse'
+    '404':
+      description: No command is currently being processed
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/error.yml#/ErrorResponse'
+
+

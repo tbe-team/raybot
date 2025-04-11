@@ -2,6 +2,11 @@
 SELECT * FROM commands
 WHERE id = @id;
 
+-- name: CommandGetProcessing :one
+SELECT * FROM commands
+WHERE status = 'PROCESSING'
+LIMIT 1;
+
 -- name: CommandGetNextExecutable :one
 SELECT * FROM commands
 WHERE

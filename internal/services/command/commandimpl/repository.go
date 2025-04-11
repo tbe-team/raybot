@@ -126,6 +126,17 @@ func (r repository) GetNextExecutableCommand(ctx context.Context) (command.Comma
 	return r.convertRowToCommand(row)
 }
 
+func (r repository) GetCurrentProcessingCommand(ctx context.Context) (command.Command, error) {
+	row, err := r.queries.CommandGetProcessing(ctx, r.db)
+	if err != nil {
+		if db.IsNoRowsError(err) {
+			return command.Command{}, command.ErrCommandNotFound
+		}
+		return command.Command{}, fmt.Errorf("failed to get current processing command: %w", err)
+	}
+	return r.convertRowToCommand(row)
+}
+
 func (r repository) GetCommandByID(ctx context.Context, id int64) (command.Command, error) {
 	row, err := r.queries.CommandGetByID(ctx, r.db, id)
 	if err != nil {

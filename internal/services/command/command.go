@@ -35,6 +35,7 @@ type ExecuteCreatedCommandParams struct {
 
 type Service interface {
 	GetCommandByID(ctx context.Context, params GetCommandByIDParams) (Command, error)
+	GetCurrentProcessingCommand(ctx context.Context) (Command, error)
 	ListCommands(ctx context.Context, params ListCommandsParams) (paging.List[Command], error)
 	CreateCommand(ctx context.Context, params CreateCommandParams) (Command, error)
 	// CancelCommand(ctx context.Context, id int64) error
@@ -57,6 +58,7 @@ type UpdateCommandParams struct {
 type Repository interface {
 	ListCommands(ctx context.Context, params ListCommandsParams) (paging.List[Command], error)
 	GetNextExecutableCommand(ctx context.Context) (Command, error)
+	GetCurrentProcessingCommand(ctx context.Context) (Command, error)
 	CommandProcessingExists(ctx context.Context) (bool, error)
 	GetCommandByID(ctx context.Context, id int64) (Command, error)
 	CreateCommand(ctx context.Context, command Command) (Command, error)

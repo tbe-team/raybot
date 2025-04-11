@@ -39,6 +39,20 @@ func (h commandHandler) GetCommandById(ctx context.Context, request gen.GetComma
 	return gen.GetCommandById200JSONResponse(res), nil
 }
 
+func (h commandHandler) GetCurrentProcessingCommand(ctx context.Context, _ gen.GetCurrentProcessingCommandRequestObject) (gen.GetCurrentProcessingCommandResponseObject, error) {
+	cmd, err := h.commandService.GetCurrentProcessingCommand(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("get current processing command: %w", err)
+	}
+
+	res, err := h.convertCommandToResponse(cmd)
+	if err != nil {
+		return nil, fmt.Errorf("convert command to response: %w", err)
+	}
+
+	return gen.GetCurrentProcessingCommand200JSONResponse(res), nil
+}
+
 func (h commandHandler) ListCommands(ctx context.Context, req gen.ListCommandsRequestObject) (gen.ListCommandsResponseObject, error) {
 	page := uint(1)
 	pageSize := uint(10)

@@ -112,6 +112,29 @@ func (q *Queries) CommandGetNextExecutable(ctx context.Context, db DBTX) (Comman
 	return i, err
 }
 
+const commandGetProcessing = `-- name: CommandGetProcessing :one
+SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at FROM commands
+WHERE status = 'PROCESSING'
+LIMIT 1
+`
+
+func (q *Queries) CommandGetProcessing(ctx context.Context, db DBTX) (Command, error) {
+	row := db.QueryRowContext(ctx, commandGetProcessing)
+	var i Command
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Status,
+		&i.Source,
+		&i.Inputs,
+		&i.Error,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+	)
+	return i, err
+}
+
 const commandProcessingExists = `-- name: CommandProcessingExists :one
 SELECT EXISTS (
 	SELECT 1 FROM commands
