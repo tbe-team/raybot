@@ -15,21 +15,23 @@ import (
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/handlers/cloud/interceptor"
+	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
 type Service struct {
 	cfg config.Cloud
+	log *slog.Logger
+
+	publisher eventbus.Publisher
 
 	conn                *grpc.ClientConn
 	reverseTunnelServer *grpctunnel.ReverseTunnelServer
 	closing             atomic.Bool
-
-	log *slog.Logger
 }
 
 type CleanupFunc func(context.Context) error
 
-func New(cfg config.Cloud, log *slog.Logger) (*Service, error) {
+func New(cfg config.Cloud, log *slog.Logger, publisher eventbus.Publisher) (*Service, error) {
 	conn, err := grpc.NewClient(
 		cfg.Address,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
@@ -44,9 +46,10 @@ func New(cfg config.Cloud, log *slog.Logger) (*Service, error) {
 
 	return &Service{
 		cfg:                 cfg,
+		log:                 log.With("service", "cloud"),
+		publisher:           publisher,
 		conn:                conn,
 		reverseTunnelServer: reverseTunnel,
-		log:                 log,
 	}, nil
 }
 
@@ -86,7 +89,11 @@ func (s *Service) runReverseTunnel(ctx context.Context) {
 			// so we emit a connected event after 3 seconds or it will emit a disconnected event
 			// if it's not connected
 			case <-time.After(2 * time.Second):
-				events.CloudConnectedSignal.Emit(ctx, events.CloudConnectedEvent{})
+				s.publisher.Publish(
+					events.CloudConnectedTopic,
+					eventbus.NewMessage(events.CloudConnectedEvent{}),
+				)
+
 			case <-connectingErrChan:
 			}
 		}()
@@ -101,12 +108,16 @@ func (s *Service) runReverseTunnel(ctx context.Context) {
 			s.log.Error("serving reverse tunnel failed, retrying",
 				slog.Bool("started", started),
 				slog.Int("attempts", attempts),
-				slog.Duration("retryDelay", retryDelay),
+				slog.Duration("retry_delay", retryDelay),
 				slog.Any("error", err),
 			)
-			events.CloudDisconnectedSignal.Emit(ctx, events.CloudDisconnectedEvent{
-				Error: err,
-			})
+
+			s.publisher.Publish(
+				events.CloudDisconnectedTopic,
+				eventbus.NewMessage(events.CloudDisconnectedEvent{
+					Error: err,
+				}),
+			)
 
 			time.Sleep(retryDelay)
 			attempts++

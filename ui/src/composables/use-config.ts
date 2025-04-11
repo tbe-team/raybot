@@ -6,7 +6,7 @@ export const HARDWARE_CONFIG_QUERY_KEY = 'hardwareConfig'
 export const CLOUD_CONFIG_QUERY_KEY = 'cloudConfig'
 export const GRPC_CONFIG_QUERY_KEY = 'grpcConfig'
 export const HTTP_CONFIG_QUERY_KEY = 'httpConfig'
-
+export const CARGO_CONFIG_QUERY_KEY = 'cargoConfig'
 export function useLogConfigQuery() {
   return useQuery({
     queryKey: [LOG_CONFIG_QUERY_KEY],
@@ -69,5 +69,18 @@ export function useHTTPConfigQuery() {
 export function useHTTPConfigMutation() {
   return useMutation({
     mutationFn: configAPI.updateHttpConfig,
+  })
+}
+
+export function useCargoConfigQuery() {
+  return useQuery({
+    queryKey: [CARGO_CONFIG_QUERY_KEY],
+    queryFn: configAPI.getCargoConfig,
+  })
+}
+
+export function useCargoConfigMutation() {
+  return useMutation({
+    mutationFn: configAPI.updateCargoConfig,
   })
 }

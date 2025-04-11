@@ -4,14 +4,20 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/tbe-team/raybot/internal/config"
-	"github.com/tbe-team/raybot/internal/services/appconnection"
-	"github.com/tbe-team/raybot/internal/services/appconnection/appconnectionimpl"
+	"github.com/tbe-team/raybot/internal/hardware/espserial"
+	"github.com/tbe-team/raybot/internal/hardware/picserial"
+	"github.com/tbe-team/raybot/internal/services/appstate"
+	"github.com/tbe-team/raybot/internal/services/appstate/appstateimpl"
 	"github.com/tbe-team/raybot/internal/services/battery"
 	"github.com/tbe-team/raybot/internal/services/battery/batteryimpl"
 	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/cargo/cargoimpl"
+	"github.com/tbe-team/raybot/internal/services/command"
+	"github.com/tbe-team/raybot/internal/services/command/commandimpl"
+	"github.com/tbe-team/raybot/internal/services/command/executor"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/services/config/configimpl"
 	"github.com/tbe-team/raybot/internal/services/dashboarddata"
@@ -31,7 +37,9 @@ import (
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/internal/storage/file"
+	"github.com/tbe-team/raybot/pkg/eventbus"
 	"github.com/tbe-team/raybot/pkg/log"
+	"github.com/tbe-team/raybot/pkg/ptr"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -39,6 +47,11 @@ type Application struct {
 	Cfg     *config.Config
 	Log     *slog.Logger
 	Context context.Context
+
+	EventBus eventbus.EventBus
+
+	ESPSerialClient espserial.Client
+	PICSerialClient picserial.Client
 
 	BatteryService        battery.Service
 	DistanceSensorService distancesensor.Service
@@ -49,14 +62,18 @@ type Application struct {
 	ConfigService         configsvc.Service
 	SystemService         system.Service
 	DashboardDataService  dashboarddata.Service
-	AppConnectionService  appconnection.Service
+	AppStateService       appstate.Service
 	PeripheralService     peripheral.Service
+	CommandService        command.Service
 }
 
 type CleanupFunc func() error
 
 func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	ctx := context.Background()
+
+	// Set UTC timezone
+	time.Local = time.UTC
 
 	cfg, err := config.NewConfig(configFilePath, dbPath)
 	if err != nil {
@@ -84,10 +101,12 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		return nil, nil, fmt.Errorf("failed to migrate db: %w", err)
 	}
 
-	queries := sqlc.New()
-	validator := validator.New()
+	// Initialize event bus
+	eventBus := eventbus.NewInProcEventBus(log)
 
 	// Initialize repositories
+	queries := sqlc.New()
+	validator := validator.New()
 	batteryStateRepository := batteryimpl.NewBatteryStateRepository()
 	batterySettingRepository := batteryimpl.NewBatterySettingRepository(db, queries)
 	driveMotorStateRepository := drivemotorimpl.NewDriveMotorStateRepository()
@@ -95,15 +114,69 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	cargoRepository := cargoimpl.NewCargoRepository(db, queries)
 	locationRepository := locationimpl.NewLocationRepository(db, queries)
 	distanceSensorStateRepository := distancesensorimpl.NewDistanceSensorStateRepository()
-	appConnectionRepository := appconnectionimpl.NewAppConnectionRepository()
+	appStateRepository := appstateimpl.NewAppStateRepository()
+	commandRepository := commandimpl.NewCommandRepository(db, queries)
+
+	// Initialize hardware components
+	espSerialClient := espserial.NewClient(cfg.Hardware.ESP.Serial)
+	if err := espSerialClient.Open(); err != nil {
+		log.Error("failed to open ESP serial client",
+			slog.Any("serial_cfg", cfg.Hardware.ESP.Serial),
+			slog.Any("error", err),
+		)
+
+		if err := appStateRepository.UpdateESPSerialConnection(ctx, appstate.UpdateESPSerialConnectionParams{
+			Connected:    false,
+			SetConnected: true,
+			Error:        ptr.New(err.Error()),
+			SetError:     true,
+		}); err != nil {
+			log.Error("failed to update ESP serial connection", slog.Any("error", err))
+		}
+	} else {
+		if err := appStateRepository.UpdateESPSerialConnection(ctx, appstate.UpdateESPSerialConnectionParams{
+			Connected:          true,
+			SetConnected:       true,
+			LastConnectedAt:    ptr.New(time.Now()),
+			SetLastConnectedAt: true,
+		}); err != nil {
+			log.Error("failed to update ESP serial connection", slog.Any("error", err))
+		}
+	}
+
+	picSerialClient := picserial.NewClient(cfg.Hardware.PIC.Serial)
+	if err := picSerialClient.Open(); err != nil {
+		log.Error("failed to open PIC serial client",
+			slog.Any("serial_cfg", cfg.Hardware.PIC.Serial),
+			slog.Any("error", err),
+		)
+
+		if err := appStateRepository.UpdatePICSerialConnection(ctx, appstate.UpdatePICSerialConnectionParams{
+			Connected:    false,
+			SetConnected: true,
+			Error:        ptr.New(err.Error()),
+			SetError:     true,
+		}); err != nil {
+			log.Error("failed to update PIC serial connection", slog.Any("error", err))
+		}
+	} else {
+		if err := appStateRepository.UpdatePICSerialConnection(ctx, appstate.UpdatePICSerialConnectionParams{
+			Connected:          true,
+			SetConnected:       true,
+			LastConnectedAt:    ptr.New(time.Now()),
+			SetLastConnectedAt: true,
+		}); err != nil {
+			log.Error("failed to update PIC serial connection", slog.Any("error", err))
+		}
+	}
 
 	// Initialize services
 	batteryService := batteryimpl.NewService(validator, batteryStateRepository, batterySettingRepository)
 	distanceSensorService := distancesensorimpl.NewService(validator, distanceSensorStateRepository)
-	driveMotorService := drivemotorimpl.NewService(validator, driveMotorStateRepository)
-	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository)
-	cargoService := cargoimpl.NewService(validator, cargoRepository)
-	locationService := locationimpl.NewService(validator, locationRepository)
+	driveMotorService := drivemotorimpl.NewService(validator, driveMotorStateRepository, picSerialClient)
+	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, picSerialClient)
+	cargoService := cargoimpl.NewService(validator, cargoRepository, espSerialClient)
+	locationService := locationimpl.NewService(validator, eventBus, locationRepository)
 	configService := configimpl.NewService(cfg, fileClient)
 	systemService := systemimpl.NewService(log)
 	dashboardDataService := dashboarddataimpl.NewService(
@@ -114,19 +187,48 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		driveMotorStateRepository,
 		locationRepository,
 		cargoRepository,
-		appConnectionRepository,
+		appStateRepository,
 	)
-	appConnectionService := appconnectionimpl.NewService(appConnectionRepository)
+	appStateService := appstateimpl.NewService(appStateRepository)
 	peripheralService := peripheralimpl.NewService()
 
+	commandService := commandimpl.NewService(
+		log,
+		validator,
+		eventBus,
+		commandRepository,
+		appStateRepository,
+		executor.NewDispatcher(cfg.Cargo, log, eventBus, driveMotorService, cargoService, liftMotorService),
+	)
+
 	cleanup := func() error {
-		return db.Close()
+		var err error
+		if espSerialClient.Connected() {
+			if espErr := espSerialClient.Close(); espErr != nil {
+				err = fmt.Errorf("failed to close ESP serial client: %w", espErr)
+			}
+		}
+
+		if picSerialClient.Connected() {
+			if picErr := picSerialClient.Close(); picErr != nil {
+				err = fmt.Errorf("failed to close PIC serial client: %w", picErr)
+			}
+		}
+
+		if dbErr := db.Close(); dbErr != nil {
+			err = fmt.Errorf("failed to close db: %w", dbErr)
+		}
+
+		return err
 	}
 
 	return &Application{
 		Cfg:                   cfg,
 		Log:                   log,
 		Context:               ctx,
+		EventBus:              eventBus,
+		ESPSerialClient:       espSerialClient,
+		PICSerialClient:       picSerialClient,
 		BatteryService:        batteryService,
 		DistanceSensorService: distanceSensorService,
 		DriveMotorService:     driveMotorService,
@@ -136,7 +238,8 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		ConfigService:         configService,
 		SystemService:         systemService,
 		DashboardDataService:  dashboardDataService,
-		AppConnectionService:  appConnectionService,
+		AppStateService:       appStateService,
 		PeripheralService:     peripheralService,
+		CommandService:        commandService,
 	}, cleanup, nil
 }

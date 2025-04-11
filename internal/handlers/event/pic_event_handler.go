@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/tbe-team/raybot/internal/events"
-	"github.com/tbe-team/raybot/internal/services/appconnection"
+	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/pkg/ptr"
 )
 
 func (s *Service) HandlePICSerialConnectedEvent(ctx context.Context, _ events.PICSerialConnectedEvent) {
-	if err := s.appConnectionService.UpdatePICSerialConnection(ctx, appconnection.UpdateConnectionParams{
+	if err := s.appStateService.UpdatePICSerialConnection(ctx, appstate.UpdatePICSerialConnectionParams{
 		Connected:          true,
 		SetConnected:       true,
 		LastConnectedAt:    ptr.New(time.Now()),
@@ -27,7 +27,7 @@ func (s *Service) HandlePICSerialDisconnectedEvent(ctx context.Context, event ev
 		errStr = event.Error.Error()
 	}
 
-	if err := s.appConnectionService.UpdatePICSerialConnection(ctx, appconnection.UpdateConnectionParams{
+	if err := s.appStateService.UpdatePICSerialConnection(ctx, appstate.UpdatePICSerialConnectionParams{
 		Connected:    false,
 		SetConnected: true,
 		Error:        &errStr,

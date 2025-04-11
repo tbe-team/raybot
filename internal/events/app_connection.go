@@ -1,43 +1,39 @@
 package events
 
-import "github.com/maniartech/signals"
+const (
+	CloudConnectedTopic    = "cloud:connected"
+	CloudDisconnectedTopic = "cloud:disconnected"
 
-type CloudConnectedEvent struct {
-}
+	ESPSerialConnectedTopic    = "espserial:connected"
+	ESPSerialDisconnectedTopic = "espserial:disconnected"
+
+	PICSerialConnectedTopic    = "picserial:connected"
+	PICSerialDisconnectedTopic = "picserial:disconnected"
+
+	RFIDUSBConnectedTopic    = "rfidusb:connected"
+	RFIDUSBDisconnectedTopic = "rfidusb:disconnected"
+)
+
+type CloudConnectedEvent struct{}
 
 type CloudDisconnectedEvent struct {
 	Error error
 }
 
-type ESPSerialConnectedEvent struct {
-}
+type ESPSerialConnectedEvent struct{}
 
 type ESPSerialDisconnectedEvent struct {
 	Error error
 }
 
-type PICSerialConnectedEvent struct {
-}
+type PICSerialConnectedEvent struct{}
 
 type PICSerialDisconnectedEvent struct {
 	Error error
 }
 
-type RFIDUSBConnectedEvent struct {
-}
+type RFIDUSBConnectedEvent struct{}
 
 type RFIDUSBDisconnectedEvent struct {
 	Error error
 }
-
-var CloudConnectedSignal = signals.New[CloudConnectedEvent]()
-var CloudDisconnectedSignal = signals.New[CloudDisconnectedEvent]()
-
-var ESPSerialConnectedSignal = signals.New[ESPSerialConnectedEvent]()
-var ESPSerialDisconnectedSignal = signals.New[ESPSerialDisconnectedEvent]()
-
-var PICSerialConnectedSignal = signals.New[PICSerialConnectedEvent]()
-var PICSerialDisconnectedSignal = signals.New[PICSerialDisconnectedEvent]()
-
-var RFIDUSBConnectedSignal = signals.New[RFIDUSBConnectedEvent]()
-var RFIDUSBDisconnectedSignal = signals.New[RFIDUSBDisconnectedEvent]()

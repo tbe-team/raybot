@@ -23,13 +23,13 @@ gen-mock:
 	go run github.com/vektra/mockery/v2@v2.53.1 --config .mockery.yml
 
 .PHONY: gen-all
-gen-all: gen-openapi gen-proto gen-mock gen-sqlc
+gen-all: gen-openapi gen-sqlc
 
 #########################
 # Database
 #########################
 GOOSE_DRIVER=sqlite3
-GOOSE_DBSTRING="file:./.raybot/data/raybot.db"
+GOOSE_DBSTRING="file:./bin/raybot.db"
 GOOSE_MIGRATION_DIR=internal/storage/db/migration
 
 .PHONY: migrate-up

@@ -8,11 +8,22 @@ import (
 	"go.bug.st/serial"
 
 	"github.com/tbe-team/raybot/internal/config"
+	"github.com/tbe-team/raybot/pkg/xerror"
 )
+
+var ErrESPSerialNotConnected = xerror.NotFound(nil, "espserial.notConnected", "ESP serial not connected")
 
 const readBufferSize = 64
 
-type client struct {
+type Client interface {
+	Open() error
+	Close() error
+	Connected() bool
+	Write(data []byte) error
+	Read() ([]byte, error)
+}
+
+type DefaultClient struct {
 	cfg config.Serial
 
 	port serial.Port
@@ -21,7 +32,7 @@ type client struct {
 	writeMu sync.Mutex
 }
 
-func newClient(cfg config.Serial) *client {
+func NewClient(cfg config.Serial) *DefaultClient {
 	mode := serial.Mode{
 		BaudRate: cfg.BaudRate,
 		DataBits: int(cfg.DataBits),
@@ -45,13 +56,13 @@ func newClient(cfg config.Serial) *client {
 		mode.Parity = serial.EvenParity
 	}
 
-	return &client{
+	return &DefaultClient{
 		cfg:  cfg,
 		mode: mode,
 	}
 }
 
-func (c *client) Open() error {
+func (c *DefaultClient) Open() error {
 	port, err := serial.Open(c.cfg.Port, &c.mode)
 	if err != nil {
 		return fmt.Errorf("failed to open serial port: %w", err)
@@ -65,11 +76,23 @@ func (c *client) Open() error {
 	return nil
 }
 
-func (c *client) Close() error {
+func (c *DefaultClient) Close() error {
+	if c.port == nil {
+		return ErrESPSerialNotConnected
+	}
+
 	return c.port.Close()
 }
 
-func (c *client) Write(data []byte) error {
+func (c *DefaultClient) Connected() bool {
+	return c.port != nil
+}
+
+func (c *DefaultClient) Write(data []byte) error {
+	if c.port == nil {
+		return ErrESPSerialNotConnected
+	}
+
 	data = append([]byte(">"), data...)
 	data = append(data, '\r', '\n')
 
@@ -81,14 +104,18 @@ func (c *client) Write(data []byte) error {
 }
 
 // Read reads data from the serial port.
-func (c *client) Read() ([]byte, error) {
+func (c *DefaultClient) Read() ([]byte, error) {
+	if c.port == nil {
+		return nil, ErrESPSerialNotConnected
+	}
+
 	return c.read()
 }
 
 // read continuously reads from the port until a complete message is received.
 // A complete message starts with '>' and ends with CR LF (\r\n).
 // The message is returned without the prefix and suffix
-func (c *client) read() ([]byte, error) {
+func (c *DefaultClient) read() ([]byte, error) {
 	var res []byte
 	messageStarted := false
 

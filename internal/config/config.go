@@ -14,6 +14,8 @@ type Config struct {
 	GRPC     GRPC     `yaml:"grpc"`
 	HTTP     HTTP     `yaml:"http"`
 
+	Cargo Cargo `yaml:"cargo"`
+
 	ConfigFilePath string `yaml:"-"`
 	DBPath         string `yaml:"-"`
 }
@@ -37,6 +39,10 @@ func (c *Config) Validate() error {
 
 	if err := c.HTTP.Validate(); err != nil {
 		return fmt.Errorf("validate http: %w", err)
+	}
+
+	if err := c.Cargo.Validate(); err != nil {
+		return fmt.Errorf("validate cargo: %w", err)
 	}
 
 	return nil

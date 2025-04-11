@@ -50,3 +50,8 @@ export interface HTTPConfig {
   port: number
   swagger: boolean
 }
+
+export interface CargoConfig {
+  liftPosition: number
+  lowerPosition: number
+}

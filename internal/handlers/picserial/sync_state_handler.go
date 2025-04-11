@@ -102,10 +102,14 @@ func (s *Service) HandleSyncState(ctx context.Context, msg syncStateMessage) err
 		}
 
 		if err := s.liftMotorService.UpdateLiftMotorState(ctx, liftmotor.UpdateLiftMotorStateParams{
-			CurrentPosition: temp.CurrentPosition,
-			TargetPosition:  temp.TargetPosition,
-			IsRunning:       temp.IsRunning == 1,
-			Enabled:         temp.Enabled == 1,
+			CurrentPosition:    temp.CurrentPosition,
+			SetCurrentPosition: true,
+			TargetPosition:     temp.TargetPosition,
+			SetTargetPosition:  true,
+			IsRunning:          temp.IsRunning == 1,
+			SetIsRunning:       true,
+			Enabled:            temp.Enabled == 1,
+			SetEnabled:         true,
 		}); err != nil {
 			return fmt.Errorf("failed to update lift motor state: %w", err)
 		}
@@ -132,10 +136,14 @@ func (s *Service) HandleSyncState(ctx context.Context, msg syncStateMessage) err
 		}
 
 		if err := s.driveMotorService.UpdateDriveMotorState(ctx, drivemotor.UpdateDriveMotorStateParams{
-			Direction: direction,
-			Speed:     temp.Speed,
-			IsRunning: temp.IsRunning == 1,
-			Enabled:   temp.Enabled == 1,
+			Direction:    direction,
+			SetDirection: true,
+			Speed:        temp.Speed,
+			SetSpeed:     true,
+			IsRunning:    temp.IsRunning == 1,
+			SetIsRunning: true,
+			Enabled:      temp.Enabled == 1,
+			SetEnabled:   true,
 		}); err != nil {
 			return fmt.Errorf("failed to update drive motor state: %w", err)
 		}

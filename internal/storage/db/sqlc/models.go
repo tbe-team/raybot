@@ -36,14 +36,15 @@ type CargoDoorMotor struct {
 }
 
 type Command struct {
-	ID          string  `json:"id"`
-	Type        int64   `json:"type"`
-	Status      int64   `json:"status"`
-	Source      int64   `json:"source"`
+	ID          int64   `json:"id"`
+	Type        string  `json:"type"`
+	Status      string  `json:"status"`
+	Source      string  `json:"source"`
 	Inputs      string  `json:"inputs"`
 	Error       *string `json:"error"`
-	CreatedAt   string  `json:"created_at"`
 	CompletedAt *string `json:"completed_at"`
+	CreatedAt   string  `json:"created_at"`
+	UpdatedAt   string  `json:"updated_at"`
 }
 
 type Location struct {

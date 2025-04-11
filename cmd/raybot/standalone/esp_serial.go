@@ -12,6 +12,8 @@ func startESPSerial(app *application.Application, interruptChan <-chan any, read
 	service := espserial.New(
 		app.Cfg.Hardware.ESP,
 		app.Log,
+		app.EventBus,
+		app.ESPSerialClient,
 		app.CargoService,
 	)
 

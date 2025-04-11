@@ -235,6 +235,50 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /configs/cargo:
+    get:
+      summary: Get the cargo configuration
+      operationId: getCargoConfig
+      description: Get the cargo configuration
+      tags:
+        - config
+      responses:
+        '200':
+          description: The cargo configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CargoConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update the cargo configuration
+      operationId: updateCargoConfig
+      description: Update the cargo configuration
+      tags:
+        - config
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CargoConfig'
+      responses:
+        '200':
+          description: The cargo configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CargoConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /system/restart:
     post:
       summary: Restart the application
@@ -287,6 +331,107 @@ paths:
                 $ref: '#/components/schemas/SerialPortListResponse'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /commands:
+    get:
+      summary: List all commands
+      operationId: listCommands
+      description: List all commands
+      tags:
+        - commands
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/PageSize'
+        - name: sorts
+          in: query
+          description: |
+            Sort the commands by the given field. Use `-` to sort in descending order. Use `,` to sort by multiple fields. Example: `-created_at,status` Allowed fields:
+              - type
+              - status
+              - source
+              - created_at
+              - updated_at
+              - completed_at
+          required: false
+          schema:
+            type: string
+        - name: statuses
+          in: query
+          description: |
+            Filter the commands by the given statuses. Use `,` to filter by multiple statuses. Example: `QUEUED,PROCESSING` Allowed values:
+              - QUEUED
+              - PROCESSING
+              - SUCCEEDED
+              - FAILED
+              - CANCELED
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A list of commands
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandsListResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      summary: Create a command
+      operationId: createCommand
+      description: Create a command
+      tags:
+        - commands
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateCommandRequest'
+      responses:
+        '201':
+          description: The created command
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /commands/{commandId}:
+    get:
+      summary: Get a command by ID
+      operationId: getCommandById
+      description: Get a command by ID
+      tags:
+        - commands
+      parameters:
+        - name: commandId
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: The ID of the command
+            example: 1
+      responses:
+        '200':
+          description: The command
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResponse'
+        '404':
+          description: The command was not found
           content:
             application/json:
               schema:
@@ -483,6 +628,24 @@ components:
       required:
         - port
         - swagger
+    CargoConfig:
+      type: object
+      properties:
+        liftPosition:
+          type: integer
+          example: 10
+          description: The lift position for the cargo, must be less than lowerPosition
+          minimum: 0
+          x-order: 1
+        lowerPosition:
+          type: integer
+          example: 100
+          description: The lower position for the cargo
+          minimum: 0
+          x-order: 2
+      required:
+        - liftPosition
+        - lowerPosition
     BatteryState:
       type: object
       properties:
@@ -959,3 +1122,181 @@ components:
           x-order: 1
       required:
         - items
+    CommandType:
+      type: string
+      enum:
+        - MOVE_FORWARD
+        - MOVE_BACKWARD
+        - MOVE_TO
+        - CARGO_OPEN
+        - CARGO_CLOSE
+        - CARGO_LIFT
+        - CARGO_LOWER
+        - CARGO_CHECK_QR
+      description: The type of command
+      x-go-type: string
+    CommandStatus:
+      type: string
+      enum:
+        - QUEUED
+        - PROCESSING
+        - SUCCEEDED
+        - FAILED
+        - CANCELED
+      description: The status of the command
+      x-go-type: string
+    CommandSource:
+      type: string
+      enum:
+        - CLOUD
+      description: The source of the command
+      x-go-type: string
+    StopInputs:
+      type: object
+    MoveForwardInputs:
+      type: object
+    MoveBackwardInputs:
+      type: object
+    MoveToInputs:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The location to move to
+          example: 1e8asj
+      required:
+        - location
+    CargoOpenInputs:
+      type: object
+    CargoCloseInputs:
+      type: object
+    CargoLiftInputs:
+      type: object
+    CargoLowerInputs:
+      type: object
+    CargoCheckQRInputs:
+      type: object
+      properties:
+        qrCode:
+          type: string
+          description: The QR code to check
+          example: 1e8asj
+      required:
+        - qrCode
+    CommandInputs:
+      oneOf:
+        - $ref: '#/components/schemas/StopInputs'
+        - $ref: '#/components/schemas/MoveForwardInputs'
+        - $ref: '#/components/schemas/MoveBackwardInputs'
+        - $ref: '#/components/schemas/MoveToInputs'
+        - $ref: '#/components/schemas/CargoOpenInputs'
+        - $ref: '#/components/schemas/CargoCloseInputs'
+        - $ref: '#/components/schemas/CargoLiftInputs'
+        - $ref: '#/components/schemas/CargoLowerInputs'
+        - $ref: '#/components/schemas/CargoCheckQRInputs'
+    CommandResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+          description: The id of the command
+          x-order: 1
+        type:
+          $ref: '#/components/schemas/CommandType'
+          description: The type of command
+          x-order: 2
+        status:
+          $ref: '#/components/schemas/CommandStatus'
+          description: The status of the command
+          x-order: 3
+        source:
+          $ref: '#/components/schemas/CommandSource'
+          description: The source of the command
+          x-order: 4
+        inputs:
+          $ref: '#/components/schemas/CommandInputs'
+          description: The inputs of the command
+          x-order: 5
+        error:
+          type: string
+          nullable: true
+          description: The error of the command
+          x-order: 6
+        completedAt:
+          type: string
+          nullable: true
+          format: date-time
+          description: The completion date of the command
+          x-order: 7
+        createdAt:
+          type: string
+          format: date-time
+          description: The creation date of the command
+          x-order: 8
+        updatedAt:
+          type: string
+          format: date-time
+          description: The update date of the command
+          x-order: 9
+      required:
+        - id
+        - type
+        - status
+        - source
+        - inputs
+        - error
+        - createdAt
+        - updatedAt
+        - completedAt
+    CommandsListResponse:
+      type: object
+      properties:
+        totalItems:
+          type: integer
+          description: The total number of commands
+          example: 100
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommandResponse'
+          description: The list of commands
+          x-order: 2
+      required:
+        - totalItems
+        - items
+    CreateCommandRequest:
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/CommandType'
+          description: The type of command
+          x-order: 1
+        inputs:
+          $ref: '#/components/schemas/CommandInputs'
+          description: The inputs of the command
+          x-order: 2
+      required:
+        - type
+        - inputs
+  parameters:
+    Page:
+      name: page
+      in: query
+      schema:
+        type: integer
+        format: uint
+        minimum: 1
+        default: 1
+      description: The page number
+      required: false
+    PageSize:
+      name: pageSize
+      in: query
+      schema:
+        type: integer
+        format: uint
+        minimum: 1
+        default: 10
+      description: The number of items per page
+      required: false

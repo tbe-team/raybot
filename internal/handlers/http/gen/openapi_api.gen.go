@@ -18,6 +18,7 @@ import (
 
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
+	"github.com/oapi-codegen/runtime"
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
 
@@ -56,6 +57,24 @@ type BatteryState struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// CargoCheckQRInputs defines model for CargoCheckQRInputs.
+type CargoCheckQRInputs struct {
+	// QrCode The QR code to check
+	QrCode string `json:"qrCode"`
+}
+
+// CargoCloseInputs defines model for CargoCloseInputs.
+type CargoCloseInputs = map[string]interface{}
+
+// CargoConfig defines model for CargoConfig.
+type CargoConfig struct {
+	// LiftPosition The lift position for the cargo, must be less than lowerPosition
+	LiftPosition int `json:"liftPosition"`
+
+	// LowerPosition The lower position for the cargo
+	LowerPosition int `json:"lowerPosition"`
+}
+
 // CargoDoorMotorState defines model for CargoDoorMotorState.
 type CargoDoorMotorState struct {
 	// Direction The direction of the cargo door motor
@@ -73,6 +92,15 @@ type CargoDoorMotorState struct {
 	// UpdatedAt The updated at time of the cargo door motor
 	UpdatedAt time.Time `json:"updatedAt"`
 }
+
+// CargoLiftInputs defines model for CargoLiftInputs.
+type CargoLiftInputs = map[string]interface{}
+
+// CargoLowerInputs defines model for CargoLowerInputs.
+type CargoLowerInputs = map[string]interface{}
+
+// CargoOpenInputs defines model for CargoOpenInputs.
+type CargoOpenInputs = map[string]interface{}
 
 // CargoState defines model for CargoState.
 type CargoState struct {
@@ -118,6 +146,64 @@ type CloudConnection struct {
 	// Uptime The uptime of the cloud connection in seconds
 	Uptime float32 `json:"uptime"`
 	Error  *string `json:"error"`
+}
+
+// CommandInputs defines model for CommandInputs.
+type CommandInputs struct {
+	union json.RawMessage
+}
+
+// CommandResponse defines model for CommandResponse.
+type CommandResponse struct {
+	// Id The id of the command
+	Id int `json:"id"`
+
+	// Type The type of command
+	Type CommandType `json:"type"`
+
+	// Status The status of the command
+	Status CommandStatus `json:"status"`
+
+	// Source The source of the command
+	Source CommandSource `json:"source"`
+	Inputs CommandInputs `json:"inputs"`
+
+	// Error The error of the command
+	Error *string `json:"error"`
+
+	// CompletedAt The completion date of the command
+	CompletedAt *time.Time `json:"completedAt"`
+
+	// CreatedAt The creation date of the command
+	CreatedAt time.Time `json:"createdAt"`
+
+	// UpdatedAt The update date of the command
+	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// CommandSource The source of the command
+type CommandSource = string
+
+// CommandStatus The status of the command
+type CommandStatus = string
+
+// CommandType The type of command
+type CommandType = string
+
+// CommandsListResponse defines model for CommandsListResponse.
+type CommandsListResponse struct {
+	// Items The list of commands
+	Items []CommandResponse `json:"items"`
+
+	// TotalItems The total number of commands
+	TotalItems int `json:"totalItems"`
+}
+
+// CreateCommandRequest defines model for CreateCommandRequest.
+type CreateCommandRequest struct {
+	// Type The type of command
+	Type   CommandType   `json:"type"`
+	Inputs CommandInputs `json:"inputs"`
 }
 
 // DischargeState defines model for DischargeState.
@@ -259,6 +345,18 @@ type LogConfig struct {
 	AddSource bool `json:"addSource"`
 }
 
+// MoveBackwardInputs defines model for MoveBackwardInputs.
+type MoveBackwardInputs = map[string]interface{}
+
+// MoveForwardInputs defines model for MoveForwardInputs.
+type MoveForwardInputs = map[string]interface{}
+
+// MoveToInputs defines model for MoveToInputs.
+type MoveToInputs struct {
+	// Location The location to move to
+	Location string `json:"location"`
+}
+
 // PICConfig defines model for PICConfig.
 type PICConfig struct {
 	Serial SerialConfig `json:"serial"`
@@ -325,6 +423,47 @@ type SerialPortListResponse struct {
 	Items []SerialPort `json:"items"`
 }
 
+// StopInputs defines model for StopInputs.
+type StopInputs = map[string]interface{}
+
+// Page defines model for Page.
+type Page = uint
+
+// PageSize defines model for PageSize.
+type PageSize = uint
+
+// ListCommandsParams defines parameters for ListCommands.
+type ListCommandsParams struct {
+	// Page The page number
+	Page *Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize The number of items per page
+	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Sorts Sort the commands by the given field. Use `-` to sort in descending order. Use `,` to sort by multiple fields. Example: `-created_at,status` Allowed fields:
+	//   - type
+	//   - status
+	//   - source
+	//   - created_at
+	//   - updated_at
+	//   - completed_at
+	Sorts *string `form:"sorts,omitempty" json:"sorts,omitempty"`
+
+	// Statuses Filter the commands by the given statuses. Use `,` to filter by multiple statuses. Example: `QUEUED,PROCESSING` Allowed values:
+	//   - QUEUED
+	//   - PROCESSING
+	//   - SUCCEEDED
+	//   - FAILED
+	//   - CANCELED
+	Statuses *string `form:"statuses,omitempty" json:"statuses,omitempty"`
+}
+
+// CreateCommandJSONRequestBody defines body for CreateCommand for application/json ContentType.
+type CreateCommandJSONRequestBody = CreateCommandRequest
+
+// UpdateCargoConfigJSONRequestBody defines body for UpdateCargoConfig for application/json ContentType.
+type UpdateCargoConfigJSONRequestBody = CargoConfig
+
 // UpdateCloudConfigJSONRequestBody defines body for UpdateCloudConfig for application/json ContentType.
 type UpdateCloudConfigJSONRequestBody = CloudConfig
 
@@ -340,8 +479,267 @@ type UpdateHTTPConfigJSONRequestBody = HTTPConfig
 // UpdateLogConfigJSONRequestBody defines body for UpdateLogConfig for application/json ContentType.
 type UpdateLogConfigJSONRequestBody = LogConfig
 
+// AsStopInputs returns the union data inside the CommandInputs as a StopInputs
+func (t CommandInputs) AsStopInputs() (StopInputs, error) {
+	var body StopInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromStopInputs overwrites any union data inside the CommandInputs as the provided StopInputs
+func (t *CommandInputs) FromStopInputs(v StopInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeStopInputs performs a merge with any union data inside the CommandInputs, using the provided StopInputs
+func (t *CommandInputs) MergeStopInputs(v StopInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsMoveForwardInputs returns the union data inside the CommandInputs as a MoveForwardInputs
+func (t CommandInputs) AsMoveForwardInputs() (MoveForwardInputs, error) {
+	var body MoveForwardInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromMoveForwardInputs overwrites any union data inside the CommandInputs as the provided MoveForwardInputs
+func (t *CommandInputs) FromMoveForwardInputs(v MoveForwardInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeMoveForwardInputs performs a merge with any union data inside the CommandInputs, using the provided MoveForwardInputs
+func (t *CommandInputs) MergeMoveForwardInputs(v MoveForwardInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsMoveBackwardInputs returns the union data inside the CommandInputs as a MoveBackwardInputs
+func (t CommandInputs) AsMoveBackwardInputs() (MoveBackwardInputs, error) {
+	var body MoveBackwardInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromMoveBackwardInputs overwrites any union data inside the CommandInputs as the provided MoveBackwardInputs
+func (t *CommandInputs) FromMoveBackwardInputs(v MoveBackwardInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeMoveBackwardInputs performs a merge with any union data inside the CommandInputs, using the provided MoveBackwardInputs
+func (t *CommandInputs) MergeMoveBackwardInputs(v MoveBackwardInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsMoveToInputs returns the union data inside the CommandInputs as a MoveToInputs
+func (t CommandInputs) AsMoveToInputs() (MoveToInputs, error) {
+	var body MoveToInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromMoveToInputs overwrites any union data inside the CommandInputs as the provided MoveToInputs
+func (t *CommandInputs) FromMoveToInputs(v MoveToInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeMoveToInputs performs a merge with any union data inside the CommandInputs, using the provided MoveToInputs
+func (t *CommandInputs) MergeMoveToInputs(v MoveToInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCargoOpenInputs returns the union data inside the CommandInputs as a CargoOpenInputs
+func (t CommandInputs) AsCargoOpenInputs() (CargoOpenInputs, error) {
+	var body CargoOpenInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCargoOpenInputs overwrites any union data inside the CommandInputs as the provided CargoOpenInputs
+func (t *CommandInputs) FromCargoOpenInputs(v CargoOpenInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCargoOpenInputs performs a merge with any union data inside the CommandInputs, using the provided CargoOpenInputs
+func (t *CommandInputs) MergeCargoOpenInputs(v CargoOpenInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCargoCloseInputs returns the union data inside the CommandInputs as a CargoCloseInputs
+func (t CommandInputs) AsCargoCloseInputs() (CargoCloseInputs, error) {
+	var body CargoCloseInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCargoCloseInputs overwrites any union data inside the CommandInputs as the provided CargoCloseInputs
+func (t *CommandInputs) FromCargoCloseInputs(v CargoCloseInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCargoCloseInputs performs a merge with any union data inside the CommandInputs, using the provided CargoCloseInputs
+func (t *CommandInputs) MergeCargoCloseInputs(v CargoCloseInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCargoLiftInputs returns the union data inside the CommandInputs as a CargoLiftInputs
+func (t CommandInputs) AsCargoLiftInputs() (CargoLiftInputs, error) {
+	var body CargoLiftInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCargoLiftInputs overwrites any union data inside the CommandInputs as the provided CargoLiftInputs
+func (t *CommandInputs) FromCargoLiftInputs(v CargoLiftInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCargoLiftInputs performs a merge with any union data inside the CommandInputs, using the provided CargoLiftInputs
+func (t *CommandInputs) MergeCargoLiftInputs(v CargoLiftInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCargoLowerInputs returns the union data inside the CommandInputs as a CargoLowerInputs
+func (t CommandInputs) AsCargoLowerInputs() (CargoLowerInputs, error) {
+	var body CargoLowerInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCargoLowerInputs overwrites any union data inside the CommandInputs as the provided CargoLowerInputs
+func (t *CommandInputs) FromCargoLowerInputs(v CargoLowerInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCargoLowerInputs performs a merge with any union data inside the CommandInputs, using the provided CargoLowerInputs
+func (t *CommandInputs) MergeCargoLowerInputs(v CargoLowerInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCargoCheckQRInputs returns the union data inside the CommandInputs as a CargoCheckQRInputs
+func (t CommandInputs) AsCargoCheckQRInputs() (CargoCheckQRInputs, error) {
+	var body CargoCheckQRInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCargoCheckQRInputs overwrites any union data inside the CommandInputs as the provided CargoCheckQRInputs
+func (t *CommandInputs) FromCargoCheckQRInputs(v CargoCheckQRInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCargoCheckQRInputs performs a merge with any union data inside the CommandInputs, using the provided CargoCheckQRInputs
+func (t *CommandInputs) MergeCargoCheckQRInputs(v CargoCheckQRInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t CommandInputs) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *CommandInputs) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// List all commands
+	// (GET /commands)
+	ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams)
+	// Create a command
+	// (POST /commands)
+	CreateCommand(w http.ResponseWriter, r *http.Request)
+	// Get a command by ID
+	// (GET /commands/{commandId})
+	GetCommandById(w http.ResponseWriter, r *http.Request, commandId int)
+	// Get the cargo configuration
+	// (GET /configs/cargo)
+	GetCargoConfig(w http.ResponseWriter, r *http.Request)
+	// Update the cargo configuration
+	// (PUT /configs/cargo)
+	UpdateCargoConfig(w http.ResponseWriter, r *http.Request)
 	// Get the cloud configuration
 	// (GET /configs/cloud)
 	GetCloudConfig(w http.ResponseWriter, r *http.Request)
@@ -386,6 +784,36 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// List all commands
+// (GET /commands)
+func (_ Unimplemented) ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Create a command
+// (POST /commands)
+func (_ Unimplemented) CreateCommand(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get a command by ID
+// (GET /commands/{commandId})
+func (_ Unimplemented) GetCommandById(w http.ResponseWriter, r *http.Request, commandId int) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get the cargo configuration
+// (GET /configs/cargo)
+func (_ Unimplemented) GetCargoConfig(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Update the cargo configuration
+// (PUT /configs/cargo)
+func (_ Unimplemented) UpdateCargoConfig(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // Get the cloud configuration
 // (GET /configs/cloud)
@@ -473,6 +901,124 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// ListCommands operation middleware
+func (siw *ServerInterfaceWrapper) ListCommands(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListCommandsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "pageSize", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "sorts" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "sorts", r.URL.Query(), &params.Sorts)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "sorts", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "statuses" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "statuses", r.URL.Query(), &params.Statuses)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "statuses", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListCommands(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// CreateCommand operation middleware
+func (siw *ServerInterfaceWrapper) CreateCommand(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.CreateCommand(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCommandById operation middleware
+func (siw *ServerInterfaceWrapper) GetCommandById(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// ------------- Path parameter "commandId" -------------
+	var commandId int
+
+	err = runtime.BindStyledParameterWithOptions("simple", "commandId", chi.URLParam(r, "commandId"), &commandId, runtime.BindStyledParameterOptions{ParamLocation: runtime.ParamLocationPath, Explode: false, Required: true})
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "commandId", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCommandById(w, r, commandId)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetCargoConfig operation middleware
+func (siw *ServerInterfaceWrapper) GetCargoConfig(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetCargoConfig(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateCargoConfig operation middleware
+func (siw *ServerInterfaceWrapper) UpdateCargoConfig(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateCargoConfig(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // GetCloudConfig operation middleware
 func (siw *ServerInterfaceWrapper) GetCloudConfig(w http.ResponseWriter, r *http.Request) {
@@ -770,6 +1316,21 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/commands", wrapper.ListCommands)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/commands", wrapper.CreateCommand)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/commands/{commandId}", wrapper.GetCommandById)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/configs/cargo", wrapper.GetCargoConfig)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/configs/cargo", wrapper.UpdateCargoConfig)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/configs/cloud", wrapper.GetCloudConfig)
 	})
 	r.Group(func(r chi.Router) {
@@ -810,6 +1371,135 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 
 	return r
+}
+
+type ListCommandsRequestObject struct {
+	Params ListCommandsParams
+}
+
+type ListCommandsResponseObject interface {
+	VisitListCommandsResponse(w http.ResponseWriter) error
+}
+
+type ListCommands200JSONResponse CommandsListResponse
+
+func (response ListCommands200JSONResponse) VisitListCommandsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListCommands400JSONResponse ErrorResponse
+
+func (response ListCommands400JSONResponse) VisitListCommandsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateCommandRequestObject struct {
+	Body *CreateCommandJSONRequestBody
+}
+
+type CreateCommandResponseObject interface {
+	VisitCreateCommandResponse(w http.ResponseWriter) error
+}
+
+type CreateCommand201JSONResponse CommandResponse
+
+func (response CreateCommand201JSONResponse) VisitCreateCommandResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(201)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type CreateCommand400JSONResponse ErrorResponse
+
+func (response CreateCommand400JSONResponse) VisitCreateCommandResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCommandByIdRequestObject struct {
+	CommandId int `json:"commandId"`
+}
+
+type GetCommandByIdResponseObject interface {
+	VisitGetCommandByIdResponse(w http.ResponseWriter) error
+}
+
+type GetCommandById200JSONResponse CommandResponse
+
+func (response GetCommandById200JSONResponse) VisitGetCommandByIdResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCommandById404JSONResponse ErrorResponse
+
+func (response GetCommandById404JSONResponse) VisitGetCommandByIdResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCargoConfigRequestObject struct {
+}
+
+type GetCargoConfigResponseObject interface {
+	VisitGetCargoConfigResponse(w http.ResponseWriter) error
+}
+
+type GetCargoConfig200JSONResponse CargoConfig
+
+func (response GetCargoConfig200JSONResponse) VisitGetCargoConfigResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetCargoConfig400JSONResponse ErrorResponse
+
+func (response GetCargoConfig400JSONResponse) VisitGetCargoConfigResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateCargoConfigRequestObject struct {
+	Body *UpdateCargoConfigJSONRequestBody
+}
+
+type UpdateCargoConfigResponseObject interface {
+	VisitUpdateCargoConfigResponse(w http.ResponseWriter) error
+}
+
+type UpdateCargoConfig200JSONResponse CargoConfig
+
+func (response UpdateCargoConfig200JSONResponse) VisitUpdateCargoConfigResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateCargoConfig400JSONResponse ErrorResponse
+
+func (response UpdateCargoConfig400JSONResponse) VisitUpdateCargoConfigResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type GetCloudConfigRequestObject struct {
@@ -1143,6 +1833,21 @@ func (response RestartApplication400JSONResponse) VisitRestartApplicationRespons
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// List all commands
+	// (GET /commands)
+	ListCommands(ctx context.Context, request ListCommandsRequestObject) (ListCommandsResponseObject, error)
+	// Create a command
+	// (POST /commands)
+	CreateCommand(ctx context.Context, request CreateCommandRequestObject) (CreateCommandResponseObject, error)
+	// Get a command by ID
+	// (GET /commands/{commandId})
+	GetCommandById(ctx context.Context, request GetCommandByIdRequestObject) (GetCommandByIdResponseObject, error)
+	// Get the cargo configuration
+	// (GET /configs/cargo)
+	GetCargoConfig(ctx context.Context, request GetCargoConfigRequestObject) (GetCargoConfigResponseObject, error)
+	// Update the cargo configuration
+	// (PUT /configs/cargo)
+	UpdateCargoConfig(ctx context.Context, request UpdateCargoConfigRequestObject) (UpdateCargoConfigResponseObject, error)
 	// Get the cloud configuration
 	// (GET /configs/cloud)
 	GetCloudConfig(ctx context.Context, request GetCloudConfigRequestObject) (GetCloudConfigResponseObject, error)
@@ -1211,6 +1916,144 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// ListCommands operation middleware
+func (sh *strictHandler) ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams) {
+	var request ListCommandsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListCommands(ctx, request.(ListCommandsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListCommands")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListCommandsResponseObject); ok {
+		if err := validResponse.VisitListCommandsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// CreateCommand operation middleware
+func (sh *strictHandler) CreateCommand(w http.ResponseWriter, r *http.Request) {
+	var request CreateCommandRequestObject
+
+	var body CreateCommandJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.CreateCommand(ctx, request.(CreateCommandRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "CreateCommand")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(CreateCommandResponseObject); ok {
+		if err := validResponse.VisitCreateCommandResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetCommandById operation middleware
+func (sh *strictHandler) GetCommandById(w http.ResponseWriter, r *http.Request, commandId int) {
+	var request GetCommandByIdRequestObject
+
+	request.CommandId = commandId
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetCommandById(ctx, request.(GetCommandByIdRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCommandById")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCommandByIdResponseObject); ok {
+		if err := validResponse.VisitGetCommandByIdResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetCargoConfig operation middleware
+func (sh *strictHandler) GetCargoConfig(w http.ResponseWriter, r *http.Request) {
+	var request GetCargoConfigRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetCargoConfig(ctx, request.(GetCargoConfigRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetCargoConfig")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetCargoConfigResponseObject); ok {
+		if err := validResponse.VisitGetCargoConfigResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateCargoConfig operation middleware
+func (sh *strictHandler) UpdateCargoConfig(w http.ResponseWriter, r *http.Request) {
+	var request UpdateCargoConfigRequestObject
+
+	var body UpdateCargoConfigJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateCargoConfig(ctx, request.(UpdateCargoConfigRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateCargoConfig")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateCargoConfigResponseObject); ok {
+		if err := validResponse.VisitUpdateCargoConfigResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // GetCloudConfig operation middleware
@@ -1563,52 +2406,70 @@ func (sh *strictHandler) RestartApplication(w http.ResponseWriter, r *http.Reque
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xbS3PbOBL+KyzsHnaraIuy5YxXN1t2st7x2B7JnmxtKgeIhCRMSIIBQCfelP77FB58",
-	"AyQlSx4dpkqHmHh04/u6ge4G8gP4JEpIjGLOwPgHYP4KRVD+8yJJJiSOkc8xicWHhJIEUY6RbPZDkgbV",
-	"Dn+naAHG4G+DYs6BnnAwqXVfuwCxZIYohmH/Wa5nD40haxck2N90poebiWkmusDBE5v3n2f6/ubqaXZZ",
-	"nkVMg76mmKIAjD81gDIv3LwIk0KfXcBfEgTGgMx/Rz4Xal9CzhF9mXHIkYEqFIa/kZDDpfo7QMynOFHL",
-	"A48r5IgezrPu4pCFw1fImatJhcLfYZSECIw/DU/c7PfZBZijSM6oFcIxR0tEhUb6C6QUihm+Hy3Jkf72",
-	"6XOKYz58Jz8TGiAKxqO1C/yUUhRzi4aqsUW3oee5dUWqgptih2sXLGAaWoTKphaRfQSel+W9W7tghWDI",
-	"V2aBqu3Vi6zI/Ek4CKK+FVrdCJeoRfDZxnLPhBWgKDELFS2IQp7SNqknZ5tKPVm7IE0CyFFwYVmvbnYg",
-	"dziO2sSDE+9keOSJ36PnjeXvf8AFC0IjyMEYiImOxCQg15NxiuNlWaXztQu0b5kV0o1ttJ9sbtunjY1I",
-	"+5empVDKre4QhblkzpEbbRlb0z40gXRJrgihvxBOqGU7CjAt9tYmGnlzhocvJnUCQqgTiWkFMHEaiSVN",
-	"bu9n18AF9w/Xd0KhgrmspclKgVmTKrEfoBjOQ4FYXbmPK8RXiBp1cjBzsoElNThNUa7DnJAQwbi+7WE2",
-	"TeNYKLKxRKoHbiDxdO0CliDT+gT4sqkN+FdsRNu7ZpsiwkfPXu2jZ3VnKYw0w6vMVGElvTzC4ghzwjmJ",
-	"rjDjMPYte4Pq4wS6UwWR155+p9L67hMU9zE9zBwium5gbMKdvtIJCSyL+3Xq+CRADkUwcBaURCVxv04d",
-	"5sM4RlW2Ly4n31/+30blK81s97Y1qtuWxjzHxq1bQqdRrSBdIlu0p7b5WxzhjlgqFF3yxcs5dxFQ9dtA",
-	"pbgtt81XUNxY5W7OeNthq1jYYLvQycICL5vMwiCgiFlCeN3oLIgGWMzkMESfsV9dcEh8GK4I4+Mzzzsb",
-	"ti1L0MnJF2Q5qmVTD4mj4GSEzs/no+HpT6P56Qiejc69d743PBnNR97ZSbs715DNUMg0a4PRnr2qNmWl",
-	"7RsYopRQ0S1Ow1CwWLNPk8O7IISMTzIhykiNFtV7UmXzcpTF4Ct2LrnwcwQcHDsM+SQOWAF2nEZz7dNW",
-	"M85xai4p1yfDyMTEFWb+HnarIJv2zTasXOKb71nGtR7WtpWdXDMUM2vcP4f+l45gB/pfGqFO/jeTk7+W",
-	"cMFDQL7F7ZqIHvvWRIRfC0pi3q6K7LJvXYavsU6bIrux0Ub4VMXMrdpVjdxOw6X4Ge0yWQ3EhI089f39",
-	"9OPF9Aq44PJi8rP8ZyVbLdr3lK+W1Np/qloTtucstSztH97R0PP++aclqjX2d+sIe8tRr2cPtpCTyYp0",
-	"VxE8r1uLOepa6iksgk11+zcM1U73E6ptFEXZg6dr0TJFLCExM8VOxsTaTxknkUPhy5xwR04us+yKQWKO",
-	"ouM7wt+TNA66MoAAcYhDKTKv+LeZw3uMwkDqbrwJKEEfIcaMZVHTIrLO5XXccBQ5MeHOomshBlIkJtms",
-	"JvxLC2mAvxBtTcXlZyeGUVVP/aEVZisY9uXfwUjGo/m6NgFAraAdgQ/Th4ltb1DbS8tRQPQ5I7fG5fRh",
-	"IpPDakGnT9icEGq7uiCU5/mnRYJMco1HQI59DRgpL9s+jbD8+/HRumX21FZMYdD23LOcVyVDYd/gUnzu",
-	"ifxMdXeebjYD3oxKJtwIC6TBN0iR1WJY0uOGNztH5JVoj3tcy7kjhKkpTKre4gVvi/t0IvRAGLZHf1lq",
-	"muheWRgQ4gXftmS+ZXpaiNx/fFeVtWV4x0VG24Gv6rNHeLeP9Mw67CnQqxtjA73t4r5b4kMxvKM0o3t1",
-	"VGd0rwwfSuaEb1i53z4JzaTvnosTW4WkkNgF8rKlnjsjKfXbz1AYBHKNTHYVX9SKKx63gCHrdLls5SZg",
-	"Q7J0VHt+QsEkCXGBq05l/zO7vwMueLz+72M1h9UNmyWwwgFD9IxCs1bLkMxhKJWTvTp0u7q+fPoAXHBz",
-	"9/4euODjxVRodD2d3k+rumYdN822a7agNM+BdUuMmkyhOKveOM8yPXb6K88q8Gk+4voLnRI6YiuXZ4Q9",
-	"FYX1x4JtZlx9Wbh2QfbipWNc5ZXb2gXqvrbr4WFxAZ8NyR+o9Bpbe84iJlHV+K7BpWsPkUTnVfyOcbUb",
-	"EzW0VF3vMb5RixeT5JXOzglqNVFhnFm03DW2FlaLoaXwoXVkJRip227xJiq/Cilfi9QQKitcWXlJncx8",
-	"Gjbh1ozZ5BKVjdhw0ZEGUx1SmS450sChkKP8MFM7d+m2rnyy/+tde0Io7zMgh5eYW26GRaszx5z1E3je",
-	"Jk3sVAmkmL9YUlzZ1i5IH9Z393fX4nT+7Voc0vdXtZK4bt7shD7rrhbEMOqJPBgE6HnA+cvT7NLrilsp",
-	"gsEjjhBJLcLlGxeuetjlV+9pi9zGBRGOcSSQ80z3twUoWL7bq7w4ZZwkdvMQrRuYx7AcQZNUnETtCi1C",
-	"Avm7UeuVjq4t5I5TMumS+rnpVeG2O+iDNoWNCjQ6pdAgZLWgLYzCtMZ2XW8x4/YzNq+9GqJ3zKTiJaUF",
-	"XL2qtSWoWqq1jeWouZvrEf1wvCBmRaeqoHvxcCM3aR/plcr66Bj8cvMoEioagjFYcZ6w8WBAErGpi6D6",
-	"mNDlQA9iA9FXKIy55KUy8zOiTAn1jofHnugnpoEJBmNweuwde9KY+EqiM/DlRs4G8tWE+LJEBgv5gHj1",
-	"bcUCL1OanSZEPmfGJL4JVN/yUx4BnaJVCjzxPB1Tcv0qu5TPDH5n6rRUBPX9jxUqJZDV+kaOblB47YLR",
-	"DrWo3lQY9LiEgTNFX1PEuDzcWRpFUIR8HbByuGQ6eBUr/Cw2eNMW+yST8N78qO51iqR6lyR42R87hQuJ",
-	"8H395xpGVk05bAPppLZhI2u38OklTfxOl5ZXB50eXboM2SNvJSkW2gzaHp47GyHdwpt7UKN619jZvS/X",
-	"iXk7V+42icyTD9o0ulht9eOVvlvq9OWsY7c/166r9khgTZKFRIvmh+fbVoi38O+edKkRBsZ27+cmst7O",
-	"1/uZSubvB28yfZhu93vOk06fl5fp3f5e3Nrvk8BCioU8g7aH5+NGSLfw7x7UaN+usrMHv64R84Y+3WkS",
-	"mT8ftGl0sdrqxyFZdrpxSJbdXlxcqO6RsUKIhbCmqofnwiY4t/DgblZU5yoxu/ffGidv576dxpB57yEb",
-	"RQehRt9NEMXJClEYsoEqLTKrD99ixh0Yhg58hljeUNarkVWbEf0vsq5FDZLt06stlVYDjvc/HxB1Clob",
-	"rBlzJbI0ffINzhHLXve0FzX1Ox7Zu/6Ip7EHF1fC+6TLcPF86FQJOCVqCsgSPWUyFD3shXEUDShiHOp7",
-	"CsIMFE1Vh/q7FwcuOKLOaXZfdNwgSg+8qLyVqbE1asq7I85Ew3g4wFpAKAGs4BTYioHyYa34/kNfJwxg",
-	"ggfPQ7D+vP4jAAD//1lOlPT1SAAA",
+	"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",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file
