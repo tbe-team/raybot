@@ -19,7 +19,7 @@ const routes: RouteRecordRaw[] = [
       {
         path: 'command-queue',
         name: 'command-queue',
-        component: () => import('@/views/command/QueueCommand.vue'),
+        component: () => import('@/views/command/CommandQueue.vue'),
         meta: { title: 'Command queue' },
       },
       {

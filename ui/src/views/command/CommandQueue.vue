@@ -13,12 +13,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useProcessingComandQuery, useQueuedComandQuery } from '@/composables/use-command'
+import { useListProcessingCommandsQuery, useQueuedComandQuery } from '@/composables/use-command'
 import { formatTimeAgo } from '@/lib/date'
 import { AlertCircle, AppWindow, Cloud, Loader } from 'lucide-vue-next'
 import { h } from 'vue'
 import CommandDetailDialog from './components/CommandDetailDialog.vue'
 import StatusBadge from './components/commands-table/StatusBadge.vue'
+import CreateCommandCard from './components/CreateCommandCard.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -26,7 +27,16 @@ const router = useRouter()
 const page = ref(Number(route.query.page) || 1)
 const pageSize = ref(Number(route.query.pageSize) || 10)
 const { data, isPending, isError, error, refetch } = useQueuedComandQuery(page, pageSize, { axiosOpts: { doNotShowLoading: true } })
-const { data: processingCommand } = useProcessingComandQuery({ axiosOpts: { doNotShowLoading: true }, refetchInterval: 1000 })
+const { data: listProcessingCommands } = useListProcessingCommandsQuery({ axiosOpts: { doNotShowLoading: true }, refetchInterval: 1000 })
+const selectedCommandId = ref<number | undefined>()
+const isOpen = ref(false)
+
+function openCommandDetailDialog(commandId: number) {
+  selectedCommandId.value = commandId
+  isOpen.value = true
+}
+
+const processingCommand = computed(()=> listProcessingCommands.value?.items[0])
 
 function handlePageChange(p: number) {
   page.value = p
@@ -72,17 +82,9 @@ function aliasCommandSource(source: string | undefined) {
     </div>
     <div class="grid grid-cols-3 gap-4">
       <div class="col-span-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              Command Queue
-            </CardTitle>
-            <CardDescription>
-              Current and queued commands
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div class="flex flex-col gap-4">
+        <!-- Queue command card-->
+        <div class="p-6 border rounded-md">
+                      <div class="flex flex-col gap-4">
               <div class="flex flex-col gap-2">
                 <p class="font-medium">
                   Current Command
@@ -99,7 +101,7 @@ function aliasCommandSource(source: string | undefined) {
                       </p>
                     </div>
                   </Card>
-                  <div v-else-if="processingCommand?.items.length === 0" class="flex flex-col w-full gap-2 p-4 border rounded-md shadow-md bg-muted">
+                  <div v-else-if="!processingCommand" class="flex flex-col w-full gap-2 p-4 border rounded-md bg-muted">
                     <div class="flex flex-col items-center gap-4 p-2">
                       <AlertCircle class="w-8 h-8 text-muted-foreground" />
                       <div class="space-y-2 text-center">
@@ -107,11 +109,10 @@ function aliasCommandSource(source: string | undefined) {
                       </div>
                     </div>
                   </div>
-                  <CommandDetailDialog v-else-if="processingCommand?.items[0]" :command="processingCommand?.items[0]">
-                    <div class="flex flex-col w-full gap-2 p-6 border rounded-md shadow cursor-pointer bg-muted">
+                    <div  v-else-if="processingCommand" class="flex flex-col w-full gap-2 p-6 border rounded-md cursor-pointer bg-muted" @click="()=>openCommandDetailDialog(processingCommand!.id)" >
                       <div class="flex items-center justify-between w-full">
                         <p class="font-medium ">
-                          {{ getCommandTypeName(processingCommand?.items[0].type) }}
+                          {{ getCommandTypeName(processingCommand.type) }}
                         </p>
                         <Badge class="text-blue-500 bg-blue-500/10 hover:bg-blue-500/20">
                           <Loader class="w-4 h-4 mr-1 duration-2000 animate-spin" />
@@ -120,13 +121,12 @@ function aliasCommandSource(source: string | undefined) {
                       </div>
                       <div class="flex gap-2">
                         <p class="flex items-center gap-1 text-sm text-muted-foreground">
-                          <component :is="aliasCommandSource(processingCommand?.items[0].source)" />
+                          <component :is="aliasCommandSource(processingCommand.source)" />
                           •
-                          <span class="text-xs text-muted-foreground">{{ formatTimeAgo(processingCommand?.items[0].createdAt || '') }}</span>
+                          <span class="text-xs text-muted-foreground">{{ formatTimeAgo(processingCommand.createdAt || '') }}</span>
                         </p>
                       </div>
                     </div>
-                  </CommandDetailDialog>
                 </div>
               </div>
               <div class="flex flex-col gap-2">
@@ -137,12 +137,11 @@ function aliasCommandSource(source: string | undefined) {
                   <Loader class="w-4 h-4 mr-1 duration-2000 animate-spin" />
                   Loading...
                 </div>
-                <div v-else-if="data?.items.length === 0" class="flex flex-col items-center justify-center w-full gap-2 p-6 border rounded-md shadow-md bg-muted">
+                <div v-else-if="data?.items.length === 0" class="flex flex-col items-center justify-center w-full gap-2 p-6 border rounded-md bg-muted">
                   <AlertCircle class="w-8 h-8 text-muted-foreground" />
                   No commands in queue
                 </div>
-                <CommandDetailDialog v-for="command in data?.items" :key="command.id" :command="command">
-                  <div class="flex flex-col w-full gap-2 p-4 border rounded-md shadow-md cursor-pointer bg-muted">
+                  <div v-for="command in data?.items" :key="command.id" class="flex flex-col w-full gap-2 p-4 border rounded-md cursor-pointer bg-muted" @click="()=>openCommandDetailDialog(command.id)">
                     <div class="flex items-center justify-between w-full">
                       <p class="font-medium">
                         {{ getCommandTypeName(command.type) }}
@@ -157,7 +156,6 @@ function aliasCommandSource(source: string | undefined) {
                       </p>
                     </div>
                   </div>
-                </CommandDetailDialog>
                 <!-- Pagination -->
                 <div class="flex items-center justify-end gap-4">
                   <div class="flex items-center gap-1">
@@ -192,29 +190,12 @@ function aliasCommandSource(source: string | undefined) {
                 </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
+        </div>
       </div>
       <div class="col-span-1">
-        <Card>
-          <CardHeader>
-            <CardTitle>
-              Create Command
-            </CardTitle>
-            <CardDescription>
-              Add a new command to the queue
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Input placeholder="Command" />
-          </CardContent>
-          <CardFooter>
-            <Button class="w-full">
-              Add Command
-            </Button>
-          </CardFooter>
-        </Card>
+        <CreateCommandCard />
       </div>
     </div>
   </PageContainer>
+  <CommandDetailDialog v-if="selectedCommandId" v-model:open="isOpen" :command-id="selectedCommandId" />
 </template>
