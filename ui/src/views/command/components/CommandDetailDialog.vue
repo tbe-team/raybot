@@ -7,11 +7,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { formatDate } from '@/lib/date'
+import { formatDate, formatDurationFromISO } from '@/lib/date'
 import { VisuallyHidden } from 'reka-ui'
 import { AlertCircle, CheckCircle, Clock, Loader, XCircle } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { useGetCommandQuery } from '@/composables/use-command'
+
+
 
 const STATUS_LABELS: Record<CommandStatus, { label: string, class: string, icon: Component }> = {
 QUEUED: { label: 'Queued', class: 'bg-yellow-500/10 text-yellow-500 hover:bg-yellow-500/20', icon: Clock },
@@ -104,6 +106,32 @@ watch(open, (val)=> {
             Created:
           </div>
           <div>{{ formatDate(data?.createdAt || '') }}</div>
+        </div>
+
+        <!-- Completed -->
+        <div class="flex" v-if="data?.completedAt">
+          <div class="w-1/4 font-medium">
+            Completed:
+          </div>
+          <div>{{ formatDate(data?.completedAt || '') }}</div>
+        </div>
+
+        <!-- Duration -->
+        <div class="flex" v-if="data?.completedAt">
+          <div class="w-1/4 font-medium">
+            Duration:
+          </div>
+          <div>{{ formatDurationFromISO(data?.createdAt || '', data?.completedAt || '') }}</div>  
+        </div>
+
+        <!-- Error -->
+        <div class="space-y-2" v-if="data?.error">
+          <div class="font-medium">
+            Error:
+          </div>
+          <div class="p-4 text-red-500 rounded-lg bg-muted-foreground/30 dark:bg-black">
+            <pre class="text-sm whitespace-pre-wrap ">{{ data?.error }}</pre>
+          </div>
         </div>
 
         <!-- Inputs -->
