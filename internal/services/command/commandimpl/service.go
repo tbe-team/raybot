@@ -50,6 +50,14 @@ func NewService(
 	return s
 }
 
+func (s service) GetCommandByID(ctx context.Context, params command.GetCommandByIDParams) (command.Command, error) {
+	if err := s.validator.Validate(params); err != nil {
+		return command.Command{}, fmt.Errorf("validate params: %w", err)
+	}
+
+	return s.commandRepository.GetCommandByID(ctx, params.CommandID)
+}
+
 func (s service) ListCommands(ctx context.Context, params command.ListCommandsParams) (paging.List[command.Command], error) {
 	if err := s.validator.Validate(params); err != nil {
 		return paging.List[command.Command]{}, fmt.Errorf("validate params: %w", err)

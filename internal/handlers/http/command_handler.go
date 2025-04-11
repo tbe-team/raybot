@@ -2,7 +2,6 @@ package http
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -21,6 +20,23 @@ func newCommandHandler(commandService command.Service) *commandHandler {
 	return &commandHandler{
 		commandService: commandService,
 	}
+}
+
+//nolint:revive
+func (h commandHandler) GetCommandById(ctx context.Context, request gen.GetCommandByIdRequestObject) (gen.GetCommandByIdResponseObject, error) {
+	cmd, err := h.commandService.GetCommandByID(ctx, command.GetCommandByIDParams{
+		CommandID: int64(request.CommandId),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("get command by id: %w", err)
+	}
+
+	res, err := h.convertCommandToResponse(cmd)
+	if err != nil {
+		return nil, fmt.Errorf("convert command to response: %w", err)
+	}
+
+	return gen.GetCommandById200JSONResponse(res), nil
 }
 
 func (h commandHandler) ListCommands(ctx context.Context, req gen.ListCommandsRequestObject) (gen.ListCommandsResponseObject, error) {
@@ -79,14 +95,9 @@ func (h commandHandler) ListCommands(ctx context.Context, req gen.ListCommandsRe
 }
 
 func (h commandHandler) CreateCommand(ctx context.Context, req gen.CreateCommandRequestObject) (gen.CreateCommandResponseObject, error) {
-	inputsJSON, err := req.Body.Inputs.MarshalJSON()
+	inputs, err := h.convertReqInputsToCommandInputs(req.Body.Type, req.Body.Inputs)
 	if err != nil {
 		return nil, xerror.ValidationFailed(err, "invalid inputs")
-	}
-
-	inputs, err := command.UnmarshalInputs(command.CommandType(req.Body.Type), inputsJSON)
-	if err != nil {
-		return nil, fmt.Errorf("unmarshal inputs: %w", err)
 	}
 
 	cmd, err := h.commandService.CreateCommand(ctx, command.CreateCommandParams{
@@ -105,16 +116,10 @@ func (h commandHandler) CreateCommand(ctx context.Context, req gen.CreateCommand
 	return gen.CreateCommand201JSONResponse(res), nil
 }
 
-func (commandHandler) convertCommandToResponse(cmd command.Command) (gen.CommandResponse, error) {
-	inputsJSON, err := json.Marshal(cmd.Inputs)
+func (h commandHandler) convertCommandToResponse(cmd command.Command) (gen.CommandResponse, error) {
+	inputs, err := h.convertInputsToResponse(cmd.Inputs)
 	if err != nil {
-		return gen.CommandResponse{}, fmt.Errorf("marshal inputs: %w", err)
-	}
-
-	var inputs gen.CommandInputs
-	err = json.Unmarshal(inputsJSON, &inputs)
-	if err != nil {
-		return gen.CommandResponse{}, fmt.Errorf("unmarshal inputs: %w", err)
+		return gen.CommandResponse{}, fmt.Errorf("convert inputs to response: %w", err)
 	}
 
 	return gen.CommandResponse{
@@ -128,4 +133,93 @@ func (commandHandler) convertCommandToResponse(cmd command.Command) (gen.Command
 		CreatedAt:   cmd.CreatedAt,
 		UpdatedAt:   cmd.UpdatedAt,
 	}, nil
+}
+
+func (commandHandler) convertInputsToResponse(inputs command.Inputs) (gen.CommandInputs, error) {
+	var res gen.CommandInputs
+	switch v := inputs.(type) {
+	case *command.MoveToInputs:
+		if err := res.FromMoveToInputs(gen.MoveToInputs{
+			Location: v.Location,
+		}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from move to inputs: %w", err)
+		}
+	case *command.MoveForwardInputs:
+		if err := res.FromMoveForwardInputs(gen.MoveForwardInputs{}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from move forward inputs: %w", err)
+		}
+	case *command.MoveBackwardInputs:
+		if err := res.FromMoveBackwardInputs(gen.MoveBackwardInputs{}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from move backward inputs: %w", err)
+		}
+	case *command.CargoOpenInputs:
+		if err := res.FromCargoOpenInputs(gen.CargoOpenInputs{}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from cargo open inputs: %w", err)
+		}
+	case *command.CargoCloseInputs:
+		if err := res.FromCargoCloseInputs(gen.CargoCloseInputs{}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from cargo close inputs: %w", err)
+		}
+	case *command.CargoLiftInputs:
+		if err := res.FromCargoLiftInputs(gen.CargoLiftInputs{}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from cargo lift inputs: %w", err)
+		}
+	case *command.CargoLowerInputs:
+		if err := res.FromCargoLowerInputs(gen.CargoLowerInputs{}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from cargo lower inputs: %w", err)
+		}
+	case *command.CargoCheckQRInputs:
+		if err := res.FromCargoCheckQRInputs(gen.CargoCheckQRInputs{
+			QrCode: v.QRCode,
+		}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from cargo check qr inputs: %w", err)
+		}
+	default:
+		return gen.CommandInputs{}, fmt.Errorf("unknown inputs type: %T", v)
+	}
+
+	return res, nil
+}
+
+func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, inputs gen.CommandInputs) (command.Inputs, error) {
+	switch command.CommandType(cmdType) {
+	case command.CommandTypeMoveTo:
+		i, err := inputs.AsMoveToInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as move to inputs: %w", err)
+		}
+		return &command.MoveToInputs{
+			Location: i.Location,
+		}, nil
+
+	case command.CommandTypeMoveForward:
+		return &command.MoveForwardInputs{}, nil
+
+	case command.CommandTypeMoveBackward:
+		return &command.MoveBackwardInputs{}, nil
+
+	case command.CommandTypeCargoOpen:
+		return &command.CargoOpenInputs{}, nil
+
+	case command.CommandTypeCargoClose:
+		return &command.CargoCloseInputs{}, nil
+
+	case command.CommandTypeCargoLift:
+		return &command.CargoLiftInputs{}, nil
+
+	case command.CommandTypeCargoLower:
+		return &command.CargoLowerInputs{}, nil
+
+	case command.CommandTypeCargoCheckQR:
+		i, err := inputs.AsCargoCheckQRInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as cargo check qr inputs: %w", err)
+		}
+		return &command.CargoCheckQRInputs{
+			QRCode: i.QrCode,
+		}, nil
+
+	default:
+		return nil, fmt.Errorf("unknown command type: %s", cmdType)
+	}
 }

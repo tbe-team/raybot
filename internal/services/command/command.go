@@ -19,6 +19,10 @@ type CreateCommandParams struct {
 	Inputs Inputs `validate:"required"`
 }
 
+type GetCommandByIDParams struct {
+	CommandID int64 `validate:"required,min=1"`
+}
+
 type ListCommandsParams struct {
 	PagingParams paging.Params `validate:"required"`
 	Sorts        []sort.Sort   `validate:"sort=type status source created_at updated_at completed_at"`
@@ -30,6 +34,7 @@ type ExecuteCreatedCommandParams struct {
 }
 
 type Service interface {
+	GetCommandByID(ctx context.Context, params GetCommandByIDParams) (Command, error)
 	ListCommands(ctx context.Context, params ListCommandsParams) (paging.List[Command], error)
 	CreateCommand(ctx context.Context, params CreateCommandParams) (Command, error)
 	// CancelCommand(ctx context.Context, id int64) error

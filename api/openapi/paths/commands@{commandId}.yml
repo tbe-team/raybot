@@ -1,0 +1,27 @@
+get:
+  summary: Get a command by ID
+  operationId: getCommandById
+  description: Get a command by ID
+  tags:
+    - commands
+  parameters:
+    - name: commandId
+      in: path
+      required: true
+      schema:
+        type: integer
+        description: The ID of the command
+        example: 1
+  responses:
+    '200':
+      description: The command
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/command.yml#/CommandResponse"
+    '404':
+      description: The command was not found
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
