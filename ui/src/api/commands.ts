@@ -1,11 +1,15 @@
 import type { SortPrefix } from '@/lib/sort'
-import type { Command, CommandStatus } from '@/types/command'
+import type { Command, CommandType, CommandStatus, CommandInputMap } from '@/types/command'
 import type { Paging } from '@/types/paging'
 import type { AxiosRequestConfig } from 'axios'
 import http from '@/lib/http'
 
 export const COMMAND_SORT_VALUES = ['type', 'status', 'source', 'created_at', 'completed_at'] as const
 export type CommandSort = (typeof COMMAND_SORT_VALUES)[number]
+export interface CreateCommandParams<T extends CommandType> {
+  type: T
+  inputs: CommandInputMap[T]
+}
 
 export interface ListCommandsParams {
   page?: number
@@ -25,6 +29,12 @@ const commandsAPI = {
       },
       ...axiosOpts,
     })
+  },
+  getCommand: (id: number, axiosOpts?: AxiosRequestConfig): Promise<Command> => {
+    return http.get(`/commands/${id}`, axiosOpts)
+  },
+  createCommand: <T extends CommandType>(params: CreateCommandParams<T>, axiosOpts?: AxiosRequestConfig): Promise<Command> => {
+    return http.post('/commands', params, axiosOpts)
   },
 }
 export default commandsAPI
