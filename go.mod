@@ -4,7 +4,7 @@ go 1.24
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/getkin/kin-openapi v0.130.0
+	github.com/getkin/kin-openapi v0.131.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-chi/cors v1.2.1
 	github.com/go-playground/validator/v10 v10.26.0
