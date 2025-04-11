@@ -158,3 +158,22 @@ HTTPConfig:
   required:
     - port
     - swagger
+
+CargoConfig:
+  type: object
+  properties:
+    liftPosition:
+      type: integer
+      example: 10
+      description: The lift position for the cargo, must be less than lowerPosition
+      minimum: 0
+      x-order: 1
+    lowerPosition:
+      type: integer
+      example: 100
+      description: The lower position for the cargo
+      minimum: 0
+      x-order: 2
+  required:
+    - liftPosition
+    - lowerPosition

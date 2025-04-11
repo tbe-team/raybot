@@ -21,4 +21,7 @@ type Service interface {
 
 	GetHTTPConfig(ctx context.Context) (config.HTTP, error)
 	UpdateHTTPConfig(ctx context.Context, httpCfg config.HTTP) (config.HTTP, error)
+
+	GetCargoConfig(ctx context.Context) (config.Cargo, error)
+	UpdateCargoConfig(ctx context.Context, cargoCfg config.Cargo) (config.Cargo, error)
 }

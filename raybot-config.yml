@@ -28,3 +28,6 @@ grpc:
 http:
   swagger: true
   port: 3000
+cargo:
+  lift_position: 10
+  lower_position: 100

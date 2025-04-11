@@ -1,0 +1,44 @@
+get:
+  summary: Get the cargo configuration
+  operationId: getCargoConfig
+  description: Get the cargo configuration
+  tags:
+    - config
+  responses:
+    "200":
+      description: The cargo configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/CargoConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
+
+put:
+  summary: Update the cargo configuration
+  operationId: updateCargoConfig
+  description: Update the cargo configuration
+  tags:
+    - config
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/config.yml#/CargoConfig"
+  responses:
+    "200":
+      description: The cargo configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/CargoConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
