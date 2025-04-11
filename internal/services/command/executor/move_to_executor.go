@@ -4,7 +4,6 @@ import (
 	"context"
 	"log/slog"
 	"sync"
-	"time"
 
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/command"
@@ -41,8 +40,6 @@ func (e moveToExecutor) Execute(ctx context.Context, inputs command.MoveToInputs
 		defer wg.Done()
 		e.trackingLocation(ctx, inputs.Location)
 	}()
-
-	time.Sleep(20 * time.Second)
 
 	// start driving
 	if err := e.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
