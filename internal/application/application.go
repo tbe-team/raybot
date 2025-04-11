@@ -198,7 +198,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		eventBus,
 		commandRepository,
 		appStateRepository,
-		executor.NewDispatcher(log, eventBus, driveMotorService),
+		executor.NewDispatcher(cfg.Cargo, log, eventBus, driveMotorService, cargoService, liftMotorService),
 	)
 
 	cleanup := func() error {
