@@ -1,5 +1,8 @@
 export type LogLevel = 'DEBUG' | 'INFO' | 'WARN' | 'ERROR'
 export type LogFormat = 'JSON' | 'TEXT'
+export interface SerialPort {
+  items: { port: string }[]
+}
 
 export interface LogConfig {
   level: LogLevel
