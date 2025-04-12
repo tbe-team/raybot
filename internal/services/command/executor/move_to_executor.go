@@ -42,8 +42,6 @@ func (e moveToExecutor) Execute(ctx context.Context, inputs command.MoveToInputs
 		e.trackingLocation(ctx, inputs.Location)
 	}()
 
-	time.Sleep(20 * time.Second)
-
 	// start driving
 	if err := e.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
 		Speed: 100,

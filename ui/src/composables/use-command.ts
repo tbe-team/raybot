@@ -1,48 +1,62 @@
-import type { CommandSort, CreateCommandParams } from '@/api/commands'
+import type { CommandSort } from '@/api/commands'
 import type { SortPrefix } from '@/lib/sort'
 import type { AxiosRequestConfig } from 'axios'
 import commandsAPI from '@/api/commands'
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
-import type { CommandType } from '@/types/command'
+import { keepPreviousData, useMutation, useQuery } from '@tanstack/vue-query'
 
-
-export function useListProcessingCommandsQuery(opts?: { axiosOpts?: Partial<AxiosRequestConfig>, refetchInterval: number }) {
+export function useCurrentProcessingCommandQuery(
+  opts?: { axiosOpts?: Partial<AxiosRequestConfig> },
+) {
   return useQuery({
-    queryKey: ['processingComand'],
-    queryFn: () => commandsAPI.listCommands({ statuses: ['PROCESSING'] }, opts?.axiosOpts),
-    refetchInterval: opts?.refetchInterval,
+    queryKey: ['currentProcessingCommand'],
+    queryFn: () => commandsAPI.getCurrentProcessingCommand(opts?.axiosOpts),
   })
 }
 
-export function useQueuedComandQuery(page: Ref<number>, pageSize: Ref<number>, opts?: { axiosOpts?: Partial<AxiosRequestConfig> }) {
+export function useListQueuedCommandsQuery(
+  page: Ref<number>,
+  pageSize: Ref<number>,
+  opts?: { axiosOpts?: Partial<AxiosRequestConfig> },
+) {
   return useQuery({
     queryKey: ['queuedComand', page, pageSize],
-    queryFn: () => commandsAPI.listCommands({ page: page.value, pageSize: pageSize.value, sorts: ['created_at'], statuses: ['QUEUED'] }, opts?.axiosOpts),
+    queryFn: () => commandsAPI.listCommands({
+      page: page.value,
+      pageSize: pageSize.value,
+      sorts: ['created_at'],
+      statuses: ['QUEUED'],
+    }, opts?.axiosOpts),
   })
 }
 
-export function useListComandsQuery(page: Ref<number>, pageSize: Ref<number>, sorts: Ref<SortPrefix<CommandSort>[]>) {
+export function useListComandsQuery(
+  page: Ref<number>,
+  pageSize: Ref<number>,
+  sorts: Ref<SortPrefix<CommandSort>[]>,
+) {
   return useQuery({
     queryKey: ['comands', page, pageSize, sorts],
-    queryFn: () => commandsAPI.listCommands({ page: page.value, pageSize: pageSize.value, sorts: sorts.value }),
+    queryFn: () => commandsAPI.listCommands({
+      page: page.value,
+      pageSize: pageSize.value,
+      sorts: sorts.value,
+    }),
     placeholderData: keepPreviousData,
   })
 }
 
-export function useGetCommandQuery(id:ComputedRef<number>, opts?: { axiosOpts?: Partial<AxiosRequestConfig>, refetchInterval: number}) {
+export function useGetCommandQuery(
+  id: Ref<number>,
+  opts?: { axiosOpts?: Partial<AxiosRequestConfig> },
+) {
   return useQuery({
     queryKey: ['command', id],
-    queryFn: () => commandsAPI.getCommand(id.value, opts?.axiosOpts) ,
-    refetchInterval: opts?.refetchInterval,
+    queryFn: () => commandsAPI.getCommand(id.value, opts?.axiosOpts),
   })
 }
 
 export function useCreateCommandMutation() {
-  const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (p : CreateCommandParams<CommandType>) => commandsAPI.createCommand(p),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['queuedComand'] })
-    },
+    mutationFn: commandsAPI.createCommand,
   })
 }

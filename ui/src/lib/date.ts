@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
 import duration from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 dayjs.extend(relativeTime)
 dayjs.extend(duration)
@@ -45,25 +45,4 @@ export function formatUptime(seconds: number): string {
     parts.push(`${remainingSeconds.toFixed(0)} second${remainingSeconds !== 1 ? 's' : ''}`)
 
   return parts.join(' ')
-}
-
-export function formatTimeAgo(dateStr: string) {
-  const date = dayjs(dateStr)
-  return date.isValid() ? date.fromNow() : 'Invalid date'
-}
-
-
-export function formatDurationFromISO(startISO: string, endISO: string): string {
-  const start = dayjs(startISO)
-  const end = dayjs(endISO)
-
-  const diffMs = end.diff(start)
-  const dur = dayjs.duration(diffMs)
-
-  const minutes = dur.minutes()
-  const seconds = dur.seconds()
-  if (minutes > 0)
-    return `${minutes} minutes ${seconds} seconds`
-  else
-    return `${seconds} seconds`
 }

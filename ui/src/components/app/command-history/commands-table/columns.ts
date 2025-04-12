@@ -43,14 +43,16 @@ export const columns: ColumnDef<Command>[] = [
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Error' }),
     cell: ({ row }) => {
       const error = row.original.error
-      if (!error)
+      if (!error) {
         return '-'
-      else
-        return h('div', { 
-          class: 'text-red-500 truncate', 
+      }
+      else {
+        return h('div', {
+          class: 'text-red-500 truncate',
           style: 'max-width: 300px;',
           title: error,
         }, error)
+      }
     },
     enableSorting: false,
   },

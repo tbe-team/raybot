@@ -3,13 +3,13 @@ import type { CommandSort } from '@/api/commands'
 import type { SortPrefix } from '@/lib/sort'
 import type { Command } from '@/types/command'
 import type { Table } from '@tanstack/vue-table'
+import { columns } from '@/components/app/command-history/commands-table'
 import DataTable from '@/components/shared/DataTable.vue'
 import DataTableColumnVisibility from '@/components/shared/DataTableColumnVisibility.vue'
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Button } from '@/components/ui/button'
 import { useListComandsQuery } from '@/composables/use-command'
 import { AlertCircle, Loader, RefreshCw } from 'lucide-vue-next'
-import { columns } from './components/commands-table'
 
 const route = useRoute()
 const router = useRouter()
