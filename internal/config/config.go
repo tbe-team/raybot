@@ -14,13 +14,14 @@ type Config struct {
 	GRPC     GRPC     `yaml:"grpc"`
 	HTTP     HTTP     `yaml:"http"`
 
-	Cargo Cargo `yaml:"cargo"`
-
+	Cargo          Cargo  `yaml:"cargo"`
+	Wifi           Wifi   `yaml:"wifi"`
 	ConfigFilePath string `yaml:"-"`
 	DBPath         string `yaml:"-"`
 }
 
 func (c *Config) Validate() error {
+	fmt.Printf("config: %+v\n", c)
 	if err := c.Log.Validate(); err != nil {
 		return fmt.Errorf("validate log: %w", err)
 	}
@@ -43,6 +44,10 @@ func (c *Config) Validate() error {
 
 	if err := c.Cargo.Validate(); err != nil {
 		return fmt.Errorf("validate cargo: %w", err)
+	}
+
+	if err := c.Wifi.Validate(); err != nil {
+		return fmt.Errorf("validate wifi: %w", err)
 	}
 
 	return nil
