@@ -27,7 +27,7 @@ function handlePageChange(p: number) {
 
 const REFRESH_INTERVAL = 1000
 const interval = setInterval(refetch, REFRESH_INTERVAL)
-onUnmounted(()=>{
+onUnmounted(() => {
   clearInterval(interval)
 })
 </script>

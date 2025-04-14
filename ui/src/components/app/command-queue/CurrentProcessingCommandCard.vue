@@ -24,7 +24,7 @@ const { data: command, refetch, isError } = useCurrentProcessingCommandQuery({ a
 const REFRESH_INTERVAL = 1000
 const inteval = setInterval(refetch, REFRESH_INTERVAL)
 
-onUnmounted(()=>{
+onUnmounted(() => {
   clearInterval(inteval)
 })
 </script>
