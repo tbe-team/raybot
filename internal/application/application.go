@@ -173,7 +173,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 
 	// Initialize services
 	batteryService := batteryimpl.NewService(validator, batteryStateRepository, batterySettingRepository)
-	distanceSensorService := distancesensorimpl.NewService(validator, distanceSensorStateRepository)
+	distanceSensorService := distancesensorimpl.NewService(validator, eventBus, distanceSensorStateRepository)
 	driveMotorService := drivemotorimpl.NewService(validator, driveMotorStateRepository, picSerialClient)
 	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, picSerialClient)
 	cargoService := cargoimpl.NewService(validator, cargoRepository, espSerialClient)
