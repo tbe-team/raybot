@@ -25,8 +25,11 @@ function handlePageChange(p: number) {
   page.value = p
 }
 
-const REFRESH_INTERVAL = 2000
-setInterval(refetch, REFRESH_INTERVAL)
+const REFRESH_INTERVAL = 1000
+const interval = setInterval(refetch, REFRESH_INTERVAL)
+onUnmounted(()=>{
+  clearInterval(interval)
+})
 </script>
 
 <template>
