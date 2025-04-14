@@ -177,3 +177,66 @@ CargoConfig:
   required:
     - liftPosition
     - lowerPosition
+
+WifiConfig:
+  type: object
+  properties:
+    ap:
+      $ref: "#/APConfig"
+    sta:
+      $ref: "#/STAConfig"
+  required:
+    - ap
+    - sta
+
+APConfig:
+  type: object
+  properties:
+    enable:
+      type: boolean
+      example: true
+      description: Whether to enable the AP mode
+      x-order: 1
+    ssid:
+      type: string
+      example: "raybot"
+      description: The SSID for the AP mode
+      x-order: 2
+    password:
+      type: string
+      example: "password"
+      description: The password for the AP mode
+      x-order: 3
+    ip:
+      type: string
+      example: "192.168.1.1"
+      description: The IP address for the AP mode
+      x-order: 4
+  required:
+    - enable
+    - ssid
+    - password
+    - ip
+
+STAConfig:
+  type: object
+  properties:
+    enable:
+      type: boolean
+      example: true
+      description: Whether to enable the STA mode
+      x-order: 1
+    ssid:
+      type: string
+      example: "raybot"
+      description: The SSID for the wifi connection
+      x-order: 2
+    password:
+      type: string
+      example: "password"
+      description: The password for the wifi connection
+      x-order: 3
+  required:
+    - enable
+    - ssid
+    - password

@@ -202,6 +202,36 @@ func (h configHandler) UpdateCargoConfig(ctx context.Context, request gen.Update
 	return gen.UpdateCargoConfig200JSONResponse(h.convertCargoConfigToResponse(cfg)), nil
 }
 
+func (h configHandler) GetWifiConfig(ctx context.Context, _ gen.GetWifiConfigRequestObject) (gen.GetWifiConfigResponseObject, error) {
+	cfg, err := h.configService.GetWifiConfig(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("config service get wifi config: %w", err)
+	}
+
+	return gen.GetWifiConfig200JSONResponse(h.convertWifiConfigToResponse(cfg)), nil
+}
+
+func (h configHandler) UpdateWifiConfig(ctx context.Context, request gen.UpdateWifiConfigRequestObject) (gen.UpdateWifiConfigResponseObject, error) {
+	cfg, err := h.configService.UpdateWifiConfig(ctx, config.Wifi{
+		AP: config.APConfig{
+			Enable:   request.Body.Ap.Enable,
+			SSID:     request.Body.Ap.Ssid,
+			Password: request.Body.Ap.Password,
+			IP:       request.Body.Ap.Ip,
+		},
+		STA: config.STAConfig{
+			Enable:   request.Body.Sta.Enable,
+			SSID:     request.Body.Sta.Ssid,
+			Password: request.Body.Sta.Password,
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("config service update wifi config: %w", err)
+	}
+
+	return gen.UpdateWifiConfig200JSONResponse(h.convertWifiConfigToResponse(cfg)), nil
+}
+
 func (configHandler) convertLogConfigToResponse(cfg config.Log) gen.LogConfig {
 	return gen.LogConfig{
 		Level:     cfg.Level.String(),
@@ -257,5 +287,24 @@ func (configHandler) convertCargoConfigToResponse(cfg config.Cargo) gen.CargoCon
 	return gen.CargoConfig{
 		LiftPosition:  int(cfg.LiftPosition),
 		LowerPosition: int(cfg.LowerPosition),
+	}
+}
+
+func (configHandler) convertWifiConfigToResponse(cfg config.Wifi) gen.WifiConfig {
+	ap := gen.APConfig{
+		Enable:   cfg.AP.Enable,
+		Ssid:     cfg.AP.SSID,
+		Password: cfg.AP.Password,
+		Ip:       cfg.AP.IP,
+	}
+	sta := gen.STAConfig{
+		Enable:   cfg.STA.Enable,
+		Ssid:     cfg.STA.SSID,
+		Password: cfg.STA.Password,
+	}
+
+	return gen.WifiConfig{
+		Ap:  ap,
+		Sta: sta,
 	}
 }

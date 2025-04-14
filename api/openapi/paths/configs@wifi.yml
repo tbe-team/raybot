@@ -1,0 +1,44 @@
+get:
+  summary: Get the wifi configuration
+  operationId: getWifiConfig
+  description: Get the wifi configuration
+  tags:
+    - config
+  responses:
+    "200":
+      description: The wifi configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/WifiConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
+
+put:
+  summary: Update the wifi configuration
+  operationId: updateWifiConfig
+  description: Update the wifi configuration
+  tags:
+    - config
+  requestBody:
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/config.yml#/WifiConfig"
+  responses:
+    "200":
+      description: The wifi configuration was updated successfully
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/WifiConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

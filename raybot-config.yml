@@ -32,7 +32,12 @@ cargo:
   lift_position: 10
   lower_position: 100
 wifi:
-  mode: AP
-  ssid: Raybot AP
-  password: 11111111
-  ip: 192.168.1.1
+  ap:
+    enable: false
+    ssid: Raybot AP
+    password: "1111111"
+    ip: 192.168.1.1
+  sta:
+    enable: false
+    ssid: ssid
+    password: password
