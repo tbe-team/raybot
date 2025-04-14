@@ -93,7 +93,7 @@ func (c *DefaultClient) StopDriveMotor() error {
 		Data: picCommandDriveMotorData{
 			Direction: moveDirectionForward,
 			Speed:     0,
-			Enable:    true,
+			Enable:    false,
 		},
 	}
 
