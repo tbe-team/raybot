@@ -61,7 +61,17 @@ func (s *service) UpdateCargoQRCode(ctx context.Context, params cargo.UpdateCarg
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	return s.cargoRepo.UpdateCargoQRCode(ctx, params)
+	if err := s.cargoRepo.UpdateCargoQRCode(ctx, params); err != nil {
+		return fmt.Errorf("update cargo qr code: %w", err)
+	}
+
+	s.publisher.Publish(events.CargoQRCodeUpdatedTopic, eventbus.NewMessage(
+		events.CargoQRCodeUpdatedEvent{
+			QRCode: params.QRCode,
+		},
+	))
+
+	return nil
 }
 
 func (s *service) UpdateCargoBottomDistance(ctx context.Context, params cargo.UpdateCargoBottomDistanceParams) error {

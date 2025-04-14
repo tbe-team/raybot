@@ -234,14 +234,13 @@ func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, i
 		return &command.CargoLowerInputs{}, nil
 
 	case command.CommandTypeCargoCheckQR:
-		return &command.CargoCheckQRInputs{}, xerror.NotImplemented(nil, "cargo.checkQR", "this command type is not implemented")
-		// i, err := inputs.AsCargoCheckQRInputs()
-		// if err != nil {
-		// 	return nil, fmt.Errorf("as cargo check qr inputs: %w", err)
-		// }
-		// return &command.CargoCheckQRInputs{
-		// 	QRCode: i.QrCode,
-		// }, nil
+		i, err := inputs.AsCargoCheckQRInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as cargo check qr inputs: %w", err)
+		}
+		return &command.CargoCheckQRInputs{
+			QRCode: i.QrCode,
+		}, nil
 
 	default:
 		return nil, fmt.Errorf("unknown command type: %s", cmdType)

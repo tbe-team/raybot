@@ -23,10 +23,11 @@ type dispatcher struct {
 	moveForwardExecutor  moveForwardExecutor
 	moveBackwardExecutor moveBackwardExecutor
 
-	cargoOpenExecutor  cargoOpenExecutor
-	cargoCloseExecutor cargoCloseExecutor
-	cargoLiftExecutor  cargoLiftExecutor
-	cargoLowerExecutor cargoLowerExecutor
+	cargoOpenExecutor    cargoOpenExecutor
+	cargoCloseExecutor   cargoCloseExecutor
+	cargoLiftExecutor    cargoLiftExecutor
+	cargoLowerExecutor   cargoLowerExecutor
+	cargoCheckQRExecutor cargoCheckQRExecutor
 }
 
 func NewDispatcher(
@@ -43,10 +44,11 @@ func NewDispatcher(
 		moveForwardExecutor:  newMoveForwardExecutor(driveMotorService),
 		moveBackwardExecutor: newMoveBackwardExecutor(driveMotorService),
 
-		cargoOpenExecutor:  newCargoOpenExecutor(log, subscriber, cargoService),
-		cargoCloseExecutor: newCargoCloseExecutor(log, subscriber, cargoService),
-		cargoLiftExecutor:  newCargoLiftExecutor(log, cargoCfg.LiftPosition, subscriber, liftMotorService),
-		cargoLowerExecutor: newCargoLowerExecutor(log, cargoCfg.LowerPosition, subscriber, liftMotorService),
+		cargoOpenExecutor:    newCargoOpenExecutor(log, subscriber, cargoService),
+		cargoCloseExecutor:   newCargoCloseExecutor(log, subscriber, cargoService),
+		cargoLiftExecutor:    newCargoLiftExecutor(log, cargoCfg.LiftPosition, subscriber, liftMotorService),
+		cargoLowerExecutor:   newCargoLowerExecutor(log, cargoCfg.LowerPosition, subscriber, liftMotorService),
+		cargoCheckQRExecutor: newCargoCheckQRExecutor(log, subscriber),
 	}
 }
 
@@ -107,6 +109,13 @@ func (d dispatcher) Dispatch(ctx context.Context, cmd command.Command) error {
 			return fmt.Errorf("invalid cargo lower inputs: %v", cmd.Inputs)
 		}
 		return d.cargoLowerExecutor.Execute(ctx, *i)
+
+	case command.CommandTypeCargoCheckQR:
+		i, ok := cmd.Inputs.(*command.CargoCheckQRInputs)
+		if !ok {
+			return fmt.Errorf("invalid cargo check qr inputs: %v", cmd.Inputs)
+		}
+		return d.cargoCheckQRExecutor.Execute(ctx, *i)
 
 	default:
 		return fmt.Errorf("unknown command type: %s", cmd.Type)
