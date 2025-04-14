@@ -71,7 +71,7 @@ func (e cargoLowerExecutor) trackingDistance(ctx context.Context) {
 		// 10% tolerance
 		acceptableDistance := e.lowerPosition - e.lowerPosition*10/100
 		if ev.DownDistance >= acceptableDistance {
-			e.log.Info("cargo lower completed", slog.Int64("lower_position", int64(e.lowerPosition)))
+			e.log.Debug("cargo lower completed", slog.Int64("lower_position", int64(e.lowerPosition)))
 			close(doneCh)
 		}
 	})

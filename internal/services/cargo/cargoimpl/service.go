@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/hardware/espserial"
 	"github.com/tbe-team/raybot/internal/services/cargo"
+	"github.com/tbe-team/raybot/pkg/eventbus"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -16,6 +18,7 @@ const (
 
 type service struct {
 	validator validator.Validator
+	publisher eventbus.Publisher
 
 	cargoRepo           cargo.Repository
 	espSerialController espserial.Controller
@@ -23,11 +26,13 @@ type service struct {
 
 func NewService(
 	validator validator.Validator,
+	publisher eventbus.Publisher,
 	cargoRepo cargo.Repository,
 	espSerialController espserial.Controller,
 ) cargo.Service {
 	return &service{
 		validator:           validator,
+		publisher:           publisher,
 		cargoRepo:           cargoRepo,
 		espSerialController: espSerialController,
 	}
@@ -38,7 +43,17 @@ func (s *service) UpdateCargoDoor(ctx context.Context, params cargo.UpdateCargoD
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	return s.cargoRepo.UpdateCargoDoor(ctx, params)
+	if err := s.cargoRepo.UpdateCargoDoor(ctx, params); err != nil {
+		return fmt.Errorf("update cargo door: %w", err)
+	}
+
+	s.publisher.Publish(events.CargoDoorUpdatedTopic, eventbus.NewMessage(
+		events.CargoDoorUpdatedEvent{
+			IsOpen: params.IsOpen,
+		},
+	))
+
+	return nil
 }
 
 func (s *service) UpdateCargoQRCode(ctx context.Context, params cargo.UpdateCargoQRCodeParams) error {

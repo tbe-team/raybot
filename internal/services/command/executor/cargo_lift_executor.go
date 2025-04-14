@@ -74,7 +74,7 @@ func (e cargoLiftExecutor) trackingDistance(ctx context.Context) {
 		// 10% tolerance
 		acceptableDistance := e.liftPosition + e.liftPosition*10/100
 		if ev.DownDistance <= acceptableDistance {
-			e.log.Info("cargo lift completed", slog.Int64("lift_position", int64(e.liftPosition)))
+			e.log.Debug("cargo lift completed", slog.Int64("lift_position", int64(e.liftPosition)))
 			close(doneCh)
 		}
 	})
