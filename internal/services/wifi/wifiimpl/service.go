@@ -38,7 +38,11 @@ func (s service) initWifi() error {
 		return s.initAPMode()
 	}
 
-	return s.initSTAMode()
+	if s.cfg.STA.Enable {
+		return s.initSTAMode()
+	}
+
+	return nil
 }
 
 func (s service) initAPMode() error {

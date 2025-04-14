@@ -19,11 +19,6 @@ func (w *Wifi) Validate() error {
 		return fmt.Errorf("only one of AP or STA can be enabled")
 	}
 
-	// If both are disabled, enable AP by default
-	if !w.AP.Enable && !w.STA.Enable {
-		w.AP.Enable = true
-	}
-
 	if w.AP.Enable {
 		if err := w.AP.Validate(); err != nil {
 			return fmt.Errorf("invalid AP config: %w", err)
