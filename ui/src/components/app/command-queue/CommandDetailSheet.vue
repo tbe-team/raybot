@@ -22,7 +22,7 @@ const { data: command, isPending, isError, refetch } = useGetCommandQuery(comman
   },
 })
 
-const REFRESH_INTERVAL = 2000
+const REFRESH_INTERVAL = 1000
 const { pause, resume } = useIntervalFn(() => {
   refetch()
 }, REFRESH_INTERVAL, { immediate: false })
@@ -33,6 +33,12 @@ watch(command, (cmd) => {
   }
   else {
     resume()
+  }
+}, { immediate: true })
+
+watch(isOpen, (open) => {
+  if (!open) {
+    pause()
   }
 }, { immediate: true })
 </script>
