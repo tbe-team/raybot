@@ -18,7 +18,7 @@ type Dispatcher interface {
 }
 
 type dispatcher struct {
-	stopExecutor         stopExecutor
+	stopMovementExecutor stopMovementExecutor
 	moveToExecutor       moveToExecutor
 	moveForwardExecutor  moveForwardExecutor
 	moveBackwardExecutor moveBackwardExecutor
@@ -38,7 +38,7 @@ func NewDispatcher(
 	liftMotorService liftmotor.Service,
 ) Dispatcher {
 	return dispatcher{
-		stopExecutor:         newStopExecutor(driveMotorService),
+		stopMovementExecutor: newStopMovementExecutor(log, subscriber, driveMotorService),
 		moveToExecutor:       newMoveToExecutor(log, subscriber, driveMotorService),
 		moveForwardExecutor:  newMoveForwardExecutor(driveMotorService),
 		moveBackwardExecutor: newMoveBackwardExecutor(driveMotorService),
@@ -52,12 +52,12 @@ func NewDispatcher(
 
 func (d dispatcher) Dispatch(ctx context.Context, cmd command.Command) error {
 	switch cmd.Type {
-	case command.CommandTypeStop:
-		i, ok := cmd.Inputs.(*command.StopInputs)
+	case command.CommandTypeStopMovement:
+		i, ok := cmd.Inputs.(*command.StopMovementInputs)
 		if !ok {
 			return fmt.Errorf("invalid stop inputs: %v", cmd.Inputs)
 		}
-		return d.stopExecutor.Execute(ctx, *i)
+		return d.stopMovementExecutor.Execute(ctx, *i)
 
 	case command.CommandTypeMoveTo:
 		i, ok := cmd.Inputs.(*command.MoveToInputs)

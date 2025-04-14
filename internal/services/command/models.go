@@ -14,7 +14,7 @@ func (c CommandType) String() string {
 
 func (c CommandType) Validate() error {
 	switch c {
-	case CommandTypeStop, CommandTypeMoveForward, CommandTypeMoveBackward,
+	case CommandTypeStopMovement, CommandTypeMoveForward, CommandTypeMoveBackward,
 		CommandTypeMoveTo, CommandTypeCargoOpen, CommandTypeCargoClose,
 		CommandTypeCargoLift, CommandTypeCargoLower, CommandTypeCargoCheckQR:
 		return nil
@@ -23,8 +23,7 @@ func (c CommandType) Validate() error {
 }
 
 const (
-	CommandTypeStop CommandType = "STOP"
-
+	CommandTypeStopMovement CommandType = "STOP_MOVEMENT"
 	CommandTypeMoveForward  CommandType = "MOVE_FORWARD"
 	CommandTypeMoveBackward CommandType = "MOVE_BACKWARD"
 	CommandTypeMoveTo       CommandType = "MOVE_TO"

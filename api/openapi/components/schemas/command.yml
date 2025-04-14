@@ -96,6 +96,7 @@ CreateCommandRequest:
 CommandType:
   type: string
   enum:
+    - STOP_MOVEMENT
     - MOVE_FORWARD
     - MOVE_BACKWARD
     - MOVE_TO
