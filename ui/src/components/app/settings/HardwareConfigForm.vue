@@ -35,19 +35,20 @@ const hardwareConfigSchema = z.object({
   pic: z.object({
     serial: serialConfigSchema,
   }),
-}).refine(
-  data => data.esp.serial.port !== data.pic.serial.port,
-  {
-    message: 'ESP and PIC cannot use the same port',
-    path: ['esp.serial.port'],
-  },
-).refine(
-  data => data.esp.serial.port !== data.pic.serial.port,
-  {
-    message: 'ESP and PIC cannot use the same port',
-    path: ['pic.serial.port'],
-  },
-)
+}).superRefine((data, ctx) => {
+  if (data.esp.serial.port === data.pic.serial.port) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'ESP and PIC cannot use the same port',
+      path: ['esp.serial.port'],
+    })
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'ESP and PIC cannot use the same port',
+      path: ['pic.serial.port'],
+    })
+  }
+})
 
 const queryClient = useQueryClient()
 const { mutate, isPending } = useHardwareConfigMutation()

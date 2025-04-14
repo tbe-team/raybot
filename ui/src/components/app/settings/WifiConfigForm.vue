@@ -46,6 +46,19 @@ const wifiConfigSchema = z.object({
       .max(63, 'Password must be at most 63 characters')
       .regex(passwordRegex, 'Password can only contain printable characters'),
   }),
+}).superRefine((data, ctx) => {
+  if (data.ap.enable && data.sta.enable || !data.ap.enable && !data.sta.enable) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'AP and STA cannot be enabled or disabled at the same time',
+      path: ['ap.enable'],
+    })
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'AP and STA cannot be enabled or disabled at the same time',
+      path: ['sta.enable'],
+    })
+  }
 })
 
 const queryClient = useQueryClient()
@@ -88,6 +101,7 @@ const onSubmit = form.handleSubmit((values) => {
           />
         </FormControl>
       </FormItem>
+      <FormMessage />
     </FormField>
 
     <FormField v-slot="{ componentField }" name="ap.ssid">
@@ -149,6 +163,7 @@ const onSubmit = form.handleSubmit((values) => {
           />
         </FormControl>
       </FormItem>
+      <FormMessage />
     </FormField>
 
     <FormField v-slot="{ componentField }" name="sta.ssid">
