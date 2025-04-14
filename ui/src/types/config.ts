@@ -55,3 +55,21 @@ export interface CargoConfig {
   liftPosition: number
   lowerPosition: number
 }
+
+export interface WifiConfig {
+  ap: APConfig
+  sta: STAConfig
+}
+
+export interface APConfig {
+  enable: boolean
+  ssid: string
+  password: string
+  ip: string
+}
+
+export interface STAConfig {
+  enable: boolean
+  ssid: string
+  password: string
+}
