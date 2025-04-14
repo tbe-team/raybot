@@ -84,6 +84,7 @@ type Command struct {
 	Source      Source
 	Inputs      Inputs
 	Error       *string
+	StartedAt   *time.Time
 	CompletedAt *time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time

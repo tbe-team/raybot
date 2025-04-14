@@ -50,6 +50,8 @@ type UpdateCommandParams struct {
 	SetStatus      bool
 	Error          *string
 	SetError       bool
+	StartedAt      *time.Time
+	SetStartedAt   bool
 	CompletedAt    *time.Time
 	SetCompletedAt bool
 	UpdatedAt      time.Time

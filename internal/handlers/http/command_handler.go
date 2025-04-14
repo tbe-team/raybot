@@ -143,6 +143,7 @@ func (h commandHandler) convertCommandToResponse(cmd command.Command) (gen.Comma
 		Source:      cmd.Source.String(),
 		Inputs:      inputs,
 		Error:       cmd.Error,
+		StartedAt:   cmd.StartedAt,
 		CompletedAt: cmd.CompletedAt,
 		CreatedAt:   cmd.CreatedAt,
 		UpdatedAt:   cmd.UpdatedAt,

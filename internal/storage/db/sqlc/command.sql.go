@@ -16,6 +16,7 @@ INSERT INTO commands (
 	source,
 	inputs,
 	error,
+	started_at,
 	created_at,
 	updated_at,
 	completed_at
@@ -28,7 +29,8 @@ VALUES (
 	?5,
 	?6,
 	?7,
-	?8
+	?8,
+	?9
 )
 RETURNING id
 `
@@ -39,6 +41,7 @@ type CommandCreateParams struct {
 	Source      string  `json:"source"`
 	Inputs      string  `json:"inputs"`
 	Error       *string `json:"error"`
+	StartedAt   *string `json:"started_at"`
 	CreatedAt   string  `json:"created_at"`
 	UpdatedAt   string  `json:"updated_at"`
 	CompletedAt *string `json:"completed_at"`
@@ -51,6 +54,7 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 		arg.Source,
 		arg.Inputs,
 		arg.Error,
+		arg.StartedAt,
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.CompletedAt,
@@ -61,7 +65,7 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 }
 
 const commandGetByID = `-- name: CommandGetByID :one
-SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at FROM commands
+SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at FROM commands
 WHERE id = ?1
 `
 
@@ -78,12 +82,13 @@ func (q *Queries) CommandGetByID(ctx context.Context, db DBTX, id int64) (Comman
 		&i.CompletedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.StartedAt,
 	)
 	return i, err
 }
 
 const commandGetNextExecutable = `-- name: CommandGetNextExecutable :one
-SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at FROM commands
+SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at FROM commands
 WHERE
 	status IN ('QUEUED', 'PROCESSING')
 ORDER BY
@@ -108,12 +113,13 @@ func (q *Queries) CommandGetNextExecutable(ctx context.Context, db DBTX) (Comman
 		&i.CompletedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.StartedAt,
 	)
 	return i, err
 }
 
 const commandGetProcessing = `-- name: CommandGetProcessing :one
-SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at FROM commands
+SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at FROM commands
 WHERE status = 'PROCESSING'
 LIMIT 1
 `
@@ -131,6 +137,7 @@ func (q *Queries) CommandGetProcessing(ctx context.Context, db DBTX) (Command, e
 		&i.CompletedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.StartedAt,
 	)
 	return i, err
 }
@@ -153,11 +160,12 @@ const commandUpdate = `-- name: CommandUpdate :one
 UPDATE commands
 SET
 	status = CASE WHEN ?1 = 1 THEN ?2 ELSE status END,
-	error = CASE WHEN ?3 IS NOT NULL THEN ?4 ELSE error END,
-	completed_at = CASE WHEN ?5 IS NOT NULL THEN ?6 ELSE completed_at END,
-	updated_at = ?7
-WHERE id = ?8
-RETURNING id, type, status, source, inputs, error, completed_at, created_at, updated_at
+	error = CASE WHEN ?3 = 1 THEN ?4 ELSE error END,
+	started_at = CASE WHEN ?5 = 1 THEN ?6 ELSE started_at END,
+	completed_at = CASE WHEN ?7 = 1 THEN ?8 ELSE completed_at END,
+	updated_at = ?9
+WHERE id = ?10
+RETURNING id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at
 `
 
 type CommandUpdateParams struct {
@@ -165,6 +173,8 @@ type CommandUpdateParams struct {
 	Status         string      `json:"status"`
 	SetError       interface{} `json:"set_error"`
 	Error          *string     `json:"error"`
+	SetStartedAt   interface{} `json:"set_started_at"`
+	StartedAt      *string     `json:"started_at"`
 	SetCompletedAt interface{} `json:"set_completed_at"`
 	CompletedAt    *string     `json:"completed_at"`
 	UpdatedAt      string      `json:"updated_at"`
@@ -177,6 +187,8 @@ func (q *Queries) CommandUpdate(ctx context.Context, db DBTX, arg CommandUpdateP
 		arg.Status,
 		arg.SetError,
 		arg.Error,
+		arg.SetStartedAt,
+		arg.StartedAt,
 		arg.SetCompletedAt,
 		arg.CompletedAt,
 		arg.UpdatedAt,
@@ -193,6 +205,7 @@ func (q *Queries) CommandUpdate(ctx context.Context, db DBTX, arg CommandUpdateP
 		&i.CompletedAt,
 		&i.CreatedAt,
 		&i.UpdatedAt,
+		&i.StartedAt,
 	)
 	return i, err
 }

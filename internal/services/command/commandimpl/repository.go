@@ -87,6 +87,7 @@ func (r repository) ListCommands(ctx context.Context, params command.ListCommand
 				&row.CompletedAt,
 				&row.CreatedAt,
 				&row.UpdatedAt,
+				&row.StartedAt,
 			); err != nil {
 				return fmt.Errorf("scan command: %w", err)
 			}
@@ -167,15 +168,21 @@ func (r repository) CreateCommand(ctx context.Context, commandArg command.Comman
 		completedAt = ptr.New(commandArg.CompletedAt.Format(time.RFC3339))
 	}
 
+	var startedAt *string
+	if commandArg.StartedAt != nil {
+		startedAt = ptr.New(commandArg.StartedAt.Format(time.RFC3339))
+	}
+
 	id, err := r.queries.CommandCreate(ctx, r.db, sqlc.CommandCreateParams{
 		Type:        commandArg.Type.String(),
 		Status:      commandArg.Status.String(),
 		Source:      commandArg.Source.String(),
 		Inputs:      string(inputsBytes),
 		Error:       commandArg.Error,
+		StartedAt:   startedAt,
+		CompletedAt: completedAt,
 		CreatedAt:   commandArg.CreatedAt.Format(time.RFC3339),
 		UpdatedAt:   commandArg.UpdatedAt.Format(time.RFC3339),
-		CompletedAt: completedAt,
 	})
 	if err != nil {
 		return command.Command{}, fmt.Errorf("queries create command: %w", err)
@@ -192,12 +199,19 @@ func (r repository) UpdateCommand(ctx context.Context, params command.UpdateComm
 		completedAt = ptr.New(params.CompletedAt.Format(time.RFC3339))
 	}
 
+	var startedAt *string
+	if params.StartedAt != nil {
+		startedAt = ptr.New(params.StartedAt.Format(time.RFC3339))
+	}
+
 	row, err := r.queries.CommandUpdate(ctx, r.db, sqlc.CommandUpdateParams{
 		ID:             params.ID,
 		Status:         params.Status.String(),
 		SetStatus:      params.SetStatus,
 		Error:          params.Error,
 		SetError:       params.SetError,
+		StartedAt:      startedAt,
+		SetStartedAt:   params.SetStartedAt,
 		CompletedAt:    completedAt,
 		SetCompletedAt: params.SetCompletedAt,
 		UpdatedAt:      params.UpdatedAt.Format(time.RFC3339),
@@ -232,6 +246,14 @@ func (repository) convertRowToCommand(row sqlc.Command) (command.Command, error)
 	ret.UpdatedAt, err = time.Parse(time.RFC3339, row.UpdatedAt)
 	if err != nil {
 		return command.Command{}, fmt.Errorf("failed to parse updated at: %w", err)
+	}
+
+	if row.StartedAt != nil {
+		startedAt, err := time.Parse(time.RFC3339, *row.StartedAt)
+		if err != nil {
+			return command.Command{}, fmt.Errorf("failed to parse started at: %w", err)
+		}
+		ret.StartedAt = &startedAt
 	}
 
 	if row.CompletedAt != nil {

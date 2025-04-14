@@ -111,10 +111,12 @@ func (s service) ExecuteCreatedCommand(ctx context.Context, params command.Execu
 	}
 
 	cmd, err = s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
-		ID:        cmd.ID,
-		Status:    command.StatusProcessing,
-		SetStatus: true,
-		UpdatedAt: time.Now(),
+		ID:           cmd.ID,
+		Status:       command.StatusProcessing,
+		SetStatus:    true,
+		StartedAt:    ptr.New(time.Now()),
+		SetStartedAt: true,
+		UpdatedAt:    time.Now(),
 	})
 	if err != nil {
 		return fmt.Errorf("update command: %w", err)
@@ -144,10 +146,12 @@ func (s service) runNextExecutableCommand(ctx context.Context) {
 
 	if cmd.Status == command.StatusQueued {
 		_, err = s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
-			ID:        cmd.ID,
-			Status:    command.StatusProcessing,
-			SetStatus: true,
-			UpdatedAt: time.Now(),
+			ID:           cmd.ID,
+			Status:       command.StatusProcessing,
+			SetStatus:    true,
+			StartedAt:    ptr.New(time.Now()),
+			SetStartedAt: true,
+			UpdatedAt:    time.Now(),
 		})
 		if err != nil {
 			s.log.Error("failed to update command to PROCESSING status", slog.Any("error", err))
