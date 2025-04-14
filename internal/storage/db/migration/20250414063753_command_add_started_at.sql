@@ -1,6 +1,8 @@
 -- +goose Up
 -- +goose StatementBegin
 ALTER TABLE commands ADD COLUMN started_at TEXT;
+
+UPDATE commands SET type = 'STOP_MOVEMENT' WHERE type = 'STOP';
 -- +goose StatementEnd
 
 -- +goose Down
@@ -22,6 +24,8 @@ CREATE TABLE commands (
 );
 
 INSERT INTO commands SELECT * FROM commands_backup;
+
+UPDATE commands SET type = 'STOP' WHERE type = 'STOP_MOVEMENT';
 
 DROP TABLE commands_backup;
 -- +goose StatementEnd
