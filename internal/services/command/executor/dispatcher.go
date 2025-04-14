@@ -46,7 +46,7 @@ func NewDispatcher(
 		cargoOpenExecutor:  newCargoOpenExecutor(cargoService),
 		cargoCloseExecutor: newCargoCloseExecutor(cargoService),
 		cargoLiftExecutor:  newCargoLiftExecutor(log, cargoCfg.LiftPosition, subscriber, liftMotorService),
-		cargoLowerExecutor: newCargoLowerExecutor(cargoCfg.LowerPosition, liftMotorService),
+		cargoLowerExecutor: newCargoLowerExecutor(log, cargoCfg.LowerPosition, subscriber, liftMotorService),
 	}
 }
 
