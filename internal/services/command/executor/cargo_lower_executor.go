@@ -78,8 +78,6 @@ func (e cargoLowerExecutor) trackingDistance(ctx context.Context) {
 
 	select {
 	case <-doneCh:
-		return
 	case <-ctx.Done():
-		return
 	}
 }

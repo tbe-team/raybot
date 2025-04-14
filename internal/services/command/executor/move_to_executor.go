@@ -83,8 +83,6 @@ func (e moveToExecutor) trackingLocation(ctx context.Context, location string) {
 
 	select {
 	case <-reachCh:
-		return
 	case <-ctx.Done():
-		return
 	}
 }
