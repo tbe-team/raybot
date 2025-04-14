@@ -21,7 +21,6 @@ type Config struct {
 }
 
 func (c *Config) Validate() error {
-	fmt.Printf("config: %+v\n", c)
 	if err := c.Log.Validate(); err != nil {
 		return fmt.Errorf("validate log: %w", err)
 	}
