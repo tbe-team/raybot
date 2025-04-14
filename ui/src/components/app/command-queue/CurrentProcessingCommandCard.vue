@@ -22,7 +22,11 @@ const emit = defineEmits<{
 const { data: command, refetch, isError } = useCurrentProcessingCommandQuery({ axiosOpts: { doNotShowLoading: true } })
 
 const REFRESH_INTERVAL = 1000
-setInterval(refetch, REFRESH_INTERVAL)
+const interval = setInterval(refetch, REFRESH_INTERVAL)
+
+onUnmounted(() => {
+  clearInterval(interval)
+})
 </script>
 
 <template>
