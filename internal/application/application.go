@@ -34,6 +34,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/peripheral/peripheralimpl"
 	"github.com/tbe-team/raybot/internal/services/system"
 	"github.com/tbe-team/raybot/internal/services/system/systemimpl"
+	"github.com/tbe-team/raybot/internal/services/wifi/wifiimpl"
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/internal/storage/file"
@@ -200,6 +201,10 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		appStateRepository,
 		executor.NewDispatcher(cfg.Cargo, log, eventBus, driveMotorService, cargoService, liftMotorService),
 	)
+	wifiService := wifiimpl.NewService(cfg.Wifi, log)
+	if err := wifiService.Run(ctx); err != nil {
+		return nil, nil, fmt.Errorf("failed to run wifi service: %w", err)
+	}
 
 	cleanup := func() error {
 		var err error

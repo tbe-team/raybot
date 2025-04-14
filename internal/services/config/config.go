@@ -24,4 +24,7 @@ type Service interface {
 
 	GetCargoConfig(ctx context.Context) (config.Cargo, error)
 	UpdateCargoConfig(ctx context.Context, cargoCfg config.Cargo) (config.Cargo, error)
+
+	GetWifiConfig(ctx context.Context) (config.Wifi, error)
+	UpdateWifiConfig(ctx context.Context, wifiCfg config.Wifi) (config.Wifi, error)
 }
