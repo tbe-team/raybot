@@ -36,7 +36,7 @@ function handleRestart() {
   <PageContainer>
     <div class="flex flex-col w-full">
       <div class="mb-6">
-        <h1 class="text-xl font-semibold">
+        <h1 class="text-xl font-semibold tracking-tight">
           Application Restart
         </h1>
         <p class="text-sm text-muted-foreground">

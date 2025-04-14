@@ -1,9 +1,9 @@
 package events
 
-import "github.com/maniartech/signals"
+const (
+	LocationUpdatedTopic = "location:updated"
+)
 
 type UpdateLocationEvent struct {
-	CurrentLocation string
+	Location string
 }
-
-var UpdateLocationSignal = signals.New[UpdateLocationEvent]()

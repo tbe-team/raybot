@@ -3,7 +3,6 @@ package liftmotorimpl
 import (
 	"context"
 	"sync"
-	"time"
 
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 )
@@ -27,15 +26,29 @@ func (r *liftMotorStateRepository) GetLiftMotorState(_ context.Context) (liftmot
 }
 
 func (r *liftMotorStateRepository) UpdateLiftMotorState(_ context.Context, params liftmotor.UpdateLiftMotorStateParams) error {
-	r.mu.Lock()
-	defer r.mu.Unlock()
+	r.mu.RLock()
+	state := r.liftMotor
+	r.mu.RUnlock()
 
-	r.liftMotor = liftmotor.LiftMotorState{
-		CurrentPosition: params.CurrentPosition,
-		TargetPosition:  params.TargetPosition,
-		IsRunning:       params.IsRunning,
-		Enabled:         params.Enabled,
-		UpdatedAt:       time.Now(),
+	if params.SetCurrentPosition {
+		state.CurrentPosition = params.CurrentPosition
 	}
+
+	if params.SetTargetPosition {
+		state.TargetPosition = params.TargetPosition
+	}
+
+	if params.SetIsRunning {
+		state.IsRunning = params.IsRunning
+	}
+
+	if params.SetEnabled {
+		state.Enabled = params.Enabled
+	}
+
+	r.mu.Lock()
+	r.liftMotor = state
+	r.mu.Unlock()
+
 	return nil
 }

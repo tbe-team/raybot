@@ -88,25 +88,25 @@ func (h dashboardDataHandler) convertRobotStateToResponse(state dashboarddata.Ro
 		},
 		AppConnection: gen.AppConnection{
 			CloudConnection: gen.CloudConnection{
-				Connected:       state.AppConnection.CloudConnection.Connected,
-				LastConnectedAt: state.AppConnection.CloudConnection.LastConnectedAt,
-				Uptime:          h.getUptime(state.AppConnection.CloudConnection.Connected, state.AppConnection.CloudConnection.LastConnectedAt),
-				Error:           state.AppConnection.CloudConnection.Error,
+				Connected:       state.AppState.CloudConnection.Connected,
+				LastConnectedAt: state.AppState.CloudConnection.LastConnectedAt,
+				Uptime:          h.getUptime(state.AppState.CloudConnection.Connected, state.AppState.CloudConnection.LastConnectedAt),
+				Error:           state.AppState.CloudConnection.Error,
 			},
 			EspSerialConnection: gen.ESPSerialConnection{
-				Connected:       state.AppConnection.ESPSerialConnection.Connected,
-				LastConnectedAt: state.AppConnection.ESPSerialConnection.LastConnectedAt,
-				Error:           state.AppConnection.ESPSerialConnection.Error,
+				Connected:       state.AppState.ESPSerialConnection.Connected,
+				LastConnectedAt: state.AppState.ESPSerialConnection.LastConnectedAt,
+				Error:           state.AppState.ESPSerialConnection.Error,
 			},
 			PicSerialConnection: gen.PICSerialConnection{
-				Connected:       state.AppConnection.PICSerialConnection.Connected,
-				LastConnectedAt: state.AppConnection.PICSerialConnection.LastConnectedAt,
-				Error:           state.AppConnection.PICSerialConnection.Error,
+				Connected:       state.AppState.PICSerialConnection.Connected,
+				LastConnectedAt: state.AppState.PICSerialConnection.LastConnectedAt,
+				Error:           state.AppState.PICSerialConnection.Error,
 			},
 			RfidUsbConnection: gen.RFIDUSBConnection{
-				Connected:       state.AppConnection.RFIDUSBConnection.Connected,
-				LastConnectedAt: state.AppConnection.RFIDUSBConnection.LastConnectedAt,
-				Error:           state.AppConnection.RFIDUSBConnection.Error,
+				Connected:       state.AppState.RFIDUSBConnection.Connected,
+				LastConnectedAt: state.AppState.RFIDUSBConnection.LastConnectedAt,
+				Error:           state.AppState.RFIDUSBConnection.Error,
 			},
 		},
 	}

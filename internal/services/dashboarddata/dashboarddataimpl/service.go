@@ -6,7 +6,7 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"github.com/tbe-team/raybot/internal/services/appconnection"
+	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/battery"
 	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/dashboarddata"
@@ -24,7 +24,7 @@ type service struct {
 	driveMotorRepo     drivemotor.DriveMotorStateRepository
 	locationRepo       location.Repository
 	cargoRepo          cargo.Repository
-	appConnectionRepo  appconnection.Repository
+	appStateRepo       appstate.Repository
 }
 
 func NewService(
@@ -35,7 +35,7 @@ func NewService(
 	driveMotorRepo drivemotor.DriveMotorStateRepository,
 	locationRepo location.Repository,
 	cargoRepo cargo.Repository,
-	appConnectionRepo appconnection.Repository,
+	appStateRepo appstate.Repository,
 ) dashboarddata.Service {
 	return &service{
 		batteryStateRepo:   batteryStateRepo,
@@ -45,7 +45,7 @@ func NewService(
 		driveMotorRepo:     driveMotorRepo,
 		locationRepo:       locationRepo,
 		cargoRepo:          cargoRepo,
-		appConnectionRepo:  appConnectionRepo,
+		appStateRepo:       appStateRepo,
 	}
 }
 
@@ -109,7 +109,7 @@ func (s *service) GetRobotState(ctx context.Context) (dashboarddata.RobotState, 
 
 	g.Go(func() error {
 		var err error
-		ret.AppConnection, err = s.appConnectionRepo.GetAppConnection(ctx)
+		ret.AppState, err = s.appStateRepo.GetAppState(ctx)
 		return err
 	})
 

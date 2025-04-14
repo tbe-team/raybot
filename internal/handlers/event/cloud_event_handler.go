@@ -6,12 +6,12 @@ import (
 	"time"
 
 	"github.com/tbe-team/raybot/internal/events"
-	"github.com/tbe-team/raybot/internal/services/appconnection"
+	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/pkg/ptr"
 )
 
 func (s *Service) HandleCloudConnectedEvent(ctx context.Context, _ events.CloudConnectedEvent) {
-	if err := s.appConnectionService.UpdateCloudConnection(ctx, appconnection.UpdateConnectionParams{
+	if err := s.appStateService.UpdateCloudConnection(ctx, appstate.UpdateCloudConnectionParams{
 		Connected:          true,
 		SetConnected:       true,
 		LastConnectedAt:    ptr.New(time.Now()),
@@ -27,7 +27,7 @@ func (s *Service) HandleCloudDisconnectedEvent(ctx context.Context, event events
 		errStr = event.Error.Error()
 	}
 
-	if err := s.appConnectionService.UpdateCloudConnection(ctx, appconnection.UpdateConnectionParams{
+	if err := s.appStateService.UpdateCloudConnection(ctx, appstate.UpdateCloudConnectionParams{
 		Connected:    false,
 		SetConnected: true,
 		Error:        &errStr,

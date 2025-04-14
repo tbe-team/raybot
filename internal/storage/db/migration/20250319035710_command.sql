@@ -1,14 +1,15 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE commands (
-	id TEXT PRIMARY KEY,
-	type INTEGER NOT NULL,
-	status INTEGER NOT NULL,
-	source INTEGER NOT NULL,
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	type TEXT NOT NULL,
+	status TEXT NOT NULL,
+	source TEXT NOT NULL,
 	inputs TEXT NOT NULL DEFAULT '{}',
 	error TEXT,
+	completed_at TEXT,
 	created_at TEXT NOT NULL,
-	completed_at TEXT
+	updated_at TEXT NOT NULL
 );
 -- +goose StatementEnd
 

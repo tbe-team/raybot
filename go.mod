@@ -4,17 +4,16 @@ go 1.24
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
-	github.com/getkin/kin-openapi v0.130.0
+	github.com/getkin/kin-openapi v0.131.0
 	github.com/go-chi/chi/v5 v5.2.1
 	github.com/go-chi/cors v1.2.1
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/jhump/grpctunnel v0.3.0
 	github.com/karalabe/hid v1.0.0
 	github.com/lithammer/shortuuid/v4 v4.2.0
-	github.com/maniartech/signals v1.2.0
-	github.com/mattn/go-sqlite3 v1.14.25
+	github.com/mattn/go-sqlite3 v1.14.27
 	github.com/oapi-codegen/runtime v1.1.1
-	github.com/pressly/goose/v3 v3.24.1
+	github.com/pressly/goose/v3 v3.24.2
 	github.com/stretchr/testify v1.10.0
 	go.bug.st/serial v1.6.4
 	golang.org/x/sync v0.13.0
@@ -23,6 +22,7 @@ require (
 )
 
 require (
+	github.com/apapsch/go-jsonmerge/v2 v2.0.0 // indirect
 	github.com/creack/goselect v0.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/fullstorydev/grpchan v1.1.1 // indirect

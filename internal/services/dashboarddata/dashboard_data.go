@@ -3,7 +3,7 @@ package dashboarddata
 import (
 	"context"
 
-	"github.com/tbe-team/raybot/internal/services/appconnection"
+	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/battery"
 	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
@@ -22,7 +22,7 @@ type RobotState struct {
 	Location         location.Location
 	Cargo            cargo.Cargo
 	CargoDoorMotor   cargo.DoorMotorState
-	AppConnection    appconnection.AppConnection
+	AppState         appstate.AppState
 }
 
 type Service interface {

@@ -1,9 +1,11 @@
 <script setup lang="ts">
+import CargoConfigTab from '@/components/app/settings/CargoConfigTab.vue'
 import CloudConfigTab from '@/components/app/settings/CloudConfigTab.vue'
 import GRPCConfigTab from '@/components/app/settings/GRPCConfigTab.vue'
 import HardwareConfigTab from '@/components/app/settings/HardwareConfigTab.vue'
 import HTTPConfigTab from '@/components/app/settings/HTTPConfigTab.vue'
 import LogConfigTab from '@/components/app/settings/LogConfigTab.vue'
+import WifiConfigTab from '@/components/app/settings/WifiConfigTab.vue'
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 
@@ -18,6 +20,17 @@ function handleTabChange(value: string | number) {
 
 <template>
   <PageContainer>
+    <div>
+      <h1 class="text-xl font-semibold tracking-tight">
+        Settings
+      </h1>
+      <p class="text-sm text-muted-foreground">
+        Configure your robot's settings
+        <RouterLink to="/restart" class="text-blue-500">
+          (Restart to apply changes)
+        </RouterLink>
+      </p>
+    </div>
     <Tabs :default-value="tab" @update:model-value="handleTabChange">
       <TabsList>
         <TabsTrigger value="log">
@@ -35,6 +48,12 @@ function handleTabChange(value: string | number) {
         <TabsTrigger value="http">
           HTTP
         </TabsTrigger>
+        <TabsTrigger value="cargo">
+          Cargo
+        </TabsTrigger>
+        <TabsTrigger value="wifi">
+          WiFi
+        </TabsTrigger>
       </TabsList>
 
       <TabsContent value="log">
@@ -51,6 +70,12 @@ function handleTabChange(value: string | number) {
       </TabsContent>
       <TabsContent value="http">
         <HTTPConfigTab />
+      </TabsContent>
+      <TabsContent value="cargo">
+        <CargoConfigTab />
+      </TabsContent>
+      <TabsContent value="wifi">
+        <WifiConfigTab />
       </TabsContent>
     </Tabs>
   </PageContainer>

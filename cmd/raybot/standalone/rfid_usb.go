@@ -11,6 +11,7 @@ import (
 func startRFIDUSB(app *application.Application, interruptChan <-chan any, readyWg *sync.WaitGroup) error {
 	service := rfidusb.New(
 		app.Log,
+		app.EventBus,
 		app.LocationService,
 	)
 

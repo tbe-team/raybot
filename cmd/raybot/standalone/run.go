@@ -23,9 +23,6 @@ func Run(configFilePath, dbPath string) {
 
 	interruptChan := cmdutil.InterruptChan()
 	var wg sync.WaitGroup
-	var hardwareWgReady sync.WaitGroup
-
-	hardwareWgReady.Add(3)
 
 	// We need to start the event service first to ensure that the event handlers are registered
 	wg.Add(1)
@@ -35,6 +32,9 @@ func Run(configFilePath, dbPath string) {
 			log.Printf("error starting event service: %v", err)
 		}
 	}()
+
+	var hardwareWgReady sync.WaitGroup
+	hardwareWgReady.Add(3)
 
 	wg.Add(1)
 	go func() {
