@@ -47,7 +47,7 @@ const wifiConfigSchema = z.object({
       .regex(passwordRegex, 'Password can only contain printable characters'),
   }),
 }).superRefine((data, ctx) => {
-  if (data.ap.enable && data.sta.enable || !data.ap.enable && !data.sta.enable) {
+  if ((data.ap.enable && data.sta.enable) || (!data.ap.enable && !data.sta.enable)) {
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'AP and STA cannot be enabled or disabled at the same time',
