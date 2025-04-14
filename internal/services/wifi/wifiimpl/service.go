@@ -39,7 +39,10 @@ func (s service) initWifi() error {
 	}
 
 	if s.cfg.STA.Enable {
-		return s.initSTAMode()
+		if err := s.initSTAMode(); err != nil {
+			s.log.Error("failed to initialize STA mode, falling back to AP mode", slog.Any("error", err))
+			return s.initAPMode()
+		}
 	}
 
 	return nil
