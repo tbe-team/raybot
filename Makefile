@@ -58,7 +58,7 @@ migrate-create:
 	GOOSE_DRIVER=$(GOOSE_DRIVER) \
 	GOOSE_DBSTRING=$(GOOSE_DBSTRING) \
 	GOOSE_MIGRATION_DIR=$(GOOSE_MIGRATION_DIR) \
-	go run github.com/pressly/goose/v3/cmd/goose@v3.24.1 create $(name) sql
+	go run github.com/pressly/goose/v3/cmd/goose@v3.24.1 create "$(name)" sql
 
 .PHONY: migrate-reset
 migrate-reset:
