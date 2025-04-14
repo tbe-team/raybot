@@ -87,7 +87,7 @@ function handlePageSizeChange(ps: number) {
     <div v-else class="flex flex-col w-full">
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h1 class="text-xl font-semibold">
+          <h1 class="text-xl font-semibold tracking-tight">
             Commands
           </h1>
           <p class="text-sm text-muted-foreground">

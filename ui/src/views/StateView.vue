@@ -55,7 +55,7 @@ const { data: robotState, isPending, isError, error } = useQueryRobotState({
     <div v-else class="flex flex-col w-full">
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h1 class="text-xl font-semibold">
+          <h1 class="text-xl font-semibold tracking-tight">
             Robot Status Dashboard
           </h1>
           <p class="text-sm text-muted-foreground">
