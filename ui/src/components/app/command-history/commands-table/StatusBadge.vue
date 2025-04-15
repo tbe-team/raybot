@@ -2,7 +2,7 @@
 import type { CommandStatus } from '@/types/command'
 import type { Component } from 'vue'
 import { Badge } from '@/components/ui/badge'
-import { AlertCircle, CheckCircle, Clock, Loader, XCircle } from 'lucide-vue-next'
+import { AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-vue-next'
 
 interface Props {
   status: CommandStatus
@@ -27,7 +27,7 @@ const STATUS_CLASSES: Record<CommandStatus, string> = {
 
 const STATUS_ICONS: Record<CommandStatus, Component> = {
   QUEUED: Clock,
-  PROCESSING: Loader,
+  PROCESSING: Clock,
   SUCCEEDED: CheckCircle,
   FAILED: AlertCircle,
   CANCELED: XCircle,

@@ -36,6 +36,7 @@ const props = withDefaults(defineProps<Props>(), {
 })
 const emit = defineEmits<{
   (e: 'sorts', sorts: SortPrefix<TSort>[]): void
+  (e: 'rowClick', row: TData): void
 }>()
 const columnVisibility = ref<VisibilityState>({})
 const page = defineModel<number>('page', { required: true })
@@ -82,6 +83,10 @@ const table = useVueTable({
   },
 })
 
+function handleRowClick(row: TData) {
+  emit('rowClick', row)
+}
+
 defineExpose({
   table,
 })
@@ -122,7 +127,9 @@ defineExpose({
             <TableRow
               v-for="row in table.getRowModel().rows"
               :key="row.id"
+              class="!cursor-pointer"
               :data-state="row.getIsSelected() ? 'selected' : 'undefined'"
+              @click="handleRowClick(row.original)"
             >
               <TableCell v-for="cell in row.getVisibleCells()" :key="cell.id">
                 <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()" />

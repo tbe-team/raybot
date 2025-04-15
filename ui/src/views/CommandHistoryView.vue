@@ -3,6 +3,7 @@ import type { CommandSort } from '@/api/commands'
 import type { SortPrefix } from '@/lib/sort'
 import type { Command } from '@/types/command'
 import type { Table } from '@tanstack/vue-table'
+import CommandDetailSheet from '@/components/app/command-history/CommandDetailSheet.vue'
 import { columns } from '@/components/app/command-history/commands-table'
 import DataTable from '@/components/shared/DataTable.vue'
 import DataTableColumnVisibility from '@/components/shared/DataTableColumnVisibility.vue'
@@ -14,6 +15,8 @@ import { AlertCircle, Loader, RefreshCw } from 'lucide-vue-next'
 const route = useRoute()
 const router = useRouter()
 const tableRef = useTemplateRef<{ table: Table<Command> } | null>('table')
+const selectedCommandId = ref<number | null>(null)
+const isCommandDetailOpen = ref(false)
 
 const page = ref(Number(route.query.page) || 1)
 const pageSize = ref(Number(route.query.pageSize) || 10)
@@ -42,6 +45,11 @@ function handlePageSizeChange(ps: number) {
   pageSize.value = ps
   page.value = 1
   router.replace({ query: { ...route.query, pageSize: ps.toString(), page: '1' } })
+}
+
+function handleSelectCommand(row: Command) {
+  selectedCommandId.value = row.id
+  isCommandDetailOpen.value = true
 }
 </script>
 
@@ -132,7 +140,13 @@ function handlePageSizeChange(ps: number) {
         @sorts="handleSortingChange"
         @update:page="handlePageChange"
         @update:page-size="handlePageSizeChange"
+        @row-click="handleSelectCommand"
       />
     </div>
+    <CommandDetailSheet
+      v-if="selectedCommandId"
+      v-model:is-open="isCommandDetailOpen"
+      :command-id="selectedCommandId"
+    />
   </PageContainer>
 </template>
