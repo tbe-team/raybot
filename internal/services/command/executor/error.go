@@ -21,3 +21,7 @@ func (e ExecutorError) Error() string {
 	}
 	return fmt.Sprintf("Msg=%s", e.msg)
 }
+
+func (e ExecutorError) Unwrap() error {
+	return e.parent
+}
