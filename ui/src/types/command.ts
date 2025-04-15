@@ -47,9 +47,9 @@ export interface Command<T extends CommandType = CommandType> {
   status: CommandStatus
   source: CommandSource
   inputs: CommandInputMap[T]
-  error?: string | null
-  completedAt?: string | null
-  startedAt?: string | null
+  error?: string
+  completedAt?: string
+  startedAt?: string
   createdAt: string
   updatedAt: string
 }
