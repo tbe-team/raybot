@@ -2,10 +2,9 @@
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { useGetCommandQuery } from '@/composables/use-command'
-import { formatUptime } from '@/lib/date'
+import { formatDate, formatUptime } from '@/lib/date'
 import { useIntervalFn } from '@vueuse/core'
 import { Loader2 } from 'lucide-vue-next'
-import CommandTimeline from './CommandTimeline.vue'
 import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
 import { getCommandIcon, getCommandName } from './utils'
@@ -130,8 +129,24 @@ watch(isOpen, (open) => {
           <p class="text-sm font-medium">
             Timeline
           </p>
-          <!-- TimeLine -->
-          <CommandTimeline :command="command" />
+          <div class="space-y-3">
+            <div class="flex justify-between text-sm">
+              <span class="text-muted-foreground">Created</span>
+              <span>{{ formatDate(command.createdAt) }}</span>
+            </div>
+            <div v-if="command.startedAt" class="flex justify-between text-sm">
+              <span class="text-muted-foreground">Started</span>
+              <span>{{ formatDate(command.startedAt) }}</span>
+            </div>
+            <div v-if="command.completedAt" class="flex justify-between text-sm">
+              <span class="text-muted-foreground">Completed</span>
+              <span>{{ formatDate(command.completedAt) }}</span>
+            </div>
+            <div class="flex justify-between text-sm">
+              <span class="text-muted-foreground">Last Updated</span>
+              <span>{{ formatDate(command.updatedAt) }}</span>
+            </div>
+          </div>
         </div>
 
         <div class="flex gap-2 pt-4">
