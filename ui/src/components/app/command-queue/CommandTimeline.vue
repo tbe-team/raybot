@@ -9,76 +9,58 @@ interface Props {
   command: Command
 }
 const props = defineProps<Props>()
-const command = toRef(props, 'command')
 
-const steps = [
+const steps = computed(() => [
   {
     step: 1,
     title: 'Created',
-    description: formatDate(command.value.createdAt),
+    description: formatDate(props.command.createdAt),
     icon: Circle,
-    completed: !!command.value.createdAt,
+    completed: !!props.command.createdAt,
   },
   {
     step: 2,
     title: 'Started',
-    description: command.value.startedAt ? formatDate(command.value.startedAt) : '',
+    description: props.command.startedAt ? formatDate(props.command.startedAt) : '',
     icon: Loader2,
-    completed: !!command.value.startedAt,
+    completed: !!props.command.startedAt,
   },
   {
     step: 3,
     title: 'Completed',
-    description: command.value.completedAt ? formatDate(command.value.completedAt) : '',
+    description: props.command.completedAt ? formatDate(props.command.completedAt) : '',
     icon: Check,
-    completed: !!command.value.completedAt,
+    completed: !!props.command.completedAt,
   },
   {
     step: 4,
     title: 'Last Updated',
-    description: formatDate(command.value.updatedAt),
+    description: formatDate(props.command.updatedAt),
     icon: Circle,
-    completed: !!command.value.updatedAt,
+    completed: !!props.command.updatedAt,
   },
-]
+])
 
 const getVisibleSteps = computed(() => {
-  if (!command.value)
+  if (!props.command)
     return []
 
-  const visibleSteps = [steps[0]]
+  const visibleSteps = [steps.value[0]]
 
-  if (command.value.startedAt) {
-    visibleSteps.push(steps[1])
+  if (props.command.startedAt) {
+    visibleSteps.push(steps.value[1])
   }
 
-  if (command.value.completedAt) {
-    visibleSteps.push(steps[2])
+  if (props.command.completedAt) {
+    visibleSteps.push(steps.value[2])
   }
 
-  if (command.value.updatedAt) {
-    visibleSteps.push(steps[3])
+  if (props.command.updatedAt) {
+    visibleSteps.push(steps.value[3])
   }
 
   return visibleSteps
 })
-
-watch(command, () => {
-  if (!command.value)
-    return
-
-  steps[0].description = formatDate(command.value.createdAt)
-  steps[0].completed = !!command.value.createdAt
-
-  steps[1].description = command.value.startedAt ? formatDate(command.value.startedAt) : ''
-  steps[1].completed = !!command.value.startedAt
-
-  steps[2].description = command.value.completedAt ? formatDate(command.value.completedAt) : ''
-  steps[2].completed = !!command.value.completedAt
-
-  steps[3].description = formatDate(command.value.updatedAt)
-  steps[3].completed = !!command.value.updatedAt
-}, { immediate: true })
 </script>
 
 <template>
