@@ -54,32 +54,32 @@ func (s service) UpdateDriveMotorState(ctx context.Context, params drivemotor.Up
 	return nil
 }
 
-func (s service) MoveForward(_ context.Context, params drivemotor.MoveForwardParams) error {
+func (s service) MoveForward(ctx context.Context, params drivemotor.MoveForwardParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	if err := s.picSerialController.MoveForward(params.Speed); err != nil {
+	if err := s.picSerialController.MoveForward(ctx, params.Speed); err != nil {
 		return fmt.Errorf("move forward: %w", err)
 	}
 
 	return nil
 }
 
-func (s service) MoveBackward(_ context.Context, params drivemotor.MoveBackwardParams) error {
+func (s service) MoveBackward(ctx context.Context, params drivemotor.MoveBackwardParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	if err := s.picSerialController.MoveBackward(params.Speed); err != nil {
+	if err := s.picSerialController.MoveBackward(ctx, params.Speed); err != nil {
 		return fmt.Errorf("move backward: %w", err)
 	}
 
 	return nil
 }
 
-func (s service) Stop(_ context.Context) error {
-	if err := s.picSerialController.StopDriveMotor(); err != nil {
+func (s service) Stop(ctx context.Context) error {
+	if err := s.picSerialController.StopDriveMotor(ctx); err != nil {
 		return fmt.Errorf("stop: %w", err)
 	}
 
