@@ -1,0 +1,15 @@
+post:
+  summary: Cancel current processing command
+  operationId: cancelCurrentProcessingCommand
+  description: Cancel the current processing command
+  tags:
+    - commands
+  responses:
+    '204':
+      description: The command was canceled
+    '400':
+      description: There is no command being processed
+      content:
+        application/json:
+          schema:
+            $ref: '../components/schemas/error.yml#/ErrorResponse'

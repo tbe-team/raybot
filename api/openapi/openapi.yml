@@ -31,9 +31,11 @@ paths:
     $ref: "./paths/robot-state.yml"
   /peripherals/serials:
     $ref: "./paths/peripherals@serials.yml"
+  /commands/{commandId}:
+    $ref: "./paths/commands@{commandId}.yml"
   /commands:
     $ref: "./paths/commands.yml"
   /commands/processing:
     $ref: "./paths/commands@processing.yml"
-  /commands/{commandId}:
-    $ref: "./paths/commands@{commandId}.yml"
+  /commands/processing/cancel:
+    $ref: "./paths/commands@processing@cancel.yml"

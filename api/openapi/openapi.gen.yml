@@ -379,6 +379,34 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /commands/{commandId}:
+    get:
+      summary: Get a command by ID
+      operationId: getCommandById
+      description: Get a command by ID
+      tags:
+        - commands
+      parameters:
+        - name: commandId
+          in: path
+          required: true
+          schema:
+            type: integer
+            description: The ID of the command
+            example: 1
+      responses:
+        '200':
+          description: The command
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandResponse'
+        '404':
+          description: The command was not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /commands:
     get:
       summary: List all commands
@@ -472,30 +500,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /commands/{commandId}:
-    get:
-      summary: Get a command by ID
-      operationId: getCommandById
-      description: Get a command by ID
+  /commands/processing/cancel:
+    post:
+      summary: Cancel current processing command
+      operationId: cancelCurrentProcessingCommand
+      description: Cancel the current processing command
       tags:
         - commands
-      parameters:
-        - name: commandId
-          in: path
-          required: true
-          schema:
-            type: integer
-            description: The ID of the command
-            example: 1
       responses:
-        '200':
-          description: The command
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CommandResponse'
-        '404':
-          description: The command was not found
+        '204':
+          description: The command was canceled
+        '400':
+          description: There is no command being processed
           content:
             application/json:
               schema:

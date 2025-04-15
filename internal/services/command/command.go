@@ -12,6 +12,7 @@ import (
 var (
 	ErrCommandNotFound         = xerror.NotFound(nil, "command.notFound", "command not found")
 	ErrNoNextExecutableCommand = xerror.NotFound(nil, "command.noNextExecutable", "no next executable command")
+	ErrNoCommandBeingProcessed = xerror.BadRequest(nil, "command.noCommandBeingProcessed", "no command being processed")
 )
 
 type CreateCommandParams struct {
@@ -38,7 +39,7 @@ type Service interface {
 	GetCurrentProcessingCommand(ctx context.Context) (Command, error)
 	ListCommands(ctx context.Context, params ListCommandsParams) (paging.List[Command], error)
 	CreateCommand(ctx context.Context, params CreateCommandParams) (Command, error)
-	// CancelCommand(ctx context.Context, id int64) error
+	CancelCurrentProcessingCommand(ctx context.Context) error
 	// RetryCommand(ctx context.Context, id int64) error
 
 	ExecuteCreatedCommand(ctx context.Context, params ExecuteCreatedCommandParams) error

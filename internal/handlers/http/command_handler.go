@@ -130,6 +130,15 @@ func (h commandHandler) CreateCommand(ctx context.Context, req gen.CreateCommand
 	return gen.CreateCommand201JSONResponse(res), nil
 }
 
+func (h commandHandler) CancelCurrentProcessingCommand(ctx context.Context, _ gen.CancelCurrentProcessingCommandRequestObject) (gen.CancelCurrentProcessingCommandResponseObject, error) {
+	err := h.commandService.CancelCurrentProcessingCommand(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("cancel current processing command: %w", err)
+	}
+
+	return gen.CancelCurrentProcessingCommand204Response{}, nil
+}
+
 func (h commandHandler) convertCommandToResponse(cmd command.Command) (gen.CommandResponse, error) {
 	inputs, err := h.convertInputsToResponse(cmd.Inputs)
 	if err != nil {

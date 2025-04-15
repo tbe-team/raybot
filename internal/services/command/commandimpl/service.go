@@ -23,9 +23,10 @@ type service struct {
 
 	publisher eventbus.Publisher
 
-	commandRepository command.Repository
-	appStateRepo      appstate.Repository
-	dispatcher        executor.Dispatcher
+	runningCmdRepository *runningCmdRepository
+	commandRepository    command.Repository
+	appStateRepo         appstate.Repository
+	dispatcher           executor.Dispatcher
 }
 
 func NewService(
@@ -37,12 +38,13 @@ func NewService(
 	dispatcher executor.Dispatcher,
 ) command.Service {
 	s := &service{
-		log:               log.With("service", "command"),
-		validator:         validator,
-		publisher:         publisher,
-		commandRepository: commandRepository,
-		appStateRepo:      appStateRepo,
-		dispatcher:        dispatcher,
+		log:                  log.With("service", "command"),
+		validator:            validator,
+		publisher:            publisher,
+		runningCmdRepository: newRunningCmdRepository(),
+		commandRepository:    commandRepository,
+		appStateRepo:         appStateRepo,
+		dispatcher:           dispatcher,
 	}
 
 	go s.startCheckingForExecutableCommand(context.Background())
@@ -89,6 +91,17 @@ func (s service) CreateCommand(ctx context.Context, params command.CreateCommand
 	)
 
 	return cmd, nil
+}
+
+func (s service) CancelCurrentProcessingCommand(_ context.Context) error {
+	runningCmd := s.runningCmdRepository.Get()
+	if runningCmd == nil {
+		return command.ErrNoCommandBeingProcessed
+	}
+
+	runningCmd.Cancel()
+
+	return nil
 }
 
 func (s service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
@@ -183,34 +196,44 @@ func (s service) waitForHardwareComponentsInitialized(ctx context.Context) {
 }
 
 func (s service) executeCommand(ctx context.Context, cmd command.Command) {
-	if err := s.dispatcher.Dispatch(ctx, cmd); err != nil {
-		_, err = s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
-			ID:             cmd.ID,
-			Status:         command.StatusFailed,
-			SetStatus:      true,
-			Error:          ptr.New(err.Error()),
-			SetError:       true,
-			CompletedAt:    ptr.New(time.Now()),
-			SetCompletedAt: true,
-			UpdatedAt:      time.Now(),
-		})
-		if err != nil {
-			s.log.Error("failed to update command status to failed", slog.Any("error", err))
-		}
+	runningCmd := newRunningCommand(cmd)
+	s.runningCmdRepository.Add(runningCmd)
+	defer s.runningCmdRepository.Remove()
 
-	} else {
-		_, err := s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
-			ID:             cmd.ID,
-			Status:         command.StatusSucceeded,
-			SetStatus:      true,
-			CompletedAt:    ptr.New(time.Now()),
-			SetCompletedAt: true,
-			UpdatedAt:      time.Now(),
-		})
-		if err != nil {
-			s.log.Error("failed to update command status to succeeded", slog.Any("error", err))
+	// pass the context of the running command to the dispatcher
+	err := s.dispatcher.Dispatch(runningCmd.Context(), cmd)
+	if err != nil {
+		if errors.Is(err, context.Canceled) {
+			s.log.Info("command execution canceled", slog.Any("command", cmd), slog.Any("error", err))
+			s.updateCommandStatus(ctx, cmd.ID, command.StatusCanceled, nil)
+		} else {
+			s.log.Error("command execution failed", slog.Any("command", cmd), slog.Any("error", err))
+			s.updateCommandStatus(ctx, cmd.ID, command.StatusFailed, ptr.New(err.Error()))
 		}
+	} else {
+		s.log.Info("command execution succeeded", slog.Any("command", cmd))
+		s.updateCommandStatus(ctx, cmd.ID, command.StatusSucceeded, nil)
 	}
 
-	go s.runNextExecutableCommand(ctx)
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		s.runNextExecutableCommand(ctx)
+	}()
+}
+
+func (s service) updateCommandStatus(ctx context.Context, cmdID int64, status command.Status, errMsg *string) {
+	now := time.Now()
+	_, err := s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
+		ID:             cmdID,
+		Status:         status,
+		SetStatus:      true,
+		Error:          errMsg,
+		SetError:       errMsg != nil,
+		CompletedAt:    ptr.New(now),
+		SetCompletedAt: true,
+		UpdatedAt:      now,
+	})
+	if err != nil {
+		s.log.Error("failed to update command status", slog.String("status", string(status)), slog.Any("error", err))
+	}
 }
