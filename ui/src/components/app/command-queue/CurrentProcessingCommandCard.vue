@@ -10,11 +10,11 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { useCurrentProcessingCommandQuery } from '@/composables/use-command'
+import { formatDate } from '@/lib/date'
 import { Clock, MoreHorizontal } from 'lucide-vue-next'
 import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
 import { getCommandIcon, getCommandName } from './utils'
-import { formatDate } from '@/lib/date'
 
 const emit = defineEmits<{
   (e: 'viewDetails', commandId: number): void

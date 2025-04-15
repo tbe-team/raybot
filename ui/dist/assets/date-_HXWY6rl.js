@@ -1,4 +1,4 @@
-import{c as it,a as at,b as ot}from"./createLucideIcon-BXZFIXMD.js";import{d as ut,c as ct,o as dt,r as ht,f as ft,u as tt,a3 as X}from"./index-Bp2dhU3B.js";/**
+import{c as it,a as at,b as ot}from"./createLucideIcon-Iw5-nVL4.js";import{d as ut,c as ct,o as dt,r as ht,f as ft,u as tt,a3 as X}from"./index-DJKvJdcM.js";/**
  * @license lucide-vue-next v0.488.0 - ISC
  *
  * This source code is licensed under the ISC license.

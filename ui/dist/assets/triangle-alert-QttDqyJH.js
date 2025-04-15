@@ -1,4 +1,4 @@
-import{c as e}from"./createLucideIcon-BXZFIXMD.js";/**
+import{c as e}from"./createLucideIcon-Iw5-nVL4.js";/**
  * @license lucide-vue-next v0.488.0 - ISC
  *
  * This source code is licensed under the ISC license.
