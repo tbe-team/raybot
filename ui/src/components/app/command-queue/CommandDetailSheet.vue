@@ -41,6 +41,9 @@ watch(isOpen, (open) => {
   if (!open) {
     pause()
   }
+  else {
+    resume()
+  }
 }, { immediate: true })
 </script>
 
