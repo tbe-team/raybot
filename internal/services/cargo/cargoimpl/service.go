@@ -91,7 +91,7 @@ func (s *service) UpdateCargoDoorMotorState(ctx context.Context, params cargo.Up
 }
 
 func (s *service) OpenCargoDoor(ctx context.Context) error {
-	if err := s.espSerialController.OpenCargoDoor(openCargoDoorSpeed); err != nil {
+	if err := s.espSerialController.OpenCargoDoor(ctx, openCargoDoorSpeed); err != nil {
 		return fmt.Errorf("open cargo door: %w", err)
 	}
 
@@ -108,7 +108,7 @@ func (s *service) OpenCargoDoor(ctx context.Context) error {
 }
 
 func (s *service) CloseCargoDoor(ctx context.Context) error {
-	if err := s.espSerialController.CloseCargoDoor(closeCargoDoorSpeed); err != nil {
+	if err := s.espSerialController.CloseCargoDoor(ctx, closeCargoDoorSpeed); err != nil {
 		return fmt.Errorf("close cargo door: %w", err)
 	}
 
