@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Button } from '@/components/ui/button';
-import { Stepper, StepperDescription, StepperIndicator, StepperItem, StepperSeparator, StepperTitle, StepperTrigger } from '@/components/ui/stepper'
-import { formatDate } from '@/lib/date';
 import type { Command } from '@/types/command'
-import { Check, Circle, Loader2 } from 'lucide-vue-next';
+import { Button } from '@/components/ui/button'
+import { Stepper, StepperDescription, StepperItem, StepperSeparator, StepperTitle } from '@/components/ui/stepper'
+import { formatDate } from '@/lib/date'
+import { Check, Circle, Loader2 } from 'lucide-vue-next'
+
 interface Props {
   command: Command
 }
@@ -42,7 +43,8 @@ const steps = [
 ]
 
 const getVisibleSteps = computed(() => {
-  if (!command.value) return []
+  if (!command.value)
+    return []
 
   const visibleSteps = [steps[0]]
 
@@ -62,7 +64,8 @@ const getVisibleSteps = computed(() => {
 })
 
 watch(command, () => {
-  if (!command.value) return
+  if (!command.value)
+    return
 
   steps[0].description = formatDate(command.value.createdAt)
   steps[0].completed = !!command.value.createdAt
@@ -79,11 +82,10 @@ watch(command, () => {
 </script>
 
 <template>
-    <Stepper orientation="vertical" class="flex flex-col justify-start w-full max-w-md gap-8 mx-auto">
+  <Stepper orientation="vertical" class="flex flex-col justify-start w-full max-w-md gap-8 mx-auto">
     <StepperItem
       v-for="step in getVisibleSteps"
       :key="step.step"
-      v-slot="{state }"
       class="relative flex items-start w-full gap-6"
       :step="step.step"
     >
@@ -91,13 +93,13 @@ watch(command, () => {
         v-if="step.step !== steps[steps.length - 1].step"
         class="absolute left-[18px] top-[38px] block h-[90%] w-0.5 shrink-0 rounded-full !bg-primary !opacity-100"
       />
-        <Button
-          variant="default"
-          size="icon"
-          class="z-10 !p-0 rounded-full shrink-0"
-        >
+      <Button
+        variant="default"
+        size="icon"
+        class="z-10 !p-0 rounded-full shrink-0"
+      >
         <component :is="step.icon" class="!w-4 !h-4" />
-        </Button>
+      </Button>
       <div class="flex flex-col gap-1">
         <StepperTitle
           class="text-sm font-semibold transition lg:text-base"

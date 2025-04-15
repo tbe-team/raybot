@@ -2,13 +2,13 @@
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
 import { useGetCommandQuery } from '@/composables/use-command'
+import { formatUptime } from '@/lib/date'
 import { useIntervalFn } from '@vueuse/core'
 import { Loader2 } from 'lucide-vue-next'
+import CommandTimeline from './CommandTimeline.vue'
 import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
 import { getCommandIcon, getCommandName } from './utils'
-import CommandTimeline from './CommandTimeline.vue'
-import { formatUptime } from '@/lib/date'
 
 const props = defineProps<{
   commandId: number
@@ -42,7 +42,6 @@ watch(isOpen, (open) => {
     pause()
   }
 }, { immediate: true })
-
 </script>
 
 <template>
@@ -99,7 +98,7 @@ watch(isOpen, (open) => {
               Duration
             </p>
             <p class="font-medium">
-              {{ formatUptime((new Date(command.completedAt).getTime() - new Date(command.startedAt).getTime())/1000) }}
+              {{ formatUptime((new Date(command.completedAt).getTime() - new Date(command.startedAt).getTime()) / 1000) }}
             </p>
           </div>
         </div>
@@ -129,7 +128,7 @@ watch(isOpen, (open) => {
             Timeline
           </p>
           <!-- TimeLine -->
-           <CommandTimeline :command="command" />
+          <CommandTimeline :command="command" />
         </div>
 
         <div class="flex gap-2 pt-4">

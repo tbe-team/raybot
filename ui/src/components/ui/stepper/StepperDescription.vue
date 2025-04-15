@@ -1,9 +1,10 @@
 <script lang="ts" setup>
 import type { StepperDescriptionProps } from 'reka-ui'
+import type { HTMLAttributes } from 'vue'
 import { cn } from '@/lib/utils'
-import { StepperDescription, useForwardProps } from 'reka-ui'
 
-import { computed, type HTMLAttributes } from 'vue'
+import { StepperDescription, useForwardProps } from 'reka-ui'
+import { computed } from 'vue'
 
 const props = defineProps<StepperDescriptionProps & { class?: HTMLAttributes['class'] }>()
 
