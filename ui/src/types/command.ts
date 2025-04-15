@@ -49,6 +49,7 @@ export interface Command<T extends CommandType = CommandType> {
   inputs: CommandInputMap[T]
   error?: string | null
   completedAt?: string | null
+  startedAt?: string | null
   createdAt: string
   updatedAt: string
 }
