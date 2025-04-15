@@ -14,7 +14,7 @@ import {
 dayjs.extend(relativeTime)
 
 const commandIcons: Record<CommandType, LucideIcon> = {
-  STOP: StopCircle,
+  STOP_MOVEMENT: StopCircle,
   MOVE_FORWARD: ArrowUp,
   MOVE_BACKWARD: ArrowDown,
   MOVE_TO: MapPin,

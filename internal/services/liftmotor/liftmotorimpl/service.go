@@ -45,7 +45,7 @@ func (s *service) SetCargoPosition(ctx context.Context, params liftmotor.SetCarg
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	if err := s.picSerialController.SetCargoPosition(params.Position); err != nil {
+	if err := s.picSerialController.SetCargoPosition(ctx, params.Position); err != nil {
 		return fmt.Errorf("set cargo position: %w", err)
 	}
 

@@ -1,6 +1,7 @@
 package espserial
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -8,13 +9,13 @@ import (
 )
 
 type Controller interface {
-	OpenCargoDoor(speed uint8) error
-	CloseCargoDoor(speed uint8) error
+	OpenCargoDoor(ctx context.Context, speed uint8) error
+	CloseCargoDoor(ctx context.Context, speed uint8) error
 }
 
 var _ Controller = (*DefaultClient)(nil)
 
-func (c *DefaultClient) OpenCargoDoor(speed uint8) error {
+func (c *DefaultClient) OpenCargoDoor(ctx context.Context, speed uint8) error {
 	cmd := espCommand{
 		ID:   shortuuid.New(),
 		Type: espCommandTypeCargoDoorMotor,
@@ -30,14 +31,14 @@ func (c *DefaultClient) OpenCargoDoor(speed uint8) error {
 		return fmt.Errorf("marshal cargo door motor command: %w", err)
 	}
 
-	if err := c.Write(cmdJSON); err != nil {
+	if err := c.Write(ctx, cmdJSON); err != nil {
 		return fmt.Errorf("write cargo door motor command: %w", err)
 	}
 
 	return nil
 }
 
-func (c *DefaultClient) CloseCargoDoor(speed uint8) error {
+func (c *DefaultClient) CloseCargoDoor(ctx context.Context, speed uint8) error {
 	cmd := espCommand{
 		ID:   shortuuid.New(),
 		Type: espCommandTypeCargoDoorMotor,
@@ -53,7 +54,7 @@ func (c *DefaultClient) CloseCargoDoor(speed uint8) error {
 		return fmt.Errorf("marshal cargo door motor command: %w", err)
 	}
 
-	if err := c.Write(cmdJSON); err != nil {
+	if err := c.Write(ctx, cmdJSON); err != nil {
 		return fmt.Errorf("write cargo door motor command: %w", err)
 	}
 

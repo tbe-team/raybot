@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 export const createCommandSchema = z.discriminatedUnion('type', [
   z.object({
-    type: z.literal('STOP'),
+    type: z.literal('STOP_MOVEMENT'),
     inputs: z.object({}),
   }),
   z.object({

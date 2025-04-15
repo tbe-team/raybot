@@ -1,4 +1,4 @@
-export interface StopInputs {}
+export interface StopMovementInputs {}
 export interface MoveForwardInputs {}
 export interface MoveBackwardInputs {}
 export interface MoveToInputs {
@@ -13,7 +13,7 @@ export interface CargoCheckQRInputs {
 }
 
 export interface CommandInputMap {
-  STOP: StopInputs
+  STOP_MOVEMENT: StopMovementInputs
   MOVE_FORWARD: MoveForwardInputs
   MOVE_BACKWARD: MoveBackwardInputs
   MOVE_TO: MoveToInputs
@@ -25,7 +25,7 @@ export interface CommandInputMap {
 }
 
 export const CommandTypeValues = [
-  'STOP',
+  'STOP_MOVEMENT',
   'MOVE_FORWARD',
   'MOVE_BACKWARD',
   'MOVE_TO',

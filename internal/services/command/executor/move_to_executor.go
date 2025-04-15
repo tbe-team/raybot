@@ -76,15 +76,13 @@ func (e moveToExecutor) trackingLocation(ctx context.Context, location string) {
 		}
 
 		if ev.Location == location {
-			e.log.Info("location reached", slog.String("location", ev.Location))
+			e.log.Debug("location reached", slog.String("location", ev.Location))
 			close(reachCh)
 		}
 	})
 
 	select {
 	case <-reachCh:
-		return
 	case <-ctx.Done():
-		return
 	}
 }

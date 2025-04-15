@@ -2,6 +2,7 @@ package picserial
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"sync"
 
@@ -19,7 +20,7 @@ type Client interface {
 	Open() error
 	Close() error
 	Connected() bool
-	Write(data []byte) error
+	Write(ctx context.Context, data []byte) error
 	Read() ([]byte, error)
 }
 
@@ -88,7 +89,7 @@ func (c *DefaultClient) Connected() bool {
 	return c.port != nil
 }
 
-func (c *DefaultClient) Write(data []byte) error {
+func (c *DefaultClient) Write(ctx context.Context, data []byte) error {
 	if c.port == nil {
 		return ErrPICSerialNotConnected
 	}
@@ -96,11 +97,21 @@ func (c *DefaultClient) Write(data []byte) error {
 	data = append([]byte(">"), data...)
 	data = append(data, '\r', '\n')
 
-	c.writeMu.Lock()
-	_, err := c.port.Write(data)
-	c.writeMu.Unlock()
+	done := make(chan error, 1)
+	go func() {
+		c.writeMu.Lock()
+		defer c.writeMu.Unlock()
 
-	return err
+		_, err := c.port.Write(data)
+		done <- err
+	}()
+
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case err := <-done:
+		return err
+	}
 }
 
 // Read reads data from the serial port.

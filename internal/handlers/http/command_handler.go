@@ -153,7 +153,7 @@ func (h commandHandler) convertCommandToResponse(cmd command.Command) (gen.Comma
 func (commandHandler) convertInputsToResponse(inputs command.Inputs) (gen.CommandInputs, error) {
 	var res gen.CommandInputs
 	switch v := inputs.(type) {
-	case *command.StopInputs:
+	case *command.StopMovementInputs:
 		if err := res.FromStopInputs(gen.StopInputs{}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from stop inputs: %w", err)
 		}
@@ -203,8 +203,8 @@ func (commandHandler) convertInputsToResponse(inputs command.Inputs) (gen.Comman
 
 func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, inputs gen.CommandInputs) (command.Inputs, error) {
 	switch command.CommandType(cmdType) {
-	case command.CommandTypeStop:
-		return &command.StopInputs{}, nil
+	case command.CommandTypeStopMovement:
+		return &command.StopMovementInputs{}, nil
 
 	case command.CommandTypeMoveTo:
 		i, err := inputs.AsMoveToInputs()
@@ -234,14 +234,13 @@ func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, i
 		return &command.CargoLowerInputs{}, nil
 
 	case command.CommandTypeCargoCheckQR:
-		return &command.CargoCheckQRInputs{}, xerror.NotImplemented(nil, "cargo.checkQR", "this command type is not implemented")
-		// i, err := inputs.AsCargoCheckQRInputs()
-		// if err != nil {
-		// 	return nil, fmt.Errorf("as cargo check qr inputs: %w", err)
-		// }
-		// return &command.CargoCheckQRInputs{
-		// 	QRCode: i.QrCode,
-		// }, nil
+		i, err := inputs.AsCargoCheckQRInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as cargo check qr inputs: %w", err)
+		}
+		return &command.CargoCheckQRInputs{
+			QRCode: i.QrCode,
+		}, nil
 
 	default:
 		return nil, fmt.Errorf("unknown command type: %s", cmdType)

@@ -1,6 +1,7 @@
 package picserial
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -8,17 +9,17 @@ import (
 )
 
 type Controller interface {
-	SetCargoPosition(targetPosition uint16) error
-	MoveForward(speed uint8) error
-	MoveBackward(speed uint8) error
-	StopDriveMotor() error
-	ConfigBatteryCharge(currentLimit uint16, enable bool) error
-	ConfigBatteryDischarge(currentLimit uint16, enable bool) error
+	SetCargoPosition(ctx context.Context, targetPosition uint16) error
+	MoveForward(ctx context.Context, speed uint8) error
+	MoveBackward(ctx context.Context, speed uint8) error
+	StopDriveMotor(ctx context.Context) error
+	ConfigBatteryCharge(ctx context.Context, currentLimit uint16, enable bool) error
+	ConfigBatteryDischarge(ctx context.Context, currentLimit uint16, enable bool) error
 }
 
 var _ Controller = (*DefaultClient)(nil)
 
-func (c *DefaultClient) SetCargoPosition(targetPosition uint16) error {
+func (c *DefaultClient) SetCargoPosition(ctx context.Context, targetPosition uint16) error {
 	cmd := picCommand{
 		ID:   shortuuid.New(),
 		Type: picCommandTypeLiftMotor,
@@ -33,14 +34,14 @@ func (c *DefaultClient) SetCargoPosition(targetPosition uint16) error {
 		return fmt.Errorf("marshal lift cargo command: %w", err)
 	}
 
-	if err := c.Write(cmdJSON); err != nil {
+	if err := c.Write(ctx, cmdJSON); err != nil {
 		return fmt.Errorf("write lift cargo command: %w", err)
 	}
 
 	return nil
 }
 
-func (c *DefaultClient) MoveForward(speed uint8) error {
+func (c *DefaultClient) MoveForward(ctx context.Context, speed uint8) error {
 	cmd := picCommand{
 		ID:   shortuuid.New(),
 		Type: picCommandTypeDriveMotor,
@@ -56,14 +57,14 @@ func (c *DefaultClient) MoveForward(speed uint8) error {
 		return fmt.Errorf("marshal move forward command: %w", err)
 	}
 
-	if err := c.Write(cmdJSON); err != nil {
+	if err := c.Write(ctx, cmdJSON); err != nil {
 		return fmt.Errorf("write move forward command: %w", err)
 	}
 
 	return nil
 }
 
-func (c *DefaultClient) MoveBackward(speed uint8) error {
+func (c *DefaultClient) MoveBackward(ctx context.Context, speed uint8) error {
 	cmd := picCommand{
 		ID:   shortuuid.New(),
 		Type: picCommandTypeDriveMotor,
@@ -79,14 +80,14 @@ func (c *DefaultClient) MoveBackward(speed uint8) error {
 		return fmt.Errorf("marshal move backward command: %w", err)
 	}
 
-	if err := c.Write(cmdJSON); err != nil {
+	if err := c.Write(ctx, cmdJSON); err != nil {
 		return fmt.Errorf("write move backward command: %w", err)
 	}
 
 	return nil
 }
 
-func (c *DefaultClient) StopDriveMotor() error {
+func (c *DefaultClient) StopDriveMotor(ctx context.Context) error {
 	cmd := picCommand{
 		ID:   shortuuid.New(),
 		Type: picCommandTypeDriveMotor,
@@ -102,14 +103,14 @@ func (c *DefaultClient) StopDriveMotor() error {
 		return fmt.Errorf("marshal stop drive motor command: %w", err)
 	}
 
-	if err := c.Write(cmdJSON); err != nil {
+	if err := c.Write(ctx, cmdJSON); err != nil {
 		return fmt.Errorf("write stop drive motor command: %w", err)
 	}
 
 	return nil
 }
 
-func (c *DefaultClient) ConfigBatteryCharge(currentLimit uint16, enable bool) error {
+func (c *DefaultClient) ConfigBatteryCharge(ctx context.Context, currentLimit uint16, enable bool) error {
 	cmd := picCommand{
 		ID:   shortuuid.New(),
 		Type: picCommandTypeBatteryCharge,
@@ -124,14 +125,14 @@ func (c *DefaultClient) ConfigBatteryCharge(currentLimit uint16, enable bool) er
 		return fmt.Errorf("marshal config battery charge command: %w", err)
 	}
 
-	if err := c.Write(cmdJSON); err != nil {
+	if err := c.Write(ctx, cmdJSON); err != nil {
 		return fmt.Errorf("write config battery charge command: %w", err)
 	}
 
 	return nil
 }
 
-func (c *DefaultClient) ConfigBatteryDischarge(currentLimit uint16, enable bool) error {
+func (c *DefaultClient) ConfigBatteryDischarge(ctx context.Context, currentLimit uint16, enable bool) error {
 	cmd := picCommand{
 		ID:   shortuuid.New(),
 		Type: picCommandTypeBatteryDischarge,
@@ -146,7 +147,7 @@ func (c *DefaultClient) ConfigBatteryDischarge(currentLimit uint16, enable bool)
 		return fmt.Errorf("marshal config battery discharge command: %w", err)
 	}
 
-	if err := c.Write(cmdJSON); err != nil {
+	if err := c.Write(ctx, cmdJSON); err != nil {
 		return fmt.Errorf("write config battery discharge command: %w", err)
 	}
 

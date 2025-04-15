@@ -10,12 +10,12 @@ type Inputs interface {
 	CommandType() CommandType
 }
 
-type StopInputs struct{}
+type StopMovementInputs struct{}
 
-func (StopInputs) CommandType() CommandType {
-	return CommandTypeStop
+func (StopMovementInputs) CommandType() CommandType {
+	return CommandTypeStopMovement
 }
-func (StopInputs) isInputs() {}
+func (StopMovementInputs) isInputs() {}
 
 type MoveForwardInputs struct{}
 
@@ -81,8 +81,8 @@ func UnmarshalInputs(cmdType CommandType, inputsBytes []byte) (Inputs, error) {
 	var inputs Inputs
 
 	switch cmdType {
-	case CommandTypeStop:
-		inputs = &StopInputs{}
+	case CommandTypeStopMovement:
+		inputs = &StopMovementInputs{}
 
 	case CommandTypeMoveForward:
 		inputs = &MoveForwardInputs{}

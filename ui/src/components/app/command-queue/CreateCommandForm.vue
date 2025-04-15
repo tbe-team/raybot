@@ -15,7 +15,7 @@ import { createCommandSchema } from './schemas'
 const { values, handleSubmit, setFieldValue, resetForm } = useForm({
   validationSchema: toTypedSchema(createCommandSchema),
   initialValues: {
-    type: 'STOP',
+    type: 'STOP_MOVEMENT',
     inputs: {},
   },
 })
@@ -73,10 +73,10 @@ function clearForm() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="STOP">
+                  <SelectItem value="STOP_MOVEMENT">
                     <div class="flex items-center gap-2">
                       <StopCircle class="w-4 h-4" />
-                      <span>Stop</span>
+                      <span>Stop Movement</span>
                     </div>
                   </SelectItem>
                   <SelectItem value="MOVE_FORWARD">
@@ -154,6 +154,7 @@ function clearForm() {
           </template>
         </div>
       </CardContent>
+
       <CardFooter class="flex flex-col gap-2">
         <Button type="submit" class="w-full" :disabled="isPending">
           <Loader2 v-if="isPending" class="w-4 h-4 mr-2 animate-spin" />
