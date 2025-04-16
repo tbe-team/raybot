@@ -29,7 +29,7 @@ interface Props {
   totalItems: number
   pageSizeOptions?: number[]
   sorts?: SortPrefix<TSort>[]
-  initValue?: { columnVisibility: VisibilityState }
+  initialState?: { columnVisibility: VisibilityState }
 }
 const props = withDefaults(defineProps<Props>(), {
   pageSizeOptions: () => [10, 20, 30],
@@ -39,7 +39,7 @@ const emit = defineEmits<{
   (e: 'sorts', sorts: SortPrefix<TSort>[]): void
   (e: 'rowClick', row: TData): void
 }>()
-const columnVisibility = ref<VisibilityState>(props.initValue?.columnVisibility || {})
+const columnVisibility = ref<VisibilityState>(props.initialState?.columnVisibility || {})
 const page = defineModel<number>('page', { required: true })
 const pageSize = defineModel<number>('pageSize', { required: true })
 
@@ -50,7 +50,7 @@ const sorting = computed<SortingState>({
 
 const table = useVueTable({
   initialState: {
-    columnVisibility: props.initValue?.columnVisibility,
+    columnVisibility: props.initialState?.columnVisibility,
   },
   get data() { return props.data },
   get columns() { return props.columns },
