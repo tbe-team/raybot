@@ -323,11 +323,11 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /system/restart:
+  /system/reboot:
     post:
-      summary: Restart the application
-      operationId: restartApplication
-      description: Restart the application after 3 seconds.
+      summary: Reboot the system
+      operationId: rebootSystem
+      description: Reboot the system after 3 seconds.
       tags:
         - system
       responses:
