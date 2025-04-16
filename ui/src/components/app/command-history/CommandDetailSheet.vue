@@ -1,24 +1,16 @@
 <script setup lang="ts">
+import type { Command } from '@/types/command'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { useGetCommandQuery } from '@/composables/use-command'
 import { formatDate, formatUptime } from '@/lib/date'
-import { Loader2 } from 'lucide-vue-next'
 import SourceBadge from '../command-queue/SourceBadge.vue'
 import StatusBadge from '../command-queue/StatusBadge.vue'
 import { getCommandIcon, getCommandName } from '../command-queue/utils'
 
 const props = defineProps<{
-  commandId: number
+  command: Command
 }>()
 
 const isOpen = defineModel<boolean>('isOpen', { required: true })
-
-const commandId = toRef(props, 'commandId')
-const { data: command, isPending, isError } = useGetCommandQuery(commandId, {
-  axiosOpts: {
-    doNotShowLoading: true,
-  },
-})
 </script>
 
 <template>
@@ -32,27 +24,16 @@ const { data: command, isPending, isError } = useGetCommandQuery(commandId, {
           Real-time information about the selected command
         </SheetDescription>
       </SheetHeader>
-      <div v-if="isPending">
-        <div class="flex items-center justify-center py-8">
-          <Loader2 class="w-8 h-8 animate-spin" />
-        </div>
-      </div>
-      <div v-else-if="isError">
-        <div class="flex items-center justify-center py-8">
-          <p class="text-sm text-muted-foreground">
-            Failed to load command details
-          </p>
-        </div>
-      </div>
-      <div v-else-if="command" class="mt-6 space-y-6">
+
+      <div class="mt-6 space-y-6">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2 ">
-            <component :is="getCommandIcon(command.type)" />
+            <component :is="getCommandIcon(props.command.type)" />
             <span class="text-sm font-medium">
-              {{ getCommandName(command.type) }}
+              {{ getCommandName(props.command.type) }}
             </span>
           </div>
-          <StatusBadge :status="command.status" />
+          <StatusBadge :status="props.command.status" />
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -61,21 +42,21 @@ const { data: command, isPending, isError } = useGetCommandQuery(commandId, {
               ID
             </p>
             <p class="font-medium">
-              {{ command.id }}
+              {{ props.command.id }}
             </p>
           </div>
           <div class="flex flex-col items-start gap-2">
             <p class="text-sm text-muted-foreground">
               Source
             </p>
-            <SourceBadge :source="command.source" />
+            <SourceBadge :source="props.command.source" />
           </div>
-          <div v-if="command.completedAt && command.startedAt">
+          <div v-if="props.command.completedAt && props.command.startedAt">
             <p class="text-sm text-muted-foreground">
               Duration
             </p>
             <p class="font-medium">
-              {{ formatUptime((new Date(command.completedAt).getTime() - new Date(command.startedAt).getTime()) / 1000) }}
+              {{ formatUptime((new Date(props.command.completedAt).getTime() - new Date(props.command.startedAt).getTime()) / 1000) }}
             </p>
           </div>
         </div>
@@ -86,17 +67,17 @@ const { data: command, isPending, isError } = useGetCommandQuery(commandId, {
           </p>
           <div class="p-4 bg-gray-100 rounded-xl dark:bg-gray-800">
             <span class="font-mono text-sm text-gray-800 break-words whitespace-pre-wrap dark:text-gray-200">
-              {{ JSON.stringify(command.inputs, null, 4) }}
+              {{ JSON.stringify(props.command.inputs, null, 4) }}
             </span>
           </div>
         </div>
 
-        <div v-if="command.error" class="space-y-2">
+        <div v-if="props.command.error" class="space-y-2">
           <p class="text-sm font-medium text-destructive">
             Error
           </p>
           <div class="p-3 rounded-md bg-destructive/10 text-destructive">
-            {{ command.error }}
+            {{ props.command.error }}
           </div>
         </div>
 
@@ -107,19 +88,19 @@ const { data: command, isPending, isError } = useGetCommandQuery(commandId, {
           <div class="space-y-3">
             <div class="flex justify-between text-sm">
               <span class="text-muted-foreground">Created</span>
-              <span>{{ formatDate(command.createdAt) }}</span>
+              <span>{{ formatDate(props.command.createdAt) }}</span>
             </div>
-            <div v-if="command.startedAt" class="flex justify-between text-sm">
+            <div v-if="props.command.startedAt" class="flex justify-between text-sm">
               <span class="text-muted-foreground">Started</span>
-              <span>{{ formatDate(command.startedAt) }}</span>
+              <span>{{ formatDate(props.command.startedAt) }}</span>
             </div>
-            <div v-if="command.completedAt" class="flex justify-between text-sm">
+            <div v-if="props.command.completedAt" class="flex justify-between text-sm">
               <span class="text-muted-foreground">Completed</span>
-              <span>{{ formatDate(command.completedAt) }}</span>
+              <span>{{ formatDate(props.command.completedAt) }}</span>
             </div>
             <div class="flex justify-between text-sm">
               <span class="text-muted-foreground">Last Updated</span>
-              <span>{{ formatDate(command.updatedAt) }}</span>
+              <span>{{ formatDate(props.command.updatedAt) }}</span>
             </div>
           </div>
         </div>

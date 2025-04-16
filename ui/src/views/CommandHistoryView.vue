@@ -15,7 +15,7 @@ import { AlertCircle, Loader, RefreshCw } from 'lucide-vue-next'
 const route = useRoute()
 const router = useRouter()
 const tableRef = useTemplateRef<{ table: Table<Command> } | null>('table')
-const selectedCommandId = ref<number | null>(null)
+const selectedCommand = ref<Command | null>(null)
 const isCommandDetailOpen = ref(false)
 
 const page = ref(Number(route.query.page) || 1)
@@ -48,7 +48,7 @@ function handlePageSizeChange(ps: number) {
 }
 
 function handleSelectCommand(row: Command) {
-  selectedCommandId.value = row.id
+  selectedCommand.value = row
   isCommandDetailOpen.value = true
 }
 </script>
@@ -144,9 +144,9 @@ function handleSelectCommand(row: Command) {
       />
     </div>
     <CommandDetailSheet
-      v-if="selectedCommandId"
+      v-if="selectedCommand"
       v-model:is-open="isCommandDetailOpen"
-      :command-id="selectedCommandId"
+      :command="selectedCommand"
     />
   </PageContainer>
 </template>
