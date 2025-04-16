@@ -327,7 +327,7 @@ paths:
     post:
       summary: Reboot the system
       operationId: rebootSystem
-      description: Reboot the system after 3 seconds.
+      description: Reboot the system.
       tags:
         - system
       responses:
