@@ -43,48 +43,12 @@ jobs:
           name: ui-dist
           path: ui/dist
 
-  build-linux-amd64:
-    name: Build for Linux amd64
-    needs:
-      - build-ui
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download UI build
-        uses: actions/download-artifact@v4
-        with:
-          name: ui-dist
-          path: ui/dist
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Build
-        env:
-          CGO_ENABLED: 1
-          GOOS: linux
-          GOARCH: amd64
-        run: go build -o raybot cmd/raybot/main.go
-      - name: Package binary
-        run: |
-          tar -czf raybot-${{ env.VERSION }}-linux-amd64.tar.gz raybot
-      - name: Archive artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-linux-amd64
-          path: raybot-${{ env.VERSION }}-linux-amd64.tar.gz
-
   build-linux-arm64:
     name: Build for Linux arm64
     needs:
       - build-ui
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
-      - name: Install build dependencies
-        run: |
-          sudo apt-get -qq update
-          sudo apt-get install -y gcc-aarch64-linux-gnu
       - name: Checkout
         uses: actions/checkout@v4
       - name: Download UI build
@@ -92,17 +56,16 @@ jobs:
         with:
           name: ui-dist
           path: ui/dist
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Build
-        env:
-          CGO_ENABLED: 1
-          GOOS: linux
-          GOARCH: arm64
-          CC: aarch64-linux-gnu-gcc
-        run: go build -o raybot cmd/raybot/main.go
+      - name: Build docker image
+        run: |
+          docker build \
+          -t raybot-builder-deb11 \
+          -f docker/raybot-build-deb11.dockerfile .
+      - name: Create container & extract binary
+        run: |
+          docker create --name temp-build raybot-builder-deb11:latest
+          docker cp temp-build:/app/raybot ./raybot
+          docker rm temp-build
       - name: Package binary
         run: |
           tar -czf raybot-${{ env.VERSION }}-linux-arm64.tar.gz raybot
@@ -111,43 +74,6 @@ jobs:
         with:
           name: dist-linux-arm64
           path: raybot-${{ env.VERSION }}-linux-arm64.tar.gz
-
-  build-windows-amd64:
-    name: Build for Windows amd64
-    needs:
-      - build-ui
-    runs-on: ubuntu-latest
-    steps:
-      - name: Install build dependencies
-        run: |
-          sudo apt-get -qq update
-          sudo apt-get install -y mingw-w64
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Download UI build
-        uses: actions/download-artifact@v4
-        with:
-          name: ui-dist
-          path: ui/dist
-      - name: Setup Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: ${{ env.GO_VERSION }}
-      - name: Build
-        env:
-          CGO_ENABLED: 1
-          GOOS: windows
-          GOARCH: amd64
-          CC: x86_64-w64-mingw32-gcc
-        run: go build -o raybot.exe cmd/raybot/main.go
-      - name: Package binary
-        run: |
-          zip raybot-${{ env.VERSION }}-windows-amd64.zip raybot.exe
-      - name: Archive artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: dist-windows-amd64
-          path: raybot-${{ env.VERSION }}-windows-amd64.zip
 
   build-and-push-docker-image:
     name: Build and push Docker image
@@ -176,9 +102,7 @@ jobs:
   release:
     name: Draft Release
     needs:
-      - build-linux-amd64
       - build-linux-arm64
-      - build-windows-amd64
     runs-on: ubuntu-latest
     steps:
       - name: Download artifacts
