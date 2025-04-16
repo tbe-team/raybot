@@ -8,6 +8,10 @@ import (
 )
 
 func startCloud(app *application.Application, interruptChan <-chan any) error {
+	if app.Cfg.Wifi.AP.Enable {
+		return nil
+	}
+
 	service, err := cloud.New(app.Cfg.Cloud, app.Log, app.EventBus)
 	if err != nil {
 		return fmt.Errorf("failed to create cloud service: %w", err)
