@@ -130,6 +130,7 @@ function handleSelectCommand(row: Command) {
 
       <DataTable
         ref="table"
+        :init-value="{ columnVisibility: { error: false } }"
         :page="page"
         :page-size="pageSize"
         :columns="columns"
