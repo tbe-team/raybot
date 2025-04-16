@@ -36,9 +36,4 @@ COPY --from=builder /app/bin/raybot /app/raybot
 
 USER raybot
 
-# raybot will occupy these ports:
-#  - 3000: http port
-#  - 60000: grpc port
-EXPOSE 3000 60000
-
 CMD ["/app/raybot"]
