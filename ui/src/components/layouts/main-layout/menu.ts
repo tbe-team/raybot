@@ -29,8 +29,8 @@ export const menus: Item[] = [
     icon: Settings2,
   },
   {
-    title: 'Restart',
-    path: '/restart',
+    title: 'Reboot',
+    path: '/reboot',
     icon: Power,
   },
 ]

@@ -2,27 +2,27 @@
 import { PageContainer } from '@/components/shared'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import { useSystemRestartMutation } from '@/composables/use-system'
+import { useSystemRebootMutation } from '@/composables/use-system'
 import { AlertTriangle, Loader, RefreshCw } from 'lucide-vue-next'
 
-const { mutate, isPending } = useSystemRestartMutation()
-const restartInitiated = ref(false)
+const { mutate, isPending } = useSystemRebootMutation()
+const rebootInitiated = ref(false)
 
-function handleRestart() {
-  if (restartInitiated.value)
+function handleReboot() {
+  if (rebootInitiated.value)
     return
 
-  restartInitiated.value = true
+  rebootInitiated.value = true
 
   mutate(undefined, {
     onSuccess: () => {
       notification.success({
-        message: 'System will restart in 3 seconds. Please refresh the page after a moment.',
-        title: 'Restarting',
+        message: 'System will reboot now. Please refresh the page after a moment.',
+        title: 'Rebooting',
       })
     },
     onError: (error) => {
-      restartInitiated.value = false
+      rebootInitiated.value = false
       notification.error({
         message: error.message,
         title: 'Error',
@@ -37,10 +37,10 @@ function handleRestart() {
     <div class="flex flex-col w-full">
       <div class="mb-6">
         <h1 class="text-xl font-semibold tracking-tight">
-          Application Restart
+          System Reboot
         </h1>
         <p class="text-sm text-muted-foreground">
-          Restart the application to apply configuration changes
+          Reboot the system to apply configuration changes
         </p>
       </div>
 
@@ -54,7 +54,7 @@ function handleRestart() {
                   Warning
                 </h3>
                 <p class="text-sm text-yellow-600 dark:text-yellow-400">
-                  Restarting the application will temporarily interrupt all services. Make sure all important operations are completed before proceeding.
+                  Rebooting the system will temporarily interrupt all services. Make sure all important operations are completed before proceeding.
                 </p>
               </div>
             </div>
@@ -69,7 +69,7 @@ function handleRestart() {
                   <li>All system services will be stopped</li>
                   <li>Configuration changes will be applied</li>
                   <li>Services will be restarted with new settings</li>
-                  <li>The process typically takes 3 seconds</li>
+                  <li>The process typically takes a few seconds</li>
                 </ul>
               </div>
             </div>
@@ -79,12 +79,12 @@ function handleRestart() {
           <Button
             variant="destructive"
             size="lg"
-            :disabled="isPending || restartInitiated"
-            @click="handleRestart"
+            :disabled="isPending || rebootInitiated"
+            @click="handleReboot"
           >
             <Loader v-if="isPending" class="w-4 h-4 mr-2 animate-spin" />
             <RefreshCw v-else class="w-4 h-4 mr-2" />
-            Restart System
+            Reboot
           </Button>
         </CardFooter>
       </Card>

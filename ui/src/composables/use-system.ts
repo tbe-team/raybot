@@ -1,8 +1,8 @@
 import systemAPI from '@/api/system'
 import { useMutation } from '@tanstack/vue-query'
 
-export function useSystemRestartMutation() {
+export function useSystemRebootMutation() {
   return useMutation({
-    mutationFn: systemAPI.restartSystem,
+    mutationFn: systemAPI.reboot,
   })
 }
