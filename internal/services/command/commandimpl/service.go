@@ -140,6 +140,14 @@ func (s service) ExecuteCreatedCommand(ctx context.Context, params command.Execu
 	return nil
 }
 
+func (s service) DeleteCommandByID(ctx context.Context, params command.DeleteCommandByIDParams) error {
+	if err := s.validator.Validate(params); err != nil {
+		return fmt.Errorf("validate params: %w", err)
+	}
+
+	return s.commandRepository.DeleteCommandByIDAndNotProcessing(ctx, params.CommandID)
+}
+
 func (s service) startCheckingForExecutableCommand(ctx context.Context) {
 	s.log.Debug("waiting for hardware components to be initialized then resuming executable command")
 	s.waitForHardwareComponentsInitialized(ctx)

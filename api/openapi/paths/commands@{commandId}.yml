@@ -25,3 +25,27 @@ get:
         application/json:
           schema:
             $ref: "../components/schemas/error.yml#/ErrorResponse"
+
+delete:
+  summary: Delete a command by ID
+  operationId: deleteCommandById
+  description: Delete a command by ID
+  tags:
+    - commands
+  parameters:
+    - name: commandId
+      in: path
+      required: true
+      schema:
+        type: integer
+        description: The ID of the command
+        example: 1
+  responses:
+    '204':
+      description: The command was deleted
+    '400':
+      description: The command is in processing and can not be deleted
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

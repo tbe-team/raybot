@@ -64,6 +64,20 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 	return id, err
 }
 
+const commandDeleteByIDAndNotProcessing = `-- name: CommandDeleteByIDAndNotProcessing :execrows
+DELETE FROM commands
+WHERE id = ?1
+AND status != 'PROCESSING'
+`
+
+func (q *Queries) CommandDeleteByIDAndNotProcessing(ctx context.Context, db DBTX, id int64) (int64, error) {
+	result, err := db.ExecContext(ctx, commandDeleteByIDAndNotProcessing, id)
+	if err != nil {
+		return 0, err
+	}
+	return result.RowsAffected()
+}
+
 const commandGetByID = `-- name: CommandGetByID :one
 SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at FROM commands
 WHERE id = ?1

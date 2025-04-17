@@ -223,6 +223,17 @@ func (r repository) UpdateCommand(ctx context.Context, params command.UpdateComm
 	return r.convertRowToCommand(row)
 }
 
+func (r repository) DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error {
+	affected, err := r.queries.CommandDeleteByIDAndNotProcessing(ctx, r.db, id)
+	if err != nil {
+		return fmt.Errorf("failed to delete command by id and not processing: %w", err)
+	}
+	if affected == 0 {
+		return command.ErrCommandInProcessingCanNotBeDeleted
+	}
+	return nil
+}
+
 func (repository) convertRowToCommand(row sqlc.Command) (command.Command, error) {
 	ret := command.Command{
 		ID:     row.ID,

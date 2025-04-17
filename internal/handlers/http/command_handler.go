@@ -130,6 +130,18 @@ func (h commandHandler) CreateCommand(ctx context.Context, req gen.CreateCommand
 	return gen.CreateCommand201JSONResponse(res), nil
 }
 
+//nolint:revive
+func (h commandHandler) DeleteCommandById(ctx context.Context, req gen.DeleteCommandByIdRequestObject) (gen.DeleteCommandByIdResponseObject, error) {
+	err := h.commandService.DeleteCommandByID(ctx, command.DeleteCommandByIDParams{
+		CommandID: int64(req.CommandId),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("delete command by id: %w", err)
+	}
+
+	return gen.DeleteCommandById204Response{}, nil
+}
+
 func (h commandHandler) CancelCurrentProcessingCommand(ctx context.Context, _ gen.CancelCurrentProcessingCommandRequestObject) (gen.CancelCurrentProcessingCommandResponseObject, error) {
 	err := h.commandService.CancelCurrentProcessingCommand(ctx)
 	if err != nil {

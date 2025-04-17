@@ -138,6 +138,53 @@ func (_c *FakeRepository_CreateCommand_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
+// DeleteCommandByIDAndNotProcessing provides a mock function with given fields: ctx, id
+func (_m *FakeRepository) DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error {
+	ret := _m.Called(ctx, id)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteCommandByIDAndNotProcessing")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) error); ok {
+		r0 = rf(ctx, id)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeRepository_DeleteCommandByIDAndNotProcessing_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteCommandByIDAndNotProcessing'
+type FakeRepository_DeleteCommandByIDAndNotProcessing_Call struct {
+	*mock.Call
+}
+
+// DeleteCommandByIDAndNotProcessing is a helper method to define mock.On call
+//   - ctx context.Context
+//   - id int64
+func (_e *FakeRepository_Expecter) DeleteCommandByIDAndNotProcessing(ctx interface{}, id interface{}) *FakeRepository_DeleteCommandByIDAndNotProcessing_Call {
+	return &FakeRepository_DeleteCommandByIDAndNotProcessing_Call{Call: _e.mock.On("DeleteCommandByIDAndNotProcessing", ctx, id)}
+}
+
+func (_c *FakeRepository_DeleteCommandByIDAndNotProcessing_Call) Run(run func(ctx context.Context, id int64)) *FakeRepository_DeleteCommandByIDAndNotProcessing_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(int64))
+	})
+	return _c
+}
+
+func (_c *FakeRepository_DeleteCommandByIDAndNotProcessing_Call) Return(_a0 error) *FakeRepository_DeleteCommandByIDAndNotProcessing_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeRepository_DeleteCommandByIDAndNotProcessing_Call) RunAndReturn(run func(context.Context, int64) error) *FakeRepository_DeleteCommandByIDAndNotProcessing_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetCommandByID provides a mock function with given fields: ctx, id
 func (_m *FakeRepository) GetCommandByID(ctx context.Context, id int64) (command.Command, error) {
 	ret := _m.Called(ctx, id)

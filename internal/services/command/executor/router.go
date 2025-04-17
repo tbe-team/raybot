@@ -55,6 +55,14 @@ func NewRouter(
 
 func (r *executorRouter) Route(ctx context.Context, cmd command.Command) error {
 	switch cmd.Type {
+	case command.CommandTypeStopMovement:
+		i, ok := cmd.Inputs.(*command.StopMovementInputs)
+		if !ok {
+			return fmt.Errorf("invalid stop movement inputs: %v", cmd.Inputs)
+		}
+		r.stopMovementExecutor.Execute(ctx, cmd.ID, *i)
+		return nil
+
 	case command.CommandTypeMoveTo:
 		i, ok := cmd.Inputs.(*command.MoveToInputs)
 		if !ok {

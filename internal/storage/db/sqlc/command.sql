@@ -60,3 +60,8 @@ SET
 	updated_at = @updated_at
 WHERE id = @id
 RETURNING *;
+
+-- name: CommandDeleteByIDAndNotProcessing :execrows
+DELETE FROM commands
+WHERE id = @id
+AND status != 'PROCESSING';
