@@ -22,17 +22,17 @@ func TestCommandExecutor(t *testing.T) {
 
 		executor, fakeCommandRepo := newTestExecutor(
 			t,
-			func(ctx context.Context, inputs string) error {
+			func(_ context.Context, _ string) error {
 				return nil
 			},
 			Hooks{
-				OnSuccess: func(ctx context.Context) {
+				OnSuccess: func(_ context.Context) {
 					successCalled = true
 				},
-				OnCancel: func(ctx context.Context) {
+				OnCancel: func(_ context.Context) {
 					cancelCalled = true
 				},
-				OnError: func(ctx context.Context, err error) {
+				OnError: func(_ context.Context, _ error) {
 					errorCalled = true
 				},
 			},
@@ -65,18 +65,18 @@ func TestCommandExecutor(t *testing.T) {
 
 		executor, fakeCommandRepo := newTestExecutor(
 			t,
-			func(ctx context.Context, inputs string) error {
+			func(ctx context.Context, _ string) error {
 				<-ctx.Done()
 				return ctx.Err()
 			},
 			Hooks{
-				OnSuccess: func(ctx context.Context) {
+				OnSuccess: func(_ context.Context) {
 					successCalled = true
 				},
-				OnCancel: func(ctx context.Context) {
+				OnCancel: func(_ context.Context) {
 					cancelCalled = true
 				},
-				OnError: func(ctx context.Context, err error) {
+				OnError: func(_ context.Context, _ error) {
 					errorCalled = true
 				},
 			},
@@ -112,17 +112,17 @@ func TestCommandExecutor(t *testing.T) {
 		failedError := errors.New("failed error")
 		executor, fakeCommandRepo := newTestExecutor(
 			t,
-			func(ctx context.Context, inputs string) error {
+			func(_ context.Context, _ string) error {
 				return failedError
 			},
 			Hooks{
-				OnSuccess: func(ctx context.Context) {
+				OnSuccess: func(_ context.Context) {
 					successCalled = true
 				},
-				OnCancel: func(ctx context.Context) {
+				OnCancel: func(_ context.Context) {
 					cancelCalled = true
 				},
-				OnError: func(ctx context.Context, err error) {
+				OnError: func(_ context.Context, _ error) {
 					errorCalled = true
 				},
 			},
