@@ -25,3 +25,7 @@ func NewSlogLogger(cfg Config) *slog.Logger {
 
 	return log
 }
+
+func NewNoopLogger() *slog.Logger {
+	return slog.New(slog.DiscardHandler)
+}
