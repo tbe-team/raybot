@@ -2,6 +2,7 @@ package executor
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"sync"
 
@@ -11,63 +12,57 @@ import (
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
-type cargoOpenExecutor struct {
-	log *slog.Logger
-
-	subscriber   eventbus.Subscriber
-	cargoService cargo.Service
-}
-
 func newCargoOpenExecutor(
 	log *slog.Logger,
 	subscriber eventbus.Subscriber,
 	cargoService cargo.Service,
-) cargoOpenExecutor {
-	return cargoOpenExecutor{
-		log:          log,
-		subscriber:   subscriber,
-		cargoService: cargoService,
-	}
+	commandRepository command.Repository,
+) *commandExecutor[command.CargoOpenInputs] {
+	return newCommandExecutor(func(ctx context.Context, _ command.CargoOpenInputs) error {
+		wg := sync.WaitGroup{}
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			trackingCargoDoorUntilOpen(ctx, log, subscriber)
+		}()
+
+		if err := cargoService.OpenCargoDoor(ctx); err != nil {
+			return fmt.Errorf("failed to open cargo: %w", err)
+		}
+
+		// wait for cargo door open to finish
+		wg.Wait()
+
+		return nil
+	},
+		Hooks{},
+		log,
+		commandRepository,
+	)
 }
 
-func (e cargoOpenExecutor) Execute(ctx context.Context, _ command.CargoOpenInputs) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		e.trackingCargoDoorOpen(ctx)
-	}()
-
-	if err := e.cargoService.OpenCargoDoor(ctx); err != nil {
-		return NewExecutorError(err, "failed to open cargo")
-	}
-
-	// wait for cargo door open to finish
-	wg.Wait()
-
-	return nil
-}
-
-func (e cargoOpenExecutor) trackingCargoDoorOpen(ctx context.Context) {
+func trackingCargoDoorUntilOpen(
+	ctx context.Context,
+	log *slog.Logger,
+	subscriber eventbus.Subscriber,
+) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Debug("stop tracking cargo door open")
-		cancel() // cancel the context to stop the subscriber
+		log.Debug("stop tracking cargo door open")
+		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	e.subscriber.Subscribe(ctx, events.CargoDoorUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	log.Debug("start tracking cargo door open")
+	subscriber.Subscribe(ctx, events.CargoDoorUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.CargoDoorUpdatedEvent)
 		if !ok {
-			e.log.Error("invalid event", slog.Any("event", msg.Payload))
+			log.Error("invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
 		if ev.IsOpen {
-			e.log.Debug("cargo door open completed")
+			log.Debug("cargo door open completed")
 			close(doneCh)
 		}
 	})

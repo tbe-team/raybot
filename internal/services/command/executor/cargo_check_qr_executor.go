@@ -10,55 +10,54 @@ import (
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
-type cargoCheckQRExecutor struct {
-	log *slog.Logger
-
-	subscriber eventbus.Subscriber
-}
-
 func newCargoCheckQRExecutor(
 	log *slog.Logger,
 	subscriber eventbus.Subscriber,
-) cargoCheckQRExecutor {
-	return cargoCheckQRExecutor{
-		log:        log,
-		subscriber: subscriber,
-	}
+	commandRepository command.Repository,
+) *commandExecutor[command.CargoCheckQRInputs] {
+	return newCommandExecutor(
+		func(ctx context.Context, inputs command.CargoCheckQRInputs) error {
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				trackingCargoQRCodeUntilMatched(ctx, inputs.QRCode, log, subscriber)
+			}()
+
+			// wait for cargo qr code to be matched
+			wg.Wait()
+
+			return nil
+		},
+		Hooks{},
+		log,
+		commandRepository,
+	)
 }
 
-func (e cargoCheckQRExecutor) Execute(ctx context.Context, inputs command.CargoCheckQRInputs) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		e.trackingCargoQRCode(ctx, inputs.QRCode)
-	}()
-
-	wg.Wait()
-
-	return nil
-}
-
-func (e cargoCheckQRExecutor) trackingCargoQRCode(ctx context.Context, qrCode string) {
+func trackingCargoQRCodeUntilMatched(
+	ctx context.Context,
+	qrCode string,
+	log *slog.Logger,
+	subscriber eventbus.Subscriber,
+) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Debug("stop tracking cargo qr code")
-		cancel() // cancel the context to stop the subscriber
+		log.Debug("stop tracking cargo qr code")
+		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	e.subscriber.Subscribe(ctx, events.CargoQRCodeUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	log.Debug("start tracking cargo qr code", slog.Any("qr_code", qrCode))
+	subscriber.Subscribe(ctx, events.CargoQRCodeUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.CargoQRCodeUpdatedEvent)
 		if !ok {
-			e.log.Error("invalid event", slog.Any("event", msg.Payload))
+			log.Error("invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
 		if ev.QRCode == qrCode {
-			e.log.Debug("cargo qr code matched", slog.Any("qrcode", ev.QRCode))
+			log.Debug("cargo qr code matched", slog.Any("qrcode", ev.QRCode))
 			close(doneCh)
 		}
 	})

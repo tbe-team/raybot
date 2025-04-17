@@ -199,7 +199,15 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		eventBus,
 		commandRepository,
 		appStateRepository,
-		executor.NewDispatcher(cfg.Cargo, log, eventBus, driveMotorService, cargoService, liftMotorService),
+		executor.NewRouter(
+			cfg.Cargo,
+			log,
+			eventBus,
+			driveMotorService,
+			liftMotorService,
+			cargoService,
+			commandRepository,
+		),
 	)
 	wifiService := wifiimpl.NewService(cfg.Wifi, log)
 	if err := wifiService.Run(ctx); err != nil {

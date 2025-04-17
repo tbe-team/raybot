@@ -2,6 +2,7 @@ package executor
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"sync"
 
@@ -11,78 +12,76 @@ import (
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
-type moveToExecutor struct {
-	log *slog.Logger
-
-	subscriber        eventbus.Subscriber
-	driveMotorService drivemotor.Service
-}
-
 func newMoveToExecutor(
 	log *slog.Logger,
 	subscriber eventbus.Subscriber,
 	driveMotorService drivemotor.Service,
-) moveToExecutor {
-	return moveToExecutor{
-		log:               log,
-		subscriber:        subscriber,
-		driveMotorService: driveMotorService,
-	}
+	commandRepository command.Repository,
+) *commandExecutor[command.MoveToInputs] {
+	return newCommandExecutor(
+		func(ctx context.Context, inputs command.MoveToInputs) error {
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				trackingLocationUntilReached(ctx, inputs.Location, log, subscriber)
+			}()
+
+			if err := driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
+				Speed: 100,
+			}); err != nil {
+				return fmt.Errorf("failed to move forward: %w", err)
+			}
+
+			wg.Wait()
+
+			if err := driveMotorService.Stop(ctx); err != nil {
+				return fmt.Errorf("failed to stop drive motor: %w", err)
+			}
+
+			return nil
+		},
+		Hooks{
+			OnCancel: func(ctx context.Context) {
+				if err := driveMotorService.Stop(ctx); err != nil {
+					log.Error("failed to stop drive motor", slog.Any("error", err))
+				}
+			},
+		},
+		log,
+		commandRepository,
+	)
 }
 
-func (e moveToExecutor) Execute(ctx context.Context, inputs command.MoveToInputs) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		e.trackingLocation(ctx, inputs.Location)
-	}()
-
-	// start driving
-	if err := e.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
-		Speed: 100,
-	}); err != nil {
-		return NewExecutorError(err, "failed to move forward")
-	}
-
-	// wait for location tracking to finish
-	wg.Wait()
-
-	// stop driving
-	if err := e.driveMotorService.Stop(ctx); err != nil {
-		return NewExecutorError(err, "failed to stop driving")
-	}
-
-	return nil
-}
-
-func (e moveToExecutor) trackingLocation(ctx context.Context, location string) {
+func trackingLocationUntilReached(
+	ctx context.Context,
+	location string,
+	log *slog.Logger,
+	subscriber eventbus.Subscriber,
+) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Debug("stop tracking location", slog.String("location", location))
-		cancel() // cancel the context to stop the subscriber
+		log.Debug("stop tracking location", slog.String("location", location))
+		cancel()
 	}()
 
-	reachCh := make(chan struct{})
-	e.log.Debug("start tracking location", slog.String("target_location", location))
-	e.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	doneCh := make(chan struct{})
+	log.Debug("start tracking location", slog.String("target_location", location))
+	subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateLocationEvent)
 		if !ok {
-			e.log.Error("invalid event", slog.Any("event", msg.Payload))
+			log.Error("invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
 		if ev.Location == location {
-			e.log.Debug("location reached", slog.String("location", ev.Location))
-			close(reachCh)
+			log.Debug("location reached", slog.String("location", ev.Location))
+			close(doneCh)
 		}
 	})
 
 	select {
-	case <-reachCh:
+	case <-doneCh:
 	case <-ctx.Done():
 	}
 }

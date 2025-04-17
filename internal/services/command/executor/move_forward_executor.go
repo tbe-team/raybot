@@ -2,28 +2,29 @@ package executor
 
 import (
 	"context"
+	"fmt"
+	"log/slog"
 
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 )
 
-type moveForwardExecutor struct {
-	driveMotorService drivemotor.Service
-}
-
 func newMoveForwardExecutor(
+	log *slog.Logger,
 	driveMotorService drivemotor.Service,
-) moveForwardExecutor {
-	return moveForwardExecutor{
-		driveMotorService: driveMotorService,
-	}
-}
-
-func (e moveForwardExecutor) Execute(ctx context.Context, _ command.MoveForwardInputs) error {
-	if err := e.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
-		Speed: 100,
-	}); err != nil {
-		return NewExecutorError(err, "failed to move forward")
-	}
-	return nil
+	commandRepository command.Repository,
+) *commandExecutor[command.MoveForwardInputs] {
+	return newCommandExecutor(
+		func(ctx context.Context, _ command.MoveForwardInputs) error {
+			if err := driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
+				Speed: 100,
+			}); err != nil {
+				return fmt.Errorf("failed to move forward: %w", err)
+			}
+			return nil
+		},
+		Hooks{},
+		log,
+		commandRepository,
+	)
 }

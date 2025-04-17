@@ -2,79 +2,75 @@ package executor
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"sync"
 
+	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
-type cargoLiftExecutor struct {
-	log          *slog.Logger
-	liftPosition uint16
-
-	subscriber       eventbus.Subscriber
-	liftMotorService liftmotor.Service
-}
-
 func newCargoLiftExecutor(
+	cfg config.Cargo,
 	log *slog.Logger,
-	liftPosition uint16,
 	subscriber eventbus.Subscriber,
 	liftMotorService liftmotor.Service,
-) cargoLiftExecutor {
-	return cargoLiftExecutor{
-		log:              log,
-		liftPosition:     liftPosition,
-		subscriber:       subscriber,
-		liftMotorService: liftMotorService,
-	}
+	commandRepository command.Repository,
+) *commandExecutor[command.CargoLiftInputs] {
+	return newCommandExecutor(
+		func(ctx context.Context, _ command.CargoLiftInputs) error {
+			wg := sync.WaitGroup{}
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				trackingLiftPositionUntilReached(ctx, cfg.LiftPosition, log, subscriber)
+			}()
+
+			if err := liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
+				Position: cfg.LiftPosition,
+			}); err != nil {
+				return fmt.Errorf("failed to set cargo position: %w", err)
+			}
+
+			// wait for distance tracking to finish
+			wg.Wait()
+
+			return nil
+		},
+		Hooks{},
+		log,
+		commandRepository,
+	)
 }
 
-func (e cargoLiftExecutor) Execute(ctx context.Context, _ command.CargoLiftInputs) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	wg := sync.WaitGroup{}
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		e.trackingDistance(ctx)
-	}()
-
-	if err := e.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
-		Position: e.liftPosition,
-	}); err != nil {
-		return NewExecutorError(err, "failed to set cargo position")
-	}
-
-	// wait for distance tracking to finish
-	wg.Wait()
-
-	return nil
-}
-
-func (e cargoLiftExecutor) trackingDistance(ctx context.Context) {
+func trackingLiftPositionUntilReached(
+	ctx context.Context,
+	liftPosition uint16,
+	log *slog.Logger,
+	subscriber eventbus.Subscriber,
+) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Debug("stop tracking distance")
-		cancel() // cancel the context to stop the subscriber
+		log.Debug("stop tracking lift position")
+		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	e.subscriber.Subscribe(ctx, events.DistanceSensorUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	log.Debug("start tracking lift position", slog.Int64("lift_position", int64(liftPosition)))
+	subscriber.Subscribe(ctx, events.DistanceSensorUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateDistanceSensorEvent)
 		if !ok {
-			e.log.Error("invalid event", slog.Any("event", msg.Payload))
+			log.Error("invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
 		// 10% tolerance
-		acceptableDistance := e.liftPosition + e.liftPosition*10/100
+		acceptableDistance := liftPosition + liftPosition*10/100
 		if ev.DownDistance <= acceptableDistance {
-			e.log.Debug("cargo lift completed", slog.Int64("lift_position", int64(e.liftPosition)))
+			log.Debug("lift position reached", slog.Int64("lift_position", int64(liftPosition)))
 			close(doneCh)
 		}
 	})

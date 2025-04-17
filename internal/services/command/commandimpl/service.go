@@ -26,7 +26,7 @@ type service struct {
 	runningCmdRepository *runningCmdRepository
 	commandRepository    command.Repository
 	appStateRepo         appstate.Repository
-	dispatcher           executor.Dispatcher
+	executorRouter       executor.Router
 }
 
 func NewService(
@@ -35,7 +35,7 @@ func NewService(
 	publisher eventbus.Publisher,
 	commandRepository command.Repository,
 	appStateRepo appstate.Repository,
-	dispatcher executor.Dispatcher,
+	executorRouter executor.Router,
 ) command.Service {
 	s := &service{
 		log:                  log.With("service", "command"),
@@ -44,7 +44,7 @@ func NewService(
 		runningCmdRepository: newRunningCmdRepository(),
 		commandRepository:    commandRepository,
 		appStateRepo:         appStateRepo,
-		dispatcher:           dispatcher,
+		executorRouter:       executorRouter,
 	}
 
 	go s.startCheckingForExecutableCommand(context.Background())
@@ -200,8 +200,8 @@ func (s service) executeCommand(ctx context.Context, cmd command.Command) {
 	s.runningCmdRepository.Add(runningCmd)
 	defer s.runningCmdRepository.Remove()
 
-	// pass the context of the running command to the dispatcher
-	err := s.dispatcher.Dispatch(runningCmd.Context(), cmd)
+	// pass the context of the running command to the executor router
+	err := s.executorRouter.Route(runningCmd.Context(), cmd)
 	if err != nil {
 		if errors.Is(err, context.Canceled) {
 			s.log.Info("command execution canceled", slog.Any("command", cmd), slog.Any("error", err))
