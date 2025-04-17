@@ -201,39 +201,12 @@ func (s service) executeCommand(ctx context.Context, cmd command.Command) {
 	defer s.runningCmdRepository.Remove()
 
 	// pass the context of the running command to the executor router
-	err := s.executorRouter.Route(runningCmd.Context(), cmd)
-	if err != nil {
-		if errors.Is(err, context.Canceled) {
-			s.log.Info("command execution canceled", slog.Any("command", cmd), slog.Any("error", err))
-			s.updateCommandStatus(ctx, cmd.ID, command.StatusCanceled, nil)
-		} else {
-			s.log.Error("command execution failed", slog.Any("command", cmd), slog.Any("error", err))
-			s.updateCommandStatus(ctx, cmd.ID, command.StatusFailed, ptr.New(err.Error()))
-		}
-	} else {
-		s.log.Info("command execution succeeded", slog.Any("command", cmd))
-		s.updateCommandStatus(ctx, cmd.ID, command.StatusSucceeded, nil)
+	if err := s.executorRouter.Route(runningCmd.Context(), cmd); err != nil {
+		s.log.Error("failed to execute command", slog.Any("command", cmd), slog.Any("error", err))
 	}
 
 	go func() {
 		time.Sleep(100 * time.Millisecond)
 		s.runNextExecutableCommand(ctx)
 	}()
-}
-
-func (s service) updateCommandStatus(ctx context.Context, cmdID int64, status command.Status, errMsg *string) {
-	now := time.Now()
-	_, err := s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
-		ID:             cmdID,
-		Status:         status,
-		SetStatus:      true,
-		Error:          errMsg,
-		SetError:       errMsg != nil,
-		CompletedAt:    ptr.New(now),
-		SetCompletedAt: true,
-		UpdatedAt:      now,
-	})
-	if err != nil {
-		s.log.Error("failed to update command status", slog.String("status", string(status)), slog.Any("error", err))
-	}
 }
