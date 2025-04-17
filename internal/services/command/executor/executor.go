@@ -54,30 +54,29 @@ func (e *commandExecutor[I]) Execute(ctx context.Context, cmdID int64, inputs I)
 		if e.onSuccess != nil {
 			e.onSuccess(ctx)
 		}
-		e.updateCommandStatus(ctx, cmdID, command.StatusSucceeded, nil)
+		e.updateCommandStatus(cmdID, command.StatusSucceeded, nil)
 
 	case errors.Is(err, context.Canceled):
 		if e.onCancel != nil {
 			e.onCancel(ctx)
 		}
-		e.updateCommandStatus(ctx, cmdID, command.StatusCanceled, nil)
+		e.updateCommandStatus(cmdID, command.StatusCanceled, nil)
 
 	default:
 		if e.onError != nil {
 			e.onError(ctx, err)
 		}
-		e.updateCommandStatus(ctx, cmdID, command.StatusFailed, ptr.New(err.Error()))
+		e.updateCommandStatus(cmdID, command.StatusFailed, ptr.New(err.Error()))
 	}
 }
 
 func (e *commandExecutor[I]) updateCommandStatus(
-	ctx context.Context,
 	id int64,
 	status command.Status,
 	errMsg *string,
 ) {
 	now := time.Now()
-	_, err := e.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
+	_, err := e.commandRepository.UpdateCommand(context.TODO(), command.UpdateCommandParams{
 		ID:             id,
 		Status:         status,
 		SetStatus:      true,
