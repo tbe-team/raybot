@@ -13,6 +13,7 @@ import (
 	"github.com/tbe-team/raybot/internal/handlers/http/gen"
 	"github.com/tbe-team/raybot/internal/handlers/http/middleware"
 	"github.com/tbe-team/raybot/internal/handlers/http/swagger"
+	"github.com/tbe-team/raybot/internal/services/apperrorcode"
 	"github.com/tbe-team/raybot/internal/services/command"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/services/dashboarddata"
@@ -29,6 +30,7 @@ type Service struct {
 	dashboardDataService dashboarddata.Service
 	peripheralService    peripheral.Service
 	commandService       command.Service
+	apperrorcodeService  apperrorcode.Service
 }
 
 type CleanupFunc func(ctx context.Context) error
@@ -41,6 +43,7 @@ func New(
 	dashboardDataService dashboarddata.Service,
 	peripheralService peripheral.Service,
 	commandService command.Service,
+	apperrorcodeService apperrorcode.Service,
 ) *Service {
 	return &Service{
 		cfg:                  cfg,
@@ -50,6 +53,7 @@ func New(
 		dashboardDataService: dashboardDataService,
 		peripheralService:    peripheralService,
 		commandService:       commandService,
+		apperrorcodeService:  apperrorcodeService,
 	}
 }
 
@@ -116,6 +120,7 @@ func (s *Service) RegisterHandlers(r chi.Router) {
 var _ gen.StrictServerInterface = (*handler)(nil)
 
 type handler struct {
+	*errorCodeHandler
 	*configHandler
 	*systemHandler
 	*dashboardDataHandler
@@ -125,6 +130,7 @@ type handler struct {
 
 func (s *Service) newHandler() *handler {
 	return &handler{
+		errorCodeHandler:     newErrorCodeHandler(s.apperrorcodeService),
 		configHandler:        newConfigHandler(s.configService),
 		systemHandler:        newSystemHandler(s.systemService),
 		dashboardDataHandler: newDashboardDataHandler(s.dashboardDataService),

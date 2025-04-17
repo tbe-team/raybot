@@ -10,6 +10,28 @@ servers:
   - url: /api/v1
 security: []
 paths:
+  /error-codes:
+    get:
+      summary: Get all error codes
+      operationId: getErrorCodes
+      description: Get all error codes
+      tags:
+        - error-codes
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ErrorCodeResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /configs/log:
     get:
       summary: Get the log configuration
@@ -541,38 +563,16 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    LogConfig:
+    ErrorCodeResponse:
       type: object
       properties:
-        level:
+        code:
           type: string
-          enum:
-            - DEBUG
-            - INFO
-            - WARN
-            - ERROR
-          example: DEBUG
-          description: The global log level for the application
-          x-order: 1
-          x-go-type: string
-        format:
+        message:
           type: string
-          enum:
-            - JSON
-            - TEXT
-          example: JSON
-          description: The log format for the application
-          x-order: 2
-          x-go-type: string
-        addSource:
-          type: boolean
-          example: false
-          description: Whether to add the source to the log
-          x-order: 3
       required:
-        - level
-        - format
-        - addSource
+        - code
+        - message
     FieldError:
       type: object
       properties:
@@ -610,6 +610,38 @@ components:
       required:
         - code
         - message
+    LogConfig:
+      type: object
+      properties:
+        level:
+          type: string
+          enum:
+            - DEBUG
+            - INFO
+            - WARN
+            - ERROR
+          example: DEBUG
+          description: The global log level for the application
+          x-order: 1
+          x-go-type: string
+        format:
+          type: string
+          enum:
+            - JSON
+            - TEXT
+          example: JSON
+          description: The log format for the application
+          x-order: 2
+          x-go-type: string
+        addSource:
+          type: boolean
+          example: false
+          description: Whether to add the source to the log
+          x-order: 3
+      required:
+        - level
+        - format
+        - addSource
     SerialConfig:
       type: object
       properties:

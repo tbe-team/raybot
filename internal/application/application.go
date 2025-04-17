@@ -9,6 +9,8 @@ import (
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/hardware/espserial"
 	"github.com/tbe-team/raybot/internal/hardware/picserial"
+	"github.com/tbe-team/raybot/internal/services/apperrorcode"
+	"github.com/tbe-team/raybot/internal/services/apperrorcode/apperrorcodeimpl"
 	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/appstate/appstateimpl"
 	"github.com/tbe-team/raybot/internal/services/battery"
@@ -66,6 +68,7 @@ type Application struct {
 	AppStateService       appstate.Service
 	PeripheralService     peripheral.Service
 	CommandService        command.Service
+	ApperrorcodeService   apperrorcode.Service
 }
 
 type CleanupFunc func() error
@@ -192,7 +195,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	)
 	appStateService := appstateimpl.NewService(appStateRepository)
 	peripheralService := peripheralimpl.NewService()
-
 	commandService := commandimpl.NewService(
 		log,
 		validator,
@@ -213,6 +215,8 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	if err := wifiService.Run(ctx); err != nil {
 		return nil, nil, fmt.Errorf("failed to run wifi service: %w", err)
 	}
+
+	apperrorcodeService := apperrorcodeimpl.NewService()
 
 	cleanup := func() error {
 		var err error
@@ -254,5 +258,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		AppStateService:       appStateService,
 		PeripheralService:     peripheralService,
 		CommandService:        commandService,
+		ApperrorcodeService:   apperrorcodeService,
 	}, cleanup, nil
 }

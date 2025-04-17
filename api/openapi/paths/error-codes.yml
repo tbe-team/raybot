@@ -1,16 +1,18 @@
 get:
-  summary: Get health status
-  operationId: getHealth
-  description: Get the health status.
+  summary: Get all error codes
+  operationId: getErrorCodes
+  description: Get all error codes
   tags:
-    - health
+    - error-codes
   responses:
     "200":
       description: OK
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/health.yml#/HealthResponse"
+            type: array
+            items:
+              $ref: "../components/schemas/error-code.yml#/ErrorCodeResponse"
     "400":
       description: Bad Request
       content:
