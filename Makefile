@@ -23,7 +23,7 @@ gen-mock:
 	go run github.com/vektra/mockery/v2@v2.53.1 --config .mockery.yml
 
 .PHONY: gen-all
-gen-all: gen-openapi gen-sqlc
+gen-all: gen-openapi gen-sqlc gen-mock
 
 #########################
 # Database

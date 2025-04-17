@@ -10,18 +10,7 @@ issue-845-fix: true
 resolve-type-alias: false
 
 packages:
-  github.com/tbe-team/raybot/internal/config:
+  github.com/tbe-team/raybot/internal/services/command:
     config:
-      all: true
-  github.com/tbe-team/raybot/internal/controller/picserial/serial:
-    config:
-      all: true
-  github.com/tbe-team/raybot/internal/db:
-    config:
-      all: true
-  github.com/tbe-team/raybot/internal/repository:
-    config:
-      all: true
-  github.com/tbe-team/raybot/internal/service:
-    config:
-      all: true
+    interfaces:
+      Repository:
