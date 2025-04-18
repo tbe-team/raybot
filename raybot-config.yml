@@ -41,3 +41,7 @@ wifi:
     enable: false
     ssid: ssid
     password: password
+cron:
+  delete_old_command:
+    schedule: "@every 1h"
+    threshold: 168h   # 7 days
