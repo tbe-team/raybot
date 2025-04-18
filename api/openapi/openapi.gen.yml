@@ -1329,6 +1329,7 @@ components:
         - CARGO_LIFT
         - CARGO_LOWER
         - CARGO_CHECK_QR
+        - SCAN_LOCATION
       description: The type of command
       x-go-type: string
     CommandStatus:
@@ -1379,6 +1380,8 @@ components:
           example: 1e8asj
       required:
         - qrCode
+    ScanLocationInputs:
+      type: object
     CommandInputs:
       oneOf:
         - $ref: '#/components/schemas/StopInputs'
@@ -1390,6 +1393,7 @@ components:
         - $ref: '#/components/schemas/CargoLiftInputs'
         - $ref: '#/components/schemas/CargoLowerInputs'
         - $ref: '#/components/schemas/CargoCheckQRInputs'
+        - $ref: '#/components/schemas/ScanLocationInputs'
     StopOutputs:
       type: object
     MoveForwardOutputs:
@@ -1408,6 +1412,30 @@ components:
       type: object
     CargoCheckQROutputs:
       type: object
+    Location:
+      type: object
+      properties:
+        location:
+          type: string
+          description: The location (RFID tag)
+          example: 1uxa91o
+        scannedAt:
+          type: string
+          format: date-time
+          description: The date and time when the location was scanned
+          example: '2025-04-18T12:00:00Z'
+      required:
+        - location
+        - scannedAt
+    ScanLocationOutputs:
+      type: object
+      properties:
+        locations:
+          type: array
+          items:
+            $ref: '#/components/schemas/Location'
+      required:
+        - locations
     CommandOutputs:
       oneOf:
         - $ref: '#/components/schemas/StopOutputs'
@@ -1419,6 +1447,7 @@ components:
         - $ref: '#/components/schemas/CargoLiftOutputs'
         - $ref: '#/components/schemas/CargoLowerOutputs'
         - $ref: '#/components/schemas/CargoCheckQROutputs'
+        - $ref: '#/components/schemas/ScanLocationOutputs'
     CommandResponse:
       type: object
       properties:

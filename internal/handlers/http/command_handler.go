@@ -229,6 +229,11 @@ func (commandHandler) convertInputsToResponse(inputs command.Inputs) (gen.Comman
 			return gen.CommandInputs{}, fmt.Errorf("from cargo check qr inputs: %w", err)
 		}
 
+	case *command.ScanLocationInputs:
+		if err := res.FromScanLocationInputs(gen.ScanLocationInputs{}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from scan location inputs: %w", err)
+		}
+
 	default:
 		return gen.CommandInputs{}, fmt.Errorf("unknown inputs type: %T", v)
 	}
@@ -284,6 +289,23 @@ func (commandHandler) convertOutputsToResponse(outputs command.Outputs) (gen.Com
 			return gen.CommandOutputs{}, fmt.Errorf("from cargo check qr outputs: %w", err)
 		}
 
+	case *command.ScanLocationOutputs:
+		locs := []gen.Location{}
+		if v.Locations != nil {
+			for _, loc := range v.Locations {
+				locs = append(locs, gen.Location{
+					Location:  loc.Location,
+					ScannedAt: loc.ScannedAt,
+				})
+			}
+		}
+
+		if err := res.FromScanLocationOutputs(gen.ScanLocationOutputs{
+			Locations: locs,
+		}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from scan location outputs: %w", err)
+		}
+
 	default:
 		return gen.CommandOutputs{}, fmt.Errorf("unknown outputs type: %T", v)
 	}
@@ -332,7 +354,10 @@ func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, i
 			QRCode: i.QrCode,
 		}, nil
 
+	case command.CommandTypeScanLocation:
+		return &command.ScanLocationInputs{}, nil
+
 	default:
-		return nil, fmt.Errorf("unknown command type: %s", cmdType)
+		return nil, xerror.ValidationFailed(nil, "unknown command type")
 	}
 }

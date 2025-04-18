@@ -16,7 +16,8 @@ func (c CommandType) Validate() error {
 	switch c {
 	case CommandTypeStopMovement, CommandTypeMoveForward, CommandTypeMoveBackward,
 		CommandTypeMoveTo, CommandTypeCargoOpen, CommandTypeCargoClose,
-		CommandTypeCargoLift, CommandTypeCargoLower, CommandTypeCargoCheckQR:
+		CommandTypeCargoLift, CommandTypeCargoLower, CommandTypeCargoCheckQR,
+		CommandTypeScanLocation:
 		return nil
 	}
 	return fmt.Errorf("invalid command type: %s", c)
@@ -33,6 +34,8 @@ const (
 	CommandTypeCargoLift    CommandType = "CARGO_LIFT"
 	CommandTypeCargoLower   CommandType = "CARGO_LOWER"
 	CommandTypeCargoCheckQR CommandType = "CARGO_CHECK_QR"
+
+	CommandTypeScanLocation CommandType = "SCAN_LOCATION"
 )
 
 type Source string

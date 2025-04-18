@@ -48,7 +48,7 @@ VALUES (
 	@updated_at,
 	@completed_at
 )
-RETURNING id;
+RETURNING id, outputs;
 
 -- name: CommandUpdate :one
 UPDATE commands

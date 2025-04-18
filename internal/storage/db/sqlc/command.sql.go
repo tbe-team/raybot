@@ -32,7 +32,7 @@ VALUES (
 	?8,
 	?9
 )
-RETURNING id
+RETURNING id, outputs
 `
 
 type CommandCreateParams struct {
@@ -47,7 +47,12 @@ type CommandCreateParams struct {
 	CompletedAt *string `json:"completed_at"`
 }
 
-func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateParams) (int64, error) {
+type CommandCreateRow struct {
+	ID      int64  `json:"id"`
+	Outputs string `json:"outputs"`
+}
+
+func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateParams) (CommandCreateRow, error) {
 	row := db.QueryRowContext(ctx, commandCreate,
 		arg.Type,
 		arg.Status,
@@ -59,9 +64,9 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 		arg.UpdatedAt,
 		arg.CompletedAt,
 	)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
+	var i CommandCreateRow
+	err := row.Scan(&i.ID, &i.Outputs)
+	return i, err
 }
 
 const commandDeleteByIDAndNotProcessing = `-- name: CommandDeleteByIDAndNotProcessing :execrows

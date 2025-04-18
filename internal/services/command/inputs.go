@@ -15,6 +15,7 @@ var (
 	_ Inputs = (*CargoLiftInputs)(nil)
 	_ Inputs = (*CargoLowerInputs)(nil)
 	_ Inputs = (*CargoCheckQRInputs)(nil)
+	_ Inputs = (*ScanLocationInputs)(nil)
 )
 
 type Inputs interface {
@@ -89,6 +90,13 @@ func (CargoCheckQRInputs) CommandType() CommandType {
 }
 func (CargoCheckQRInputs) isInputs() {}
 
+type ScanLocationInputs struct{}
+
+func (ScanLocationInputs) CommandType() CommandType {
+	return CommandTypeScanLocation
+}
+func (ScanLocationInputs) isInputs() {}
+
 func UnmarshalInputs(cmdType CommandType, inputsBytes []byte) (Inputs, error) {
 	var inputs Inputs
 
@@ -127,6 +135,9 @@ func UnmarshalInputs(cmdType CommandType, inputsBytes []byte) (Inputs, error) {
 			return nil, fmt.Errorf("failed to unmarshal cargo check qr inputs: %w", err)
 		}
 		inputs = i
+
+	case CommandTypeScanLocation:
+		inputs = &ScanLocationInputs{}
 
 	default:
 		return nil, fmt.Errorf("invalid command type: %s", cmdType)

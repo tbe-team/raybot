@@ -174,7 +174,7 @@ func (r repository) CreateCommand(ctx context.Context, commandArg command.Comman
 		startedAt = ptr.New(commandArg.StartedAt.Format(time.RFC3339))
 	}
 
-	id, err := r.queries.CommandCreate(ctx, r.db, sqlc.CommandCreateParams{
+	row, err := r.queries.CommandCreate(ctx, r.db, sqlc.CommandCreateParams{
 		Type:        commandArg.Type.String(),
 		Status:      commandArg.Status.String(),
 		Source:      commandArg.Source.String(),
@@ -189,7 +189,11 @@ func (r repository) CreateCommand(ctx context.Context, commandArg command.Comman
 		return command.Command{}, fmt.Errorf("queries create command: %w", err)
 	}
 
-	commandArg.ID = id
+	commandArg.ID = row.ID
+	commandArg.Outputs, err = command.UnmarshalOutputs(commandArg.Type, []byte(row.Outputs))
+	if err != nil {
+		return command.Command{}, fmt.Errorf("failed to unmarshal outputs: %w", err)
+	}
 
 	return commandArg, nil
 }
