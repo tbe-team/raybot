@@ -2,12 +2,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 
-interface ConfirmationState {
-  open: boolean
-  title: string | null
-  description: string | null
-  cancelLabel: string | null
-  actionLabel: string | null
+interface ConfirmationData {
+  title: string
+  description: string
+  cancelLabel: string
+  actionLabel: string
   onAction: () => void
   onCancel: () => void
 }
@@ -20,15 +19,6 @@ export const useConfirmationStore = defineStore('confirmation', () => {
   const actionLabel = ref<string | null>(null)
   const onAction = ref<() => void>(() => {})
   const onCancel = ref<() => void>(() => {})
-
-  interface ConfirmationData {
-    title: string
-    description: string
-    cancelLabel: string
-    actionLabel: string
-    onAction: () => void
-    onCancel: () => void
-  }
 
   function openConfirmation(data: ConfirmationData) {
     open.value = true

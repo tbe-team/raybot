@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '@/components/ui/sheet'
-import { useGetCommandQuery } from '@/composables/use-command'
+import { useCancelProcessingCommandMutation, useDeleteCommandMutation, useGetCommandQuery } from '@/composables/use-command'
 import { formatDate, formatUptime } from '@/lib/date'
+import { useConfirmationStore } from '@/stores/confirmation-store'
+import { RaybotError } from '@/types/error'
 import { useIntervalFn } from '@vueuse/core'
 import { Loader2 } from 'lucide-vue-next'
 import SourceBadge from './SourceBadge.vue'
@@ -21,6 +23,9 @@ const { data: command, isPending, isError, refetch } = useGetCommandQuery(comman
     doNotShowLoading: true,
   },
 })
+const { mutate: deleteCommand } = useDeleteCommandMutation()
+const { mutate: cancelProcessingCommand } = useCancelProcessingCommandMutation()
+const { openConfirmation } = useConfirmationStore()
 
 const REFRESH_INTERVAL = 1000
 const { pause, resume } = useIntervalFn(() => {
@@ -44,6 +49,68 @@ watch(isOpen, (open) => {
     resume()
   }
 }, { immediate: true })
+
+function handleRemoveFromQueue() {
+  openConfirmation({
+    title: 'Remove command',
+    description: 'Are you sure you want to remove this command from queue?',
+    actionLabel: 'Confirm',
+    cancelLabel: 'Cancel',
+    onAction: () => {
+      deleteCommand(props.commandId, {
+        onSuccess: () => {
+          notification.success('Command removed from queue')
+        },
+        onError: (error) => {
+          if (error instanceof RaybotError) {
+            if (error.errorCode === 'command.inProcessingCanNotBeDeleted') {
+              notification.error('Command is being processed and cannot be deleted')
+            }
+            else {
+              notification.error(error.message)
+            }
+          }
+          else {
+            notification.error(error.message)
+          }
+        },
+      })
+    },
+    onCancel: () => {
+    },
+  })
+}
+
+function handleStopExecution() {
+  openConfirmation({
+    title: 'Cancel command',
+    description: 'Are you sure you want to cancel this command?',
+    actionLabel: 'Confirm',
+    cancelLabel: 'Cancel',
+    onAction: () => {
+      cancelProcessingCommand(undefined, {
+        onSuccess: () => {
+          notification.success('Command cancelled successfully')
+        },
+        onError: (error) => {
+          if (error instanceof RaybotError) {
+            if (error.errorCode === 'command.noCommandBeingProcessed') {
+              notification.error('No command is being processed')
+            }
+            else {
+              notification.error(error.message)
+            }
+          }
+          else {
+            notification.error(error.message)
+          }
+        },
+      })
+    },
+    onCancel: () => {
+    },
+  })
+}
 </script>
 
 <template>
@@ -151,13 +218,13 @@ watch(isOpen, (open) => {
 
         <div class="flex gap-2 pt-4">
           <template v-if="command.status === 'QUEUED'">
-            <Button variant="destructive" class="flex-1" disabled>
+            <Button variant="destructive" class="flex-1" @click="handleRemoveFromQueue">
               Remove from queue
             </Button>
           </template>
           <template v-else-if="command.status === 'PROCESSING'">
-            <Button variant="destructive" class="flex-1" disabled>
-              Stop Execution
+            <Button variant="destructive" class="flex-1" @click="handleStopExecution">
+              Stop execution
             </Button>
           </template>
           <template v-else>

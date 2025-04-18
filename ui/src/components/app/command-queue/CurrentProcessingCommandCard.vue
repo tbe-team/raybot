@@ -25,7 +25,7 @@ const emit = defineEmits<{
 const { openConfirmation } = useConfirmationStore()
 
 const { data: command, refetch, isError } = useCurrentProcessingCommandQuery({ axiosOpts: { doNotShowLoading: true } })
-const { mutate: cancelProgressingCommand, isPending: isCancellingCommand } = useCancelProcessingCommandMutation()
+const { mutate: cancelProcessingCommand, isPending: isCancellingCommand } = useCancelProcessingCommandMutation()
 const REFRESH_INTERVAL = 1000
 const interval = setInterval(refetch, REFRESH_INTERVAL)
 
@@ -40,7 +40,7 @@ function handleCancelCommand() {
     actionLabel: 'Confirm',
     cancelLabel: 'Cancel',
     onAction: () => {
-      cancelProgressingCommand(undefined, {
+      cancelProcessingCommand(undefined, {
         onSuccess: () => {
           notification.success('Command cancelled successfully')
         },
