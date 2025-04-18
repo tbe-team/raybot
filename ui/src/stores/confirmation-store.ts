@@ -1,5 +1,6 @@
 // confirmation-store.ts
 import { defineStore } from 'pinia'
+import { ref } from 'vue'
 
 interface ConfirmationState {
   open: boolean
@@ -11,43 +12,53 @@ interface ConfirmationState {
   onCancel: () => void
 }
 
-export const useConfirmationStore = defineStore('confirmation', {
-  state: (): ConfirmationState => ({
-    open: false,
-    title: null,
-    description: null,
-    cancelLabel: null,
-    actionLabel: null,
-    onAction: () => {},
-    onCancel: () => {},
-  }),
+export const useConfirmationStore = defineStore('confirmation', () => {
+  const open = ref(false)
+  const title = ref<string | null>(null)
+  const description = ref<string | null>(null)
+  const cancelLabel = ref<string | null>(null)
+  const actionLabel = ref<string | null>(null)
+  const onAction = ref<() => void>(() => {})
+  const onCancel = ref<() => void>(() => {})
 
-  actions: {
-    openConfirmation(data: {
-      title: string
-      description: string
-      cancelLabel: string
-      actionLabel: string
-      onAction: () => void
-      onCancel: () => void
-    }) {
-      this.open = true
-      this.title = data.title
-      this.description = data.description
-      this.cancelLabel = data.cancelLabel
-      this.actionLabel = data.actionLabel
-      this.onAction = data.onAction
-      this.onCancel = data.onCancel
-    },
+  interface ConfirmationData {
+    title: string
+    description: string
+    cancelLabel: string
+    actionLabel: string
+    onAction: () => void
+    onCancel: () => void
+  }
 
-    closeConfirmation() {
-      this.open = false
-      this.title = null
-      this.description = null
-      this.cancelLabel = null
-      this.actionLabel = null
-      this.onAction = () => {}
-      this.onCancel = () => {}
-    },
-  },
+  function openConfirmation(data: ConfirmationData) {
+    open.value = true
+    title.value = data.title
+    description.value = data.description
+    cancelLabel.value = data.cancelLabel
+    actionLabel.value = data.actionLabel
+    onAction.value = data.onAction
+    onCancel.value = data.onCancel
+  }
+
+  function closeConfirmation() {
+    open.value = false
+    title.value = null
+    description.value = null
+    cancelLabel.value = null
+    actionLabel.value = null
+    onAction.value = () => {}
+    onCancel.value = () => {}
+  }
+
+  return {
+    open,
+    title,
+    description,
+    cancelLabel,
+    actionLabel,
+    onAction,
+    onCancel,
+    openConfirmation,
+    closeConfirmation,
+  }
 })

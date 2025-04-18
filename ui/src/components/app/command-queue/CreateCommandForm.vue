@@ -161,7 +161,7 @@ function clearForm() {
           Add command
         </Button>
         <Button type="button" variant="outline" class="w-full" :disabled="isPending" @click="clearForm">
-          Clear Form
+          Clear form
         </Button>
       </CardFooter>
     </form>

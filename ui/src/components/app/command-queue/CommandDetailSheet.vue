@@ -152,7 +152,7 @@ watch(isOpen, (open) => {
         <div class="flex gap-2 pt-4">
           <template v-if="command.status === 'QUEUED'">
             <Button variant="destructive" class="flex-1" disabled>
-              Remove From Queue
+              Remove from queue
             </Button>
           </template>
           <template v-else-if="command.status === 'PROCESSING'">

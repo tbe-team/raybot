@@ -80,12 +80,12 @@ function handleRemoveFromQueue() {
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" @click.stop>
             <DropdownMenuItem @click="emit('viewDetails', props.command.id)">
-              View Details
+              View details
             </DropdownMenuItem>
-            <DropdownMenuItem>Edit Command</DropdownMenuItem>
+            <DropdownMenuItem>Edit command</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem class="text-red-500" @click="handleRemoveFromQueue">
-              Remove from Queue
+              Remove from queue
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

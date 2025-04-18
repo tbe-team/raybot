@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ConfirmationDialog from '@/components/shared/ConfirmationDialog.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { useLocalStorage } from '@vueuse/core'
@@ -13,6 +14,7 @@ const open = useLocalStorage('sidebar', true)
   <Notivue v-slot="item">
     <Notification :item="item" />
   </Notivue>
+  <ConfirmationDialog />
   <SidebarProvider v-model:open="open">
     <AppSidebar />
     <SidebarInset>

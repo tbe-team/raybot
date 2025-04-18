@@ -40,7 +40,7 @@ function handleCancelCommand() {
     actionLabel: 'Confirm',
     cancelLabel: 'Cancel',
     onAction: () => {
-      cancelProgressingCommand({ doNotShowLoading: false }, {
+      cancelProgressingCommand(undefined, {
         onSuccess: () => {
           notification.success('Command cancelled successfully')
         },
@@ -100,11 +100,11 @@ function handleCancelCommand() {
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuItem class="cursor-pointer" @click.stop="emit('viewDetails', command.id)">
-                  View Details
+                  View details
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem class="text-red-500 cursor-pointer" @click="handleCancelCommand">
-                  Cancel Command
+                  Cancel command
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
