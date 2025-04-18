@@ -196,6 +196,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	appStateService := appstateimpl.NewService(appStateRepository)
 	peripheralService := peripheralimpl.NewService()
 	commandService := commandimpl.NewService(
+		cfg.Cron.DeleteOldCommand,
 		log,
 		validator,
 		eventBus,

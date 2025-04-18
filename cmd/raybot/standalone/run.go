@@ -66,6 +66,14 @@ func Run(configFilePath, dbPath string) {
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		if err := startJobs(app, interruptChan); err != nil {
+			log.Printf("error starting job service: %v", err)
+		}
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
 		if err := startCloud(app, interruptChan); err != nil {
 			log.Printf("error starting cloud service: %v", err)
 		}

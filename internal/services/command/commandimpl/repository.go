@@ -234,6 +234,14 @@ func (r repository) DeleteCommandByIDAndNotProcessing(ctx context.Context, id in
 	return nil
 }
 
+func (r repository) DeleteOldCommands(ctx context.Context, cutoffTime time.Time) error {
+	_, err := r.queries.CommandDeleteOldCommands(ctx, r.db, cutoffTime.Format(time.RFC3339))
+	if err != nil {
+		return fmt.Errorf("failed to delete old commands: %w", err)
+	}
+	return nil
+}
+
 func (repository) convertRowToCommand(row sqlc.Command) (command.Command, error) {
 	ret := command.Command{
 		ID:     row.ID,

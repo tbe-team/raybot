@@ -14,8 +14,11 @@ type Config struct {
 	GRPC     GRPC     `yaml:"grpc"`
 	HTTP     HTTP     `yaml:"http"`
 
-	Cargo          Cargo  `yaml:"cargo"`
-	Wifi           Wifi   `yaml:"wifi"`
+	Cargo Cargo `yaml:"cargo"`
+	Wifi  Wifi  `yaml:"wifi"`
+
+	Cron Cron `yaml:"cron"`
+
 	ConfigFilePath string `yaml:"-"`
 	DBPath         string `yaml:"-"`
 }
@@ -47,6 +50,10 @@ func (c *Config) Validate() error {
 
 	if err := c.Wifi.Validate(); err != nil {
 		return fmt.Errorf("validate wifi: %w", err)
+	}
+
+	if err := c.Cron.Validate(); err != nil {
+		return fmt.Errorf("validate cron: %w", err)
 	}
 
 	return nil

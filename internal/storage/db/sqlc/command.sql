@@ -65,3 +65,8 @@ RETURNING *;
 DELETE FROM commands
 WHERE id = @id
 AND status != 'PROCESSING';
+
+-- name: CommandDeleteOldCommands :execrows
+DELETE FROM commands
+WHERE created_at < @created_at
+AND status NOT IN ('QUEUED', 'PROCESSING');

@@ -7,6 +7,7 @@ import (
 	"log/slog"
 	"time"
 
+	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/command"
@@ -18,6 +19,8 @@ import (
 )
 
 type service struct {
+	deleteOldCmdCfg config.DeleteOldCommand
+
 	log       *slog.Logger
 	validator validator.Validator
 
@@ -30,6 +33,7 @@ type service struct {
 }
 
 func NewService(
+	deleteOldCmdCfg config.DeleteOldCommand,
 	log *slog.Logger,
 	validator validator.Validator,
 	publisher eventbus.Publisher,
@@ -38,6 +42,7 @@ func NewService(
 	executorRouter executor.Router,
 ) command.Service {
 	s := &service{
+		deleteOldCmdCfg:      deleteOldCmdCfg,
 		log:                  log.With("service", "command"),
 		validator:            validator,
 		publisher:            publisher,
@@ -52,7 +57,7 @@ func NewService(
 	return s
 }
 
-func (s service) GetCommandByID(ctx context.Context, params command.GetCommandByIDParams) (command.Command, error) {
+func (s *service) GetCommandByID(ctx context.Context, params command.GetCommandByIDParams) (command.Command, error) {
 	if err := s.validator.Validate(params); err != nil {
 		return command.Command{}, fmt.Errorf("validate params: %w", err)
 	}
@@ -60,11 +65,11 @@ func (s service) GetCommandByID(ctx context.Context, params command.GetCommandBy
 	return s.commandRepository.GetCommandByID(ctx, params.CommandID)
 }
 
-func (s service) GetCurrentProcessingCommand(ctx context.Context) (command.Command, error) {
+func (s *service) GetCurrentProcessingCommand(ctx context.Context) (command.Command, error) {
 	return s.commandRepository.GetCurrentProcessingCommand(ctx)
 }
 
-func (s service) ListCommands(ctx context.Context, params command.ListCommandsParams) (paging.List[command.Command], error) {
+func (s *service) ListCommands(ctx context.Context, params command.ListCommandsParams) (paging.List[command.Command], error) {
 	if err := s.validator.Validate(params); err != nil {
 		return paging.List[command.Command]{}, fmt.Errorf("validate params: %w", err)
 	}
@@ -72,7 +77,7 @@ func (s service) ListCommands(ctx context.Context, params command.ListCommandsPa
 	return s.commandRepository.ListCommands(ctx, params)
 }
 
-func (s service) CreateCommand(ctx context.Context, params command.CreateCommandParams) (command.Command, error) {
+func (s *service) CreateCommand(ctx context.Context, params command.CreateCommandParams) (command.Command, error) {
 	if err := s.validator.Validate(params); err != nil {
 		return command.Command{}, fmt.Errorf("validate params: %w", err)
 	}
@@ -93,7 +98,7 @@ func (s service) CreateCommand(ctx context.Context, params command.CreateCommand
 	return cmd, nil
 }
 
-func (s service) CancelCurrentProcessingCommand(_ context.Context) error {
+func (s *service) CancelCurrentProcessingCommand(_ context.Context) error {
 	runningCmd := s.runningCmdRepository.Get()
 	if runningCmd == nil {
 		return command.ErrNoCommandBeingProcessed
@@ -104,7 +109,7 @@ func (s service) CancelCurrentProcessingCommand(_ context.Context) error {
 	return nil
 }
 
-func (s service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
+func (s *service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
 	cmd, err := s.commandRepository.GetCommandByID(ctx, params.CommandID)
 	if err != nil {
 		return fmt.Errorf("get command by id: %w", err)
@@ -140,7 +145,7 @@ func (s service) ExecuteCreatedCommand(ctx context.Context, params command.Execu
 	return nil
 }
 
-func (s service) DeleteCommandByID(ctx context.Context, params command.DeleteCommandByIDParams) error {
+func (s *service) DeleteCommandByID(ctx context.Context, params command.DeleteCommandByIDParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
 	}
@@ -148,14 +153,19 @@ func (s service) DeleteCommandByID(ctx context.Context, params command.DeleteCom
 	return s.commandRepository.DeleteCommandByIDAndNotProcessing(ctx, params.CommandID)
 }
 
-func (s service) startCheckingForExecutableCommand(ctx context.Context) {
+func (s *service) DeleteOldCommands(ctx context.Context) error {
+	cutoffTime := time.Now().Add(-s.deleteOldCmdCfg.Threshold)
+	return s.commandRepository.DeleteOldCommands(ctx, cutoffTime)
+}
+
+func (s *service) startCheckingForExecutableCommand(ctx context.Context) {
 	s.log.Debug("waiting for hardware components to be initialized then resuming executable command")
 	s.waitForHardwareComponentsInitialized(ctx)
 
 	go s.runNextExecutableCommand(ctx)
 }
 
-func (s service) runNextExecutableCommand(ctx context.Context) {
+func (s *service) runNextExecutableCommand(ctx context.Context) {
 	cmd, err := s.commandRepository.GetNextExecutableCommand(ctx)
 	if err != nil {
 		if errors.Is(err, command.ErrNoNextExecutableCommand) {
@@ -184,7 +194,7 @@ func (s service) runNextExecutableCommand(ctx context.Context) {
 	s.executeCommand(ctx, cmd)
 }
 
-func (s service) waitForHardwareComponentsInitialized(ctx context.Context) {
+func (s *service) waitForHardwareComponentsInitialized(ctx context.Context) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -203,7 +213,7 @@ func (s service) waitForHardwareComponentsInitialized(ctx context.Context) {
 	}
 }
 
-func (s service) executeCommand(ctx context.Context, cmd command.Command) {
+func (s *service) executeCommand(ctx context.Context, cmd command.Command) {
 	runningCmd := newRunningCommand(cmd)
 	s.runningCmdRepository.Add(runningCmd)
 	defer s.runningCmdRepository.Remove()
