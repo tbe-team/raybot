@@ -19,7 +19,7 @@ function handleRemoveFromHistory() {
   openConfirmation({
     title: 'Remove command',
     description: 'Are you sure you want to remove this command from history?',
-    actionLabel: 'Remove',
+    actionLabel: 'Confirm',
     cancelLabel: 'Cancel',
     onAction: () => {
       deleteCommand(props.command.id, {

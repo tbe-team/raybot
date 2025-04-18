@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { useCancelProcessingCommandMutation, useCurrentProcessingCommandQuery } from '@/composables/use-command'
 import { formatDate } from '@/lib/date'
+import { useConfirmationStore } from '@/stores/confirmation-store'
 import { RaybotError } from '@/types/error'
 import { Clock, Loader, MoreHorizontal } from 'lucide-vue-next'
 import SourceBadge from './SourceBadge.vue'
@@ -20,6 +21,8 @@ import { getCommandIcon, getCommandName } from './utils'
 const emit = defineEmits<{
   (e: 'viewDetails', commandId: number): void
 }>()
+
+const { openConfirmation } = useConfirmationStore()
 
 const { data: command, refetch, isError } = useCurrentProcessingCommandQuery({ axiosOpts: { doNotShowLoading: true } })
 const { mutate: cancelProgressingCommand, isPending: isCancellingCommand } = useCancelProcessingCommandMutation()
@@ -31,22 +34,32 @@ onUnmounted(() => {
 })
 
 function handleCancelCommand() {
-  cancelProgressingCommand({ doNotShowLoading: false }, {
-    onSuccess: () => {
-      notification.success('Command cancelled successfully')
+  openConfirmation({
+    title: 'Cancel command',
+    description: 'Are you sure you want to cancel this command?',
+    actionLabel: 'Confirm',
+    cancelLabel: 'Cancel',
+    onAction: () => {
+      cancelProgressingCommand({ doNotShowLoading: false }, {
+        onSuccess: () => {
+          notification.success('Command cancelled successfully')
+        },
+        onError: (error) => {
+          if (error instanceof RaybotError) {
+            if (error.errorCode === 'command.noCommandBeingProcessed') {
+              notification.error('No command is being processed')
+            }
+            else {
+              notification.error(error.message)
+            }
+          }
+          else {
+            notification.error(error.message)
+          }
+        },
+      })
     },
-    onError: (error) => {
-      if (error instanceof RaybotError) {
-        if (error.errorCode === 'command.noCommandBeingProcessed') {
-          notification.error('No command is being processed')
-        }
-        else {
-          notification.error(error.message)
-        }
-      }
-      else {
-        notification.error(error.message)
-      }
+    onCancel: () => {
     },
   })
 }
