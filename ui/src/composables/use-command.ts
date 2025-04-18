@@ -2,7 +2,7 @@ import type { CommandSort } from '@/api/commands'
 import type { SortPrefix } from '@/lib/sort'
 import type { AxiosRequestConfig } from 'axios'
 import commandsAPI from '@/api/commands'
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/vue-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
 export function useCurrentProcessingCommandQuery(
   opts?: { axiosOpts?: Partial<AxiosRequestConfig> },
@@ -67,7 +67,11 @@ export function useCancelProcessingCommandMutation() {
   })
 }
 export function useDeleteCommandMutation() {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: commandsAPI.deleteCommand,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['comands'] })
+    },
   })
 }

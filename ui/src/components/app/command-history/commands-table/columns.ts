@@ -3,6 +3,7 @@ import type { ColumnDef } from '@tanstack/vue-table'
 import DataTableSortableHeader from '@/components/shared/DataTableSortableHeader.vue'
 import { formatDate } from '@/lib/date'
 import { h } from 'vue'
+import CommandAction from './CommandAction.vue'
 import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
 
@@ -68,5 +69,10 @@ export const columns: ColumnDef<Command>[] = [
       const completedAt = row.original.completedAt
       return completedAt ? formatDate(completedAt) : '-'
     },
+  },
+  {
+    accessorKey: 'action',
+    header: 'Action',
+    cell: ({ row }) => h(CommandAction, { command: row.original }),
   },
 ]
