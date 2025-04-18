@@ -88,6 +88,7 @@ func (r repository) ListCommands(ctx context.Context, params command.ListCommand
 				&row.CreatedAt,
 				&row.UpdatedAt,
 				&row.StartedAt,
+				&row.Outputs,
 			); err != nil {
 				return fmt.Errorf("scan command: %w", err)
 			}
@@ -204,10 +205,21 @@ func (r repository) UpdateCommand(ctx context.Context, params command.UpdateComm
 		startedAt = ptr.New(params.StartedAt.Format(time.RFC3339))
 	}
 
+	var outputs string
+	if params.Outputs != nil {
+		outputsBytes, err := json.Marshal(params.Outputs)
+		if err != nil {
+			return command.Command{}, fmt.Errorf("failed to marshal outputs: %w", err)
+		}
+		outputs = string(outputsBytes)
+	}
+
 	row, err := r.queries.CommandUpdate(ctx, r.db, sqlc.CommandUpdateParams{
 		ID:             params.ID,
 		Status:         params.Status.String(),
 		SetStatus:      params.SetStatus,
+		Outputs:        outputs,
+		SetOutputs:     params.SetOutputs,
 		Error:          params.Error,
 		SetError:       params.SetError,
 		StartedAt:      startedAt,
@@ -255,6 +267,11 @@ func (repository) convertRowToCommand(row sqlc.Command) (command.Command, error)
 	ret.Inputs, err = command.UnmarshalInputs(command.CommandType(row.Type), []byte(row.Inputs))
 	if err != nil {
 		return command.Command{}, fmt.Errorf("failed to unmarshal inputs: %w", err)
+	}
+
+	ret.Outputs, err = command.UnmarshalOutputs(command.CommandType(row.Type), []byte(row.Outputs))
+	if err != nil {
+		return command.Command{}, fmt.Errorf("failed to unmarshal outputs: %w", err)
 	}
 
 	ret.CreatedAt, err = time.Parse(time.RFC3339, row.CreatedAt)

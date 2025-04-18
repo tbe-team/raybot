@@ -1390,6 +1390,35 @@ components:
         - $ref: '#/components/schemas/CargoLiftInputs'
         - $ref: '#/components/schemas/CargoLowerInputs'
         - $ref: '#/components/schemas/CargoCheckQRInputs'
+    StopOutputs:
+      type: object
+    MoveForwardOutputs:
+      type: object
+    MoveBackwardOutputs:
+      type: object
+    MoveToOutputs:
+      type: object
+    CargoOpenOutputs:
+      type: object
+    CargoCloseOutputs:
+      type: object
+    CargoLiftOutputs:
+      type: object
+    CargoLowerOutputs:
+      type: object
+    CargoCheckQROutputs:
+      type: object
+    CommandOutputs:
+      oneOf:
+        - $ref: '#/components/schemas/StopOutputs'
+        - $ref: '#/components/schemas/MoveForwardOutputs'
+        - $ref: '#/components/schemas/MoveBackwardOutputs'
+        - $ref: '#/components/schemas/MoveToOutputs'
+        - $ref: '#/components/schemas/CargoOpenOutputs'
+        - $ref: '#/components/schemas/CargoCloseOutputs'
+        - $ref: '#/components/schemas/CargoLiftOutputs'
+        - $ref: '#/components/schemas/CargoLowerOutputs'
+        - $ref: '#/components/schemas/CargoCheckQROutputs'
     CommandResponse:
       type: object
       properties:
@@ -1414,39 +1443,44 @@ components:
           $ref: '#/components/schemas/CommandInputs'
           description: The inputs of the command
           x-order: 5
+        outputs:
+          $ref: '#/components/schemas/CommandOutputs'
+          description: The outputs of the command
+          x-order: 6
         error:
           type: string
           nullable: true
           description: The error of the command
-          x-order: 6
+          x-order: 7
         startedAt:
           type: string
           nullable: true
           format: date-time
           description: The start date of the command
-          x-order: 7
+          x-order: 8
         completedAt:
           type: string
           nullable: true
           format: date-time
           description: The completion date of the command
-          x-order: 8
+          x-order: 9
         createdAt:
           type: string
           format: date-time
           description: The creation date of the command
-          x-order: 9
+          x-order: 10
         updatedAt:
           type: string
           format: date-time
           description: The update date of the command
-          x-order: 10
+          x-order: 11
       required:
         - id
         - type
         - status
         - source
         - inputs
+        - outputs
         - error
         - startedAt
         - completedAt

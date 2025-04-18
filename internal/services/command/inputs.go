@@ -5,6 +5,18 @@ import (
 	"fmt"
 )
 
+var (
+	_ Inputs = (*StopMovementInputs)(nil)
+	_ Inputs = (*MoveForwardInputs)(nil)
+	_ Inputs = (*MoveBackwardInputs)(nil)
+	_ Inputs = (*MoveToInputs)(nil)
+	_ Inputs = (*CargoOpenInputs)(nil)
+	_ Inputs = (*CargoCloseInputs)(nil)
+	_ Inputs = (*CargoLiftInputs)(nil)
+	_ Inputs = (*CargoLowerInputs)(nil)
+	_ Inputs = (*CargoCheckQRInputs)(nil)
+)
+
 type Inputs interface {
 	isInputs()
 	CommandType() CommandType

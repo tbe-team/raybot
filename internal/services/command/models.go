@@ -82,6 +82,7 @@ type Command struct {
 	Status      Status
 	Source      Source
 	Inputs      Inputs
+	Outputs     Outputs
 	Error       *string
 	StartedAt   *time.Time
 	CompletedAt *time.Time
