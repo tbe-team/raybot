@@ -27,7 +27,7 @@ const { data: robotState, isPending, isError, error } = useQueryRobotState({
       </p>
     </div>
     <div v-else-if="isError" class="flex flex-col items-center justify-center gap-4 pt-20">
-      <Card class="flex flex-col items-center gap-4 p-6 text-destructive">
+      <Card class="flex flex-col items-center gap-4 p-6 text-red-500">
         <AlertCircle class="w-8 h-8" />
         <div class="space-y-2 text-center">
           <h2 class="text-lg font-semibold">

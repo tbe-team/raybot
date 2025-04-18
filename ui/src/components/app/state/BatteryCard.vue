@@ -10,7 +10,7 @@ const props = defineProps<{
 
 function getBatteryColor(percent: number): string {
   if (percent < 20)
-    return 'text-destructive'
+    return 'text-red-500'
   if (percent < 40)
     return 'text-warning'
   if (percent < 60)

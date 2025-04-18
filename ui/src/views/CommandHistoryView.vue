@@ -65,7 +65,7 @@ function handleSelectCommand(row: Command) {
     </div>
 
     <div v-else-if="isError" class="flex flex-col items-center justify-center gap-4 pt-20">
-      <div class="flex flex-col items-center gap-4 p-6 text-destructive">
+      <div class="flex flex-col items-center gap-4 p-6 text-red-500">
         <AlertCircle class="w-8 h-8" />
         <div class="space-y-2 text-center">
           <h2 class="text-lg font-semibold">
@@ -130,7 +130,7 @@ function handleSelectCommand(row: Command) {
 
       <DataTable
         ref="table"
-        :initial-state="{ columnVisibility: { error: false } }"
+        :initial-state="{ columnVisibility: { error: false, outputs: false } }"
         :page="page"
         :page-size="pageSize"
         :columns="columns"

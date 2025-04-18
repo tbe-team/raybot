@@ -29,11 +29,11 @@ const props = defineProps<{
                 <div class="flex items-center gap-4 mb-4">
                   <div
                     class="p-2 rounded-full"
-                    :class="props.appConnection.cloudConnection.connected ? 'bg-green-100' : 'bg-destructive/10'"
+                    :class="props.appConnection.cloudConnection.connected ? 'bg-green-100' : 'bg-red-500/10'"
                   >
                     <Cloud
                       class="w-5 h-5"
-                      :class="props.appConnection.cloudConnection.connected ? 'text-green-600' : 'text-destructive'"
+                      :class="props.appConnection.cloudConnection.connected ? 'text-green-600' : 'text-red-500'"
                     />
                   </div>
                   <div>
@@ -55,7 +55,7 @@ const props = defineProps<{
                     <span>{{ props.appConnection.cloudConnection.lastConnectedAt ? formatDate(props.appConnection.cloudConnection.lastConnectedAt) : 'Never' }}</span>
                   </div>
                 </div>
-                <div v-if="props.appConnection.cloudConnection.error" class="mt-2 text-xs text-destructive">
+                <div v-if="props.appConnection.cloudConnection.error" class="mt-2 text-xs text-red-500">
                   Error: {{ props.appConnection.cloudConnection.error }}
                 </div>
               </CardContent>
@@ -71,11 +71,11 @@ const props = defineProps<{
                 <div class="flex items-center gap-4 mb-4">
                   <div
                     class="p-2 rounded-full"
-                    :class="props.appConnection.espSerialConnection.connected ? 'bg-green-100' : 'bg-destructive/10'"
+                    :class="props.appConnection.espSerialConnection.connected ? 'bg-green-100' : 'bg-red-500/10'"
                   >
                     <Cpu
                       class="w-5 h-5"
-                      :class="props.appConnection.espSerialConnection.connected ? 'text-green-600' : 'text-destructive'"
+                      :class="props.appConnection.espSerialConnection.connected ? 'text-green-600' : 'text-red-500'"
                     />
                   </div>
                   <div>
@@ -93,7 +93,7 @@ const props = defineProps<{
                     <span>{{ props.appConnection.espSerialConnection.lastConnectedAt ? formatDate(props.appConnection.espSerialConnection.lastConnectedAt) : 'Never' }}</span>
                   </div>
                 </div>
-                <div v-if="props.appConnection.espSerialConnection.error" class="mt-2 text-xs text-destructive">
+                <div v-if="props.appConnection.espSerialConnection.error" class="mt-2 text-xs text-red-500">
                   Error: {{ props.appConnection.espSerialConnection.error }}
                 </div>
               </CardContent>
@@ -111,11 +111,11 @@ const props = defineProps<{
                 <div class="flex items-center gap-4 mb-4">
                   <div
                     class="p-2 rounded-full"
-                    :class="props.appConnection.picSerialConnection.connected ? 'bg-green-100' : 'bg-destructive/10'"
+                    :class="props.appConnection.picSerialConnection.connected ? 'bg-green-100' : 'bg-red-500/10'"
                   >
                     <Cpu
                       class="w-5 h-5"
-                      :class="props.appConnection.picSerialConnection.connected ? 'text-green-600' : 'text-destructive'"
+                      :class="props.appConnection.picSerialConnection.connected ? 'text-green-600' : 'text-red-500'"
                     />
                   </div>
                   <div>
@@ -133,7 +133,7 @@ const props = defineProps<{
                     <span>{{ props.appConnection.picSerialConnection.lastConnectedAt ? formatDate(props.appConnection.picSerialConnection.lastConnectedAt) : 'Never' }}</span>
                   </div>
                 </div>
-                <div v-if="props.appConnection.picSerialConnection.error" class="mt-2 text-xs text-destructive">
+                <div v-if="props.appConnection.picSerialConnection.error" class="mt-2 text-xs text-red-500">
                   Error: {{ props.appConnection.picSerialConnection.error }}
                 </div>
               </CardContent>
@@ -149,11 +149,11 @@ const props = defineProps<{
                 <div class="flex items-center gap-4 mb-4">
                   <div
                     class="p-2 rounded-full"
-                    :class="props.appConnection.rfidUsbConnection.connected ? 'bg-green-100' : 'bg-destructive/10'"
+                    :class="props.appConnection.rfidUsbConnection.connected ? 'bg-green-100' : 'bg-red-500/10'"
                   >
                     <Usb
                       class="w-5 h-5"
-                      :class="props.appConnection.rfidUsbConnection.connected ? 'text-green-600' : 'text-destructive'"
+                      :class="props.appConnection.rfidUsbConnection.connected ? 'text-green-600' : 'text-red-500'"
                     />
                   </div>
                   <div>
@@ -171,7 +171,7 @@ const props = defineProps<{
                     <span>{{ props.appConnection.rfidUsbConnection.lastConnectedAt ? formatDate(props.appConnection.rfidUsbConnection.lastConnectedAt) : 'Never' }}</span>
                   </div>
                 </div>
-                <div v-if="props.appConnection.rfidUsbConnection.error" class="mt-2 text-xs text-destructive">
+                <div v-if="props.appConnection.rfidUsbConnection.error" class="mt-2 text-xs text-red-500">
                   Error: {{ props.appConnection.rfidUsbConnection.error }}
                 </div>
               </CardContent>

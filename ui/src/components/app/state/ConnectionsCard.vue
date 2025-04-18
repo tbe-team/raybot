@@ -36,11 +36,11 @@ const getTotalPeripherals = computed(() => 3)
         <div class="flex items-center gap-4">
           <div
             class="p-2 rounded-full"
-            :class="props.appConnection.cloudConnection.connected ? 'bg-success/10' : 'bg-destructive/10'"
+            :class="props.appConnection.cloudConnection.connected ? 'bg-success/10' : 'bg-red-500/10'"
           >
             <Cloud
               class="w-4 h-4"
-              :class="props.appConnection.cloudConnection.connected ? 'text-success' : 'text-destructive'"
+              :class="props.appConnection.cloudConnection.connected ? 'text-success' : 'text-red-500'"
             />
           </div>
           <div class="flex-1">

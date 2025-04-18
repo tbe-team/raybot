@@ -137,7 +137,7 @@ const props = defineProps<{
               </CardContent>
             </Card>
 
-            <Card :class="battery.fault > 0 ? 'border-destructive' : 'border-success'">
+            <Card :class="battery.fault > 0 ? 'border-red-500' : 'border-success'">
               <CardHeader>
                 <CardTitle class="text-base">
                   Fault Status
@@ -145,12 +145,12 @@ const props = defineProps<{
               </CardHeader>
               <CardContent>
                 <div class="flex items-center gap-2">
-                  <TriangleAlert class="w-5 h-5 text-destructive" />
-                  <span class="text-sm font-medium" :class="props.battery.fault > 0 ? 'text-destructive' : 'text-success'">
+                  <TriangleAlert class="w-5 h-5 text-red-500" />
+                  <span class="text-sm font-medium" :class="props.battery.fault > 0 ? 'text-red-500' : 'text-success'">
                     {{ props.battery.fault > 0 ? 'Fault Detected' : 'No Faults' }}
                   </span>
                 </div>
-                <p v-if="props.battery.fault > 0" class="mt-2 text-sm text-destructive">
+                <p v-if="props.battery.fault > 0" class="mt-2 text-sm text-red-500">
                   Fault code: {{ props.battery.fault }}
                 </p>
               </CardContent>
