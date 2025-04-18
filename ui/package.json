@@ -22,7 +22,7 @@
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
     "lodash-es": "^4.17.21",
-    "lucide-vue-next": "^0.491.0",
+    "lucide-vue-next": "^0.494.0",
     "notivue": "^2.4.5",
     "nprogress": "^0.2.0",
     "pinia": "^3.0.2",
