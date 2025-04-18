@@ -1,6 +1,7 @@
 import type { App } from 'vue'
 import router from '@/router'
 import { VueQueryPlugin } from '@tanstack/vue-query'
+import { createPinia } from 'pinia'
 import { notivue } from './notivue'
 import { queryPluginOpts } from './vue-query'
 
@@ -12,6 +13,7 @@ import { queryPluginOpts } from './vue-query'
 export function registerPlugins(app: App) {
   app
     .use(router)
+    .use(createPinia())
     .use(notivue)
     .use(VueQueryPlugin, queryPluginOpts)
 }
