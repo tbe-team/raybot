@@ -1,3 +1,7 @@
+export interface Location {
+  location: string
+  scannedAt: string
+}
 export interface StopMovementInputs {}
 export interface MoveForwardInputs {}
 export interface MoveBackwardInputs {}
@@ -11,7 +15,20 @@ export interface CargoLowerInputs {}
 export interface CargoCheckQRInputs {
   qrCode: string
 }
+export interface ScanLocationInputs {}
 
+export interface StopMovementOutputs {}
+export interface MoveForwardOutputs {}
+export interface MoveBackwardOutputs {}
+export interface MoveToOutputs {}
+export interface CargoOpenOutputs {}
+export interface CargoCloseOutputs {}
+export interface CargoLiftOutputs {}
+export interface CargoLowerOutputs {}
+export interface CargoCheckQROutputs {}
+export interface ScanLocationOutputs {
+  locations: Location[]
+}
 export interface CommandInputMap {
   STOP_MOVEMENT: StopMovementInputs
   MOVE_FORWARD: MoveForwardInputs
@@ -22,6 +39,19 @@ export interface CommandInputMap {
   CARGO_LIFT: CargoLiftInputs
   CARGO_LOWER: CargoLowerInputs
   CARGO_CHECK_QR: CargoCheckQRInputs
+  SCAN_LOCATION: ScanLocationInputs
+}
+export interface CommandOutputMap {
+  STOP_MOVEMENT: StopMovementOutputs
+  MOVE_FORWARD: MoveForwardOutputs
+  MOVE_BACKWARD: MoveBackwardOutputs
+  MOVE_TO: MoveToOutputs
+  CARGO_OPEN: CargoOpenOutputs
+  CARGO_CLOSE: CargoCloseOutputs
+  CARGO_LIFT: CargoLiftOutputs
+  CARGO_LOWER: CargoLowerOutputs
+  CARGO_CHECK_QR: CargoCheckQROutputs
+  SCAN_LOCATION: ScanLocationOutputs
 }
 
 export const CommandTypeValues = [
@@ -34,6 +64,7 @@ export const CommandTypeValues = [
   'CARGO_LIFT',
   'CARGO_LOWER',
   'CARGO_CHECK_QR',
+  'SCAN_LOCATION',
 ] as const
 export type CommandType = typeof CommandTypeValues[number]
 
@@ -47,6 +78,7 @@ export interface Command<T extends CommandType = CommandType> {
   status: CommandStatus
   source: CommandSource
   inputs: CommandInputMap[T]
+  outputs: CommandOutputMap[T]
   error?: string
   completedAt?: string
   startedAt?: string

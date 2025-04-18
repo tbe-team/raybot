@@ -8,6 +8,7 @@ import {
   MapPin,
   Package,
   QrCode,
+  Scan,
   StopCircle,
 } from 'lucide-vue-next'
 
@@ -23,6 +24,7 @@ const commandIcons: Record<CommandType, LucideIcon> = {
   CARGO_LIFT: Package,
   CARGO_LOWER: Package,
   CARGO_CHECK_QR: QrCode,
+  SCAN_LOCATION: Scan,
 }
 
 export function getCommandIcon(type: CommandType) {

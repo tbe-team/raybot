@@ -15,7 +15,7 @@ const isOpen = defineModel<boolean>('isOpen', { required: true })
 
 <template>
   <Sheet v-model:open="isOpen">
-    <SheetContent class="max-h-screen overflow-y-auto sm:max-w-md">
+    <SheetContent class="max-h-screen overflow-y-auto sm:max-w-xl">
       <SheetHeader>
         <SheetTitle>
           Command detail
@@ -71,12 +71,22 @@ const isOpen = defineModel<boolean>('isOpen', { required: true })
             </span>
           </div>
         </div>
+        <div v-if="props.command.status !== 'PROCESSING' && props.command.status !== 'QUEUED'" class="space-y-2">
+          <p class="text-sm font-medium">
+            Command Outputs
+          </p>
+          <div class="p-4 bg-gray-100 rounded-xl dark:bg-gray-800">
+            <span class="font-mono text-sm text-gray-800 break-words whitespace-pre-wrap dark:text-gray-200">
+              {{ JSON.stringify(props.command.outputs, null, 4) }}
+            </span>
+          </div>
+        </div>
 
         <div v-if="props.command.error" class="space-y-2">
-          <p class="text-sm font-medium text-destructive">
+          <p class="text-sm font-medium text-red-500">
             Error
           </p>
-          <div class="p-3 rounded-md bg-destructive/10 text-destructive">
+          <div class="p-3 text-red-500 rounded-md bg-red-500/10">
             {{ props.command.error }}
           </div>
         </div>

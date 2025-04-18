@@ -42,6 +42,18 @@ export const columns: ColumnDef<Command>[] = [
     enableSorting: false,
   },
   {
+    accessorKey: 'outputs',
+    header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Outputs' }),
+    cell: ({ row }) => {
+      const outputs = row.original.outputs
+      return h('pre', {
+        class: 'text-xs overflow-auto max-h-32 truncate',
+        style: 'max-width: 300px;',
+      }, JSON.stringify(outputs, null, 2))
+    },
+    enableSorting: false,
+  },
+  {
     accessorKey: 'error',
     header: ({ column }) => h(DataTableSortableHeader<Command>, { column, title: 'Error' }),
     cell: ({ row }) => {

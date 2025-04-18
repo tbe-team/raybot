@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCreateCommandMutation } from '@/composables/use-command'
 import { RaybotError } from '@/types/error'
 import { toTypedSchema } from '@vee-validate/zod'
-import { ArrowDown, ArrowUp, Loader2, MapPin, Package, QrCode, StopCircle } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp, Loader2, MapPin, Package, QrCode, Scan, StopCircle } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { createCommandSchema } from './schemas'
 
@@ -125,6 +125,12 @@ function clearForm() {
                     <div class="flex items-center gap-2">
                       <QrCode class="w-4 h-4" />
                       <span>Cargo Check QR</span>
+                    </div>
+                  </SelectItem>
+                  <SelectItem value="SCAN_LOCATION">
+                    <div class="flex items-center gap-2">
+                      <Scan class="w-4 h-4" />
+                      <span>Scan Location</span>
                     </div>
                   </SelectItem>
                 </SelectContent>

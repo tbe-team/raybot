@@ -41,4 +41,8 @@ export const createCommandSchema = z.discriminatedUnion('type', [
       qrCode: z.string(),
     }),
   }),
+  z.object({
+    type: z.literal('SCAN_LOCATION'),
+    inputs: z.object({}),
+  }),
 ])
