@@ -7,7 +7,7 @@ const MainLayout = () => import('@/components/layouts/main-layout/MainLayout.vue
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: { name: 'settings' },
+    redirect: { name: 'state' },
     component: MainLayout,
     children: [
       {
