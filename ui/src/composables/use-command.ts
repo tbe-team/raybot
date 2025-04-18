@@ -60,3 +60,14 @@ export function useCreateCommandMutation() {
     mutationFn: commandsAPI.createCommand,
   })
 }
+
+export function useCancelProcessingCommandMutation() {
+  return useMutation({
+    mutationFn: commandsAPI.cancelProcessingCommand,
+  })
+}
+export function useDeleteCommandMutation() {
+  return useMutation({
+    mutationFn: commandsAPI.deleteCommand,
+  })
+}

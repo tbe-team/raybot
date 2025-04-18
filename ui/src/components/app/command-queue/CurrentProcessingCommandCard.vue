@@ -9,9 +9,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useCurrentProcessingCommandQuery } from '@/composables/use-command'
+import { useCancelProcessingCommandMutation, useCurrentProcessingCommandQuery } from '@/composables/use-command'
 import { formatDate } from '@/lib/date'
-import { Clock, MoreHorizontal } from 'lucide-vue-next'
+import { RaybotError } from '@/types/error'
+import { Clock, Loader, MoreHorizontal } from 'lucide-vue-next'
 import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
 import { getCommandIcon, getCommandName } from './utils'
@@ -21,13 +22,34 @@ const emit = defineEmits<{
 }>()
 
 const { data: command, refetch, isError } = useCurrentProcessingCommandQuery({ axiosOpts: { doNotShowLoading: true } })
-
+const { mutate: cancelProgressingCommand, isPending: isCancellingCommand } = useCancelProcessingCommandMutation()
 const REFRESH_INTERVAL = 1000
 const interval = setInterval(refetch, REFRESH_INTERVAL)
 
 onUnmounted(() => {
   clearInterval(interval)
 })
+
+function handleCancelCommand() {
+  cancelProgressingCommand({ doNotShowLoading: false }, {
+    onSuccess: () => {
+      notification.success('Command cancelled successfully')
+    },
+    onError: (error) => {
+      if (error instanceof RaybotError) {
+        if (error.errorCode === 'command.noCommandBeingProcessed') {
+          notification.error('No command is being processed')
+        }
+        else {
+          notification.error(error.message)
+        }
+      }
+      else {
+        notification.error(error.message)
+      }
+    },
+  })
+}
 </script>
 
 <template>
@@ -39,7 +61,14 @@ onUnmounted(() => {
       </CardTitle>
     </CardHeader>
     <CardContent>
+      <div v-if="isCancellingCommand">
+        <div class="flex items-center justify-center gap-2 p-9">
+          <Loader class="w-4 h-4 animate-spin" />
+          <span>Cancelling command...</span>
+        </div>
+      </div>
       <div
+        v-else
         class="p-4 space-y-3 border rounded-lg cursor-pointer bg-muted/50"
         @click="emit('viewDetails', command.id)"
       >
@@ -57,11 +86,11 @@ onUnmounted(() => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuItem @click.stop="emit('viewDetails', command.id)">
+                <DropdownMenuItem class="cursor-pointer" @click.stop="emit('viewDetails', command.id)">
                   View Details
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem class="text-destructive">
+                <DropdownMenuItem class="text-red-500 cursor-pointer" @click="handleCancelCommand">
                   Cancel Command
                 </DropdownMenuItem>
               </DropdownMenuContent>

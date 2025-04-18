@@ -8,6 +8,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useDeleteCommandMutation } from '@/composables/use-command'
+import { RaybotError } from '@/types/error'
 import { Clock, MoreHorizontal } from 'lucide-vue-next'
 import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
@@ -16,10 +18,32 @@ import { getCommandIcon, getCommandName, timeSince } from './utils'
 const props = defineProps<{
   command: Command
 }>()
-
 const emit = defineEmits<{
   (e: 'viewDetails', commandId: number): void
 }>()
+
+const { mutate: deleteCommand } = useDeleteCommandMutation()
+
+function handleRemoveFromQueue() {
+  deleteCommand(props.command.id, {
+    onSuccess: () => {
+      notification.success('Command removed from queue')
+    },
+    onError: (error) => {
+      if (error instanceof RaybotError) {
+        if (error.errorCode === 'command.inProcessingCanNotBeDeleted') {
+          notification.error('Command is being processed and cannot be deleted')
+        }
+        else {
+          notification.error(error.message)
+        }
+      }
+      else {
+        notification.error(error.message)
+      }
+    },
+  })
+}
 </script>
 
 <template>
@@ -47,7 +71,7 @@ const emit = defineEmits<{
             </DropdownMenuItem>
             <DropdownMenuItem>Edit Command</DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem class="text-destructive" disabled>
+            <DropdownMenuItem class="text-red-500" @click="handleRemoveFromQueue">
               Remove from Queue
             </DropdownMenuItem>
           </DropdownMenuContent>
