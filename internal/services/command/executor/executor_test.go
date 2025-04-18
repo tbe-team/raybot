@@ -22,11 +22,11 @@ func TestCommandExecutor(t *testing.T) {
 
 		executor, fakeCommandRepo := newTestExecutor(
 			t,
-			func(_ context.Context, _ string) error {
-				return nil
+			func(_ context.Context, _ command.StopMovementInputs) (command.StopMovementOutputs, error) {
+				return command.StopMovementOutputs{}, nil
 			},
-			Hooks{
-				OnSuccess: func(_ context.Context) {
+			Hooks[command.StopMovementOutputs]{
+				OnSuccess: func(_ context.Context, _ command.StopMovementOutputs) {
 					successCalled = true
 				},
 				OnCancel: func(_ context.Context) {
@@ -50,7 +50,7 @@ func TestCommandExecutor(t *testing.T) {
 					!p.UpdatedAt.IsZero()
 			}),
 		).Return(command.Command{}, nil)
-		executor.Execute(context.Background(), cmdID, "")
+		executor.Execute(context.Background(), cmdID, command.StopMovementInputs{})
 
 		assert.True(t, successCalled)
 		assert.False(t, cancelCalled)
@@ -65,12 +65,12 @@ func TestCommandExecutor(t *testing.T) {
 
 		executor, fakeCommandRepo := newTestExecutor(
 			t,
-			func(ctx context.Context, _ string) error {
+			func(ctx context.Context, _ command.StopMovementInputs) (command.StopMovementOutputs, error) {
 				<-ctx.Done()
-				return ctx.Err()
+				return command.StopMovementOutputs{}, ctx.Err()
 			},
-			Hooks{
-				OnSuccess: func(_ context.Context) {
+			Hooks[command.StopMovementOutputs]{
+				OnSuccess: func(_ context.Context, _ command.StopMovementOutputs) {
 					successCalled = true
 				},
 				OnCancel: func(_ context.Context) {
@@ -96,7 +96,7 @@ func TestCommandExecutor(t *testing.T) {
 		).Return(command.Command{}, nil)
 		ctx, cancel := context.WithCancel(context.Background())
 		cancel()
-		executor.Execute(ctx, cmdID, "")
+		executor.Execute(ctx, cmdID, command.StopMovementInputs{})
 
 		assert.False(t, successCalled)
 		assert.True(t, cancelCalled)
@@ -112,11 +112,11 @@ func TestCommandExecutor(t *testing.T) {
 		failedError := errors.New("failed error")
 		executor, fakeCommandRepo := newTestExecutor(
 			t,
-			func(_ context.Context, _ string) error {
-				return failedError
+			func(_ context.Context, _ command.StopMovementInputs) (command.StopMovementOutputs, error) {
+				return command.StopMovementOutputs{}, failedError
 			},
-			Hooks{
-				OnSuccess: func(_ context.Context) {
+			Hooks[command.StopMovementOutputs]{
+				OnSuccess: func(_ context.Context, _ command.StopMovementOutputs) {
 					successCalled = true
 				},
 				OnCancel: func(_ context.Context) {
@@ -141,7 +141,7 @@ func TestCommandExecutor(t *testing.T) {
 					!p.UpdatedAt.IsZero()
 			}),
 		).Return(command.Command{}, nil)
-		executor.Execute(context.Background(), cmdID, "")
+		executor.Execute(context.Background(), cmdID, command.StopMovementInputs{})
 
 		assert.False(t, successCalled)
 		assert.False(t, cancelCalled)
@@ -150,11 +150,11 @@ func TestCommandExecutor(t *testing.T) {
 	})
 }
 
-func newTestExecutor[I any](
+func newTestExecutor[I command.Inputs, O command.Outputs](
 	t *testing.T,
-	executeFunc func(ctx context.Context, inputs I) error,
-	hooks Hooks,
-) (*commandExecutor[I], *commandmock.FakeRepository) {
+	executeFunc func(ctx context.Context, inputs I) (O, error),
+	hooks Hooks[O],
+) (*commandExecutor[I, O], *commandmock.FakeRepository) {
 	log := log.NewNoopLogger()
 	commandRepo := commandmock.NewFakeRepository(t)
 	exec := newCommandExecutor(executeFunc, hooks, log, commandRepo)

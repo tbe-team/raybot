@@ -17,8 +17,8 @@ func newCargoOpenExecutor(
 	subscriber eventbus.Subscriber,
 	cargoService cargo.Service,
 	commandRepository command.Repository,
-) *commandExecutor[command.CargoOpenInputs] {
-	return newCommandExecutor(func(ctx context.Context, _ command.CargoOpenInputs) error {
+) *commandExecutor[command.CargoOpenInputs, command.CargoOpenOutputs] {
+	return newCommandExecutor(func(ctx context.Context, _ command.CargoOpenInputs) (command.CargoOpenOutputs, error) {
 		wg := sync.WaitGroup{}
 		wg.Add(1)
 		go func() {
@@ -27,15 +27,15 @@ func newCargoOpenExecutor(
 		}()
 
 		if err := cargoService.OpenCargoDoor(ctx); err != nil {
-			return fmt.Errorf("failed to open cargo: %w", err)
+			return command.CargoOpenOutputs{}, fmt.Errorf("failed to open cargo: %w", err)
 		}
 
 		// wait for cargo door open to finish
 		wg.Wait()
 
-		return nil
+		return command.CargoOpenOutputs{}, nil
 	},
-		Hooks{},
+		Hooks[command.CargoOpenOutputs]{},
 		log,
 		commandRepository,
 	)

@@ -18,16 +18,16 @@ type Router interface {
 }
 
 type executorRouter struct {
-	stopMovementExecutor *commandExecutor[command.StopMovementInputs]
-	moveToExecutor       *commandExecutor[command.MoveToInputs]
-	moveForwardExecutor  *commandExecutor[command.MoveForwardInputs]
-	moveBackwardExecutor *commandExecutor[command.MoveBackwardInputs]
+	stopMovementExecutor *commandExecutor[command.StopMovementInputs, command.StopMovementOutputs]
+	moveToExecutor       *commandExecutor[command.MoveToInputs, command.MoveToOutputs]
+	moveForwardExecutor  *commandExecutor[command.MoveForwardInputs, command.MoveForwardOutputs]
+	moveBackwardExecutor *commandExecutor[command.MoveBackwardInputs, command.MoveBackwardOutputs]
 
-	cargoOpenExecutor    *commandExecutor[command.CargoOpenInputs]
-	cargoCloseExecutor   *commandExecutor[command.CargoCloseInputs]
-	cargoLiftExecutor    *commandExecutor[command.CargoLiftInputs]
-	cargoLowerExecutor   *commandExecutor[command.CargoLowerInputs]
-	cargoCheckQRExecutor *commandExecutor[command.CargoCheckQRInputs]
+	cargoOpenExecutor    *commandExecutor[command.CargoOpenInputs, command.CargoOpenOutputs]
+	cargoCloseExecutor   *commandExecutor[command.CargoCloseInputs, command.CargoCloseOutputs]
+	cargoLiftExecutor    *commandExecutor[command.CargoLiftInputs, command.CargoLiftOutputs]
+	cargoLowerExecutor   *commandExecutor[command.CargoLowerInputs, command.CargoLowerOutputs]
+	cargoCheckQRExecutor *commandExecutor[command.CargoCheckQRInputs, command.CargoCheckQROutputs]
 }
 
 func NewRouter(

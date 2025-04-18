@@ -17,9 +17,9 @@ func newMoveToExecutor(
 	subscriber eventbus.Subscriber,
 	driveMotorService drivemotor.Service,
 	commandRepository command.Repository,
-) *commandExecutor[command.MoveToInputs] {
+) *commandExecutor[command.MoveToInputs, command.MoveToOutputs] {
 	return newCommandExecutor(
-		func(ctx context.Context, inputs command.MoveToInputs) error {
+		func(ctx context.Context, inputs command.MoveToInputs) (command.MoveToOutputs, error) {
 			wg := sync.WaitGroup{}
 			wg.Add(1)
 			go func() {
@@ -30,18 +30,18 @@ func newMoveToExecutor(
 			if err := driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
 				Speed: 100,
 			}); err != nil {
-				return fmt.Errorf("failed to move forward: %w", err)
+				return command.MoveToOutputs{}, fmt.Errorf("failed to move forward: %w", err)
 			}
 
 			wg.Wait()
 
 			if err := driveMotorService.Stop(ctx); err != nil {
-				return fmt.Errorf("failed to stop drive motor: %w", err)
+				return command.MoveToOutputs{}, fmt.Errorf("failed to stop drive motor: %w", err)
 			}
 
-			return nil
+			return command.MoveToOutputs{}, nil
 		},
-		Hooks{
+		Hooks[command.MoveToOutputs]{
 			OnCancel: func(ctx context.Context) {
 				if err := driveMotorService.Stop(ctx); err != nil {
 					log.Error("failed to stop drive motor", slog.Any("error", err))

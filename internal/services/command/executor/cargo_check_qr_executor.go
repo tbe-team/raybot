@@ -14,9 +14,9 @@ func newCargoCheckQRExecutor(
 	log *slog.Logger,
 	subscriber eventbus.Subscriber,
 	commandRepository command.Repository,
-) *commandExecutor[command.CargoCheckQRInputs] {
+) *commandExecutor[command.CargoCheckQRInputs, command.CargoCheckQROutputs] {
 	return newCommandExecutor(
-		func(ctx context.Context, inputs command.CargoCheckQRInputs) error {
+		func(ctx context.Context, inputs command.CargoCheckQRInputs) (command.CargoCheckQROutputs, error) {
 			wg := sync.WaitGroup{}
 			wg.Add(1)
 			go func() {
@@ -27,9 +27,9 @@ func newCargoCheckQRExecutor(
 			// wait for cargo qr code to be matched
 			wg.Wait()
 
-			return nil
+			return command.CargoCheckQROutputs{}, nil
 		},
-		Hooks{},
+		Hooks[command.CargoCheckQROutputs]{},
 		log,
 		commandRepository,
 	)

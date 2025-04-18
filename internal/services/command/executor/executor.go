@@ -11,16 +11,16 @@ import (
 	"github.com/tbe-team/raybot/pkg/ptr"
 )
 
-type Hooks struct {
-	OnSuccess func(ctx context.Context)
+type Hooks[O command.Outputs] struct {
+	OnSuccess func(ctx context.Context, outputs O)
 	OnError   func(ctx context.Context, err error)
 	OnCancel  func(ctx context.Context)
 }
 
-type commandExecutor[I any] struct {
-	executeFunc func(ctx context.Context, inputs I) error
+type commandExecutor[I command.Inputs, O command.Outputs] struct {
+	executeFunc func(ctx context.Context, inputs I) (O, error)
 
-	onSuccess func(ctx context.Context)
+	onSuccess func(ctx context.Context, outputs O)
 	onError   func(ctx context.Context, err error)
 	onCancel  func(ctx context.Context)
 
@@ -28,13 +28,13 @@ type commandExecutor[I any] struct {
 	commandRepository command.Repository
 }
 
-func newCommandExecutor[I any](
-	executeFunc func(ctx context.Context, inputs I) error,
-	hooks Hooks,
+func newCommandExecutor[I command.Inputs, O command.Outputs](
+	executeFunc func(ctx context.Context, inputs I) (O, error),
+	hooks Hooks[O],
 	log *slog.Logger,
 	commandRepository command.Repository,
-) *commandExecutor[I] {
-	return &commandExecutor[I]{
+) *commandExecutor[I, O] {
+	return &commandExecutor[I, O]{
 		executeFunc:       executeFunc,
 		onSuccess:         hooks.OnSuccess,
 		onError:           hooks.OnError,
@@ -44,35 +44,36 @@ func newCommandExecutor[I any](
 	}
 }
 
-func (e *commandExecutor[I]) Execute(ctx context.Context, cmdID int64, inputs I) {
+func (e *commandExecutor[I, O]) Execute(ctx context.Context, cmdID int64, inputs I) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel() // cleanup all resources
 
-	err := e.executeFunc(ctx, inputs)
+	outputs, err := e.executeFunc(ctx, inputs)
 	switch {
 	case err == nil:
 		if e.onSuccess != nil {
-			e.onSuccess(ctx)
+			e.onSuccess(ctx, outputs)
 		}
-		e.updateCommandStatus(cmdID, command.StatusSucceeded, nil)
+		e.updateCommandStatus(cmdID, command.StatusSucceeded, outputs, nil)
 
 	case errors.Is(err, context.Canceled):
 		if e.onCancel != nil {
 			e.onCancel(ctx)
 		}
-		e.updateCommandStatus(cmdID, command.StatusCanceled, nil)
+		e.updateCommandStatus(cmdID, command.StatusCanceled, outputs, nil)
 
 	default:
 		if e.onError != nil {
 			e.onError(ctx, err)
 		}
-		e.updateCommandStatus(cmdID, command.StatusFailed, ptr.New(err.Error()))
+		e.updateCommandStatus(cmdID, command.StatusFailed, outputs, ptr.New(err.Error()))
 	}
 }
 
-func (e *commandExecutor[I]) updateCommandStatus(
+func (e *commandExecutor[I, O]) updateCommandStatus(
 	id int64,
 	status command.Status,
+	outputs O,
 	errMsg *string,
 ) {
 	now := time.Now()
@@ -80,6 +81,8 @@ func (e *commandExecutor[I]) updateCommandStatus(
 		ID:             id,
 		Status:         status,
 		SetStatus:      true,
+		Outputs:        outputs,
+		SetOutputs:     true,
 		Error:          errMsg,
 		SetError:       errMsg != nil,
 		CompletedAt:    ptr.New(now),
