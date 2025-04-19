@@ -19,33 +19,14 @@ func newScanLocationExecutor(
 	driveMotorService drivemotor.Service,
 	commandRepository command.Repository,
 ) *commandExecutor[command.ScanLocationInputs, command.ScanLocationOutputs] {
-	outputs := command.ScanLocationOutputs{
-		Locations: []command.Location{},
+	handler := scanLocationHandler{
+		log:               log,
+		subscriber:        subscriber,
+		driveMotorService: driveMotorService,
 	}
 
 	return newCommandExecutor(
-		func(ctx context.Context, _ command.ScanLocationInputs) (command.ScanLocationOutputs, error) {
-			wg := sync.WaitGroup{}
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				outputs.Locations = recordLocationsUntilLoopedBack(ctx, log, subscriber)
-			}()
-
-			if err := driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
-				Speed: 100,
-			}); err != nil {
-				return outputs, fmt.Errorf("failed to move forward: %w", err)
-			}
-
-			wg.Wait()
-
-			if err := driveMotorService.Stop(ctx); err != nil {
-				return outputs, fmt.Errorf("failed to stop drive motor: %w", err)
-			}
-
-			return outputs, nil
-		},
+		handler.Handle,
 		Hooks[command.ScanLocationOutputs]{
 			OnCancel: func(ctx context.Context) {
 				if err := driveMotorService.Stop(ctx); err != nil {
@@ -58,25 +39,55 @@ func newScanLocationExecutor(
 	)
 }
 
-func recordLocationsUntilLoopedBack(
-	ctx context.Context,
-	log *slog.Logger,
-	subscriber eventbus.Subscriber,
-) []command.Location {
+type scanLocationHandler struct {
+	log               *slog.Logger
+	subscriber        eventbus.Subscriber
+	driveMotorService drivemotor.Service
+}
+
+func (h scanLocationHandler) Handle(ctx context.Context, _ command.ScanLocationInputs) (command.ScanLocationOutputs, error) {
+	outputs := command.ScanLocationOutputs{
+		Locations: []command.Location{},
+	}
+
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		outputs.Locations = h.recordLocationsUntilLoopedBack(ctx)
+	}()
+
+	if err := h.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
+		Speed: 100,
+	}); err != nil {
+		return outputs, fmt.Errorf("failed to move forward: %w", err)
+	}
+
+	// wait for recording to finish
+	wg.Wait()
+
+	if err := h.driveMotorService.Stop(ctx); err != nil {
+		return outputs, fmt.Errorf("failed to stop drive motor: %w", err)
+	}
+
+	return outputs, nil
+}
+
+func (h scanLocationHandler) recordLocationsUntilLoopedBack(ctx context.Context) []command.Location {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		log.Debug("stop recording location")
+		h.log.Debug("stop recording location")
 		cancel()
 	}()
 
 	locs := []command.Location{}
 
 	doneCh := make(chan struct{})
-	log.Debug("start recording location")
-	subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	h.log.Debug("start recording location")
+	h.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateLocationEvent)
 		if !ok {
-			log.Error("invalid event", slog.Any("event", msg.Payload))
+			h.log.Error("invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
@@ -86,7 +97,7 @@ func recordLocationsUntilLoopedBack(
 			return
 		}
 
-		log.Debug("record location", slog.String("location", ev.Location))
+		h.log.Debug("record location", slog.String("location", ev.Location))
 		locs = append(locs, command.Location{
 			Location:  ev.Location,
 			ScannedAt: time.Now(),

@@ -18,29 +18,14 @@ func newMoveToExecutor(
 	driveMotorService drivemotor.Service,
 	commandRepository command.Repository,
 ) *commandExecutor[command.MoveToInputs, command.MoveToOutputs] {
+	handler := moveToHandler{
+		log:               log,
+		subscriber:        subscriber,
+		driveMotorService: driveMotorService,
+	}
+
 	return newCommandExecutor(
-		func(ctx context.Context, inputs command.MoveToInputs) (command.MoveToOutputs, error) {
-			wg := sync.WaitGroup{}
-			wg.Add(1)
-			go func() {
-				defer wg.Done()
-				trackingLocationUntilReached(ctx, inputs.Location, log, subscriber)
-			}()
-
-			if err := driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
-				Speed: 100,
-			}); err != nil {
-				return command.MoveToOutputs{}, fmt.Errorf("failed to move forward: %w", err)
-			}
-
-			wg.Wait()
-
-			if err := driveMotorService.Stop(ctx); err != nil {
-				return command.MoveToOutputs{}, fmt.Errorf("failed to stop drive motor: %w", err)
-			}
-
-			return command.MoveToOutputs{}, nil
-		},
+		handler.Handle,
 		Hooks[command.MoveToOutputs]{
 			OnCancel: func(ctx context.Context) {
 				if err := driveMotorService.Stop(ctx); err != nil {
@@ -53,29 +38,49 @@ func newMoveToExecutor(
 	)
 }
 
-func trackingLocationUntilReached(
-	ctx context.Context,
-	location string,
-	log *slog.Logger,
-	subscriber eventbus.Subscriber,
-) {
+type moveToHandler struct {
+	log               *slog.Logger
+	subscriber        eventbus.Subscriber
+	driveMotorService drivemotor.Service
+}
+
+func (h moveToHandler) Handle(ctx context.Context, inputs command.MoveToInputs) (command.MoveToOutputs, error) {
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		h.trackingLocationUntilReached(ctx, inputs.Location)
+	}()
+
+	if err := h.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
+		Speed: 100,
+	}); err != nil {
+		return command.MoveToOutputs{}, fmt.Errorf("failed to move forward: %w", err)
+	}
+
+	wg.Wait()
+
+	return command.MoveToOutputs{}, nil
+}
+
+func (h moveToHandler) trackingLocationUntilReached(ctx context.Context, location string) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		log.Debug("stop tracking location", slog.String("location", location))
+		h.log.Debug("stop tracking location", slog.String("location", location))
 		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	log.Debug("start tracking location", slog.String("target_location", location))
-	subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	h.log.Debug("start tracking location", slog.String("target_location", location))
+	h.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateLocationEvent)
 		if !ok {
-			log.Error("invalid event", slog.Any("event", msg.Payload))
+			h.log.Error("invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
 		if ev.Location == location {
-			log.Debug("location reached", slog.String("location", ev.Location))
+			h.log.Debug("location reached", slog.String("location", ev.Location))
 			close(doneCh)
 		}
 	})

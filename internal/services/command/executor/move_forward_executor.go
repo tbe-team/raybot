@@ -14,17 +14,30 @@ func newMoveForwardExecutor(
 	driveMotorService drivemotor.Service,
 	commandRepository command.Repository,
 ) *commandExecutor[command.MoveForwardInputs, command.MoveForwardOutputs] {
+	handler := moveForwardHandler{
+		log:               log,
+		driveMotorService: driveMotorService,
+	}
+
 	return newCommandExecutor(
-		func(ctx context.Context, _ command.MoveForwardInputs) (command.MoveForwardOutputs, error) {
-			if err := driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
-				Speed: 100,
-			}); err != nil {
-				return command.MoveForwardOutputs{}, fmt.Errorf("failed to move forward: %w", err)
-			}
-			return command.MoveForwardOutputs{}, nil
-		},
+		handler.Handle,
 		Hooks[command.MoveForwardOutputs]{},
 		log,
 		commandRepository,
 	)
+}
+
+type moveForwardHandler struct {
+	log               *slog.Logger
+	driveMotorService drivemotor.Service
+}
+
+func (h moveForwardHandler) Handle(ctx context.Context, _ command.MoveForwardInputs) (command.MoveForwardOutputs, error) {
+	if err := h.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
+		Speed: 100,
+	}); err != nil {
+		return command.MoveForwardOutputs{}, fmt.Errorf("failed to move forward: %w", err)
+	}
+
+	return command.MoveForwardOutputs{}, nil
 }
