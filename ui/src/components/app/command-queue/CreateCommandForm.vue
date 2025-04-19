@@ -121,7 +121,7 @@ function clearForm() {
                       <span>Cargo Lower</span>
                     </div>
                   </SelectItem>
-                  <SelectItem value="CARGO_CHECK_QR" disabled>
+                  <SelectItem value="CARGO_CHECK_QR">
                     <div class="flex items-center gap-2">
                       <QrCode class="w-4 h-4" />
                       <span>Cargo Check QR</span>
