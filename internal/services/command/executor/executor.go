@@ -49,6 +49,10 @@ func (e *commandExecutor[I, O]) Execute(ctx context.Context, cmdID int64, inputs
 	defer cancel() // cleanup all resources
 
 	outputs, err := e.executeFunc(ctx, inputs)
+	if ctx.Err() != nil {
+		err = ctx.Err()
+	}
+
 	switch {
 	case err == nil:
 		if e.onSuccess != nil {
