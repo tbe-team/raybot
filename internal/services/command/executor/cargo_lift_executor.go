@@ -19,9 +19,9 @@ func newCargoLiftExecutor(
 	subscriber eventbus.Subscriber,
 	liftMotorService liftmotor.Service,
 	commandRepository command.Repository,
-) *commandExecutor[command.CargoLiftInputs] {
+) *commandExecutor[command.CargoLiftInputs, command.CargoLiftOutputs] {
 	return newCommandExecutor(
-		func(ctx context.Context, _ command.CargoLiftInputs) error {
+		func(ctx context.Context, _ command.CargoLiftInputs) (command.CargoLiftOutputs, error) {
 			wg := sync.WaitGroup{}
 			wg.Add(1)
 			go func() {
@@ -32,15 +32,15 @@ func newCargoLiftExecutor(
 			if err := liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
 				Position: cfg.LiftPosition,
 			}); err != nil {
-				return fmt.Errorf("failed to set cargo position: %w", err)
+				return command.CargoLiftOutputs{}, fmt.Errorf("failed to set cargo position: %w", err)
 			}
 
 			// wait for distance tracking to finish
 			wg.Wait()
 
-			return nil
+			return command.CargoLiftOutputs{}, nil
 		},
-		Hooks{},
+		Hooks[command.CargoLiftOutputs]{},
 		log,
 		commandRepository,
 	)

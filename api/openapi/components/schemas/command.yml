@@ -22,39 +22,44 @@ CommandResponse:
       $ref: "#/CommandInputs"
       description: The inputs of the command
       x-order: 5
+    outputs:
+      $ref: "#/CommandOutputs"
+      description: The outputs of the command
+      x-order: 6
     error:
       type: string
       nullable: true
       description: The error of the command
-      x-order: 6
+      x-order: 7
     startedAt:
       type: string
       nullable: true
       format: date-time
       description: The start date of the command
-      x-order: 7
+      x-order: 8
     completedAt:
       type: string
       nullable: true
       format: date-time
       description: The completion date of the command
-      x-order: 8
+      x-order: 9
     createdAt:
       type: string
       format: date-time
       description: The creation date of the command
-      x-order: 9
+      x-order: 10
     updatedAt:
       type: string
       format: date-time
       description: The update date of the command
-      x-order: 10
+      x-order: 11
   required:
     - id
     - type
     - status
     - source
     - inputs
+    - outputs
     - error
     - startedAt
     - completedAt
@@ -105,6 +110,7 @@ CommandType:
     - CARGO_LIFT
     - CARGO_LOWER
     - CARGO_CHECK_QR
+    - SCAN_LOCATION
   description: The type of command
   x-go-type: string
 
@@ -137,7 +143,7 @@ CommandInputs:
     - $ref: "#/CargoLiftInputs"
     - $ref: "#/CargoLowerInputs"
     - $ref: "#/CargoCheckQRInputs"
-
+    - $ref: "#/ScanLocationInputs"
 StopInputs:
   type: object
 
@@ -178,3 +184,72 @@ CargoCheckQRInputs:
       example: "1e8asj"
   required:
     - qrCode
+
+ScanLocationInputs:
+  type: object
+
+CommandOutputs:
+  oneOf:
+    - $ref: "#/StopOutputs"
+    - $ref: "#/MoveForwardOutputs"
+    - $ref: "#/MoveBackwardOutputs"
+    - $ref: "#/MoveToOutputs"
+    - $ref: "#/CargoOpenOutputs"
+    - $ref: "#/CargoCloseOutputs"
+    - $ref: "#/CargoLiftOutputs"
+    - $ref: "#/CargoLowerOutputs"
+    - $ref: "#/CargoCheckQROutputs"
+    - $ref: "#/ScanLocationOutputs"
+
+StopOutputs:
+  type: object
+
+MoveForwardOutputs:
+  type: object
+
+MoveBackwardOutputs:
+  type: object
+
+MoveToOutputs:
+  type: object
+
+CargoOpenOutputs:
+  type: object
+
+CargoCloseOutputs:
+  type: object
+
+CargoLiftOutputs:
+  type: object
+
+CargoLowerOutputs:
+  type: object
+
+CargoCheckQROutputs:
+  type: object
+
+ScanLocationOutputs:
+  type: object
+  properties:
+    locations:
+      type: array
+      items:
+        $ref: "#/Location"
+  required:
+    - locations
+
+Location:
+  type: object
+  properties:
+    location:
+      type: string
+      description: The location (RFID tag)
+      example: "1uxa91o"
+    scannedAt:
+      type: string
+      format: date-time
+      description: The date and time when the location was scanned
+      example: "2025-04-18T12:00:00Z"
+  required:
+    - location
+    - scannedAt

@@ -18,16 +18,18 @@ type Router interface {
 }
 
 type executorRouter struct {
-	stopMovementExecutor *commandExecutor[command.StopMovementInputs]
-	moveToExecutor       *commandExecutor[command.MoveToInputs]
-	moveForwardExecutor  *commandExecutor[command.MoveForwardInputs]
-	moveBackwardExecutor *commandExecutor[command.MoveBackwardInputs]
+	stopMovementExecutor *commandExecutor[command.StopMovementInputs, command.StopMovementOutputs]
+	moveToExecutor       *commandExecutor[command.MoveToInputs, command.MoveToOutputs]
+	moveForwardExecutor  *commandExecutor[command.MoveForwardInputs, command.MoveForwardOutputs]
+	moveBackwardExecutor *commandExecutor[command.MoveBackwardInputs, command.MoveBackwardOutputs]
 
-	cargoOpenExecutor    *commandExecutor[command.CargoOpenInputs]
-	cargoCloseExecutor   *commandExecutor[command.CargoCloseInputs]
-	cargoLiftExecutor    *commandExecutor[command.CargoLiftInputs]
-	cargoLowerExecutor   *commandExecutor[command.CargoLowerInputs]
-	cargoCheckQRExecutor *commandExecutor[command.CargoCheckQRInputs]
+	cargoOpenExecutor    *commandExecutor[command.CargoOpenInputs, command.CargoOpenOutputs]
+	cargoCloseExecutor   *commandExecutor[command.CargoCloseInputs, command.CargoCloseOutputs]
+	cargoLiftExecutor    *commandExecutor[command.CargoLiftInputs, command.CargoLiftOutputs]
+	cargoLowerExecutor   *commandExecutor[command.CargoLowerInputs, command.CargoLowerOutputs]
+	cargoCheckQRExecutor *commandExecutor[command.CargoCheckQRInputs, command.CargoCheckQROutputs]
+
+	scanLocationExecutor *commandExecutor[command.ScanLocationInputs, command.ScanLocationOutputs]
 }
 
 func NewRouter(
@@ -50,6 +52,8 @@ func NewRouter(
 		cargoLiftExecutor:    newCargoLiftExecutor(cargoCfg, log, subscriber, liftMotorService, commandRepository),
 		cargoLowerExecutor:   newCargoLowerExecutor(cargoCfg, log, subscriber, liftMotorService, commandRepository),
 		cargoCheckQRExecutor: newCargoCheckQRExecutor(log, subscriber, commandRepository),
+
+		scanLocationExecutor: newScanLocationExecutor(log, subscriber, driveMotorService, commandRepository),
 	}
 }
 
@@ -125,6 +129,14 @@ func (r *executorRouter) Route(ctx context.Context, cmd command.Command) error {
 			return fmt.Errorf("invalid cargo check qr inputs: %v", cmd.Inputs)
 		}
 		r.cargoCheckQRExecutor.Execute(ctx, cmd.ID, *i)
+		return nil
+
+	case command.CommandTypeScanLocation:
+		i, ok := cmd.Inputs.(*command.ScanLocationInputs)
+		if !ok {
+			return fmt.Errorf("invalid scan location inputs: %v", cmd.Inputs)
+		}
+		r.scanLocationExecutor.Execute(ctx, cmd.ID, *i)
 		return nil
 
 	default:

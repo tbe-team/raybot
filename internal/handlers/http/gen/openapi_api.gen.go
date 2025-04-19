@@ -78,8 +78,14 @@ type CargoCheckQRInputs struct {
 	QrCode string `json:"qrCode"`
 }
 
+// CargoCheckQROutputs defines model for CargoCheckQROutputs.
+type CargoCheckQROutputs = map[string]interface{}
+
 // CargoCloseInputs defines model for CargoCloseInputs.
 type CargoCloseInputs = map[string]interface{}
+
+// CargoCloseOutputs defines model for CargoCloseOutputs.
+type CargoCloseOutputs = map[string]interface{}
 
 // CargoConfig defines model for CargoConfig.
 type CargoConfig struct {
@@ -111,11 +117,20 @@ type CargoDoorMotorState struct {
 // CargoLiftInputs defines model for CargoLiftInputs.
 type CargoLiftInputs = map[string]interface{}
 
+// CargoLiftOutputs defines model for CargoLiftOutputs.
+type CargoLiftOutputs = map[string]interface{}
+
 // CargoLowerInputs defines model for CargoLowerInputs.
 type CargoLowerInputs = map[string]interface{}
 
+// CargoLowerOutputs defines model for CargoLowerOutputs.
+type CargoLowerOutputs = map[string]interface{}
+
 // CargoOpenInputs defines model for CargoOpenInputs.
 type CargoOpenInputs = map[string]interface{}
+
+// CargoOpenOutputs defines model for CargoOpenOutputs.
+type CargoOpenOutputs = map[string]interface{}
 
 // CargoState defines model for CargoState.
 type CargoState struct {
@@ -168,6 +183,11 @@ type CommandInputs struct {
 	union json.RawMessage
 }
 
+// CommandOutputs defines model for CommandOutputs.
+type CommandOutputs struct {
+	union json.RawMessage
+}
+
 // CommandResponse defines model for CommandResponse.
 type CommandResponse struct {
 	// Id The id of the command
@@ -180,8 +200,9 @@ type CommandResponse struct {
 	Status CommandStatus `json:"status"`
 
 	// Source The source of the command
-	Source CommandSource `json:"source"`
-	Inputs CommandInputs `json:"inputs"`
+	Source  CommandSource  `json:"source"`
+	Inputs  CommandInputs  `json:"inputs"`
+	Outputs CommandOutputs `json:"outputs"`
 
 	// Error The error of the command
 	Error *string `json:"error"`
@@ -348,6 +369,15 @@ type LiftMotorState struct {
 	UpdatedAt time.Time `json:"updatedAt"`
 }
 
+// Location defines model for Location.
+type Location struct {
+	// Location The location (RFID tag)
+	Location string `json:"location"`
+
+	// ScannedAt The date and time when the location was scanned
+	ScannedAt time.Time `json:"scannedAt"`
+}
+
 // LocationState defines model for LocationState.
 type LocationState struct {
 	// CurrentLocation The current location of the robot
@@ -372,14 +402,23 @@ type LogConfig struct {
 // MoveBackwardInputs defines model for MoveBackwardInputs.
 type MoveBackwardInputs = map[string]interface{}
 
+// MoveBackwardOutputs defines model for MoveBackwardOutputs.
+type MoveBackwardOutputs = map[string]interface{}
+
 // MoveForwardInputs defines model for MoveForwardInputs.
 type MoveForwardInputs = map[string]interface{}
+
+// MoveForwardOutputs defines model for MoveForwardOutputs.
+type MoveForwardOutputs = map[string]interface{}
 
 // MoveToInputs defines model for MoveToInputs.
 type MoveToInputs struct {
 	// Location The location to move to
 	Location string `json:"location"`
 }
+
+// MoveToOutputs defines model for MoveToOutputs.
+type MoveToOutputs = map[string]interface{}
 
 // PICConfig defines model for PICConfig.
 type PICConfig struct {
@@ -426,6 +465,14 @@ type STAConfig struct {
 	Password string `json:"password"`
 }
 
+// ScanLocationInputs defines model for ScanLocationInputs.
+type ScanLocationInputs = map[string]interface{}
+
+// ScanLocationOutputs defines model for ScanLocationOutputs.
+type ScanLocationOutputs struct {
+	Locations []Location `json:"locations"`
+}
+
 // SerialConfig defines model for SerialConfig.
 type SerialConfig struct {
 	// Port The port name for the serial connection
@@ -461,6 +508,9 @@ type SerialPortListResponse struct {
 
 // StopInputs defines model for StopInputs.
 type StopInputs = map[string]interface{}
+
+// StopOutputs defines model for StopOutputs.
+type StopOutputs = map[string]interface{}
 
 // WifiConfig defines model for WifiConfig.
 type WifiConfig struct {
@@ -758,12 +808,308 @@ func (t *CommandInputs) MergeCargoCheckQRInputs(v CargoCheckQRInputs) error {
 	return err
 }
 
+// AsScanLocationInputs returns the union data inside the CommandInputs as a ScanLocationInputs
+func (t CommandInputs) AsScanLocationInputs() (ScanLocationInputs, error) {
+	var body ScanLocationInputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromScanLocationInputs overwrites any union data inside the CommandInputs as the provided ScanLocationInputs
+func (t *CommandInputs) FromScanLocationInputs(v ScanLocationInputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeScanLocationInputs performs a merge with any union data inside the CommandInputs, using the provided ScanLocationInputs
+func (t *CommandInputs) MergeScanLocationInputs(v ScanLocationInputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
 func (t CommandInputs) MarshalJSON() ([]byte, error) {
 	b, err := t.union.MarshalJSON()
 	return b, err
 }
 
 func (t *CommandInputs) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
+
+// AsStopOutputs returns the union data inside the CommandOutputs as a StopOutputs
+func (t CommandOutputs) AsStopOutputs() (StopOutputs, error) {
+	var body StopOutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromStopOutputs overwrites any union data inside the CommandOutputs as the provided StopOutputs
+func (t *CommandOutputs) FromStopOutputs(v StopOutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeStopOutputs performs a merge with any union data inside the CommandOutputs, using the provided StopOutputs
+func (t *CommandOutputs) MergeStopOutputs(v StopOutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsMoveForwardOutputs returns the union data inside the CommandOutputs as a MoveForwardOutputs
+func (t CommandOutputs) AsMoveForwardOutputs() (MoveForwardOutputs, error) {
+	var body MoveForwardOutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromMoveForwardOutputs overwrites any union data inside the CommandOutputs as the provided MoveForwardOutputs
+func (t *CommandOutputs) FromMoveForwardOutputs(v MoveForwardOutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeMoveForwardOutputs performs a merge with any union data inside the CommandOutputs, using the provided MoveForwardOutputs
+func (t *CommandOutputs) MergeMoveForwardOutputs(v MoveForwardOutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsMoveBackwardOutputs returns the union data inside the CommandOutputs as a MoveBackwardOutputs
+func (t CommandOutputs) AsMoveBackwardOutputs() (MoveBackwardOutputs, error) {
+	var body MoveBackwardOutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromMoveBackwardOutputs overwrites any union data inside the CommandOutputs as the provided MoveBackwardOutputs
+func (t *CommandOutputs) FromMoveBackwardOutputs(v MoveBackwardOutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeMoveBackwardOutputs performs a merge with any union data inside the CommandOutputs, using the provided MoveBackwardOutputs
+func (t *CommandOutputs) MergeMoveBackwardOutputs(v MoveBackwardOutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsMoveToOutputs returns the union data inside the CommandOutputs as a MoveToOutputs
+func (t CommandOutputs) AsMoveToOutputs() (MoveToOutputs, error) {
+	var body MoveToOutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromMoveToOutputs overwrites any union data inside the CommandOutputs as the provided MoveToOutputs
+func (t *CommandOutputs) FromMoveToOutputs(v MoveToOutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeMoveToOutputs performs a merge with any union data inside the CommandOutputs, using the provided MoveToOutputs
+func (t *CommandOutputs) MergeMoveToOutputs(v MoveToOutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCargoOpenOutputs returns the union data inside the CommandOutputs as a CargoOpenOutputs
+func (t CommandOutputs) AsCargoOpenOutputs() (CargoOpenOutputs, error) {
+	var body CargoOpenOutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCargoOpenOutputs overwrites any union data inside the CommandOutputs as the provided CargoOpenOutputs
+func (t *CommandOutputs) FromCargoOpenOutputs(v CargoOpenOutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCargoOpenOutputs performs a merge with any union data inside the CommandOutputs, using the provided CargoOpenOutputs
+func (t *CommandOutputs) MergeCargoOpenOutputs(v CargoOpenOutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCargoCloseOutputs returns the union data inside the CommandOutputs as a CargoCloseOutputs
+func (t CommandOutputs) AsCargoCloseOutputs() (CargoCloseOutputs, error) {
+	var body CargoCloseOutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCargoCloseOutputs overwrites any union data inside the CommandOutputs as the provided CargoCloseOutputs
+func (t *CommandOutputs) FromCargoCloseOutputs(v CargoCloseOutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCargoCloseOutputs performs a merge with any union data inside the CommandOutputs, using the provided CargoCloseOutputs
+func (t *CommandOutputs) MergeCargoCloseOutputs(v CargoCloseOutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCargoLiftOutputs returns the union data inside the CommandOutputs as a CargoLiftOutputs
+func (t CommandOutputs) AsCargoLiftOutputs() (CargoLiftOutputs, error) {
+	var body CargoLiftOutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCargoLiftOutputs overwrites any union data inside the CommandOutputs as the provided CargoLiftOutputs
+func (t *CommandOutputs) FromCargoLiftOutputs(v CargoLiftOutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCargoLiftOutputs performs a merge with any union data inside the CommandOutputs, using the provided CargoLiftOutputs
+func (t *CommandOutputs) MergeCargoLiftOutputs(v CargoLiftOutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCargoLowerOutputs returns the union data inside the CommandOutputs as a CargoLowerOutputs
+func (t CommandOutputs) AsCargoLowerOutputs() (CargoLowerOutputs, error) {
+	var body CargoLowerOutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCargoLowerOutputs overwrites any union data inside the CommandOutputs as the provided CargoLowerOutputs
+func (t *CommandOutputs) FromCargoLowerOutputs(v CargoLowerOutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCargoLowerOutputs performs a merge with any union data inside the CommandOutputs, using the provided CargoLowerOutputs
+func (t *CommandOutputs) MergeCargoLowerOutputs(v CargoLowerOutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsCargoCheckQROutputs returns the union data inside the CommandOutputs as a CargoCheckQROutputs
+func (t CommandOutputs) AsCargoCheckQROutputs() (CargoCheckQROutputs, error) {
+	var body CargoCheckQROutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromCargoCheckQROutputs overwrites any union data inside the CommandOutputs as the provided CargoCheckQROutputs
+func (t *CommandOutputs) FromCargoCheckQROutputs(v CargoCheckQROutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeCargoCheckQROutputs performs a merge with any union data inside the CommandOutputs, using the provided CargoCheckQROutputs
+func (t *CommandOutputs) MergeCargoCheckQROutputs(v CargoCheckQROutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsScanLocationOutputs returns the union data inside the CommandOutputs as a ScanLocationOutputs
+func (t CommandOutputs) AsScanLocationOutputs() (ScanLocationOutputs, error) {
+	var body ScanLocationOutputs
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromScanLocationOutputs overwrites any union data inside the CommandOutputs as the provided ScanLocationOutputs
+func (t *CommandOutputs) FromScanLocationOutputs(v ScanLocationOutputs) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeScanLocationOutputs performs a merge with any union data inside the CommandOutputs, using the provided ScanLocationOutputs
+func (t *CommandOutputs) MergeScanLocationOutputs(v ScanLocationOutputs) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t CommandOutputs) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *CommandOutputs) UnmarshalJSON(b []byte) error {
 	err := t.union.UnmarshalJSON(b)
 	return err
 }
@@ -2939,78 +3285,82 @@ func (sh *strictHandler) RebootSystem(w http.ResponseWriter, r *http.Request) {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"H4sIAAAAAAAC/+xdb3PiOJP/Ki7dvbircgLkz2yWd4SQebjNhAyQnaubS80KW4B3jOWVRLJ5pvjuV/pj",
-	"W7Yl2xDIw9ZtVaoGUFvd6l93qyW1PD+Ah1cxjlDEKOj+ADEkcIUYIuLbA1wg/q+PqEeCmAU4Al0wXSIn",
-	"hgvkROvVDBHggoD//McakVfgggiuEOgCTgFcQL0lWkHZyRyuQwa6HRfMMVlBBrpgHUQMuGAVRMFqvRJt",
-	"7DXmzwcRQwtEwGbjCjkmwT8tskgxHDx3AoZW1IkRcRR3m2CiM7Nw7S2l2yTdCI31Hvo4mgcLoUuCY0RY",
-	"gEQLiuAsNIzgyxKxJSIOw44kcdgSOb0HZ4V9LiP6E65i/iAja5Tyn2EcIhgBF/x5gomPCOh2Ni4IYrOK",
-	"hg8O9H2CKHXmmNg4gM7PZ6edD1enndMOSFlRRoJooXO62LgghpS+YOLbzEO2VnJLu6hgdc7VSwMLm8lk",
-	"eFPJgsDXGWZVDM44gAT9sQ4I8kH3a4KTYuvqUgYxeEq7wrPfkcfAxgW9OO7jKEKelKwIvBfitZ8n+HeC",
-	"5qAL/q2VOV9LGVGrXyDfuADReIJIAMPmvQwmD6VHOGqBt21PD8O+qScyD/xHOmvez/h2ePM4udZ7KWi+",
-	"qCjzwM2DMAlkwuoaMobI64RBhgxQoTD8FYcMLuT3ssVxCudZkfCQwy1vJjvVLe9r58xN/p5cIAIT77EY",
-	"PlIRISHwVRjmAp+o374+8QDU+VD0PW9NCIqYRULZWCFbp90uxbE84zJbHlxUhDQxFU0VLJswvNL5fdi4",
-	"YIlgyJZmhrLtzYPM8fyJOwginlW1qpFPfXbGl1vzveRWgFaW0M1bEIFsTaq4nl1uy/Vs44J17EOG/J5l",
-	"vKrZgcxhwaqKPThrn3VO2vxv2m53xd//AG0m5R2d8E6qYvHVxgXKt8wCqcYq2M+2t+3zUiBS/qVgyYRy",
-	"8xEiM5fEOVKj1XVrikN9SBa4v0Te98/jYRSvVfaVi0Z/kD6fz4ya+Dx2POwjnjV4vJf8NI6uIP29pOni",
-	"MFX/dvFCTFEmnIXIku6EwZw9YBokU0N5CJzCiRVJOot7vFPXWa0pc2bICXnKwpYwckL8gkjaY87TtQzN",
-	"jL4WxPLdmAXjJBbJSiGmGedSlpFTT1EqKyI3GJNPmGFimb/8gGSTcXlgaXPiQGJIjo8xcVa8Wz66iA/m",
-	"K+jfjSYD4ILRw+CeC5RZV9JSduPMycq+zXUvUyu/Igc2yOQE1Eke3CIb5vNkQMfrKOKCbM2RqAe34ChS",
-	"1RghS64qmqoU/4aZa/dYXiUID+qXbw7ql0XTz4w00ZeOVGYljULoXTBndSHqjjtXHdEoRlEdjcXrZpgx",
-	"vLoJKIORZ4nXksbxFVFO/W/Nzc6FqfMBNLHzgDqYk265smwyGREEfWdO8Epj93nsUA9GEcqbVu+6/+fr",
-	"P6sXZm+y6f0b8kXRkJXOU924RUuoteAlJAtkW4vIJOQuWAU1mX7ISdLBiz73ke43i9aC3Y4x+g0Ql0a5",
-	"nwzUlgpKFLaITWopa0yN1E6MecDFbRqxKHYoIs+Blx9wiD0YLjFl3ct2+7Jyw4bDyfB3ZMkLRFMDjhf+",
-	"2QW6uppddM5/upidX8DLi6v2B6/dObuYXbQvz7baZ0m0kEhWpUb73opsk1ZaHcAQIZhwsmgdhnIrLmef",
-	"5m2uEFLWT5hIIzVaVONOpc2LpywGn7NzgYWXasAJIociD0c+zZSdbsNWmHGqp/KQUnkSHRmRwKsVjPxs",
-	"hsQRGs1B92v1ps+E4Vg9s3GrST/hZ3SLyQsk/hZPXEPv+5aPTHFD4mJe0IheXzQ1ekDLYJrRa9lMM4ly",
-	"q8zNU4bmGNEYR9Q0+WDu8hVxWRFwk+RukNqr7NgWdxt7ydXGBR5BVTODaN6Sv5Xfz3qAKPMSTWUejYfz",
-	"gWdolnVB4Jc7zubuuuVskDpkpR3kvJevU/CayFS1wWMTScwfY5BUQCKaD2IPP0nmbN10qBNJnO6vNnpo",
-	"ykmb5iR7sbtOu5RUpsch6YhTuFK4E2PVEXFzTqu7T22ykoPZjKxoMxhqtlvweKN1XrUpoHFMETXaEltT",
-	"O8fPj4PHwQ1wwcN41B9MJsP7j8AFk8d+fzC4EQ23veGd+NDv3fcH/OO28k2V6RgyptdYaKMs12Q6evj2",
-	"afTr4NPgfgpcwD9+ux2Nv/TGN8nX617/F/37dCSkHH8cfRPbLcmXZKdFfrsb3k6zL6Mvg3FG+I9B/5dv",
-	"n8dbj5DeBZTZp4H02MK0e0eZpgFukyl1A1dLeZpOQLRUiWEGw6FdDNGunQBr4lQugIpup/FJBmJ0FeFU",
-	"6Rj+WCPKDGrbLShvHamKY5BRQ3E3iX8TUO8Aa04/6fbdlp0px3dfeRrHelyLz2T/YYIiat0qnkHve82W",
-	"FfS+lzas0u9UdP5WwDkOPn6JqiXhFIeW5HzjgjnBEasWRZAcWpbOW6zTJsh+bLS0CZbXmZu3qwK4tYZL",
-	"gme0z/MNn3dYOtrIZuN0Is4dcGTtBzri0MQ6/OlGgdmBDzZ0bv/RPum02//5LzvbKKC/X0c42LHGYGIt",
-	"IaOi6qUuRUhrY3gfRSlVFxbGptqgd9xwOz/MhttWe2H2LbABb+ljH1Vtm8gjklK6vUKUqqqG6jN5Tx4k",
-	"JPRWOeplyLuJt6YMrxxZD6f2M7xitRzPe0/vMbvF68iv20/2EYNBmF8mVJnlbYBCX8helfOf55VVP4iE",
-	"WB8Hz+OdCDNnXjeQsx30rw2kpPw5bysLLn52RP2pLqf6oVLNVmXYh38PVyIvTse1jQLkCKo18HH80N9P",
-	"meti/NAXRw3548Em6XuMia1MCxOWnmZYOIgjk+rNtYJiBL8kjBvV8o/p1Bq6G0rLuzBIe9Vu1xa20Be4",
-	"4D831PxEkjuPw+0Ub9ZKwtyoFkj8F0iQ1WJo3KCaNZnPRPlng5pVy/zHmckuTKLeBXNWlX+qBVl1+VCy",
-	"RE4LiFQ6Iuqddqz22HGZnLE8fJ6Z57Vjmsn4yrpGv5LmgOrdPeM0y3CghLNojCXt7ZZ/3mFPnKvUbBEp",
-	"qppdIkWV6IdgWY2/TR3I7ovhhPv+sTiz7dRkHOuUvKioDrDtxGuRHPq+GKPamGdYjTjncXMY0lqXS0Zu",
-	"roRcOLI9naFgHIdBple1pP6vyegeuGA6+O9pfi2tGrZbSHMHDNEzCs1SLUI8g6EQTlDVyHYzuH78CFww",
-	"vL8dARd86Y25RIPxeDTOy5oQbrvqL5Z2CslTxboaoiZTMJximwrQysfjNqr0fLtck1vptKmzMuys8DM3",
-	"ql2qilMmpsFmE/M7L25Nt1j+Xtxm+infzvlbO5p2+LwlJkT7uhsWb4FVmXH+ytjGBclVhprncteXNi6Q",
-	"pY7dBlUg+UfSQvJGzxbKznkn8gik7mHtrGnjguzopOa5wjGVfFQ70mjwfOkAhHeSbi/XdlDYiObGmSwN",
-	"6p4trCHElYMs7FY+mcu8irabXXZJz5/0s6iChnSBcyPXxEnMp2QTbsGYTS4xmfb2swUwmfZ2uuq65QXU",
-	"l2AeaIV0h7yIWsVqnxdSjbDo86Ph0G/tj1VabzrwW/sOgQylI5ETqmUsP39o19x5cXnYhtcBsxze81Zn",
-	"FjDajOFVFbdzYRIkYK82g+Bt1YxUwng/uh/wDPFXUYoxuikcD6nm7bLEy/odqwiuGmoetHz03GLs9XFy",
-	"3a5bOxEE/WmwQnhtYS6q9pmksPPPV57qBWqGG1BaRWqmFHmXPlcTRxmO7ebBW7cwD/21Aj5eS5+pEmge",
-	"Ysg+XFQeb6r9rdRxNJPWxE9NL69uu4M+KFPYapNQLWuVEpL9yB2MwjTGalnfXCakCd24VEhTVcWJQWk4",
-	"9uodrRrZtHj6EswD66q8do+yp21RUgZrB5fOn6XC+FjW9RmGsBEVn3Ns1vVYnov0HoZi+veQAku99+LT",
-	"cApcsCYh6IIlYzHttlo45ukCX5ueYrJoqYdoi9NynQdMmFau52dEqGTaPu2ctjkd7wbGAeiC89P2aVv4",
-	"A1sKxbXSiqzuD7BABvvmtuXAMNRrt7C48hzgaOgrin7WqL+jxFJ/npG0xDtMbIXSBTrxWhBOm5dwwr1P",
-	"K0OkzuxVHi4EzyhyxJHJqfNIkfPbyW88vaH8gSByeDco8oNo4QhrVURuRjR7dVbrkAVxiGQ/9NQZSJfu",
-	"Or+dqCLOb5C5siDyN6cXhvgF+Yq6+7+R45yIekT5SZKpzwJZ+TnrSX5X+1Pp97R4VPxieXUKVe6bvTel",
-	"tBdQ1N1tELLkrpBRe1JgRHO6mcundO1kdJl+ZBGom5WAZup5huEaJeqRdPJzRiy/pyWj8qusGpWfk8JR",
-	"uz6UTJUqeeLuLUOncIKzdlstp5l604C2b9X6ncqFQtZfg3LAfBmnCBN5FHrles2NCy72KEn+VNogwjX0",
-	"naRiUrw0Z71aQb7iNQYABhdUrtjVT08igaKG+CFrMh2oFePmw0euaBPIYIsou8b+6/6AMBWGbvKhna9q",
-	"NiVj6OzbGKpASC9OID9V1/EYggFJgx1s3GxSacUEe4hSdTplnF8+olzwdtgSMiegySFF+OrMEI/QqitU",
-	"NqCPiPXVYUvKTjenwzp3LZ46jhfvh+M9TlVaqc08xhyN9IQ01eZOiLc8GHnykMASGUS7BL+KZSFciKea",
-	"A35hvSEldPMCqSMFRe/va9MlIqIWJMrAqsZH6exNEP1Qn4b+RuqGJxZlLd2I3zN359P98KaEhyRT6r9+",
-	"HfrlFFDMzTzlzKbmVARQDMH5176V3pR2s9V1LNP03sAgpEr+JfagO20Q6QDzHz0YicqpGcpkzNmHFTTj",
-	"jG0NyHWg85D710H8/03ML9pxVmRXjvKNTETGDb4Opq30MKN6GhevlZDPrEmyk122Hu3lRIfES2Nj05dB",
-	"4OPJuarVmiEmRiiScNM+4qO8EtkUH0lehOgAWXkenc3fhmA3hFoIS7aQ890Qr/16301eZ1Dju9rbMw4J",
-	"mcbGBplB4CP0XaNad/HdBvgo3y1AdADfLaJTt5B+V8NISs6O20Bqoa306QWJvVqXFvXVtR6tVYwfEDeN",
-	"iwU2g7TH585Gle7gzQ2gkdQFdPbvy0Vg3s+V600i8eSjNo06VCv9eKkK8Gt9OSGs9+dCTf8BASxwsoBo",
-	"kfz4fNuq4h38uyFc8gkDYvv3cxNY7+frzUwl8fejN5kmSFf7PWNxrc+LG0f1/p5dbTokgBkXC3gGaY/P",
-	"x40q3cG/G0CjfDuPzgH8ugDMO/p0rUkk/nzUplGHaqUfh7j+cCvEi3ovzm6dHBCxjIkFsLKox+fCJnXu",
-	"4MH1qEjiPDD7998CJu/nvrXGkHjvMRtFDaCVvvsSzINa500Khqu9VytPOyBiGhcLZAZpj8+BjSrdwYMb",
-	"QCOpC+js34fzwGyOzATEaVDizHTteYjS+ToMX4/Tj5uZB3dkcSnoxMM+opV+DMNQe60GNTlw+gIR+lYH",
-	"blQ+W35fSbGK1qC90S9H5sxlvSYw6chIrGJEgniJCAxpSxYcN6g6hc8wENfJijXK5RrUXkKaVSbTQ8Zi",
-	"S/31scMmVWtTawKfBpaCT9wOP6HJvfPqkyRVnyKoi9fLS56X3d87JFyGW4J/BQ8TWpOK1ODRwZDw0FfK",
-	"0KpF0AxjZi+6Got2eVNBPHFaQkSSTERro3qqe+z0laaOR3elgWraUz88yf8eUrzPRdatyPL7FoyD1nMH",
-	"bJ42/xcAAP//UmKrv4FzAAA=",
+	"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",
+	"AA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

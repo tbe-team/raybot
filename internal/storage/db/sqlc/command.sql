@@ -48,12 +48,13 @@ VALUES (
 	@updated_at,
 	@completed_at
 )
-RETURNING id;
+RETURNING id, outputs;
 
 -- name: CommandUpdate :one
 UPDATE commands
 SET
 	status = CASE WHEN @set_status = 1 THEN @status ELSE status END,
+	outputs = CASE WHEN @set_outputs = 1 THEN @outputs ELSE outputs END,
 	error = CASE WHEN @set_error = 1 THEN @error ELSE error END,
 	started_at = CASE WHEN @set_started_at = 1 THEN @started_at ELSE started_at END,
 	completed_at = CASE WHEN @set_completed_at = 1 THEN @completed_at ELSE completed_at END,

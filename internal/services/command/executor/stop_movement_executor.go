@@ -13,15 +13,15 @@ func newStopMovementExecutor(
 	log *slog.Logger,
 	driveMotorService drivemotor.Service,
 	commandRepository command.Repository,
-) *commandExecutor[command.StopMovementInputs] {
+) *commandExecutor[command.StopMovementInputs, command.StopMovementOutputs] {
 	return newCommandExecutor(
-		func(ctx context.Context, _ command.StopMovementInputs) error {
+		func(ctx context.Context, _ command.StopMovementInputs) (command.StopMovementOutputs, error) {
 			if err := driveMotorService.Stop(ctx); err != nil {
-				return fmt.Errorf("failed to stop drive motor: %w", err)
+				return command.StopMovementOutputs{}, fmt.Errorf("failed to stop drive motor: %w", err)
 			}
-			return nil
+			return command.StopMovementOutputs{}, nil
 		},
-		Hooks{},
+		Hooks[command.StopMovementOutputs]{},
 		log,
 		commandRepository,
 	)

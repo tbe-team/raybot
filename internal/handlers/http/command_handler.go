@@ -157,12 +157,18 @@ func (h commandHandler) convertCommandToResponse(cmd command.Command) (gen.Comma
 		return gen.CommandResponse{}, fmt.Errorf("convert inputs to response: %w", err)
 	}
 
+	outputs, err := h.convertOutputsToResponse(cmd.Outputs)
+	if err != nil {
+		return gen.CommandResponse{}, fmt.Errorf("convert outputs to response: %w", err)
+	}
+
 	return gen.CommandResponse{
 		Id:          int(cmd.ID),
 		Type:        cmd.Type.String(),
 		Status:      cmd.Status.String(),
 		Source:      cmd.Source.String(),
 		Inputs:      inputs,
+		Outputs:     outputs,
 		Error:       cmd.Error,
 		StartedAt:   cmd.StartedAt,
 		CompletedAt: cmd.CompletedAt,
@@ -185,38 +191,123 @@ func (commandHandler) convertInputsToResponse(inputs command.Inputs) (gen.Comman
 		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from move to inputs: %w", err)
 		}
+
 	case *command.MoveForwardInputs:
 		if err := res.FromMoveForwardInputs(gen.MoveForwardInputs{}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from move forward inputs: %w", err)
 		}
+
 	case *command.MoveBackwardInputs:
 		if err := res.FromMoveBackwardInputs(gen.MoveBackwardInputs{}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from move backward inputs: %w", err)
 		}
+
 	case *command.CargoOpenInputs:
 		if err := res.FromCargoOpenInputs(gen.CargoOpenInputs{}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from cargo open inputs: %w", err)
 		}
+
 	case *command.CargoCloseInputs:
 		if err := res.FromCargoCloseInputs(gen.CargoCloseInputs{}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from cargo close inputs: %w", err)
 		}
+
 	case *command.CargoLiftInputs:
 		if err := res.FromCargoLiftInputs(gen.CargoLiftInputs{}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from cargo lift inputs: %w", err)
 		}
+
 	case *command.CargoLowerInputs:
 		if err := res.FromCargoLowerInputs(gen.CargoLowerInputs{}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from cargo lower inputs: %w", err)
 		}
+
 	case *command.CargoCheckQRInputs:
 		if err := res.FromCargoCheckQRInputs(gen.CargoCheckQRInputs{
 			QrCode: v.QRCode,
 		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from cargo check qr inputs: %w", err)
 		}
+
+	case *command.ScanLocationInputs:
+		if err := res.FromScanLocationInputs(gen.ScanLocationInputs{}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from scan location inputs: %w", err)
+		}
+
 	default:
 		return gen.CommandInputs{}, fmt.Errorf("unknown inputs type: %T", v)
+	}
+
+	return res, nil
+}
+
+func (commandHandler) convertOutputsToResponse(outputs command.Outputs) (gen.CommandOutputs, error) {
+	var res gen.CommandOutputs
+	switch v := outputs.(type) {
+	case *command.StopMovementOutputs:
+		if err := res.FromStopOutputs(gen.StopOutputs{}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from stop outputs: %w", err)
+		}
+
+	case *command.MoveForwardOutputs:
+		if err := res.FromMoveForwardOutputs(gen.MoveForwardOutputs{}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from move forward outputs: %w", err)
+		}
+
+	case *command.MoveBackwardOutputs:
+		if err := res.FromMoveBackwardOutputs(gen.MoveBackwardOutputs{}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from move backward outputs: %w", err)
+		}
+
+	case *command.MoveToOutputs:
+		if err := res.FromMoveToOutputs(gen.MoveToOutputs{}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from move to outputs: %w", err)
+		}
+
+	case *command.CargoOpenOutputs:
+		if err := res.FromCargoOpenOutputs(gen.CargoOpenOutputs{}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from cargo open outputs: %w", err)
+		}
+
+	case *command.CargoCloseOutputs:
+		if err := res.FromCargoCloseOutputs(gen.CargoCloseOutputs{}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from cargo close outputs: %w", err)
+		}
+
+	case *command.CargoLiftOutputs:
+		if err := res.FromCargoLiftOutputs(gen.CargoLiftOutputs{}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from cargo lift outputs: %w", err)
+		}
+
+	case *command.CargoLowerOutputs:
+		if err := res.FromCargoLowerOutputs(gen.CargoLowerOutputs{}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from cargo lower outputs: %w", err)
+		}
+
+	case *command.CargoCheckQROutputs:
+		if err := res.FromCargoCheckQROutputs(gen.CargoCheckQROutputs{}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from cargo check qr outputs: %w", err)
+		}
+
+	case *command.ScanLocationOutputs:
+		locs := []gen.Location{}
+		if v.Locations != nil {
+			for _, loc := range v.Locations {
+				locs = append(locs, gen.Location{
+					Location:  loc.Location,
+					ScannedAt: loc.ScannedAt,
+				})
+			}
+		}
+
+		if err := res.FromScanLocationOutputs(gen.ScanLocationOutputs{
+			Locations: locs,
+		}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from scan location outputs: %w", err)
+		}
+
+	default:
+		return gen.CommandOutputs{}, fmt.Errorf("unknown outputs type: %T", v)
 	}
 
 	return res, nil
@@ -263,7 +354,10 @@ func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, i
 			QRCode: i.QrCode,
 		}, nil
 
+	case command.CommandTypeScanLocation:
+		return &command.ScanLocationInputs{}, nil
+
 	default:
-		return nil, fmt.Errorf("unknown command type: %s", cmdType)
+		return nil, xerror.ValidationFailed(nil, "unknown command type")
 	}
 }

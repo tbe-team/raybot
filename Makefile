@@ -83,11 +83,12 @@ build-ui:
 
 .PHONY: build-arm64
 build-arm64:
-	CGO_ENABLED=1 \
-	GOOS=linux \
-	GOARCH=arm64 \
-	CC=aarch64-linux-gnu-gcc \
-	go build -o bin/raybot-arm64 cmd/raybot/main.go
+	set -eux
+
+	docker build -t raybot-builder-deb11 -f docker/raybot-build-deb11.dockerfile .
+	docker create --name temp-build raybot-builder-deb11:latest
+	docker cp temp-build:/app/raybot ./raybot-arm64
+	docker rm temp-build
 
 #########################
 # Docker

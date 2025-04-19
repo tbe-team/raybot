@@ -56,6 +56,8 @@ type UpdateCommandParams struct {
 	ID             int64
 	Status         Status
 	SetStatus      bool
+	Outputs        Outputs
+	SetOutputs     bool
 	Error          *string
 	SetError       bool
 	StartedAt      *time.Time

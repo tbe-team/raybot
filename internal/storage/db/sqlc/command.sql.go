@@ -32,7 +32,7 @@ VALUES (
 	?8,
 	?9
 )
-RETURNING id
+RETURNING id, outputs
 `
 
 type CommandCreateParams struct {
@@ -47,7 +47,12 @@ type CommandCreateParams struct {
 	CompletedAt *string `json:"completed_at"`
 }
 
-func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateParams) (int64, error) {
+type CommandCreateRow struct {
+	ID      int64  `json:"id"`
+	Outputs string `json:"outputs"`
+}
+
+func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateParams) (CommandCreateRow, error) {
 	row := db.QueryRowContext(ctx, commandCreate,
 		arg.Type,
 		arg.Status,
@@ -59,9 +64,9 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 		arg.UpdatedAt,
 		arg.CompletedAt,
 	)
-	var id int64
-	err := row.Scan(&id)
-	return id, err
+	var i CommandCreateRow
+	err := row.Scan(&i.ID, &i.Outputs)
+	return i, err
 }
 
 const commandDeleteByIDAndNotProcessing = `-- name: CommandDeleteByIDAndNotProcessing :execrows
@@ -93,7 +98,7 @@ func (q *Queries) CommandDeleteOldCommands(ctx context.Context, db DBTX, created
 }
 
 const commandGetByID = `-- name: CommandGetByID :one
-SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at FROM commands
+SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs FROM commands
 WHERE id = ?1
 `
 
@@ -111,12 +116,13 @@ func (q *Queries) CommandGetByID(ctx context.Context, db DBTX, id int64) (Comman
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.StartedAt,
+		&i.Outputs,
 	)
 	return i, err
 }
 
 const commandGetNextExecutable = `-- name: CommandGetNextExecutable :one
-SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at FROM commands
+SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs FROM commands
 WHERE
 	status IN ('QUEUED', 'PROCESSING')
 ORDER BY
@@ -142,12 +148,13 @@ func (q *Queries) CommandGetNextExecutable(ctx context.Context, db DBTX) (Comman
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.StartedAt,
+		&i.Outputs,
 	)
 	return i, err
 }
 
 const commandGetProcessing = `-- name: CommandGetProcessing :one
-SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at FROM commands
+SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs FROM commands
 WHERE status = 'PROCESSING'
 LIMIT 1
 `
@@ -166,6 +173,7 @@ func (q *Queries) CommandGetProcessing(ctx context.Context, db DBTX) (Command, e
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.StartedAt,
+		&i.Outputs,
 	)
 	return i, err
 }
@@ -188,17 +196,20 @@ const commandUpdate = `-- name: CommandUpdate :one
 UPDATE commands
 SET
 	status = CASE WHEN ?1 = 1 THEN ?2 ELSE status END,
-	error = CASE WHEN ?3 = 1 THEN ?4 ELSE error END,
-	started_at = CASE WHEN ?5 = 1 THEN ?6 ELSE started_at END,
-	completed_at = CASE WHEN ?7 = 1 THEN ?8 ELSE completed_at END,
-	updated_at = ?9
-WHERE id = ?10
-RETURNING id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at
+	outputs = CASE WHEN ?3 = 1 THEN ?4 ELSE outputs END,
+	error = CASE WHEN ?5 = 1 THEN ?6 ELSE error END,
+	started_at = CASE WHEN ?7 = 1 THEN ?8 ELSE started_at END,
+	completed_at = CASE WHEN ?9 = 1 THEN ?10 ELSE completed_at END,
+	updated_at = ?11
+WHERE id = ?12
+RETURNING id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs
 `
 
 type CommandUpdateParams struct {
 	SetStatus      interface{} `json:"set_status"`
 	Status         string      `json:"status"`
+	SetOutputs     interface{} `json:"set_outputs"`
+	Outputs        string      `json:"outputs"`
 	SetError       interface{} `json:"set_error"`
 	Error          *string     `json:"error"`
 	SetStartedAt   interface{} `json:"set_started_at"`
@@ -213,6 +224,8 @@ func (q *Queries) CommandUpdate(ctx context.Context, db DBTX, arg CommandUpdateP
 	row := db.QueryRowContext(ctx, commandUpdate,
 		arg.SetStatus,
 		arg.Status,
+		arg.SetOutputs,
+		arg.Outputs,
 		arg.SetError,
 		arg.Error,
 		arg.SetStartedAt,
@@ -234,6 +247,7 @@ func (q *Queries) CommandUpdate(ctx context.Context, db DBTX, arg CommandUpdateP
 		&i.CreatedAt,
 		&i.UpdatedAt,
 		&i.StartedAt,
+		&i.Outputs,
 	)
 	return i, err
 }
