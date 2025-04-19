@@ -65,9 +65,8 @@ func TestCommandExecutor(t *testing.T) {
 
 		executor, fakeCommandRepo := newTestExecutor(
 			t,
-			func(ctx context.Context, _ command.StopMovementInputs) (command.StopMovementOutputs, error) {
-				<-ctx.Done()
-				return command.StopMovementOutputs{}, ctx.Err()
+			func(_ context.Context, _ command.StopMovementInputs) (command.StopMovementOutputs, error) {
+				return command.StopMovementOutputs{}, nil
 			},
 			Hooks[command.StopMovementOutputs]{
 				OnSuccess: func(_ context.Context, _ command.StopMovementOutputs) {
