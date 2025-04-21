@@ -11,6 +11,8 @@ servers:
   - url: /api/v1
 security: []
 paths:
+  /health:
+    $ref: "./paths/health.yml"
   /error-codes:
     $ref: "./paths/error-codes.yml"
   /configs/log:

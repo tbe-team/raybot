@@ -10,6 +10,26 @@ servers:
   - url: /api/v1
 security: []
 paths:
+  /health:
+    get:
+      summary: Get the health of the server
+      operationId: getHealth
+      description: Get the health of the server
+      tags:
+        - health
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /error-codes:
     get:
       summary: Get all error codes
@@ -563,16 +583,16 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    ErrorCodeResponse:
+    HealthResponse:
       type: object
       properties:
-        code:
+        status:
           type: string
-        message:
-          type: string
+          example: ok
+          description: The status of the health check
+          x-order: 1
       required:
-        - code
-        - message
+        - status
     FieldError:
       type: object
       properties:
@@ -607,6 +627,16 @@ components:
           items:
             $ref: '#/components/schemas/FieldError'
           x-order: 3
+      required:
+        - code
+        - message
+    ErrorCodeResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
       required:
         - code
         - message

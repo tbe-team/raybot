@@ -1,0 +1,10 @@
+HealthResponse:
+  type: object
+  properties:
+    status:
+      type: string
+      example: "ok"
+      description: The status of the health check
+      x-order: 1
+  required:
+    - status

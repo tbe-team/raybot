@@ -120,6 +120,7 @@ func (s *Service) RegisterHandlers(r chi.Router) {
 var _ gen.StrictServerInterface = (*handler)(nil)
 
 type handler struct {
+	*healthHandler
 	*errorCodeHandler
 	*configHandler
 	*systemHandler
@@ -130,6 +131,7 @@ type handler struct {
 
 func (s *Service) newHandler() *handler {
 	return &handler{
+		healthHandler:        newHealthHandler(),
 		errorCodeHandler:     newErrorCodeHandler(s.apperrorcodeService),
 		configHandler:        newConfigHandler(s.configService),
 		systemHandler:        newSystemHandler(s.systemService),
