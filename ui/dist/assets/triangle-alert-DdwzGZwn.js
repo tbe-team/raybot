@@ -1,5 +1,5 @@
-import{c as e}from"./createLucideIcon-C08hqJUE.js";/**
- * @license lucide-vue-next v0.488.0 - ISC
+import{c as e}from"./createLucideIcon-BqR3EBSv.js";/**
+ * @license lucide-vue-next v0.503.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.

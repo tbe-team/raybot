@@ -1,5 +1,5 @@
-import{P as d,c as m,a as _}from"./createLucideIcon-C08hqJUE.js";import{g as f,c as y}from"./PopperContent-BHrwd_An.js";import{d as c,c as l,o as n,w as p,r as u,m as i,u as a,a as x}from"./index-sUx4EJyp.js";const[G,C]=y("SelectGroup"),g=c({__name:"SelectGroup",props:{asChild:{type:Boolean},as:{}},setup(o){const e=o,s=f(void 0,"reka-select-group");return C({id:s}),(t,r)=>(n(),l(a(d),i({role:"group"},e,{"aria-labelledby":a(s)}),{default:p(()=>[u(t.$slots,"default")]),_:3},16,["aria-labelledby"]))}});/**
- * @license lucide-vue-next v0.488.0 - ISC
+import{P as d,c as m,a as _}from"./createLucideIcon-BqR3EBSv.js";import{g as f,c as y}from"./PopperContent-BB7a6Q4A.js";import{d as c,c as l,o as n,w as p,r as u,m as i,u as a,a as x}from"./index-CiBcqSrJ.js";const[G,C]=y("SelectGroup"),g=c({__name:"SelectGroup",props:{asChild:{type:Boolean},as:{}},setup(o){const e=o,s=f(void 0,"reka-select-group");return C({id:s}),(t,r)=>(n(),l(a(d),i({role:"group"},e,{"aria-labelledby":a(s)}),{default:p(()=>[u(t.$slots,"default")]),_:3},16,["aria-labelledby"]))}});/**
+ * @license lucide-vue-next v0.503.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
