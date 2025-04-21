@@ -45,4 +45,10 @@ export const createCommandSchema = z.discriminatedUnion('type', [
     type: z.literal('SCAN_LOCATION'),
     inputs: z.object({}),
   }),
+  z.object({
+    type: z.literal('WAIT'),
+    inputs: z.object({
+      durationMs: z.number(),
+    }),
+  }),
 ])

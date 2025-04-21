@@ -5,6 +5,7 @@ import relativeTime from 'dayjs/plugin/relativeTime'
 import {
   ArrowDown,
   ArrowUp,
+  Clock,
   MapPin,
   Package,
   QrCode,
@@ -25,6 +26,7 @@ const commandIcons: Record<CommandType, LucideIcon> = {
   CARGO_LOWER: Package,
   CARGO_CHECK_QR: QrCode,
   SCAN_LOCATION: Scan,
+  WAIT: Clock,
 }
 
 export function getCommandIcon(type: CommandType) {

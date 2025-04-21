@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCreateCommandMutation } from '@/composables/use-command'
 import { RaybotError } from '@/types/error'
 import { toTypedSchema } from '@vee-validate/zod'
-import { ArrowDown, ArrowUp, Loader2, MapPin, Package, QrCode, Scan, StopCircle } from 'lucide-vue-next'
+import { ArrowDown, ArrowUp, Clock, Loader2, MapPin, Package, QrCode, Scan, StopCircle } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { createCommandSchema } from './schemas'
 
@@ -133,6 +133,12 @@ function clearForm() {
                       <span>Scan Location</span>
                     </div>
                   </SelectItem>
+                  <SelectItem value="WAIT">
+                    <div class="flex items-center gap-2">
+                      <Clock class="w-4 h-4" />
+                      <span>Wait</span>
+                    </div>
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -154,6 +160,15 @@ function clearForm() {
               <FormItem>
                 <FormLabel>QR Code</FormLabel>
                 <Input v-bind="componentField" placeholder="Enter QR code" />
+                <FormMessage />
+              </FormItem>
+            </FormField>
+          </template>
+          <template v-else-if="commandType === 'WAIT'">
+            <FormField v-slot="{ componentField }" name="inputs.durationMs">
+              <FormItem>
+                <FormLabel>Duration (ms)</FormLabel>
+                <Input v-bind="componentField" type="number" placeholder="Enter duration" />
                 <FormMessage />
               </FormItem>
             </FormField>

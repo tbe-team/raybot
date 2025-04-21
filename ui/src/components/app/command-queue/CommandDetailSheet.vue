@@ -115,7 +115,7 @@ function handleStopExecution() {
 
 <template>
   <Sheet v-model:open="isOpen">
-    <SheetContent class="max-h-screen overflow-y-auto sm:max-w-md">
+    <SheetContent class="max-h-screen overflow-y-auto sm:max-w-xl">
       <SheetHeader>
         <SheetTitle>
           Command detail
