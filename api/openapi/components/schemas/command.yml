@@ -111,6 +111,7 @@ CommandType:
     - CARGO_LOWER
     - CARGO_CHECK_QR
     - SCAN_LOCATION
+    - WAIT
   description: The type of command
   x-go-type: string
 
@@ -144,6 +145,8 @@ CommandInputs:
     - $ref: "#/CargoLowerInputs"
     - $ref: "#/CargoCheckQRInputs"
     - $ref: "#/ScanLocationInputs"
+    - $ref: "#/WaitInputs"
+
 StopInputs:
   type: object
 
@@ -188,6 +191,16 @@ CargoCheckQRInputs:
 ScanLocationInputs:
   type: object
 
+WaitInputs:
+  type: object
+  properties:
+    durationMs:
+      type: integer
+      description: The duration in milliseconds
+      example: 1000
+  required:
+    - durationMs
+
 CommandOutputs:
   oneOf:
     - $ref: "#/StopOutputs"
@@ -200,6 +213,7 @@ CommandOutputs:
     - $ref: "#/CargoLowerOutputs"
     - $ref: "#/CargoCheckQROutputs"
     - $ref: "#/ScanLocationOutputs"
+    - $ref: "#/WaitOutputs"
 
 StopOutputs:
   type: object
@@ -253,3 +267,6 @@ Location:
   required:
     - location
     - scannedAt
+
+WaitOutputs:
+  type: object

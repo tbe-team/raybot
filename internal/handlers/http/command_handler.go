@@ -234,6 +234,13 @@ func (commandHandler) convertInputsToResponse(inputs command.Inputs) (gen.Comman
 			return gen.CommandInputs{}, fmt.Errorf("from scan location inputs: %w", err)
 		}
 
+	case *command.WaitInputs:
+		if err := res.FromWaitInputs(gen.WaitInputs{
+			DurationMs: int(v.DurationMs),
+		}); err != nil {
+			return gen.CommandInputs{}, fmt.Errorf("from wait inputs: %w", err)
+		}
+
 	default:
 		return gen.CommandInputs{}, fmt.Errorf("unknown inputs type: %T", v)
 	}
@@ -306,6 +313,11 @@ func (commandHandler) convertOutputsToResponse(outputs command.Outputs) (gen.Com
 			return gen.CommandOutputs{}, fmt.Errorf("from scan location outputs: %w", err)
 		}
 
+	case *command.WaitOutputs:
+		if err := res.FromWaitOutputs(gen.WaitOutputs{}); err != nil {
+			return gen.CommandOutputs{}, fmt.Errorf("from wait outputs: %w", err)
+		}
+
 	default:
 		return gen.CommandOutputs{}, fmt.Errorf("unknown outputs type: %T", v)
 	}
@@ -356,6 +368,15 @@ func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, i
 
 	case command.CommandTypeScanLocation:
 		return &command.ScanLocationInputs{}, nil
+
+	case command.CommandTypeWait:
+		i, err := inputs.AsWaitInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as wait inputs: %w", err)
+		}
+		return &command.WaitInputs{
+			DurationMs: int64(i.DurationMs),
+		}, nil
 
 	default:
 		return nil, xerror.ValidationFailed(nil, "unknown command type")
