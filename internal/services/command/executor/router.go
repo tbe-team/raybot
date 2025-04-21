@@ -30,6 +30,7 @@ type executorRouter struct {
 	cargoCheckQRExecutor *commandExecutor[command.CargoCheckQRInputs, command.CargoCheckQROutputs]
 
 	scanLocationExecutor *commandExecutor[command.ScanLocationInputs, command.ScanLocationOutputs]
+	waitExecutor         *commandExecutor[command.WaitInputs, command.WaitOutputs]
 }
 
 func NewRouter(
@@ -54,6 +55,7 @@ func NewRouter(
 		cargoCheckQRExecutor: newCargoCheckQRExecutor(log, subscriber, commandRepository),
 
 		scanLocationExecutor: newScanLocationExecutor(log, subscriber, driveMotorService, commandRepository),
+		waitExecutor:         newWaitExecutor(log, commandRepository),
 	}
 }
 
@@ -137,6 +139,14 @@ func (r *executorRouter) Route(ctx context.Context, cmd command.Command) error {
 			return fmt.Errorf("invalid scan location inputs: %v", cmd.Inputs)
 		}
 		r.scanLocationExecutor.Execute(ctx, cmd.ID, *i)
+		return nil
+
+	case command.CommandTypeWait:
+		i, ok := cmd.Inputs.(*command.WaitInputs)
+		if !ok {
+			return fmt.Errorf("invalid wait inputs: %v", cmd.Inputs)
+		}
+		r.waitExecutor.Execute(ctx, cmd.ID, *i)
 		return nil
 
 	default:

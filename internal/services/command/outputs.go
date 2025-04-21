@@ -16,6 +16,8 @@ var (
 	_ Outputs = (*CargoLiftOutputs)(nil)
 	_ Outputs = (*CargoLowerOutputs)(nil)
 	_ Outputs = (*CargoCheckQROutputs)(nil)
+	_ Outputs = (*ScanLocationOutputs)(nil)
+	_ Outputs = (*WaitOutputs)(nil)
 )
 
 type Outputs interface {
@@ -100,6 +102,13 @@ func (ScanLocationOutputs) CommandType() CommandType {
 }
 func (ScanLocationOutputs) isOutputs() {}
 
+type WaitOutputs struct{}
+
+func (WaitOutputs) CommandType() CommandType {
+	return CommandTypeWait
+}
+func (WaitOutputs) isOutputs() {}
+
 func UnmarshalOutputs(cmdType CommandType, outputsBytes []byte) (Outputs, error) {
 	var outputs Outputs
 
@@ -137,6 +146,9 @@ func UnmarshalOutputs(cmdType CommandType, outputsBytes []byte) (Outputs, error)
 			return nil, err
 		}
 		outputs = o
+
+	case CommandTypeWait:
+		outputs = &WaitOutputs{}
 
 	default:
 		return nil, fmt.Errorf("unknown command type: %s", cmdType)

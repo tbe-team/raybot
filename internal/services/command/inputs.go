@@ -16,6 +16,7 @@ var (
 	_ Inputs = (*CargoLowerInputs)(nil)
 	_ Inputs = (*CargoCheckQRInputs)(nil)
 	_ Inputs = (*ScanLocationInputs)(nil)
+	_ Inputs = (*WaitInputs)(nil)
 )
 
 type Inputs interface {
@@ -97,6 +98,15 @@ func (ScanLocationInputs) CommandType() CommandType {
 }
 func (ScanLocationInputs) isInputs() {}
 
+type WaitInputs struct {
+	DurationMs int64 `json:"duration_ms" validate:"required"`
+}
+
+func (WaitInputs) CommandType() CommandType {
+	return CommandTypeWait
+}
+func (WaitInputs) isInputs() {}
+
 func UnmarshalInputs(cmdType CommandType, inputsBytes []byte) (Inputs, error) {
 	var inputs Inputs
 
@@ -138,6 +148,13 @@ func UnmarshalInputs(cmdType CommandType, inputsBytes []byte) (Inputs, error) {
 
 	case CommandTypeScanLocation:
 		inputs = &ScanLocationInputs{}
+
+	case CommandTypeWait:
+		i := &WaitInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal wait inputs: %w", err)
+		}
+		inputs = i
 
 	default:
 		return nil, fmt.Errorf("invalid command type: %s", cmdType)

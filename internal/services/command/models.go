@@ -17,7 +17,7 @@ func (c CommandType) Validate() error {
 	case CommandTypeStopMovement, CommandTypeMoveForward, CommandTypeMoveBackward,
 		CommandTypeMoveTo, CommandTypeCargoOpen, CommandTypeCargoClose,
 		CommandTypeCargoLift, CommandTypeCargoLower, CommandTypeCargoCheckQR,
-		CommandTypeScanLocation:
+		CommandTypeScanLocation, CommandTypeWait:
 		return nil
 	}
 	return fmt.Errorf("invalid command type: %s", c)
@@ -36,6 +36,7 @@ const (
 	CommandTypeCargoCheckQR CommandType = "CARGO_CHECK_QR"
 
 	CommandTypeScanLocation CommandType = "SCAN_LOCATION"
+	CommandTypeWait         CommandType = "WAIT"
 )
 
 type Source string
