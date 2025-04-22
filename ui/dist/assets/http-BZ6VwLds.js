@@ -1,4 +1,4 @@
-import{aI as i,aa as c,aJ as u,d as p,f as d,e as l,r as y,h,u as m,o as f,aK as k,aL as j,aM as g,R as w,aN as C}from"./index-CiBcqSrJ.js";import{c as x,a as P}from"./createLucideIcon-BqR3EBSv.js";function E(e=""){if(!i())throw new Error("vue-query hooks can only be used inside setup() function or functions that support injection context.");const s=u(e),t=c(s);if(!t)throw new Error("No 'queryClient' found in Vue context, use 'VueQueryPlugin' to properly initialize the library.");return t}/**
+import{aI as i,aa as c,aJ as u,d as p,f as d,e as l,r as y,h,u as m,o as f,aK as k,aL as j,aM as g,R as w,aN as C}from"./index-DCNzhtOK.js";import{c as x,a as P}from"./createLucideIcon-Dgyr7DO4.js";function E(e=""){if(!i())throw new Error("vue-query hooks can only be used inside setup() function or functions that support injection context.");const s=u(e),t=c(s);if(!t)throw new Error("No 'queryClient' found in Vue context, use 'VueQueryPlugin' to properly initialize the library.");return t}/**
  * @license lucide-vue-next v0.503.0 - ISC
  *
  * This source code is licensed under the ISC license.

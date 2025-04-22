@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useConfirmationStore } from '@/stores/confirmation-store'
+import { DialogOverlay } from 'reka-ui'
 
 const confirmation = useConfirmationStore()
 
@@ -13,6 +14,7 @@ function handleAction() {
 
 <template>
   <Dialog :open="confirmation.open" @update:open="confirmation.closeConfirmation">
+    <DialogOverlay class="z-50" />
     <DialogContent>
       <DialogHeader>
         <DialogTitle>{{ confirmation.title }}</DialogTitle>
