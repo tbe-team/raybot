@@ -60,6 +60,10 @@ func (h moveToHandler) Handle(ctx context.Context, inputs command.MoveToInputs) 
 
 	wg.Wait()
 
+	if err := h.driveMotorService.Stop(ctx); err != nil {
+		return command.MoveToOutputs{}, fmt.Errorf("failed to stop drive motor: %w", err)
+	}
+
 	return command.MoveToOutputs{}, nil
 }
 
