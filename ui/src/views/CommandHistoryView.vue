@@ -21,7 +21,9 @@ const isCommandDetailOpen = ref(false)
 const page = ref(Number(route.query.page) || 1)
 const pageSize = ref(Number(route.query.pageSize) || 10)
 const sorts = ref<SortPrefix<CommandSort>[]>(
-  route.query.sorts ? (route.query.sorts as string).split(',') as SortPrefix<CommandSort>[] : ['-created_at'],
+  route.query.sorts
+  ? (route.query.sorts as string).split(',') as SortPrefix<CommandSort>[]
+  : ['-created_at'],
 )
 
 const { data, isPending, isFetching, isError, error, refetch } = useListComandsQuery(page, pageSize, sorts)
