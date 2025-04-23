@@ -19,8 +19,6 @@ func Logging(log *slog.Logger) func(http.Handler) http.Handler {
 				logLevel := slog.LevelInfo
 				if ww.Status() >= 500 {
 					logLevel = slog.LevelError
-				} else if ww.Status() >= 400 {
-					logLevel = slog.LevelWarn
 				}
 
 				log.Log(r.Context(), logLevel, "http request",
