@@ -96,7 +96,6 @@ func (s *Service) RunWithServer(handler http.Handler) (CleanupFunc, error) {
 func (s *Service) RegisterMiddlewares(r chi.Router) {
 	r.Use(middleware.Recoverer(s.log))
 	r.Use(middleware.Logging(s.log))
-	r.Use(middleware.Cors())
 }
 
 func (s *Service) RegisterHandlers(r chi.Router) {
