@@ -12,10 +12,7 @@ func startCloud(app *application.Application, interruptChan <-chan any) error {
 		return nil
 	}
 
-	service, err := cloud.New(app.Cfg.Cloud, app.Log, app.EventBus)
-	if err != nil {
-		return fmt.Errorf("failed to create cloud service: %w", err)
-	}
+	service := cloud.New(app.Cfg.Cloud, app.Log, app.EventBus)
 
 	cleanup, err := service.Run(app.Context)
 	if err != nil {

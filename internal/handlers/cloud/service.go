@@ -7,6 +7,7 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/fullstorydev/grpchan"
 	"github.com/jhump/grpctunnel"
 	"github.com/jhump/grpctunnel/tunnelpb"
 	"google.golang.org/grpc"
@@ -14,64 +15,88 @@ import (
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
+	commandv1 "github.com/tbe-team/raybot/internal/handlers/cloud/gen/command/v1"
 	"github.com/tbe-team/raybot/internal/handlers/cloud/interceptor"
+	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
 type Service struct {
-	cfg config.Cloud
-	log *slog.Logger
+	opts Options
+	cfg  config.Cloud
+	log  *slog.Logger
 
-	publisher eventbus.Publisher
+	publisher      eventbus.Publisher
+	commandService command.Service
 
-	conn                *grpc.ClientConn
-	reverseTunnelServer *grpctunnel.ReverseTunnelServer
-	closing             atomic.Bool
+	closing atomic.Bool
+}
+
+type Options struct {
+	connectTimeout time.Duration
+}
+
+var defaultOptions = Options{
+	connectTimeout: 2 * time.Second,
+}
+
+type OptionFunc func(opts *Options)
+
+func WithConnectTimeout(timeout time.Duration) OptionFunc {
+	return func(opts *Options) {
+		opts.connectTimeout = timeout
+	}
 }
 
 type CleanupFunc func(context.Context) error
 
-func New(cfg config.Cloud, log *slog.Logger, publisher eventbus.Publisher) (*Service, error) {
+func New(cfg config.Cloud, log *slog.Logger, publisher eventbus.Publisher, optFuncs ...OptionFunc) *Service {
+	opts := defaultOptions
+	for _, apply := range optFuncs {
+		apply(&opts)
+	}
+
+	return &Service{
+		opts:      opts,
+		cfg:       cfg,
+		log:       log.With("service", "cloud"),
+		publisher: publisher,
+	}
+}
+
+func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
 	conn, err := grpc.NewClient(
-		cfg.Address,
+		s.cfg.Address,
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
-		grpc.WithStreamInterceptor(interceptor.ReverseCredentialsInterceptor(cfg.Token)),
+		grpc.WithStreamInterceptor(interceptor.ReverseCredentialsInterceptor(s.cfg.Token)),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create grpc client: %w", err)
 	}
 
 	tunnel := tunnelpb.NewTunnelServiceClient(conn)
-	reverseTunnel := grpctunnel.NewReverseTunnelServer(tunnel)
+	reverseTunnelServer := grpctunnel.NewReverseTunnelServer(tunnel)
 
-	return &Service{
-		cfg:                 cfg,
-		log:                 log.With("service", "cloud"),
-		publisher:           publisher,
-		conn:                conn,
-		reverseTunnelServer: reverseTunnel,
-	}, nil
-}
+	sr := s.wrapInterceptors(reverseTunnelServer)
+	s.registerHandlers(sr)
 
-func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
 	ctx, cancel := context.WithCancel(ctx)
-
-	go s.runReverseTunnel(ctx)
+	go s.runReverseTunnel(ctx, reverseTunnelServer)
 
 	return func(_ context.Context) error {
 		s.closing.Store(true)
 
-		s.reverseTunnelServer.Stop()
+		reverseTunnelServer.Stop()
 		cancel()
 
-		if err := s.conn.Close(); err != nil {
+		if err := conn.Close(); err != nil {
 			return fmt.Errorf("failed to close grpc client: %w", err)
 		}
 		return nil
 	}, nil
 }
 
-func (s *Service) runReverseTunnel(ctx context.Context) {
+func (s *Service) runReverseTunnel(ctx context.Context, reverseTunnelServer *grpctunnel.ReverseTunnelServer) {
 	attempts := 0
 	retryDelay := 1 * time.Second
 
@@ -86,9 +111,8 @@ func (s *Service) runReverseTunnel(ctx context.Context) {
 			case <-ctx.Done():
 				return
 			// Because Serve function is blocking, we don't know if it's connected or not
-			// so we emit a connected event after 3 seconds or it will emit a disconnected event
-			// if it's not connected
-			case <-time.After(2 * time.Second):
+			// so we emit a connected event before it will emit a disconnected event
+			case <-time.After(s.opts.connectTimeout):
 				s.publisher.Publish(
 					events.CloudConnectedTopic,
 					eventbus.NewMessage(events.CloudConnectedEvent{}),
@@ -98,11 +122,7 @@ func (s *Service) runReverseTunnel(ctx context.Context) {
 			}
 		}()
 
-		started, err := s.reverseTunnelServer.Serve(ctx)
-		if ctx.Err() != nil {
-			// Context cancelled, exit loop
-			return
-		}
+		started, err := reverseTunnelServer.Serve(ctx)
 		if !started || err != nil {
 			connectingErrChan <- struct{}{}
 			s.log.Error("serving reverse tunnel failed, retrying",
@@ -129,4 +149,28 @@ func (s *Service) runReverseTunnel(ctx context.Context) {
 
 func (s *Service) isClosing() bool {
 	return s.closing.Load()
+}
+
+func (s *Service) wrapInterceptors(srv *grpctunnel.ReverseTunnelServer) grpc.ServiceRegistrar {
+	sr := grpchan.WithInterceptor(
+		srv,
+		interceptor.UnaryRecoveryInterceptor(s.log),
+		interceptor.StreamRecoveryInterceptor(s.log),
+	)
+	sr = grpchan.WithInterceptor(
+		sr,
+		interceptor.UnaryLoggingInterceptor(s.log),
+		interceptor.StreamLoggingInterceptor(s.log),
+	)
+	sr = grpchan.WithInterceptor(
+		sr,
+		interceptor.UnaryErrorInterceptor(),
+		interceptor.StreamErrorInterceptor(),
+	)
+	return sr
+}
+
+func (s *Service) registerHandlers(sr grpc.ServiceRegistrar) {
+	commandHandler := newCommandHandler(s.commandService)
+	commandv1.RegisterCommandServiceServer(sr, commandHandler)
 }
