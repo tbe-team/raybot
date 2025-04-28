@@ -105,26 +105,25 @@ func (s *Service) runReverseTunnel(ctx context.Context, reverseTunnelServer *grp
 			return
 		}
 
-		connectingErrChan := make(chan struct{}, 1)
+		serveErrChan := make(chan struct{}, 1)
 		go func() {
 			select {
-			case <-ctx.Done():
-				return
-			// Because Serve function is blocking, we don't know if it's connected or not
-			// so we emit a connected event before it will emit a disconnected event
+			// Because Serve function is blocking and we don't have a way to know if it's connected or not
+			// so we emit a connected event after [connectTimeout] or it will emit a disconnected event when error occurs
 			case <-time.After(s.opts.connectTimeout):
 				s.publisher.Publish(
 					events.CloudConnectedTopic,
 					eventbus.NewMessage(events.CloudConnectedEvent{}),
 				)
 
-			case <-connectingErrChan:
+			case <-ctx.Done():
+			case <-serveErrChan:
 			}
 		}()
 
 		started, err := reverseTunnelServer.Serve(ctx)
 		if !started || err != nil {
-			connectingErrChan <- struct{}{}
+			serveErrChan <- struct{}{}
 			s.log.Error("serving reverse tunnel failed, retrying",
 				slog.Bool("started", started),
 				slog.Int("attempts", attempts),
@@ -141,7 +140,7 @@ func (s *Service) runReverseTunnel(ctx context.Context, reverseTunnelServer *grp
 
 			time.Sleep(retryDelay)
 			attempts++
-			retryDelay *= 2
+			retryDelay = min(retryDelay*2, 1*time.Minute)
 			continue
 		}
 	}
