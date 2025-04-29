@@ -14,8 +14,8 @@ import (
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
 
+	"github.com/tbe-team/raybot/internal/handlers/cloud/cloudtest"
 	"github.com/tbe-team/raybot/internal/handlers/cloud/interceptor"
-	"github.com/tbe-team/raybot/internal/handlers/cloud/testutils"
 )
 
 func TestIntegrationReverseCredentialsInterceptor_AuthenticateSuccessfully(t *testing.T) {
@@ -26,14 +26,14 @@ func TestIntegrationReverseCredentialsInterceptor_AuthenticateSuccessfully(t *te
 	headerKey := "x-tunnel-token"
 	requireToken := "test-token"
 
-	port, stop := testutils.StartCloudServer(
+	port, stop := cloudtest.SetupTestCloudServer(
 		t,
-		testutils.WithServerOpts(
+		cloudtest.WithServerOpts(
 			grpc.ChainUnaryInterceptor(
-				testutils.UnaryTunneledAuthnInterceptor(headerKey, requireToken),
+				cloudtest.UnaryTunneledAuthnInterceptor(headerKey, requireToken),
 			),
 			grpc.ChainStreamInterceptor(
-				testutils.StreamTunneledAuthnInterceptor(headerKey, requireToken),
+				cloudtest.StreamTunneledAuthnInterceptor(headerKey, requireToken),
 			),
 		),
 	)
@@ -67,14 +67,14 @@ func TestIntegrationReverseCredentialsInterceptor_AuthenticateFailed(t *testing.
 	headerKey := "x-tunnel-token"
 	requireToken := "test-token"
 
-	port, stop := testutils.StartCloudServer(
+	port, stop := cloudtest.SetupTestCloudServer(
 		t,
-		testutils.WithServerOpts(
+		cloudtest.WithServerOpts(
 			grpc.ChainUnaryInterceptor(
-				testutils.UnaryTunneledAuthnInterceptor(headerKey, requireToken),
+				cloudtest.UnaryTunneledAuthnInterceptor(headerKey, requireToken),
 			),
 			grpc.ChainStreamInterceptor(
-				testutils.StreamTunneledAuthnInterceptor(headerKey, requireToken),
+				cloudtest.StreamTunneledAuthnInterceptor(headerKey, requireToken),
 			),
 		),
 	)

@@ -1,4 +1,4 @@
-package testutils
+package cloudtest
 
 import (
 	"net"
@@ -34,7 +34,10 @@ func WithTunnelServiceHandlerOpts(opts grpctunnel.TunnelServiceHandlerOptions) O
 	}
 }
 
-func StartCloudServer(t *testing.T, optFuncs ...OptionFunc) (port int, stop func()) {
+// SetupTestCloudServer starts a temporary gRPC server on a random port for testing purposes.
+// It registers a TunnelServiceServer (used for reverse gRPC tunnels) with custom handler options,
+// which can be customized via the optional OptionFuncs.
+func SetupTestCloudServer(t *testing.T, optFuncs ...OptionFunc) (port int, stop func()) {
 	t.Helper()
 
 	opts := defaultOptions

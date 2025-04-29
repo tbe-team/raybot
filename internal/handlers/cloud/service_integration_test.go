@@ -11,7 +11,7 @@ import (
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/handlers/cloud"
-	"github.com/tbe-team/raybot/internal/handlers/cloud/testutils"
+	"github.com/tbe-team/raybot/internal/handlers/cloud/cloudtest"
 	commandmocks "github.com/tbe-team/raybot/internal/services/command/mocks"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 	"github.com/tbe-team/raybot/pkg/log"
@@ -22,7 +22,7 @@ func TestIntegrationService_ConnectAndDisconnect(t *testing.T) {
 		t.Skip("skipping integration test")
 	}
 
-	port, stop := testutils.StartCloudServer(t)
+	port, stop := cloudtest.SetupTestCloudServer(t)
 	defer stop()
 
 	cfg := config.Cloud{
