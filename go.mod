@@ -2,6 +2,8 @@ module github.com/tbe-team/raybot
 
 go 1.24
 
+toolchain go1.24.1
+
 require (
 	github.com/Masterminds/squirrel v1.5.4
 	github.com/fullstorydev/grpchan v1.1.1
