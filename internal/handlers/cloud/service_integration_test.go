@@ -34,7 +34,7 @@ func TestIntegrationService_ConnectAndDisconnect(t *testing.T) {
 	cleanup, err := service.Run(context.Background())
 	require.NoError(t, err)
 	defer func() {
-		require.NoError(t, cleanup(context.Background()))
+		require.NoError(t, cleanup())
 	}()
 
 	// Wait for the cloud to connect
@@ -64,7 +64,7 @@ func TestIntegrationService_CloudServerNotRun(t *testing.T) {
 	cleanup, err := service.Run(context.Background())
 	require.NoError(t, err)
 	defer func() {
-		require.NoError(t, cleanup(context.Background()))
+		require.NoError(t, cleanup())
 	}()
 
 	// Wait for the disconnected event

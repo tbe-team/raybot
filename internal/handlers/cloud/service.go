@@ -48,7 +48,7 @@ func WithConnectTimeout(timeout time.Duration) OptionFunc {
 	}
 }
 
-type CleanupFunc func(context.Context) error
+type CleanupFunc func() error
 
 func New(cfg config.Cloud, log *slog.Logger, publisher eventbus.Publisher, optFuncs ...OptionFunc) *Service {
 	opts := defaultOptions
@@ -83,7 +83,7 @@ func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	go s.runReverseTunnel(ctx, reverseTunnelServer)
 
-	return func(_ context.Context) error {
+	return func() error {
 		s.closing.Store(true)
 
 		reverseTunnelServer.Stop()

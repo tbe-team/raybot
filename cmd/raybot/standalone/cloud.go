@@ -25,7 +25,7 @@ func startCloud(app *application.Application, interruptChan <-chan any) error {
 
 	app.Log.Debug("cloud service is shutting down")
 
-	if err := cleanup(app.Context); err != nil {
+	if err := cleanup(); err != nil {
 		return fmt.Errorf("failed to cleanup cloud service: %w", err)
 	}
 
