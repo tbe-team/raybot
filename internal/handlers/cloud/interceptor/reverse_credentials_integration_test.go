@@ -28,11 +28,13 @@ func TestIntegrationReverseCredentialsInterceptor_AuthenticateSuccessfully(t *te
 
 	port, stop := testutils.StartCloudServer(
 		t,
-		grpc.ChainUnaryInterceptor(
-			testutils.UnaryTunneledAuthnInterceptor(headerKey, requireToken),
-		),
-		grpc.ChainStreamInterceptor(
-			testutils.StreamTunneledAuthnInterceptor(headerKey, requireToken),
+		testutils.WithServerOpts(
+			grpc.ChainUnaryInterceptor(
+				testutils.UnaryTunneledAuthnInterceptor(headerKey, requireToken),
+			),
+			grpc.ChainStreamInterceptor(
+				testutils.StreamTunneledAuthnInterceptor(headerKey, requireToken),
+			),
 		),
 	)
 	defer stop()
@@ -67,11 +69,13 @@ func TestIntegrationReverseCredentialsInterceptor_AuthenticateFailed(t *testing.
 
 	port, stop := testutils.StartCloudServer(
 		t,
-		grpc.ChainUnaryInterceptor(
-			testutils.UnaryTunneledAuthnInterceptor(headerKey, requireToken),
-		),
-		grpc.ChainStreamInterceptor(
-			testutils.StreamTunneledAuthnInterceptor(headerKey, requireToken),
+		testutils.WithServerOpts(
+			grpc.ChainUnaryInterceptor(
+				testutils.UnaryTunneledAuthnInterceptor(headerKey, requireToken),
+			),
+			grpc.ChainStreamInterceptor(
+				testutils.StreamTunneledAuthnInterceptor(headerKey, requireToken),
+			),
 		),
 	)
 	defer stop()

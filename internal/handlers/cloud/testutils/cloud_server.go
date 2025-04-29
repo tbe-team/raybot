@@ -10,11 +10,40 @@ import (
 	"google.golang.org/grpc"
 )
 
-func StartCloudServer(t *testing.T, opt ...grpc.ServerOption) (port int, stop func()) {
+type Options struct {
+	serverOpts              []grpc.ServerOption
+	tunnelServiceHandlerOpt grpctunnel.TunnelServiceHandlerOptions
+}
+
+var defaultOptions = Options{
+	serverOpts:              []grpc.ServerOption{},
+	tunnelServiceHandlerOpt: grpctunnel.TunnelServiceHandlerOptions{},
+}
+
+type OptionFunc func(opts *Options)
+
+func WithServerOpts(opts ...grpc.ServerOption) OptionFunc {
+	return func(o *Options) {
+		o.serverOpts = opts
+	}
+}
+
+func WithTunnelServiceHandlerOpts(opts grpctunnel.TunnelServiceHandlerOptions) OptionFunc {
+	return func(o *Options) {
+		o.tunnelServiceHandlerOpt = opts
+	}
+}
+
+func StartCloudServer(t *testing.T, optFuncs ...OptionFunc) (port int, stop func()) {
 	t.Helper()
 
-	server := grpc.NewServer(opt...)
-	tunnelSvc := grpctunnel.NewTunnelServiceHandler(grpctunnel.TunnelServiceHandlerOptions{})
+	opts := defaultOptions
+	for _, optFunc := range optFuncs {
+		optFunc(&opts)
+	}
+
+	server := grpc.NewServer(opts.serverOpts...)
+	tunnelSvc := grpctunnel.NewTunnelServiceHandler(opts.tunnelServiceHandlerOpt)
 	tunnelpb.RegisterTunnelServiceServer(server, tunnelSvc.Service())
 
 	//nolint:gosec
