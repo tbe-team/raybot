@@ -153,3 +153,13 @@ func (r *executorRouter) Route(ctx context.Context, cmd command.Command) error {
 		return fmt.Errorf("invalid command type: %v", cmd.Type)
 	}
 }
+
+type NoopRouter struct{}
+
+func NewNoopRouter() *NoopRouter {
+	return &NoopRouter{}
+}
+
+func (r *NoopRouter) Route(_ context.Context, _ command.Command) error {
+	return nil
+}

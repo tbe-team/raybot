@@ -59,3 +59,12 @@ func (p *SQLiteDB) WithTX(ctx context.Context, fn func(DB) error) (err error) {
 
 	return err
 }
+
+func NewTestDB() (*SQLiteDB, error) {
+	db, err := NewSQLiteDB(":memory:")
+	if err != nil {
+		return nil, fmt.Errorf("new test db: %w", err)
+	}
+
+	return db, nil
+}
