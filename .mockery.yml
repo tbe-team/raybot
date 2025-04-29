@@ -14,3 +14,4 @@ packages:
     config:
     interfaces:
       Repository:
+      Service:

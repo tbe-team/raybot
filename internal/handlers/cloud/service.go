@@ -50,17 +50,24 @@ func WithConnectTimeout(timeout time.Duration) OptionFunc {
 
 type CleanupFunc func() error
 
-func New(cfg config.Cloud, log *slog.Logger, publisher eventbus.Publisher, optFuncs ...OptionFunc) *Service {
+func New(
+	cfg config.Cloud,
+	log *slog.Logger,
+	publisher eventbus.Publisher,
+	commandService command.Service,
+	optFuncs ...OptionFunc,
+) *Service {
 	opts := defaultOptions
 	for _, apply := range optFuncs {
 		apply(&opts)
 	}
 
 	return &Service{
-		opts:      opts,
-		cfg:       cfg,
-		log:       log.With("service", "cloud"),
-		publisher: publisher,
+		opts:           opts,
+		cfg:            cfg,
+		log:            log.With("service", "cloud"),
+		publisher:      publisher,
+		commandService: commandService,
 	}
 }
 
