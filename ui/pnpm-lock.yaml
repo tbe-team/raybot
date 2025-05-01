@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@tanstack/vue-query':
         specifier: ^5.67.2
-        version: 5.74.9(vue@3.5.13(typescript@5.8.3))
+        version: 5.75.0(vue@3.5.13(typescript@5.8.3))
       '@tanstack/vue-table':
         specifier: ^8.21.2
         version: 8.21.3(vue@3.5.13(typescript@5.8.3))
@@ -790,8 +790,8 @@ packages:
     resolution: {integrity: sha512-Wo1iKt2b9OT7d+YGhvEPD3DXvPv2etTusIMhMUoG7fbhmxcXCtIjJDEygy91Y2JFlwGyjqiBPRozme7UD8hoqg==}
     engines: {node: '>=12'}
 
-  '@tanstack/query-core@5.74.9':
-    resolution: {integrity: sha512-qmjXpWyigDw4SfqdSBy24FzRvpBPXlaSbl92N77lcrL+yvVQLQkf0T6bQNbTxl9IEB/SvVFhhVZoIlQvFnNuuw==}
+  '@tanstack/query-core@5.75.0':
+    resolution: {integrity: sha512-rk8KQuCdhoRkzjRVF3QxLgAfFUyS0k7+GCQjlGEpEGco+qazJ0eMH6aO1DjDjibH7/ik383nnztua3BG+lOnwg==}
 
   '@tanstack/table-core@8.21.3':
     resolution: {integrity: sha512-ldZXEhOBb8Is7xLs01fR3YEc3DERiz5silj8tnGkFZytt1abEvl/GhUmCE0PMLaMPTa3Jk4HbKmRlHmu+gCftg==}
@@ -800,8 +800,8 @@ packages:
   '@tanstack/virtual-core@3.13.6':
     resolution: {integrity: sha512-cnQUeWnhNP8tJ4WsGcYiX24Gjkc9ALstLbHcBj1t3E7EimN6n6kHH+DPV4PpDnuw00NApQp+ViojMj1GRdwYQg==}
 
-  '@tanstack/vue-query@5.74.9':
-    resolution: {integrity: sha512-iMZxrKfIiDdX9uNH8WusBZXq87lBL8v2UXhifYiBNH+BUPCaezP7gNv4TN7WAlHVSfAx0fsnMKLB5+D3GAspbA==}
+  '@tanstack/vue-query@5.75.0':
+    resolution: {integrity: sha512-OvbCmM1Fth7k0O+lmFWmoylyn5pSoecJbGUOnJtmvWHGICGVM0I+KzBVHLB3/PTvLuswF3uPFHO7E/rpiQubSg==}
     peerDependencies:
       '@vue/composition-api': ^1.1.2
       vue: ^2.6.0 || ^3.3.0
@@ -3688,16 +3688,16 @@ snapshots:
     dependencies:
       remove-accents: 0.5.0
 
-  '@tanstack/query-core@5.74.9': {}
+  '@tanstack/query-core@5.75.0': {}
 
   '@tanstack/table-core@8.21.3': {}
 
   '@tanstack/virtual-core@3.13.6': {}
 
-  '@tanstack/vue-query@5.74.9(vue@3.5.13(typescript@5.8.3))':
+  '@tanstack/vue-query@5.75.0(vue@3.5.13(typescript@5.8.3))':
     dependencies:
       '@tanstack/match-sorter-utils': 8.19.4
-      '@tanstack/query-core': 5.74.9
+      '@tanstack/query-core': 5.75.0
       '@vue/devtools-api': 6.6.4
       vue: 3.5.13(typescript@5.8.3)
       vue-demi: 0.14.10(vue@3.5.13(typescript@5.8.3))
