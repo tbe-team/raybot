@@ -1,7 +1,14 @@
 log:
-  format: TEXT
-  level: DEBUG
-  add_source: false
+  file:
+    enable: false
+    path: logs/raybot.log
+    rotation_count: 2
+    format: JSON
+    level: ERROR
+  console:
+    enable: true
+    format: TEXT
+    level: DEBUG
 hardware:
   esp:
     serial:

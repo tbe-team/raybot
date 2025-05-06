@@ -85,11 +85,10 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	}
 
 	// Initialize logger
-	log := logging.NewSlogLogger(config.Log{
-		Level:     cfg.Log.Level,
-		Format:    cfg.Log.Format,
-		AddSource: cfg.Log.AddSource,
-	})
+	log, cleanupLogger, err := logging.NewSlogLogger(cfg.Log)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to create logger: %w", err)
+	}
 
 	// Initialize file client
 	fileClient := file.NewLocalFileClient()
@@ -235,6 +234,10 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 
 		if dbErr := db.Close(); dbErr != nil {
 			err = fmt.Errorf("failed to close db: %w", dbErr)
+		}
+
+		if err := cleanupLogger(); err != nil {
+			return fmt.Errorf("failed to cleanup logger: %w", err)
 		}
 
 		return err
