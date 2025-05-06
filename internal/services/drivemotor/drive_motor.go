@@ -5,7 +5,7 @@ import "context"
 type UpdateDriveMotorStateParams struct {
 	Direction    Direction `validate:"required_if=SetDirection true,enum"`
 	SetDirection bool
-	Speed        uint8 `validate:"required_if=SetSpeed true,min=0,max=100"`
+	Speed        uint8
 	SetSpeed     bool
 	IsRunning    bool
 	SetIsRunning bool
