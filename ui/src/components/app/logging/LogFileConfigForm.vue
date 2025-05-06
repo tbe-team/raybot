@@ -1,21 +1,20 @@
 <script setup lang="ts">
-import type { LogFileConfig } from '@/types/config'
+import type { LogConfig } from '@/types/config'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { LOG_CONFIG_QUERY_KEY, useLogConfigMutation } from '@/composables/use-config'
+import { useQueryClient } from '@tanstack/vue-query'
 import { toTypedSchema } from '@vee-validate/zod'
 import { Loader } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
 
-interface Props {
-  initialValues: LogFileConfig
-  isMutating: boolean
-}
-const props = defineProps<Props>()
-const emit = defineEmits(['updateLogFileConfig'])
+const props = defineProps<{
+  logConfig: LogConfig
+}>()
 
 const logConfigSchema = z.object({
   enable: z.boolean(),
@@ -27,11 +26,26 @@ const logConfigSchema = z.object({
 
 const form = useForm({
   validationSchema: toTypedSchema(logConfigSchema),
-  initialValues: props.initialValues,
+  initialValues: props.logConfig.file,
 })
 
+const queryClient = useQueryClient()
+const { mutate, isPending } = useLogConfigMutation()
+
 const onSubmit = form.handleSubmit((values) => {
-  emit('updateLogFileConfig', values)
+  const logConfig = {
+    ...props.logConfig,
+    file: values,
+  }
+  mutate(logConfig, {
+    onSuccess: () => {
+      queryClient.setQueryData([LOG_CONFIG_QUERY_KEY], logConfig)
+      notification.success('Log configuration updated successfully!')
+    },
+    onError: () => {
+      notification.error('Failed to update log configuration')
+    },
+  })
 })
 </script>
 
@@ -45,7 +59,7 @@ const onSubmit = form.handleSubmit((values) => {
         <FormControl>
           <Switch
             :model-value="value"
-            :disabled="props.isMutating"
+            :disabled="isPending"
             aria-readonly
             @update:model-value="handleChange"
           />
@@ -74,7 +88,7 @@ const onSubmit = form.handleSubmit((values) => {
         <FormLabel>Log Level</FormLabel>
         <Select v-bind="componentField">
           <FormControl>
-            <SelectTrigger :disabled="props.isMutating">
+            <SelectTrigger :disabled="isPending">
               <SelectValue placeholder="Select log level" />
             </SelectTrigger>
           </FormControl>
@@ -102,7 +116,7 @@ const onSubmit = form.handleSubmit((values) => {
         <FormLabel>Log Formatter</FormLabel>
         <Select v-bind="componentField">
           <FormControl>
-            <SelectTrigger :disabled="props.isMutating">
+            <SelectTrigger :disabled="isPending">
               <SelectValue placeholder="Select log format" />
             </SelectTrigger>
           </FormControl>
@@ -120,8 +134,8 @@ const onSubmit = form.handleSubmit((values) => {
     </FormField>
 
     <div>
-      <Button type="submit" :disabled="props.isMutating">
-        <Loader v-if="props.isMutating" class="w-4 h-4 mr-2 animate-spin" />
+      <Button type="submit" :disabled="isPending">
+        <Loader v-if="isPending" class="w-4 h-4 mr-2 animate-spin" />
         Save
       </Button>
     </div>

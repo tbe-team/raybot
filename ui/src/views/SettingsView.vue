@@ -25,8 +25,8 @@ function handleTabChange(value: string | number) {
       </h1>
       <p class="text-sm text-muted-foreground">
         Configure your robot's settings
-        <RouterLink to="/restart" class="text-blue-500">
-          (Restart to apply changes)
+        <RouterLink to="/reboot" class="text-blue-500">
+          (Reboot to apply changes)
         </RouterLink>
       </p>
     </div>
