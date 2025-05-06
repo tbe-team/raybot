@@ -9,7 +9,6 @@ import (
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/handlers/http/gen"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
-	"github.com/tbe-team/raybot/pkg/log"
 	"github.com/tbe-team/raybot/pkg/xerror"
 )
 
@@ -47,12 +46,12 @@ func (h configHandler) UpdateLogConfig(ctx context.Context, request gen.UpdateLo
 		return nil, xerror.ValidationFailed(nil, "invalid log level")
 	}
 
-	var format log.Format
+	var format config.LogFormat
 	switch request.Body.Format {
 	case "JSON":
-		format = log.FormatJSON
+		format = config.LogFormatJSON
 	case "TEXT":
-		format = log.FormatText
+		format = config.LogFormatText
 	default:
 		return nil, xerror.ValidationFailed(nil, "invalid log format")
 	}

@@ -9,6 +9,7 @@ import (
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/hardware/espserial"
 	"github.com/tbe-team/raybot/internal/hardware/picserial"
+	"github.com/tbe-team/raybot/internal/logging"
 	"github.com/tbe-team/raybot/internal/services/apperrorcode"
 	"github.com/tbe-team/raybot/internal/services/apperrorcode/apperrorcodeimpl"
 	"github.com/tbe-team/raybot/internal/services/appstate"
@@ -41,7 +42,6 @@ import (
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/internal/storage/file"
 	"github.com/tbe-team/raybot/pkg/eventbus"
-	"github.com/tbe-team/raybot/pkg/log"
 	"github.com/tbe-team/raybot/pkg/ptr"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
@@ -85,7 +85,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	}
 
 	// Initialize logger
-	log := log.NewSlogLogger(log.Config{
+	log := logging.NewSlogLogger(config.Log{
 		Level:     cfg.Log.Level,
 		Format:    cfg.Log.Format,
 		AddSource: cfg.Log.AddSource,

@@ -8,9 +8,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
+	"github.com/tbe-team/raybot/internal/logging"
 	"github.com/tbe-team/raybot/internal/services/command"
 	commandmock "github.com/tbe-team/raybot/internal/services/command/mocks"
-	"github.com/tbe-team/raybot/pkg/log"
 )
 
 func TestCommandExecutor(t *testing.T) {
@@ -154,7 +154,7 @@ func newTestExecutor[I command.Inputs, O command.Outputs](
 	executeFunc func(ctx context.Context, inputs I) (O, error),
 	hooks Hooks[O],
 ) (*commandExecutor[I, O], *commandmock.FakeRepository) {
-	log := log.NewNoopLogger()
+	log := logging.NewNoopLogger()
 	commandRepo := commandmock.NewFakeRepository(t)
 	exec := newCommandExecutor(executeFunc, hooks, log, commandRepo)
 	return exec, commandRepo

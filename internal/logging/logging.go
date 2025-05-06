@@ -1,14 +1,16 @@
-package log
+package logging
 
 import (
 	"log/slog"
 	"os"
+
+	"github.com/tbe-team/raybot/internal/config"
 )
 
 // NewSlogLogger creates a new slog logger.
-func NewSlogLogger(cfg Config) *slog.Logger {
+func NewSlogLogger(cfg config.Log) *slog.Logger {
 	var handler slog.Handler
-	if cfg.Format == FormatJSON {
+	if cfg.Format == config.LogFormatJSON {
 		handler = slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
 			Level:     cfg.Level,
 			AddSource: cfg.AddSource,

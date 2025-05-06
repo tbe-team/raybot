@@ -12,9 +12,9 @@ import (
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/handlers/cloud"
 	"github.com/tbe-team/raybot/internal/handlers/cloud/cloudtest"
+	"github.com/tbe-team/raybot/internal/logging"
 	commandmocks "github.com/tbe-team/raybot/internal/services/command/mocks"
 	"github.com/tbe-team/raybot/pkg/eventbus"
-	"github.com/tbe-team/raybot/pkg/log"
 )
 
 func TestIntegrationService_ConnectAndDisconnect(t *testing.T) {
@@ -28,7 +28,7 @@ func TestIntegrationService_ConnectAndDisconnect(t *testing.T) {
 	cfg := config.Cloud{
 		Address: fmt.Sprintf("localhost:%d", port),
 	}
-	log := log.NewNoopLogger()
+	log := logging.NewNoopLogger()
 	publisher := newFakePublisher()
 	commandService := commandmocks.NewFakeService(t)
 	service := cloud.New(
@@ -65,7 +65,7 @@ func TestIntegrationService_CloudServerNotRun(t *testing.T) {
 	cfg := config.Cloud{
 		Address: "localhost:1234",
 	}
-	log := log.NewNoopLogger()
+	log := logging.NewNoopLogger()
 	publisher := newFakePublisher()
 	commandService := commandmocks.NewFakeService(t)
 	service := cloud.New(

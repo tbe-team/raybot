@@ -12,6 +12,7 @@ import (
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/handlers/cloud"
+	"github.com/tbe-team/raybot/internal/logging"
 	"github.com/tbe-team/raybot/internal/services/appstate/appstateimpl"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/command/commandimpl"
@@ -19,7 +20,6 @@ import (
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/pkg/eventbus"
-	"github.com/tbe-team/raybot/pkg/log"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -59,7 +59,7 @@ func SetupTunnelTestEnv(t *testing.T) TunnelTestEnv {
 	require.NoError(t, err)
 	require.NoError(t, db.AutoMigrate())
 	queries := sqlc.New()
-	log := log.NewNoopLogger()
+	log := logging.NewNoopLogger()
 	bus := eventbus.NewNoopEventBus()
 	validator := validator.New()
 	commandService := commandimpl.NewService(
