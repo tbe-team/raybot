@@ -14,10 +14,8 @@ type CleanupFunc func() error
 
 // NewSlogLogger creates and configures a new slog.Logger.
 func NewSlogLogger(cfg config.Log) (*slog.Logger, CleanupFunc, error) {
-	var (
-		handlers    []slog.Handler
-		cleanupFunc CleanupFunc
-	)
+	handlers := []slog.Handler{}
+	cleanupFunc := func() error { return nil }
 
 	if cfg.File.Enable {
 		fileHandler, cleanup, err := newFileHandler(cfg.File)
