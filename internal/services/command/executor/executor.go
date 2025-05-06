@@ -48,25 +48,39 @@ func (e *commandExecutor[I, O]) Execute(ctx context.Context, cmdID int64, inputs
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel() // cleanup all resources
 
+	log := e.log.With(slog.Int64("command_id", cmdID))
+	log.Info("executing command",
+		slog.Any("inputs", inputs),
+	)
+
 	outputs, err := e.executeFunc(ctx, inputs)
-	if ctx.Err() != nil {
+	if ctx.Err() != nil && err == nil {
 		err = ctx.Err()
 	}
 
 	switch {
 	case err == nil:
+		log.Info("command executed successfully",
+			slog.Any("outputs", outputs),
+		)
 		if e.onSuccess != nil {
 			e.onSuccess(ctx, outputs)
 		}
 		e.updateCommandStatus(cmdID, command.StatusSucceeded, outputs, nil)
 
 	case errors.Is(err, context.Canceled):
+		log.Info("command execution canceled",
+			slog.Any("outputs", outputs),
+		)
 		if e.onCancel != nil {
 			e.onCancel(ctx)
 		}
 		e.updateCommandStatus(cmdID, command.StatusCanceled, outputs, nil)
 
 	default:
+		log.Error("command execution failed",
+			slog.Any("error", err),
+		)
 		if e.onError != nil {
 			e.onError(ctx, err)
 		}
