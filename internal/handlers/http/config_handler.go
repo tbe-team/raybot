@@ -32,35 +32,12 @@ func (h configHandler) GetLogConfig(ctx context.Context, _ gen.GetLogConfigReque
 }
 
 func (h configHandler) UpdateLogConfig(ctx context.Context, request gen.UpdateLogConfigRequestObject) (gen.UpdateLogConfigResponseObject, error) {
-	var level slog.Level
-	switch request.Body.Level {
-	case "DEBUG":
-		level = slog.LevelDebug
-	case "INFO":
-		level = slog.LevelInfo
-	case "WARN":
-		level = slog.LevelWarn
-	case "ERROR":
-		level = slog.LevelError
-	default:
-		return nil, xerror.ValidationFailed(nil, "invalid log level")
+	cfg, err := h.convertLogConfigReqToModel(*request.Body)
+	if err != nil {
+		return nil, fmt.Errorf("convert log config request to model: %w", err)
 	}
 
-	var format config.LogFormat
-	switch request.Body.Format {
-	case "JSON":
-		format = config.LogFormatJSON
-	case "TEXT":
-		format = config.LogFormatText
-	default:
-		return nil, xerror.ValidationFailed(nil, "invalid log format")
-	}
-
-	cfg, err := h.configService.UpdateLogConfig(ctx, config.Log{
-		Level:     level,
-		Format:    format,
-		AddSource: request.Body.AddSource,
-	})
+	cfg, err = h.configService.UpdateLogConfig(ctx, cfg)
 	if err != nil {
 		return nil, fmt.Errorf("config service update log config: %w", err)
 	}
@@ -233,9 +210,18 @@ func (h configHandler) UpdateWifiConfig(ctx context.Context, request gen.UpdateW
 
 func (configHandler) convertLogConfigToResponse(cfg config.Log) gen.LogConfig {
 	return gen.LogConfig{
-		Level:     cfg.Level.String(),
-		Format:    cfg.Format.String(),
-		AddSource: cfg.AddSource,
+		File: gen.LogFileHandler{
+			Enable:        cfg.File.Enable,
+			Path:          cfg.File.Path,
+			RotationCount: cfg.File.RotationCount,
+			Level:         cfg.File.Level.String(),
+			Format:        cfg.File.Format.String(),
+		},
+		Console: gen.LogConsoleHandler{
+			Enable: cfg.Console.Enable,
+			Level:  cfg.Console.Level.String(),
+			Format: cfg.Console.Format.String(),
+		},
 	}
 }
 
@@ -305,5 +291,68 @@ func (configHandler) convertWifiConfigToResponse(cfg config.Wifi) gen.WifiConfig
 	return gen.WifiConfig{
 		Ap:  ap,
 		Sta: sta,
+	}
+}
+
+func (h configHandler) convertLogConfigReqToModel(req gen.LogConfig) (config.Log, error) {
+	fileLogLevel, err := h.convertLogLevelReqToModel(req.File.Level)
+	if err != nil {
+		return config.Log{}, err
+	}
+
+	fileLogFormat, err := h.convertLogFormatReqToModel(req.File.Format)
+	if err != nil {
+		return config.Log{}, err
+	}
+
+	consoleLogLevel, err := h.convertLogLevelReqToModel(req.Console.Level)
+	if err != nil {
+		return config.Log{}, err
+	}
+
+	consoleLogFormat, err := h.convertLogFormatReqToModel(req.Console.Format)
+	if err != nil {
+		return config.Log{}, err
+	}
+
+	return config.Log{
+		File: config.LogFileHandler{
+			Enable:        req.File.Enable,
+			Path:          req.File.Path,
+			RotationCount: req.File.RotationCount,
+			Level:         fileLogLevel,
+			Format:        fileLogFormat,
+		},
+		Console: config.LogConsoleHandler{
+			Enable: req.Console.Enable,
+			Level:  consoleLogLevel,
+			Format: consoleLogFormat,
+		},
+	}, nil
+}
+
+func (configHandler) convertLogLevelReqToModel(level string) (slog.Level, error) {
+	switch level {
+	case "DEBUG":
+		return slog.LevelDebug, nil
+	case "INFO":
+		return slog.LevelInfo, nil
+	case "WARN":
+		return slog.LevelWarn, nil
+	case "ERROR":
+		return slog.LevelError, nil
+	default:
+		return slog.LevelInfo, xerror.ValidationFailed(nil, "invalid log level")
+	}
+}
+
+func (configHandler) convertLogFormatReqToModel(format string) (config.LogFormat, error) {
+	switch format {
+	case "JSON":
+		return config.LogFormatJSON, nil
+	case "TEXT":
+		return config.LogFormatText, nil
+	default:
+		return config.LogFormatText, xerror.ValidationFailed(nil, "invalid log format")
 	}
 }

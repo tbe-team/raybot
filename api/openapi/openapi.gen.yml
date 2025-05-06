@@ -640,9 +640,24 @@ components:
       required:
         - code
         - message
-    LogConfig:
+    LogFileHandler:
       type: object
       properties:
+        enable:
+          type: boolean
+          example: true
+          description: Whether to enable the file log
+          x-order: 1
+        path:
+          type: string
+          example: logs/raybot.log
+          description: The path to the file log
+          x-order: 2
+        rotationCount:
+          type: integer
+          example: 10
+          description: The number of log files to keep
+          x-order: 3
         level:
           type: string
           enum:
@@ -652,7 +667,7 @@ components:
             - ERROR
           example: DEBUG
           description: The global log level for the application
-          x-order: 1
+          x-order: 4
           x-go-type: string
         format:
           type: string
@@ -661,17 +676,58 @@ components:
             - TEXT
           example: JSON
           description: The log format for the application
-          x-order: 2
+          x-order: 5
           x-go-type: string
-        addSource:
-          type: boolean
-          example: false
-          description: Whether to add the source to the log
-          x-order: 3
       required:
+        - enable
+        - path
+        - rotationCount
         - level
         - format
-        - addSource
+    LogConsoleHandler:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: true
+          description: Whether to enable the console log
+          x-order: 1
+        level:
+          type: string
+          enum:
+            - DEBUG
+            - INFO
+            - WARN
+            - ERROR
+          example: DEBUG
+          description: The global log level for the application
+          x-order: 2
+          x-go-type: string
+        format:
+          type: string
+          enum:
+            - JSON
+            - TEXT
+          example: JSON
+          description: The log format for the application
+          x-order: 3
+          x-go-type: string
+      required:
+        - enable
+        - level
+        - format
+    LogConfig:
+      type: object
+      properties:
+        file:
+          $ref: '#/components/schemas/LogFileHandler'
+          x-order: 1
+        console:
+          $ref: '#/components/schemas/LogConsoleHandler'
+          x-order: 2
+      required:
+        - file
+        - console
     SerialConfig:
       type: object
       properties:
