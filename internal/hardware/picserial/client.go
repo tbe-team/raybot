@@ -1,7 +1,6 @@
 package picserial
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"sync"
@@ -21,7 +20,7 @@ type Client interface {
 	Close() error
 	Connected() bool
 	Write(ctx context.Context, data []byte) error
-	Read() ([]byte, error)
+	Read(ctx context.Context) ([]byte, error)
 }
 
 type DefaultClient struct {
@@ -115,51 +114,52 @@ func (c *DefaultClient) Write(ctx context.Context, data []byte) error {
 }
 
 // Read reads data from the serial port.
-func (c *DefaultClient) Read() ([]byte, error) {
+func (c *DefaultClient) Read(ctx context.Context) ([]byte, error) {
 	if c.port == nil {
 		return nil, ErrPICSerialNotConnected
 	}
 
-	return c.read()
+	return c.read(ctx)
 }
 
 // read continuously reads from the port until a complete message is received.
 // A complete message starts with '>' and ends with CR LF (\r\n).
 // The message is returned without the prefix and suffix
-func (c *DefaultClient) read() ([]byte, error) {
-	var res []byte
-	messageStarted := false
+func (c *DefaultClient) read(ctx context.Context) ([]byte, error) {
+	var msg []byte
+	isMsgStarted := false
 
 	for {
-		buf := make([]byte, readBufferSize)
-		n, err := c.port.Read(buf)
-		if err != nil {
-			return nil, err
-		}
+		select {
+		case <-ctx.Done():
+			return nil, ctx.Err()
 
-		// Only append the bytes that were actually read
-		chunk := buf[:n]
-
-		// If we haven't found the start marker yet, look for it
-		if !messageStarted {
-			startIdx := bytes.IndexByte(chunk, '>')
-			if startIdx >= 0 {
-				// Found the start marker, only append from that point
-				res = append(res, chunk[startIdx:]...)
-				messageStarted = true
+		default:
+			buf := make([]byte, readBufferSize)
+			n, err := c.port.Read(buf)
+			if err != nil {
+				return nil, err
 			}
-		} else {
-			// Already found start marker, append the whole chunk
-			res = append(res, chunk...)
-		}
 
-		// Check if we have a complete message
-		if messageStarted && len(res) > 0 && res[0] == '>' && bytes.HasSuffix(res, []byte("\r\n")) {
-			// Remove the prefix and suffix
-			res = res[1 : len(res)-2]
-			// Remove null bytes
-			res = bytes.Trim(res, "\x00")
-			return res, nil
+			chunk := buf[:n]
+
+			for _, b := range chunk {
+				if !isMsgStarted {
+					if b == '>' {
+						isMsgStarted = true
+					}
+					continue
+				}
+
+				msg = append(msg, b)
+				msgLength := len(msg)
+
+				// check end marker
+				if msgLength >= 2 && msg[msgLength-2] == '\r' && msg[msgLength-1] == '\n' {
+					msg = msg[:msgLength-2] // remove \r\n
+					return msg, nil
+				}
+			}
 		}
 	}
 }

@@ -3,6 +3,7 @@ package picserial
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"strconv"
@@ -83,15 +84,17 @@ func (s *Service) readLoop(ctx context.Context) {
 		case <-ctx.Done():
 			return
 		default:
-			msg, err := s.client.Read()
+			msg, err := s.client.Read(ctx)
 			if err != nil {
 				s.log.Error("failed to read from serial client", slog.Any("error", err))
-				s.publisher.Publish(
-					events.PICSerialDisconnectedTopic,
-					eventbus.NewMessage(events.PICSerialDisconnectedEvent{
-						Error: err,
-					}),
-				)
+				if errors.Is(err, picserial.ErrPICSerialNotConnected) {
+					s.publisher.Publish(
+						events.PICSerialDisconnectedTopic,
+						eventbus.NewMessage(events.PICSerialDisconnectedEvent{
+							Error: err,
+						}),
+					)
+				}
 				return
 			}
 			s.routeMessage(ctx, msg)

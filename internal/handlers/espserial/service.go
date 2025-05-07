@@ -3,6 +3,7 @@ package espserial
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"log/slog"
 	"strconv"
@@ -67,16 +68,19 @@ func (s *Service) readLoop(ctx context.Context) {
 		select {
 		case <-ctx.Done():
 			return
+
 		default:
-			msg, err := s.client.Read()
+			msg, err := s.client.Read(ctx)
 			if err != nil {
 				s.log.Error("failed to read from serial client", slog.Any("error", err))
-				s.publisher.Publish(
-					events.ESPSerialDisconnectedTopic,
-					eventbus.NewMessage(events.ESPSerialDisconnectedEvent{
-						Error: err,
-					}),
-				)
+				if errors.Is(err, espserial.ErrESPSerialNotConnected) {
+					s.publisher.Publish(
+						events.ESPSerialDisconnectedTopic,
+						eventbus.NewMessage(events.ESPSerialDisconnectedEvent{
+							Error: err,
+						}),
+					)
+				}
 				return
 			}
 			s.routeMessage(ctx, msg)
