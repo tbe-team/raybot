@@ -54,7 +54,7 @@ function handleRemoveFromHistory() {
         <MoreHorizontal class-name="h-4 w-4" />
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="end" @click.stop>
+    <DropdownMenuContent align="end">
       <DropdownMenuItem class="text-red-500" :disabled="command.status === 'PROCESSING'" @click="handleRemoveFromHistory">
         Remove from history
       </DropdownMenuItem>
