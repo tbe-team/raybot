@@ -1,5 +1,5 @@
-import{aI as i,aa as c,aJ as u,d as p,f as d,e as l,r as y,h,u as m,o as f,aK as k,aL as j,aM as g,R as w,aN as C}from"./index-Dn51okIu.js";import{c as x,a as P}from"./createLucideIcon-B3xC62L7.js";function E(e=""){if(!i())throw new Error("vue-query hooks can only be used inside setup() function or functions that support injection context.");const s=u(e),t=c(s);if(!t)throw new Error("No 'queryClient' found in Vue context, use 'VueQueryPlugin' to properly initialize the library.");return t}/**
- * @license lucide-vue-next v0.507.0 - ISC
+import{aI as i,aa as c,aJ as u,d as p,f as d,e as l,r as y,h,u as m,o as f,aK as k,aL as j,aM as g,R as w,aN as C}from"./index-2aRVzFhH.js";import{c as x,a as P}from"./createLucideIcon-DBpP39xB.js";function E(e=""){if(!i())throw new Error("vue-query hooks can only be used inside setup() function or functions that support injection context.");const s=u(e),t=c(s);if(!t)throw new Error("No 'queryClient' found in Vue context, use 'VueQueryPlugin' to properly initialize the library.");return t}/**
+ * @license lucide-vue-next v0.508.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
