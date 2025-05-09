@@ -61,7 +61,7 @@ func (p *SQLiteDB) WithTX(ctx context.Context, fn func(DB) error) (err error) {
 }
 
 func NewTestDB() (*SQLiteDB, error) {
-	db, err := NewSQLiteDB(":memory:")
+	db, err := NewSQLiteDB("file::memory:?cache=shared")
 	if err != nil {
 		return nil, fmt.Errorf("new test db: %w", err)
 	}
