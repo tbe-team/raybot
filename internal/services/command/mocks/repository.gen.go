@@ -27,6 +27,52 @@ func (_m *FakeRepository) EXPECT() *FakeRepository_Expecter {
 	return &FakeRepository_Expecter{mock: &_m.Mock}
 }
 
+// CancelQueuedAndProcessingCommands provides a mock function with given fields: ctx
+func (_m *FakeRepository) CancelQueuedAndProcessingCommands(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CancelQueuedAndProcessingCommands")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeRepository_CancelQueuedAndProcessingCommands_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CancelQueuedAndProcessingCommands'
+type FakeRepository_CancelQueuedAndProcessingCommands_Call struct {
+	*mock.Call
+}
+
+// CancelQueuedAndProcessingCommands is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeRepository_Expecter) CancelQueuedAndProcessingCommands(ctx interface{}) *FakeRepository_CancelQueuedAndProcessingCommands_Call {
+	return &FakeRepository_CancelQueuedAndProcessingCommands_Call{Call: _e.mock.On("CancelQueuedAndProcessingCommands", ctx)}
+}
+
+func (_c *FakeRepository_CancelQueuedAndProcessingCommands_Call) Run(run func(ctx context.Context)) *FakeRepository_CancelQueuedAndProcessingCommands_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeRepository_CancelQueuedAndProcessingCommands_Call) Return(_a0 error) *FakeRepository_CancelQueuedAndProcessingCommands_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeRepository_CancelQueuedAndProcessingCommands_Call) RunAndReturn(run func(context.Context) error) *FakeRepository_CancelQueuedAndProcessingCommands_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CommandProcessingExists provides a mock function with given fields: ctx
 func (_m *FakeRepository) CommandProcessingExists(ctx context.Context) (bool, error) {
 	ret := _m.Called(ctx)

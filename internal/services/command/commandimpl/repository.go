@@ -239,6 +239,15 @@ func (r repository) UpdateCommand(ctx context.Context, params command.UpdateComm
 	return r.convertRowToCommand(row)
 }
 
+func (r repository) CancelQueuedAndProcessingCommands(ctx context.Context) error {
+	err := r.queries.CommandCancelByStatusQueuedAndProcessing(ctx, r.db)
+	if err != nil {
+		return fmt.Errorf("failed to cancel queued and processing commands: %w", err)
+	}
+
+	return nil
+}
+
 func (r repository) DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error {
 	affected, err := r.queries.CommandDeleteByIDAndNotProcessing(ctx, r.db, id)
 	if err != nil {

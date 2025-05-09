@@ -75,6 +75,7 @@ type Repository interface {
 	GetCommandByID(ctx context.Context, id int64) (Command, error)
 	CreateCommand(ctx context.Context, command Command) (Command, error)
 	UpdateCommand(ctx context.Context, params UpdateCommandParams) (Command, error)
+	CancelQueuedAndProcessingCommands(ctx context.Context) error
 	DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error
 	DeleteOldCommands(ctx context.Context, cutoffTime time.Time) error
 }

@@ -9,6 +9,17 @@ import (
 	"context"
 )
 
+const commandCancelByStatusQueuedAndProcessing = `-- name: CommandCancelByStatusQueuedAndProcessing :exec
+UPDATE commands
+SET status = 'CANCELED'
+WHERE status IN ('QUEUED', 'PROCESSING')
+`
+
+func (q *Queries) CommandCancelByStatusQueuedAndProcessing(ctx context.Context, db DBTX) error {
+	_, err := db.ExecContext(ctx, commandCancelByStatusQueuedAndProcessing)
+	return err
+}
+
 const commandCreate = `-- name: CommandCreate :one
 INSERT INTO commands (
 	type,

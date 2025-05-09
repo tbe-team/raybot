@@ -52,7 +52,7 @@ func NewService(
 		executorRouter:       executorRouter,
 	}
 
-	go s.startCheckingForExecutableCommand(context.Background())
+	go s.cancelQueuedAndProcessingCommands(context.Background())
 
 	return s
 }
@@ -158,11 +158,10 @@ func (s *service) DeleteOldCommands(ctx context.Context) error {
 	return s.commandRepository.DeleteOldCommands(ctx, cutoffTime)
 }
 
-func (s *service) startCheckingForExecutableCommand(ctx context.Context) {
-	s.log.Debug("waiting for hardware components to be initialized then resuming executable command")
-	s.waitForHardwareComponentsInitialized(ctx)
-
-	go s.runNextExecutableCommand(ctx)
+func (s *service) cancelQueuedAndProcessingCommands(ctx context.Context) {
+	if err := s.commandRepository.CancelQueuedAndProcessingCommands(ctx); err != nil {
+		s.log.Error("failed to cancel queued and processing commands on startup", slog.Any("error", err))
+	}
 }
 
 func (s *service) runNextExecutableCommand(ctx context.Context) {
@@ -192,25 +191,6 @@ func (s *service) runNextExecutableCommand(ctx context.Context) {
 
 	s.log.Info("found executable command, executing", slog.Any("command", cmd))
 	s.executeCommand(ctx, cmd)
-}
-
-func (s *service) waitForHardwareComponentsInitialized(ctx context.Context) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	ch := s.appStateRepo.ListenForAppStateChanges(ctx)
-	for {
-		select {
-		case <-ctx.Done():
-			return
-		case appState := <-ch:
-			if appState.ESPSerialConnection.ServiceInitialized() &&
-				appState.PICSerialConnection.ServiceInitialized() &&
-				appState.RFIDUSBConnection.ServiceInitialized() {
-				return
-			}
-		}
-	}
 }
 
 func (s *service) executeCommand(ctx context.Context, cmd command.Command) {
