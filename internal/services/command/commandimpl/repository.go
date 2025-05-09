@@ -248,6 +248,14 @@ func (r repository) CancelQueuedAndProcessingCommands(ctx context.Context) error
 	return nil
 }
 
+func (r repository) CancelQueuedAndProcessingCommandsCreatedByCloud(ctx context.Context) error {
+	err := r.queries.CommandCancelByStatusQueuedAndProcessingAndCreatedByCloud(ctx, r.db)
+	if err != nil {
+		return fmt.Errorf("failed to cancel queued and processing commands created by cloud: %w", err)
+	}
+	return nil
+}
+
 func (r repository) DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error {
 	affected, err := r.queries.CommandDeleteByIDAndNotProcessing(ctx, r.db, id)
 	if err != nil {

@@ -17,6 +17,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/command/commandimpl"
 	"github.com/tbe-team/raybot/internal/services/command/executor"
+	"github.com/tbe-team/raybot/internal/services/command/processinglockimpl"
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/pkg/eventbus"
@@ -69,7 +70,7 @@ func SetupTunnelTestEnv(t *testing.T) TunnelTestEnv {
 		bus,
 		commandimpl.NewCommandRepository(db, queries),
 		appstateimpl.NewAppStateRepository(),
-		commandimpl.NewProcessingLockRepository(),
+		processinglockimpl.New(),
 		executor.NewNoopRouter(),
 	)
 

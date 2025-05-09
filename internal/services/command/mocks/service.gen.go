@@ -25,6 +25,52 @@ func (_m *FakeService) EXPECT() *FakeService_Expecter {
 	return &FakeService_Expecter{mock: &_m.Mock}
 }
 
+// CancelActiveCloudCommands provides a mock function with given fields: ctx
+func (_m *FakeService) CancelActiveCloudCommands(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CancelActiveCloudCommands")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeService_CancelActiveCloudCommands_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CancelActiveCloudCommands'
+type FakeService_CancelActiveCloudCommands_Call struct {
+	*mock.Call
+}
+
+// CancelActiveCloudCommands is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) CancelActiveCloudCommands(ctx interface{}) *FakeService_CancelActiveCloudCommands_Call {
+	return &FakeService_CancelActiveCloudCommands_Call{Call: _e.mock.On("CancelActiveCloudCommands", ctx)}
+}
+
+func (_c *FakeService_CancelActiveCloudCommands_Call) Run(run func(ctx context.Context)) *FakeService_CancelActiveCloudCommands_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_CancelActiveCloudCommands_Call) Return(_a0 error) *FakeService_CancelActiveCloudCommands_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeService_CancelActiveCloudCommands_Call) RunAndReturn(run func(context.Context) error) *FakeService_CancelActiveCloudCommands_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CancelCurrentProcessingCommand provides a mock function with given fields: ctx
 func (_m *FakeService) CancelCurrentProcessingCommand(ctx context.Context) error {
 	ret := _m.Called(ctx)

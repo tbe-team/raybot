@@ -46,6 +46,9 @@ type Service interface {
 	CreateCommand(ctx context.Context, params CreateCommandParams) (Command, error)
 	CancelCurrentProcessingCommand(ctx context.Context) error
 
+	// CancelActiveCloudCommands cancels all QUEUED and PROCESSING commands created by the cloud.
+	CancelActiveCloudCommands(ctx context.Context) error
+
 	ExecuteCreatedCommand(ctx context.Context, params ExecuteCreatedCommandParams) error
 
 	DeleteCommandByID(ctx context.Context, params DeleteCommandByIDParams) error
@@ -76,25 +79,23 @@ type Repository interface {
 	CreateCommand(ctx context.Context, command Command) (Command, error)
 	UpdateCommand(ctx context.Context, params UpdateCommandParams) (Command, error)
 	CancelQueuedAndProcessingCommands(ctx context.Context) error
+	CancelQueuedAndProcessingCommandsCreatedByCloud(ctx context.Context) error
 	DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error
 	DeleteOldCommands(ctx context.Context, cutoffTime time.Time) error
 }
 
-// ProcessingLockRepository is responsible for controlling a lock mechanism
+// ProcessingLock is responsible for controlling a lock mechanism
 // that prevents the system from automatically picking up and processing the next command in the queue.
 //
 // Note: This lock does not handle stopping or canceling a command that is already being executed.
 // Its sole purpose is to block the transition to the next command,
 // ensuring that no new command is started while the lock is held.
-type ProcessingLockRepository interface {
-	// Lock acquires the lock.
-	Lock(ctx context.Context) error
-
-	// Unlock releases the lock.
-	Unlock(ctx context.Context) error
+type ProcessingLock interface {
+	// WithLock acquires the lock and executes the function.
+	// The lock is released when the function returns.
+	WithLock(fn func() error) error
 
 	// WaitUntilUnlocked blocks the execution until the lock is released.
-	// If the lock is already released, the function will return immediately.
-	// If the context is canceled, the function will return context.Canceled error.
+	// If the context is canceled, the function returns immediately.
 	WaitUntilUnlocked(ctx context.Context) error
 }

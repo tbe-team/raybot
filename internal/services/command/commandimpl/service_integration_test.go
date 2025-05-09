@@ -1,0 +1,257 @@
+package commandimpl
+
+import (
+	"context"
+	"errors"
+	"testing"
+	"time"
+
+	"github.com/stretchr/testify/require"
+
+	"github.com/tbe-team/raybot/internal/config"
+	"github.com/tbe-team/raybot/internal/logging"
+	"github.com/tbe-team/raybot/internal/services/appstate/appstateimpl"
+	"github.com/tbe-team/raybot/internal/services/command"
+	"github.com/tbe-team/raybot/internal/services/command/processinglockimpl"
+	"github.com/tbe-team/raybot/internal/storage/db"
+	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
+	"github.com/tbe-team/raybot/pkg/eventbus"
+	"github.com/tbe-team/raybot/pkg/validator"
+)
+
+func TestIntegrationCommandService(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
+
+	t.Run(`Created 3 commands from cloud, 1 will be in PROCESSING, 2 will be in QUEUED,
+		CancelActiveCloudCommands should cancel 3 commands and there is no running command`,
+		func(t *testing.T) {
+			log := logging.NewNoopLogger()
+			db, err := db.NewTestDB()
+			require.NoError(t, err)
+			defer func() {
+				require.NoError(t, db.Close())
+			}()
+			err = db.AutoMigrate()
+			require.NoError(t, err)
+			queries := sqlc.New()
+			runningCmdRepository := newRunningCmdRepository()
+			commandRepository := NewCommandRepository(db, queries)
+			router := newBlockingExecutorRouter(commandRepository)
+
+			commandService := Service{
+				deleteOldCmdCfg:      config.DeleteOldCommand{},
+				log:                  log,
+				validator:            validator.New(),
+				publisher:            eventbus.NewInProcEventBus(log),
+				runningCmdRepository: runningCmdRepository,
+				commandRepository:    commandRepository,
+				appStateRepository:   appstateimpl.NewAppStateRepository(),
+				processingLock:       processinglockimpl.New(),
+				executorRouter:       router,
+			}
+
+			// Create 2 commands from cloud
+			cmd1, err := commandService.CreateCommand(context.Background(), command.CreateCommandParams{
+				Source: command.SourceCloud,
+				Inputs: command.MoveForwardInputs{},
+			})
+			require.NoError(t, err)
+
+			cmd2, err := commandService.CreateCommand(context.Background(), command.CreateCommandParams{
+				Source: command.SourceCloud,
+				Inputs: command.MoveForwardInputs{},
+			})
+			require.NoError(t, err)
+
+			cmd3, err := commandService.CreateCommand(context.Background(), command.CreateCommandParams{
+				Source: command.SourceCloud,
+				Inputs: command.MoveForwardInputs{},
+			})
+			require.NoError(t, err)
+
+			// Because event we don't handle event in service layer
+			// so we simulate handle [events.CommandCreatedEvent] here
+			go func() {
+				// This should block until executor router unblock
+				if err := commandService.ExecuteCreatedCommand(context.Background(), command.ExecuteCreatedCommandParams{
+					CommandID: cmd1.ID,
+				}); err != nil {
+					t.Errorf("failed to execute command: %v", err)
+				}
+			}()
+
+			// Block until we have a running command (cause by ExecuteCreatedCommand)
+			require.Eventually(t, func() bool {
+				return runningCmdRepository.Get() != nil
+			}, 500*time.Millisecond, 10*time.Millisecond)
+
+			// Get command to validate state
+			cmd1, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+				CommandID: cmd1.ID,
+			})
+			require.NoError(t, err)
+			require.Equal(t, command.StatusProcessing, cmd1.Status)
+
+			cmd2, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+				CommandID: cmd2.ID,
+			})
+			require.NoError(t, err)
+			require.Equal(t, command.StatusQueued, cmd2.Status)
+
+			cmd3, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+				CommandID: cmd3.ID,
+			})
+			require.NoError(t, err)
+			require.Equal(t, command.StatusQueued, cmd3.Status)
+
+			// Current running should be cmd1
+			runningCmd := runningCmdRepository.Get()
+			require.NotNil(t, runningCmd)
+			require.Equal(t, cmd1.ID, runningCmd.ID)
+
+			err = commandService.CancelActiveCloudCommands(context.Background())
+			require.NoError(t, err)
+
+			// Block until no running command (cause by CancelActiveCloudCommands)
+			require.Eventually(t, func() bool {
+				return runningCmdRepository.Get() == nil
+			}, 500*time.Millisecond, 10*time.Millisecond)
+
+			// Get command to validate state
+			cmd1, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+				CommandID: cmd1.ID,
+			})
+			require.NoError(t, err)
+			require.Equal(t, command.StatusCanceled, cmd1.Status)
+
+			cmd2, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+				CommandID: cmd2.ID,
+			})
+			require.NoError(t, err)
+			require.Equal(t, command.StatusCanceled, cmd2.Status)
+
+			cmd3, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+				CommandID: cmd3.ID,
+			})
+			require.NoError(t, err)
+			require.Equal(t, command.StatusCanceled, cmd3.Status)
+		},
+	)
+
+	t.Run(`Created 2 commands, 1 will be in PROCESSING, 1 will be in QUEUED,
+		CancelCurrentProcessingCommand should cancel the running command and the next command should be in PROCESSING`,
+		func(t *testing.T) {
+			log := logging.NewNoopLogger()
+			db, err := db.NewTestDB()
+			require.NoError(t, err)
+			defer func() {
+				require.NoError(t, db.Close())
+			}()
+			err = db.AutoMigrate()
+			require.NoError(t, err)
+			queries := sqlc.New()
+			commandRepository := NewCommandRepository(db, queries)
+			runningCmdRepository := newRunningCmdRepository()
+			commandService := Service{
+				deleteOldCmdCfg:      config.DeleteOldCommand{},
+				log:                  log,
+				validator:            validator.New(),
+				publisher:            eventbus.NewInProcEventBus(log),
+				runningCmdRepository: runningCmdRepository,
+				commandRepository:    commandRepository,
+				appStateRepository:   appstateimpl.NewAppStateRepository(),
+				processingLock:       processinglockimpl.New(),
+				executorRouter:       newBlockingExecutorRouter(commandRepository),
+			}
+
+			// Create 2 commands
+			cmd1, err := commandService.CreateCommand(context.Background(), command.CreateCommandParams{
+				Source: command.SourceCloud,
+				Inputs: command.MoveForwardInputs{},
+			})
+			require.NoError(t, err)
+
+			cmd2, err := commandService.CreateCommand(context.Background(), command.CreateCommandParams{
+				Source: command.SourceCloud,
+				Inputs: command.MoveForwardInputs{},
+			})
+			require.NoError(t, err)
+
+			// Because event we don't handle event in service layer
+			// so we simulate handle [events.CommandCreatedEvent] here
+			go func() {
+				// This should block until executor router unblock
+				if err := commandService.ExecuteCreatedCommand(context.Background(), command.ExecuteCreatedCommandParams{
+					CommandID: cmd1.ID,
+				}); err != nil {
+					t.Errorf("failed to execute command: %v", err)
+				}
+			}()
+
+			// Block until we have a running command (cause by ExecuteCreatedCommand)
+			require.Eventually(t, func() bool {
+				return runningCmdRepository.Get() != nil
+			}, 500*time.Millisecond, 10*time.Millisecond)
+
+			// Get command to validate state
+			cmd1, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+				CommandID: cmd1.ID,
+			})
+			require.NoError(t, err)
+			require.Equal(t, command.StatusProcessing, cmd1.Status)
+
+			cmd2, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+				CommandID: cmd2.ID,
+			})
+			require.NoError(t, err)
+			require.Equal(t, command.StatusQueued, cmd2.Status)
+
+			err = commandService.CancelCurrentProcessingCommand(context.Background())
+			require.NoError(t, err)
+
+			// Block until next command is in running (cause by ExecuteCreatedCommand)
+			require.Eventually(t, func() bool {
+				cmd := runningCmdRepository.Get()
+				return cmd != nil && cmd.ID == cmd2.ID && cmd.Status == command.StatusProcessing
+			}, 500*time.Millisecond, 10*time.Millisecond)
+		})
+}
+
+// blockingExecutorRouter is a mock Router used for testing.
+// It simulates a blocked executor and updates the command status to Canceled
+// if the context is canceled. Useful for testing cancelation behavior in the command service.
+type blockingExecutorRouter struct {
+	doneCh            chan struct{}
+	commandRepository command.Repository
+}
+
+func newBlockingExecutorRouter(commandRepository command.Repository) *blockingExecutorRouter {
+	return &blockingExecutorRouter{
+		doneCh:            make(chan struct{}),
+		commandRepository: commandRepository,
+	}
+}
+
+func (r *blockingExecutorRouter) Route(ctx context.Context, cmd command.Command) error {
+	select {
+	case <-r.doneCh:
+	case <-ctx.Done():
+		if errors.Is(ctx.Err(), context.Canceled) {
+			_, err := r.commandRepository.UpdateCommand(context.Background(), command.UpdateCommandParams{
+				ID:        cmd.ID,
+				Status:    command.StatusCanceled,
+				SetStatus: true,
+			})
+			if err != nil {
+				return err
+			}
+		}
+	}
+	return nil
+}
+
+func (r *blockingExecutorRouter) UnBlock() {
+	close(r.doneCh)
+}

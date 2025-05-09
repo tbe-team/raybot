@@ -20,6 +20,18 @@ func (q *Queries) CommandCancelByStatusQueuedAndProcessing(ctx context.Context, 
 	return err
 }
 
+const commandCancelByStatusQueuedAndProcessingAndCreatedByCloud = `-- name: CommandCancelByStatusQueuedAndProcessingAndCreatedByCloud :exec
+UPDATE commands
+SET status = 'CANCELED'
+WHERE status IN ('QUEUED', 'PROCESSING')
+AND source = 'CLOUD'
+`
+
+func (q *Queries) CommandCancelByStatusQueuedAndProcessingAndCreatedByCloud(ctx context.Context, db DBTX) error {
+	_, err := db.ExecContext(ctx, commandCancelByStatusQueuedAndProcessingAndCreatedByCloud)
+	return err
+}
+
 const commandCreate = `-- name: CommandCreate :one
 INSERT INTO commands (
 	type,

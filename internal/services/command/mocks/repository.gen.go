@@ -73,6 +73,52 @@ func (_c *FakeRepository_CancelQueuedAndProcessingCommands_Call) RunAndReturn(ru
 	return _c
 }
 
+// CancelQueuedAndProcessingCommandsCreatedByCloud provides a mock function with given fields: ctx
+func (_m *FakeRepository) CancelQueuedAndProcessingCommandsCreatedByCloud(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CancelQueuedAndProcessingCommandsCreatedByCloud")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CancelQueuedAndProcessingCommandsCreatedByCloud'
+type FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call struct {
+	*mock.Call
+}
+
+// CancelQueuedAndProcessingCommandsCreatedByCloud is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeRepository_Expecter) CancelQueuedAndProcessingCommandsCreatedByCloud(ctx interface{}) *FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call {
+	return &FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call{Call: _e.mock.On("CancelQueuedAndProcessingCommandsCreatedByCloud", ctx)}
+}
+
+func (_c *FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call) Run(run func(ctx context.Context)) *FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call) Return(_a0 error) *FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call) RunAndReturn(run func(context.Context) error) *FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CommandProcessingExists provides a mock function with given fields: ctx
 func (_m *FakeRepository) CommandProcessingExists(ctx context.Context) (bool, error) {
 	ret := _m.Called(ctx)

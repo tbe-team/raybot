@@ -21,6 +21,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/command/commandimpl"
 	"github.com/tbe-team/raybot/internal/services/command/executor"
+	"github.com/tbe-team/raybot/internal/services/command/processinglockimpl"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/services/config/configimpl"
 	"github.com/tbe-team/raybot/internal/services/dashboarddata"
@@ -201,7 +202,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		eventBus,
 		commandRepository,
 		appStateRepository,
-		commandimpl.NewProcessingLockRepository(),
+		processinglockimpl.New(),
 		executor.NewRouter(
 			cfg.Cargo,
 			log,

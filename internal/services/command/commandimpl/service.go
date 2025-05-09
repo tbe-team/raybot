@@ -18,7 +18,7 @@ import (
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
-type service struct {
+type Service struct {
 	deleteOldCmdCfg config.DeleteOldCommand
 
 	log       *slog.Logger
@@ -26,11 +26,11 @@ type service struct {
 
 	publisher eventbus.Publisher
 
-	runningCmdRepository     *runningCmdRepository
-	commandRepository        command.Repository
-	appStateRepository       appstate.Repository
-	processingLockRepository command.ProcessingLockRepository
+	runningCmdRepository *runningCmdRepository
+	commandRepository    command.Repository
+	appStateRepository   appstate.Repository
 
+	processingLock command.ProcessingLock
 	executorRouter executor.Router
 }
 
@@ -41,19 +41,19 @@ func NewService(
 	publisher eventbus.Publisher,
 	commandRepository command.Repository,
 	appStateRepository appstate.Repository,
-	processingLockRepository command.ProcessingLockRepository,
+	processingLock command.ProcessingLock,
 	executorRouter executor.Router,
 ) command.Service {
-	s := &service{
-		deleteOldCmdCfg:          deleteOldCmdCfg,
-		log:                      log.With("service", "command"),
-		validator:                validator,
-		publisher:                publisher,
-		runningCmdRepository:     newRunningCmdRepository(),
-		commandRepository:        commandRepository,
-		appStateRepository:       appStateRepository,
-		processingLockRepository: processingLockRepository,
-		executorRouter:           executorRouter,
+	s := &Service{
+		deleteOldCmdCfg:      deleteOldCmdCfg,
+		log:                  log.With("service", "command"),
+		validator:            validator,
+		publisher:            publisher,
+		runningCmdRepository: newRunningCmdRepository(),
+		commandRepository:    commandRepository,
+		appStateRepository:   appStateRepository,
+		processingLock:       processingLock,
+		executorRouter:       executorRouter,
 	}
 
 	go s.cancelQueuedAndProcessingCommands(context.Background())
@@ -61,7 +61,7 @@ func NewService(
 	return s
 }
 
-func (s *service) GetCommandByID(ctx context.Context, params command.GetCommandByIDParams) (command.Command, error) {
+func (s *Service) GetCommandByID(ctx context.Context, params command.GetCommandByIDParams) (command.Command, error) {
 	if err := s.validator.Validate(params); err != nil {
 		return command.Command{}, fmt.Errorf("validate params: %w", err)
 	}
@@ -69,11 +69,11 @@ func (s *service) GetCommandByID(ctx context.Context, params command.GetCommandB
 	return s.commandRepository.GetCommandByID(ctx, params.CommandID)
 }
 
-func (s *service) GetCurrentProcessingCommand(ctx context.Context) (command.Command, error) {
+func (s *Service) GetCurrentProcessingCommand(ctx context.Context) (command.Command, error) {
 	return s.commandRepository.GetCurrentProcessingCommand(ctx)
 }
 
-func (s *service) ListCommands(ctx context.Context, params command.ListCommandsParams) (paging.List[command.Command], error) {
+func (s *Service) ListCommands(ctx context.Context, params command.ListCommandsParams) (paging.List[command.Command], error) {
 	if err := s.validator.Validate(params); err != nil {
 		return paging.List[command.Command]{}, fmt.Errorf("validate params: %w", err)
 	}
@@ -81,7 +81,7 @@ func (s *service) ListCommands(ctx context.Context, params command.ListCommandsP
 	return s.commandRepository.ListCommands(ctx, params)
 }
 
-func (s *service) CreateCommand(ctx context.Context, params command.CreateCommandParams) (command.Command, error) {
+func (s *Service) CreateCommand(ctx context.Context, params command.CreateCommandParams) (command.Command, error) {
 	if err := s.validator.Validate(params); err != nil {
 		return command.Command{}, fmt.Errorf("validate params: %w", err)
 	}
@@ -102,7 +102,7 @@ func (s *service) CreateCommand(ctx context.Context, params command.CreateComman
 	return cmd, nil
 }
 
-func (s *service) CancelCurrentProcessingCommand(_ context.Context) error {
+func (s *Service) CancelCurrentProcessingCommand(_ context.Context) error {
 	runningCmd := s.runningCmdRepository.Get()
 	if runningCmd == nil {
 		return command.ErrNoCommandBeingProcessed
@@ -113,7 +113,28 @@ func (s *service) CancelCurrentProcessingCommand(_ context.Context) error {
 	return nil
 }
 
-func (s *service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
+func (s *Service) CancelActiveCloudCommands(ctx context.Context) error {
+	if err := s.processingLock.WithLock(func() error {
+		// Cancel current processing command
+		runningCmd := s.runningCmdRepository.Get()
+		if runningCmd != nil {
+			runningCmd.Cancel()
+		}
+
+		// Cancel all queued and processing commands created by the cloud
+		if err := s.commandRepository.CancelQueuedAndProcessingCommandsCreatedByCloud(ctx); err != nil {
+			return fmt.Errorf("cancel queued and processing commands created by cloud: %w", err)
+		}
+
+		return nil
+	}); err != nil {
+		return fmt.Errorf("cancel active cloud commands: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
 	cmd, err := s.commandRepository.GetCommandByID(ctx, params.CommandID)
 	if err != nil {
 		return fmt.Errorf("get command by id: %w", err)
@@ -149,7 +170,7 @@ func (s *service) ExecuteCreatedCommand(ctx context.Context, params command.Exec
 	return nil
 }
 
-func (s *service) DeleteCommandByID(ctx context.Context, params command.DeleteCommandByIDParams) error {
+func (s *Service) DeleteCommandByID(ctx context.Context, params command.DeleteCommandByIDParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
 	}
@@ -157,18 +178,18 @@ func (s *service) DeleteCommandByID(ctx context.Context, params command.DeleteCo
 	return s.commandRepository.DeleteCommandByIDAndNotProcessing(ctx, params.CommandID)
 }
 
-func (s *service) DeleteOldCommands(ctx context.Context) error {
+func (s *Service) DeleteOldCommands(ctx context.Context) error {
 	cutoffTime := time.Now().Add(-s.deleteOldCmdCfg.Threshold)
 	return s.commandRepository.DeleteOldCommands(ctx, cutoffTime)
 }
 
-func (s *service) cancelQueuedAndProcessingCommands(ctx context.Context) {
+func (s *Service) cancelQueuedAndProcessingCommands(ctx context.Context) {
 	if err := s.commandRepository.CancelQueuedAndProcessingCommands(ctx); err != nil {
 		s.log.Error("failed to cancel queued and processing commands on startup", slog.Any("error", err))
 	}
 }
 
-func (s *service) runNextExecutableCommand(ctx context.Context) {
+func (s *Service) runNextExecutableCommand(ctx context.Context) {
 	cmd, err := s.commandRepository.GetNextExecutableCommand(ctx)
 	if err != nil {
 		if errors.Is(err, command.ErrNoNextExecutableCommand) {
@@ -179,7 +200,7 @@ func (s *service) runNextExecutableCommand(ctx context.Context) {
 	}
 
 	if cmd.Status == command.StatusQueued {
-		_, err = s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
+		cmd, err = s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
 			ID:           cmd.ID,
 			Status:       command.StatusProcessing,
 			SetStatus:    true,
@@ -197,8 +218,8 @@ func (s *service) runNextExecutableCommand(ctx context.Context) {
 	s.executeCommand(ctx, cmd)
 }
 
-func (s *service) executeCommand(ctx context.Context, cmd command.Command) {
-	if err := s.processingLockRepository.WaitUntilUnlocked(ctx); err != nil {
+func (s *Service) executeCommand(ctx context.Context, cmd command.Command) {
+	if err := s.processingLock.WaitUntilUnlocked(ctx); err != nil {
 		// if the context is canceled, we don't need to run the next executable command
 		if errors.Is(err, context.Canceled) {
 			return
