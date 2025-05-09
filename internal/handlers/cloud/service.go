@@ -120,6 +120,7 @@ func (s *Service) runReverseTunnel(ctx context.Context, reverseTunnelServer *grp
 			// so we emit a connected event after [connectTimeout] or it will emit a disconnected event when error occurs
 			case <-time.After(s.opts.connectTimeout):
 				connected = true
+				attempts = 0
 				s.publisher.Publish(
 					events.CloudConnectedTopic,
 					eventbus.NewMessage(events.CloudConnectedEvent{}),
