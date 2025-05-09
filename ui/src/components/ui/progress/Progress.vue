@@ -10,9 +10,10 @@ import {
 import { computed } from 'vue'
 
 const props = withDefaults(
-  defineProps<ProgressRootProps & { class?: HTMLAttributes['class'] }>(),
+  defineProps<ProgressRootProps & { class?: HTMLAttributes['class'], variant?: string, max?: number }>(),
   {
     modelValue: 0,
+    max: 100,
   },
 )
 
@@ -34,8 +35,9 @@ const delegatedProps = computed(() => {
     "
   >
     <ProgressIndicator
-      class="h-full w-full flex-1 bg-primary transition-all"
-      :style="`transform: translateX(-${100 - (props.modelValue ?? 0)}%);`"
+      class="flex-1 w-full h-full transition-all"
+      :class="props.variant ? `bg-${props.variant}` : 'bg-primary'"
+      :style="`transform: translateX(-${max - (props.modelValue ?? 0)}%);`"
     />
   </ProgressRoot>
 </template>
