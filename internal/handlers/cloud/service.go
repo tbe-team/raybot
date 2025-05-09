@@ -106,6 +106,7 @@ func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
 func (s *Service) runReverseTunnel(ctx context.Context, reverseTunnelServer *grpctunnel.ReverseTunnelServer) {
 	attempts := 0
 	retryDelay := 1 * time.Second
+	connected := false
 
 	for {
 		if s.isClosing() {
@@ -118,6 +119,7 @@ func (s *Service) runReverseTunnel(ctx context.Context, reverseTunnelServer *grp
 			// Because Serve function is blocking and we don't have a way to know if it's connected or not
 			// so we emit a connected event after [connectTimeout] or it will emit a disconnected event when error occurs
 			case <-time.After(s.opts.connectTimeout):
+				connected = true
 				s.publisher.Publish(
 					events.CloudConnectedTopic,
 					eventbus.NewMessage(events.CloudConnectedEvent{}),
@@ -138,12 +140,16 @@ func (s *Service) runReverseTunnel(ctx context.Context, reverseTunnelServer *grp
 				slog.Any("error", err),
 			)
 
-			s.publisher.Publish(
-				events.CloudDisconnectedTopic,
-				eventbus.NewMessage(events.CloudDisconnectedEvent{
-					Error: err,
-				}),
-			)
+			// If the last state is connected or this is the first attempt to connect
+			// emit a disconnected event
+			if connected || attempts == 0 {
+				s.publisher.Publish(
+					events.CloudDisconnectedTopic,
+					eventbus.NewMessage(events.CloudDisconnectedEvent{
+						Error: err,
+					}),
+				)
+			}
 
 			time.Sleep(retryDelay)
 			attempts++
