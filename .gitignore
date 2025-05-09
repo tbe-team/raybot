@@ -19,6 +19,10 @@ vendor
 coverage.out
 coverage.html
 
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
 .env
 
 /logs
