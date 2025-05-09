@@ -79,3 +79,22 @@ type Repository interface {
 	DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error
 	DeleteOldCommands(ctx context.Context, cutoffTime time.Time) error
 }
+
+// ProcessingLockRepository is responsible for controlling a lock mechanism
+// that prevents the system from automatically picking up and processing the next command in the queue.
+//
+// Note: This lock does not handle stopping or canceling a command that is already being executed.
+// Its sole purpose is to block the transition to the next command,
+// ensuring that no new command is started while the lock is held.
+type ProcessingLockRepository interface {
+	// Lock acquires the lock.
+	Lock(ctx context.Context) error
+
+	// Unlock releases the lock.
+	Unlock(ctx context.Context) error
+
+	// WaitUntilUnlocked blocks the execution until the lock is released.
+	// If the lock is already released, the function will return immediately.
+	// If the context is canceled, the function will return context.Canceled error.
+	WaitUntilUnlocked(ctx context.Context) error
+}

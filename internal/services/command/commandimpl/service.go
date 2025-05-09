@@ -26,10 +26,12 @@ type service struct {
 
 	publisher eventbus.Publisher
 
-	runningCmdRepository *runningCmdRepository
-	commandRepository    command.Repository
-	appStateRepo         appstate.Repository
-	executorRouter       executor.Router
+	runningCmdRepository     *runningCmdRepository
+	commandRepository        command.Repository
+	appStateRepository       appstate.Repository
+	processingLockRepository command.ProcessingLockRepository
+
+	executorRouter executor.Router
 }
 
 func NewService(
@@ -38,18 +40,20 @@ func NewService(
 	validator validator.Validator,
 	publisher eventbus.Publisher,
 	commandRepository command.Repository,
-	appStateRepo appstate.Repository,
+	appStateRepository appstate.Repository,
+	processingLockRepository command.ProcessingLockRepository,
 	executorRouter executor.Router,
 ) command.Service {
 	s := &service{
-		deleteOldCmdCfg:      deleteOldCmdCfg,
-		log:                  log.With("service", "command"),
-		validator:            validator,
-		publisher:            publisher,
-		runningCmdRepository: newRunningCmdRepository(),
-		commandRepository:    commandRepository,
-		appStateRepo:         appStateRepo,
-		executorRouter:       executorRouter,
+		deleteOldCmdCfg:          deleteOldCmdCfg,
+		log:                      log.With("service", "command"),
+		validator:                validator,
+		publisher:                publisher,
+		runningCmdRepository:     newRunningCmdRepository(),
+		commandRepository:        commandRepository,
+		appStateRepository:       appStateRepository,
+		processingLockRepository: processingLockRepository,
+		executorRouter:           executorRouter,
 	}
 
 	go s.cancelQueuedAndProcessingCommands(context.Background())
@@ -194,17 +198,23 @@ func (s *service) runNextExecutableCommand(ctx context.Context) {
 }
 
 func (s *service) executeCommand(ctx context.Context, cmd command.Command) {
+	if err := s.processingLockRepository.WaitUntilUnlocked(ctx); err != nil {
+		// if the context is canceled, we don't need to run the next executable command
+		if errors.Is(err, context.Canceled) {
+			return
+		}
+		s.log.Error("failed to wait for processing lock to be unlocked", slog.Any("error", err))
+	}
+
 	runningCmd := newRunningCommand(cmd)
 	s.runningCmdRepository.Add(runningCmd)
-	defer s.runningCmdRepository.Remove()
 
 	// pass the context of the running command to the executor router
 	if err := s.executorRouter.Route(runningCmd.Context(), cmd); err != nil {
 		s.log.Error("failed to execute command", slog.Any("command", cmd), slog.Any("error", err))
 	}
 
-	go func() {
-		time.Sleep(100 * time.Millisecond)
-		s.runNextExecutableCommand(ctx)
-	}()
+	s.runningCmdRepository.Remove()
+	time.Sleep(100 * time.Millisecond)
+	s.runNextExecutableCommand(ctx)
 }

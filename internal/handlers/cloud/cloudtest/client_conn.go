@@ -69,6 +69,7 @@ func SetupTunnelTestEnv(t *testing.T) TunnelTestEnv {
 		bus,
 		commandimpl.NewCommandRepository(db, queries),
 		appstateimpl.NewAppStateRepository(),
+		commandimpl.NewProcessingLockRepository(),
 		executor.NewNoopRouter(),
 	)
 

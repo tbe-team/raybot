@@ -201,6 +201,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		eventBus,
 		commandRepository,
 		appStateRepository,
+		commandimpl.NewProcessingLockRepository(),
 		executor.NewRouter(
 			cfg.Cargo,
 			log,
