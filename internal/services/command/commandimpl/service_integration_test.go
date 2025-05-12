@@ -16,6 +16,7 @@ import (
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/pkg/eventbus"
+	"github.com/tbe-team/raybot/pkg/paging"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -217,6 +218,142 @@ func TestIntegrationCommandService(t *testing.T) {
 				return cmd != nil && cmd.ID == cmd2.ID && cmd.Status == command.StatusProcessing
 			}, 500*time.Millisecond, 10*time.Millisecond)
 		})
+
+	t.Run(`When create CommandService it should run cancel QUEUED and PROCESSING commands`, func(t *testing.T) {
+		log := logging.NewNoopLogger()
+		db, err := db.NewTestDB()
+		require.NoError(t, err)
+		defer func() {
+			require.NoError(t, db.Close())
+		}()
+		err = db.AutoMigrate()
+		require.NoError(t, err)
+		queries := sqlc.New()
+		commandRepository := NewCommandRepository(db, queries)
+
+		// Create 2 commands 1 in QUEUED and 1 in PROCESSING
+		cmd1, err := commandRepository.CreateCommand(context.Background(), command.Command{
+			Status: command.StatusQueued,
+			Type:   command.CommandTypeStopMovement,
+		})
+		require.NoError(t, err)
+
+		cmd2, err := commandRepository.CreateCommand(context.Background(), command.Command{
+			Status: command.StatusProcessing,
+			Type:   command.CommandTypeStopMovement,
+		})
+		require.NoError(t, err)
+
+		commandService := NewService(
+			config.DeleteOldCommand{},
+			log,
+			validator.New(),
+			eventbus.NewInProcEventBus(log),
+			commandRepository,
+			appstateimpl.NewAppStateRepository(),
+			processinglockimpl.New(),
+			newBlockingExecutorRouter(commandRepository),
+		)
+
+		require.Eventually(t, func() bool {
+			cmd1, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+				CommandID: cmd1.ID,
+			})
+			require.NoError(t, err)
+			return cmd1.Status == command.StatusCanceled
+		}, 500*time.Millisecond, 10*time.Millisecond)
+
+		cmd2, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+			CommandID: cmd2.ID,
+		})
+		require.NoError(t, err)
+		require.Equal(t, command.StatusCanceled, cmd2.Status)
+	})
+
+	t.Run(`Get current processing command should return the command in PROCESSING status`, func(t *testing.T) {
+		log := logging.NewNoopLogger()
+		db, err := db.NewTestDB()
+		require.NoError(t, err)
+		defer func() {
+			require.NoError(t, db.Close())
+		}()
+		err = db.AutoMigrate()
+		require.NoError(t, err)
+		queries := sqlc.New()
+		commandRepository := NewCommandRepository(db, queries)
+		runningCmdRepository := newRunningCmdRepository()
+		commandService := Service{
+			deleteOldCmdCfg:      config.DeleteOldCommand{},
+			log:                  log,
+			validator:            validator.New(),
+			publisher:            eventbus.NewInProcEventBus(log),
+			runningCmdRepository: runningCmdRepository,
+			commandRepository:    commandRepository,
+			appStateRepository:   appstateimpl.NewAppStateRepository(),
+			processingLock:       processinglockimpl.New(),
+			executorRouter:       newBlockingExecutorRouter(commandRepository),
+		}
+
+		cmd1, err := commandRepository.CreateCommand(context.Background(), command.Command{
+			Status: command.StatusProcessing,
+			Type:   command.CommandTypeStopMovement,
+		})
+		require.NoError(t, err)
+
+		cmd, err := commandService.GetCurrentProcessingCommand(context.Background())
+		require.NoError(t, err)
+		require.Equal(t, cmd1.ID, cmd.ID)
+		require.Equal(t, command.StatusProcessing, cmd.Status)
+	})
+
+	t.Run(`List commands should return list of commands`, func(t *testing.T) {
+		log := logging.NewNoopLogger()
+		db, err := db.NewTestDB()
+		require.NoError(t, err)
+		defer func() {
+			require.NoError(t, db.Close())
+		}()
+		err = db.AutoMigrate()
+		require.NoError(t, err)
+		queries := sqlc.New()
+		commandRepository := NewCommandRepository(db, queries)
+		runningCmdRepository := newRunningCmdRepository()
+		commandService := Service{
+			deleteOldCmdCfg:      config.DeleteOldCommand{},
+			log:                  log,
+			validator:            validator.New(),
+			publisher:            eventbus.NewInProcEventBus(log),
+			runningCmdRepository: runningCmdRepository,
+			commandRepository:    commandRepository,
+			appStateRepository:   appstateimpl.NewAppStateRepository(),
+			processingLock:       processinglockimpl.New(),
+			executorRouter:       newBlockingExecutorRouter(commandRepository),
+		}
+
+		cmd1, err := commandRepository.CreateCommand(context.Background(), command.Command{
+			Status: command.StatusProcessing,
+			Type:   command.CommandTypeStopMovement,
+		})
+		require.NoError(t, err)
+
+		cmd2, err := commandRepository.CreateCommand(context.Background(), command.Command{
+			Status: command.StatusQueued,
+			Type:   command.CommandTypeStopMovement,
+		})
+		require.NoError(t, err)
+
+		commands, err := commandService.ListCommands(context.Background(), command.ListCommandsParams{
+			PagingParams: paging.NewParams(paging.Page(1), paging.PageSize(10)),
+		})
+		require.NoError(t, err)
+
+		var ids []int64
+		for _, cmd := range commands.Items {
+			ids = append(ids, cmd.ID)
+		}
+		require.Contains(t, ids, cmd1.ID)
+		require.Contains(t, ids, cmd2.ID)
+	})
 }
 
 // blockingExecutorRouter is a mock Router used for testing.
