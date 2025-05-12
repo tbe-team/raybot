@@ -62,19 +62,19 @@ func TestProcessingLock(t *testing.T) {
 		wg.Add(10)
 		for range 10 {
 			go func() {
-				wg.Done()
+				defer wg.Done()
 				err := l.WaitUntilUnlocked(context.Background())
 				assert.NoError(t, err)
 				counter.Add(1)
 			}()
 		}
 
-		wg.Wait()
-
 		err := l.WithLock(func() error {
 			return nil
 		})
 		assert.NoError(t, err)
+
+		wg.Wait()
 
 		assert.Equal(t, 10, int(counter.Load()))
 	})
