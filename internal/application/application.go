@@ -200,7 +200,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	appStateService := appstateimpl.NewService(appStateRepository)
 	peripheralService := peripheralimpl.NewService()
 
-	commandProcessingLock := processinglockimpl.New()
 	commandService := commandimpl.NewService(
 		cfg.Cron.DeleteOldCommand,
 		log,
@@ -208,7 +207,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		eventBus,
 		commandRepository,
 		appStateRepository,
-		commandProcessingLock,
+		processinglockimpl.New(),
 		executor.NewRouter(
 			cfg.Cargo,
 			log,
@@ -226,7 +225,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 
 	apperrorcodeService := apperrorcodeimpl.NewService()
 	emergencyService := emergencyimpl.NewService(
-		commandProcessingLock,
 		commandService,
 		driveMotorService,
 		liftMotorService,

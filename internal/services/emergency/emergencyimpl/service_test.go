@@ -15,7 +15,6 @@ import (
 func TestService(t *testing.T) {
 	t.Run("Get emergency state", func(t *testing.T) {
 		t.Run("Should return the emergency state successfully", func(t *testing.T) {
-			lock := commandmocks.NewFakeProcessingLock(t)
 			commandService := commandmocks.NewFakeService(t)
 			driveMotorService := drivemotormocks.NewFakeService(t)
 			liftMotorService := liftmotormocks.NewFakeService(t)
@@ -24,7 +23,7 @@ func TestService(t *testing.T) {
 			err := emergencyStateRepository.UpdateEmergencyState(context.Background(), emergency.State{Locked: true})
 			assert.NoError(t, err)
 
-			service := NewService(lock, commandService, driveMotorService, liftMotorService, emergencyStateRepository)
+			service := NewService(commandService, driveMotorService, liftMotorService, emergencyStateRepository)
 
 			state, err := service.GetEmergencyState(context.Background())
 			assert.NoError(t, err)
@@ -34,18 +33,16 @@ func TestService(t *testing.T) {
 
 	t.Run("Stop operation", func(t *testing.T) {
 		t.Run("Should stop the command processing, drive motor and lift motor successfully", func(t *testing.T) {
-			lock := commandmocks.NewFakeProcessingLock(t)
 			commandService := commandmocks.NewFakeService(t)
 			driveMotorService := drivemotormocks.NewFakeService(t)
 			liftMotorService := liftmotormocks.NewFakeService(t)
 			emergencyStateRepository := NewEmergencyStateRepository()
 
-			lock.EXPECT().Lock().Return(nil)
-			commandService.EXPECT().CancelCurrentProcessingCommand(context.Background()).Return(nil)
+			commandService.EXPECT().LockProcessingCommand(context.Background()).Return(nil)
 			driveMotorService.EXPECT().Stop(context.Background()).Return(nil)
 			liftMotorService.EXPECT().Stop(context.Background()).Return(nil)
 
-			service := NewService(lock, commandService, driveMotorService, liftMotorService, emergencyStateRepository)
+			service := NewService(commandService, driveMotorService, liftMotorService, emergencyStateRepository)
 
 			err := service.StopOperation(context.Background())
 			assert.NoError(t, err)
@@ -55,41 +52,17 @@ func TestService(t *testing.T) {
 			assert.True(t, state.Locked)
 		})
 
-		t.Run("Should return an error if the command processing lock fails", func(t *testing.T) {
-			lock := commandmocks.NewFakeProcessingLock(t)
+		t.Run("Should return an error if lock processing command fails", func(t *testing.T) {
 			commandService := commandmocks.NewFakeService(t)
 			driveMotorService := drivemotormocks.NewFakeService(t)
 			liftMotorService := liftmotormocks.NewFakeService(t)
 			emergencyStateRepository := NewEmergencyStateRepository()
 
-			lock.EXPECT().Lock().Return(assert.AnError)
-			commandService.AssertNotCalled(t, "CancelCurrentProcessingCommand")
+			commandService.EXPECT().LockProcessingCommand(context.Background()).Return(assert.AnError)
 			driveMotorService.AssertNotCalled(t, "Stop")
 			liftMotorService.AssertNotCalled(t, "Stop")
 
-			service := NewService(lock, commandService, driveMotorService, liftMotorService, emergencyStateRepository)
-
-			err := service.StopOperation(context.Background())
-			assert.ErrorIs(t, err, assert.AnError)
-
-			state, err := emergencyStateRepository.GetEmergencyState(context.Background())
-			assert.NoError(t, err)
-			assert.False(t, state.Locked)
-		})
-
-		t.Run("Should return an error if the command service fails", func(t *testing.T) {
-			lock := commandmocks.NewFakeProcessingLock(t)
-			commandService := commandmocks.NewFakeService(t)
-			driveMotorService := drivemotormocks.NewFakeService(t)
-			liftMotorService := liftmotormocks.NewFakeService(t)
-			emergencyStateRepository := NewEmergencyStateRepository()
-
-			lock.EXPECT().Lock().Return(nil)
-			commandService.EXPECT().CancelCurrentProcessingCommand(context.Background()).Return(assert.AnError)
-			driveMotorService.AssertNotCalled(t, "Stop")
-			liftMotorService.AssertNotCalled(t, "Stop")
-
-			service := NewService(lock, commandService, driveMotorService, liftMotorService, emergencyStateRepository)
+			service := NewService(commandService, driveMotorService, liftMotorService, emergencyStateRepository)
 
 			err := service.StopOperation(context.Background())
 			assert.ErrorIs(t, err, assert.AnError)
@@ -100,18 +73,16 @@ func TestService(t *testing.T) {
 		})
 
 		t.Run("Should return an error if the drive motor service fails", func(t *testing.T) {
-			lock := commandmocks.NewFakeProcessingLock(t)
 			commandService := commandmocks.NewFakeService(t)
 			driveMotorService := drivemotormocks.NewFakeService(t)
 			liftMotorService := liftmotormocks.NewFakeService(t)
 			emergencyStateRepository := NewEmergencyStateRepository()
 
-			lock.EXPECT().Lock().Return(nil)
-			commandService.EXPECT().CancelCurrentProcessingCommand(context.Background()).Return(nil)
+			commandService.EXPECT().LockProcessingCommand(context.Background()).Return(nil)
 			driveMotorService.EXPECT().Stop(context.Background()).Return(assert.AnError)
 			liftMotorService.AssertNotCalled(t, "Stop")
 
-			service := NewService(lock, commandService, driveMotorService, liftMotorService, emergencyStateRepository)
+			service := NewService(commandService, driveMotorService, liftMotorService, emergencyStateRepository)
 
 			err := service.StopOperation(context.Background())
 			assert.ErrorIs(t, err, assert.AnError)
@@ -122,18 +93,16 @@ func TestService(t *testing.T) {
 		})
 
 		t.Run("Should return an error if the lift motor service fails", func(t *testing.T) {
-			lock := commandmocks.NewFakeProcessingLock(t)
 			commandService := commandmocks.NewFakeService(t)
 			driveMotorService := drivemotormocks.NewFakeService(t)
 			liftMotorService := liftmotormocks.NewFakeService(t)
 			emergencyStateRepository := NewEmergencyStateRepository()
 
-			lock.EXPECT().Lock().Return(nil)
-			commandService.EXPECT().CancelCurrentProcessingCommand(context.Background()).Return(nil)
+			commandService.EXPECT().LockProcessingCommand(context.Background()).Return(nil)
 			driveMotorService.EXPECT().Stop(context.Background()).Return(nil)
 			liftMotorService.EXPECT().Stop(context.Background()).Return(assert.AnError)
 
-			service := NewService(lock, commandService, driveMotorService, liftMotorService, emergencyStateRepository)
+			service := NewService(commandService, driveMotorService, liftMotorService, emergencyStateRepository)
 
 			err := service.StopOperation(context.Background())
 			assert.ErrorIs(t, err, assert.AnError)
@@ -146,14 +115,14 @@ func TestService(t *testing.T) {
 
 	t.Run("Resume operation", func(t *testing.T) {
 		t.Run("Should unlock the command processing successfully", func(t *testing.T) {
-			lock := commandmocks.NewFakeProcessingLock(t)
 			commandService := commandmocks.NewFakeService(t)
 			driveMotorService := drivemotormocks.NewFakeService(t)
 			liftMotorService := liftmotormocks.NewFakeService(t)
 			emergencyStateRepository := NewEmergencyStateRepository()
-			lock.EXPECT().Unlock().Return(nil)
 
-			service := NewService(lock, commandService, driveMotorService, liftMotorService, emergencyStateRepository)
+			commandService.EXPECT().UnlockProcessingCommand(context.Background()).Return(nil)
+
+			service := NewService(commandService, driveMotorService, liftMotorService, emergencyStateRepository)
 
 			err := service.ResumeOperation(context.Background())
 			assert.NoError(t, err)
@@ -164,15 +133,14 @@ func TestService(t *testing.T) {
 		})
 
 		t.Run("Should return an error if the command processing lock fails", func(t *testing.T) {
-			lock := commandmocks.NewFakeProcessingLock(t)
 			commandService := commandmocks.NewFakeService(t)
 			driveMotorService := drivemotormocks.NewFakeService(t)
 			liftMotorService := liftmotormocks.NewFakeService(t)
 			emergencyStateRepository := NewEmergencyStateRepository()
 
-			lock.EXPECT().Unlock().Return(assert.AnError)
+			commandService.EXPECT().UnlockProcessingCommand(context.Background()).Return(assert.AnError)
 
-			service := NewService(lock, commandService, driveMotorService, liftMotorService, emergencyStateRepository)
+			service := NewService(commandService, driveMotorService, liftMotorService, emergencyStateRepository)
 
 			err := service.ResumeOperation(context.Background())
 			assert.ErrorIs(t, err, assert.AnError)

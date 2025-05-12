@@ -49,6 +49,13 @@ type Service interface {
 	// CancelActiveCloudCommands cancels all QUEUED and PROCESSING commands created by the cloud.
 	CancelActiveCloudCommands(ctx context.Context) error
 
+	// LockProcessingCommand locks the processing command.
+	// It also cancels the current processing command.
+	LockProcessingCommand(ctx context.Context) error
+
+	// UnlockProcessingCommand unlocks the processing command.
+	UnlockProcessingCommand(ctx context.Context) error
+
 	ExecuteCreatedCommand(ctx context.Context, params ExecuteCreatedCommandParams) error
 
 	DeleteCommandByID(ctx context.Context, params DeleteCommandByIDParams) error

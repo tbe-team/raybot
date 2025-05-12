@@ -484,6 +484,98 @@ func (_c *FakeService_ListCommands_Call) RunAndReturn(run func(context.Context, 
 	return _c
 }
 
+// LockProcessingCommand provides a mock function with given fields: ctx
+func (_m *FakeService) LockProcessingCommand(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LockProcessingCommand")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeService_LockProcessingCommand_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LockProcessingCommand'
+type FakeService_LockProcessingCommand_Call struct {
+	*mock.Call
+}
+
+// LockProcessingCommand is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) LockProcessingCommand(ctx interface{}) *FakeService_LockProcessingCommand_Call {
+	return &FakeService_LockProcessingCommand_Call{Call: _e.mock.On("LockProcessingCommand", ctx)}
+}
+
+func (_c *FakeService_LockProcessingCommand_Call) Run(run func(ctx context.Context)) *FakeService_LockProcessingCommand_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_LockProcessingCommand_Call) Return(_a0 error) *FakeService_LockProcessingCommand_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeService_LockProcessingCommand_Call) RunAndReturn(run func(context.Context) error) *FakeService_LockProcessingCommand_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UnlockProcessingCommand provides a mock function with given fields: ctx
+func (_m *FakeService) UnlockProcessingCommand(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UnlockProcessingCommand")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeService_UnlockProcessingCommand_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UnlockProcessingCommand'
+type FakeService_UnlockProcessingCommand_Call struct {
+	*mock.Call
+}
+
+// UnlockProcessingCommand is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) UnlockProcessingCommand(ctx interface{}) *FakeService_UnlockProcessingCommand_Call {
+	return &FakeService_UnlockProcessingCommand_Call{Call: _e.mock.On("UnlockProcessingCommand", ctx)}
+}
+
+func (_c *FakeService_UnlockProcessingCommand_Call) Run(run func(ctx context.Context)) *FakeService_UnlockProcessingCommand_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_UnlockProcessingCommand_Call) Return(_a0 error) *FakeService_UnlockProcessingCommand_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeService_UnlockProcessingCommand_Call) RunAndReturn(run func(context.Context) error) *FakeService_UnlockProcessingCommand_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // NewFakeService creates a new instance of FakeService. It also registers a testing interface on the mock and a cleanup function to assert the mocks expectations.
 // The first argument is typically a *testing.T value.
 func NewFakeService(t interface {

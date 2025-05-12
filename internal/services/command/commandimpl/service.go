@@ -134,6 +134,26 @@ func (s *Service) CancelActiveCloudCommands(ctx context.Context) error {
 	return nil
 }
 
+func (s *Service) LockProcessingCommand(ctx context.Context) error {
+	if err := s.processingLock.Lock(); err != nil {
+		return fmt.Errorf("lock processing command: %w", err)
+	}
+
+	if err := s.CancelCurrentProcessingCommand(ctx); err != nil {
+		return fmt.Errorf("cancel current processing command: %w", err)
+	}
+
+	return nil
+}
+
+func (s *Service) UnlockProcessingCommand(_ context.Context) error {
+	if err := s.processingLock.Unlock(); err != nil {
+		return fmt.Errorf("unlock processing command: %w", err)
+	}
+
+	return nil
+}
+
 func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
 	cmd, err := s.commandRepository.GetCommandByID(ctx, params.CommandID)
 	if err != nil {
