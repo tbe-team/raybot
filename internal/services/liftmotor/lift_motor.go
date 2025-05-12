@@ -25,6 +25,9 @@ type Service interface {
 	// SetCargoPosition moves the cargo to the specified position using hardware control.
 	// This directly sends commands to the hardware.
 	SetCargoPosition(ctx context.Context, params SetCargoPositionParams) error
+
+	// Stop stops the cargo motor using hardware control.
+	Stop(ctx context.Context) error
 }
 
 //nolint:revive

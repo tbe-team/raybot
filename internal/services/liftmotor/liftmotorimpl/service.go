@@ -58,3 +58,11 @@ func (s *service) SetCargoPosition(ctx context.Context, params liftmotor.SetCarg
 		Enabled:           true,
 	})
 }
+
+func (s *service) Stop(ctx context.Context) error {
+	if err := s.picSerialController.StopCargoMotor(ctx); err != nil {
+		return fmt.Errorf("stop cargo motor: %w", err)
+	}
+
+	return nil
+}

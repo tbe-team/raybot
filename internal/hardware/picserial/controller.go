@@ -10,6 +10,7 @@ import (
 
 type Controller interface {
 	SetCargoPosition(ctx context.Context, targetPosition uint16) error
+	StopCargoMotor(ctx context.Context) error
 	MoveForward(ctx context.Context, speed uint8) error
 	MoveBackward(ctx context.Context, speed uint8) error
 	StopDriveMotor(ctx context.Context) error
@@ -36,6 +37,27 @@ func (c *DefaultClient) SetCargoPosition(ctx context.Context, targetPosition uin
 
 	if err := c.Write(ctx, cmdJSON); err != nil {
 		return fmt.Errorf("write lift cargo command: %w", err)
+	}
+
+	return nil
+}
+
+func (c *DefaultClient) StopCargoMotor(ctx context.Context) error {
+	cmd := picCommand{
+		ID:   shortuuid.New(),
+		Type: picCommandTypeLiftMotor,
+		Data: picCommandLiftMotorData{
+			Enable: false,
+		},
+	}
+
+	cmdJSON, err := json.Marshal(cmd)
+	if err != nil {
+		return fmt.Errorf("marshal stop cargo motor command: %w", err)
+	}
+
+	if err := c.Write(ctx, cmdJSON); err != nil {
+		return fmt.Errorf("write stop cargo motor command: %w", err)
 	}
 
 	return nil
