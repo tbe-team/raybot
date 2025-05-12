@@ -11,8 +11,8 @@ get:
         application/json:
           schema:
             $ref: "../components/schemas/health.yml#/HealthResponse"
-    "500":
-      description: Internal Server Error
+    "400":
+      description: Bad Request
       content:
         application/json:
           schema:
