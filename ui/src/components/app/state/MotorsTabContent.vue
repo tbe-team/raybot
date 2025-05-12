@@ -13,6 +13,11 @@ const props = defineProps<{
   driveMotor: DriveMotorState
   cargoDoorMotor: CargoDoorMotorState
 }>()
+
+const liftMotorProgress = computed(() => {
+  const percent = (props.liftMotor.currentPosition / props.liftMotor.targetPosition) * 100
+  return percent > 100 ? 100 : percent
+})
 </script>
 
 <template>
@@ -41,7 +46,6 @@ const props = defineProps<{
                 <span>Current Position</span>
                 <span>{{ props.liftMotor.currentPosition }}cm</span>
               </div>
-              <Progress :value="props.liftMotor.currentPosition" :max="100" class="h-2" />
             </div>
 
             <div class="space-y-1">
@@ -52,7 +56,7 @@ const props = defineProps<{
               <div class="relative h-2 rounded-full bg-muted">
                 <div
                   class="absolute w-1 h-4 -translate-y-1/2 rounded-full bg-primary top-1/2"
-                  :style="{ left: `${props.liftMotor.targetPosition}%` }"
+                  :style="{ left: `${liftMotorProgress}%` }"
                 />
               </div>
             </div>
@@ -88,22 +92,22 @@ const props = defineProps<{
               <div class="flex items-center gap-2">
                 <ArrowRight
                   v-if="props.driveMotor.direction === 'FORWARD'"
-                  class="w-4 h-4 text-success"
+                  class="w-4 h-4 leading-5 text-success"
                 />
                 <ArrowLeft
                   v-else
-                  class="w-4 h-4 text-warning"
+                  class="w-4 h-4 leading-5 text-warning"
                 />
-                <span>{{ props.driveMotor.direction }}</span>
+                <span class="leading-5">{{ props.driveMotor.direction }}</span>
               </div>
             </div>
 
             <div class="space-y-1">
               <div class="flex justify-between text-sm">
                 <span>Speed</span>
-                <span>{{ (props.driveMotor.speed * 100).toFixed(0) }}%</span>
+                <span>{{ props.driveMotor.speed }}%</span>
               </div>
-              <Progress :value="props.driveMotor.speed * 100" class="h-2" />
+              <Progress :model-value="props.driveMotor.speed" :max="100" class="h-2" />
             </div>
 
             <div class="flex items-center justify-between">

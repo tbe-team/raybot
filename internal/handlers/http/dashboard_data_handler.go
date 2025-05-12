@@ -38,6 +38,7 @@ func (h dashboardDataHandler) convertRobotStateToResponse(state dashboarddata.Ro
 			Fault:        state.Battery.Fault,
 			CellVoltages: state.Battery.CellVoltages,
 			Health:       state.Battery.Health,
+			UpdatedAt:    state.Battery.UpdatedAt,
 		},
 		Charge: gen.ChargeState{
 			CurrentLimit: state.BatteryCharge.CurrentLimit,
