@@ -95,6 +95,12 @@ type ProcessingLock interface {
 	// The lock is released when the function returns.
 	WithLock(fn func() error) error
 
+	// Lock acquires the lock.
+	Lock() error
+
+	// Unlock releases the lock.
+	Unlock() error
+
 	// WaitUntilUnlocked blocks the execution until the lock is released.
 	// If the context is canceled, the function returns immediately.
 	WaitUntilUnlocked(ctx context.Context) error

@@ -33,6 +33,23 @@ func (r *processingLock) WithLock(fn func() error) error {
 	return err
 }
 
+func (r *processingLock) Lock() error {
+	r.cond.L.Lock()
+	r.locked = true
+	r.cond.L.Unlock()
+
+	return nil
+}
+
+func (r *processingLock) Unlock() error {
+	r.cond.L.Lock()
+	r.locked = false
+	r.cond.Broadcast()
+	r.cond.L.Unlock()
+
+	return nil
+}
+
 func (r *processingLock) WaitUntilUnlocked(ctx context.Context) error {
 	done := make(chan struct{})
 

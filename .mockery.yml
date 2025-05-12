@@ -13,5 +13,14 @@ packages:
   github.com/tbe-team/raybot/internal/services/command:
     config:
     interfaces:
+      Service:
       Repository:
+      ProcessingLock:
+  github.com/tbe-team/raybot/internal/services/drivemotor:
+    config:
+    interfaces:
+      Service:
+  github.com/tbe-team/raybot/internal/services/liftmotor:
+    config:
+    interfaces:
       Service:
