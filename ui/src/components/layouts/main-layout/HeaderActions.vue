@@ -15,7 +15,7 @@ const { mutate: resumeEmergency } = useEmergencyResumeMutation()
 const { openConfirmation } = useConfirmationStore()
 
 function handleEmergencyStop() {
-    if (emergencyState.value?.locked) {
+  if (emergencyState.value?.locked) {
     resumeEmergency(undefined, {
       onSuccess: () => {
         refetchEmergencyState()
@@ -24,26 +24,27 @@ function handleEmergencyStop() {
         notification.error('Failed to resume emergency')
       },
     })
-  } else {
+  }
+  else {
     openConfirmation({
-    title: 'Stop emergency',
-    description: 'Are you sure you want to stop the emergency?',
-    actionLabel: 'Confirm',
-    cancelLabel: 'Cancel',
-    onAction: () => {
-      stopEmergency(undefined, {
-        onSuccess: () => {
-        refetchEmergencyState()
+      title: 'Stop emergency',
+      description: 'Are you sure you want to stop the emergency?',
+      actionLabel: 'Confirm',
+      cancelLabel: 'Cancel',
+      onAction: () => {
+        stopEmergency(undefined, {
+          onSuccess: () => {
+            refetchEmergencyState()
+          },
+          onError: () => {
+            notification.error('Failed to stop emergency')
+          },
+        })
       },
-      onError: () => {
-        notification.error('Failed to stop emergency')
+      onCancel: () => {
       },
     })
-    },
-    onCancel: () => {
-    },
-  })
-}
+  }
 }
 </script>
 

@@ -1,6 +1,6 @@
+import type { EmergencyState } from '@/types/emergency'
 import type { AxiosRequestConfig } from 'axios'
 import http from '@/lib/http'
-import type { EmergencyState } from '@/types/emergency'
 
 const emergencyAPI = {
   getEmergencyState: (axiosOpts?: Partial<AxiosRequestConfig>): Promise<EmergencyState> =>
