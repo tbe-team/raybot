@@ -2,6 +2,7 @@ package drivemotorimpl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/tbe-team/raybot/internal/events"
@@ -60,6 +61,9 @@ func (s service) MoveForward(ctx context.Context, params drivemotor.MoveForwardP
 	}
 
 	if err := s.picSerialController.MoveForward(ctx, params.Speed); err != nil {
+		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
+			return drivemotor.ErrCanNotControlDriveMotor
+		}
 		return fmt.Errorf("move forward: %w", err)
 	}
 
@@ -72,6 +76,9 @@ func (s service) MoveBackward(ctx context.Context, params drivemotor.MoveBackwar
 	}
 
 	if err := s.picSerialController.MoveBackward(ctx, params.Speed); err != nil {
+		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
+			return drivemotor.ErrCanNotControlDriveMotor
+		}
 		return fmt.Errorf("move backward: %w", err)
 	}
 
@@ -80,6 +87,10 @@ func (s service) MoveBackward(ctx context.Context, params drivemotor.MoveBackwar
 
 func (s service) Stop(ctx context.Context) error {
 	if err := s.picSerialController.StopDriveMotor(ctx); err != nil {
+		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
+			return drivemotor.ErrCanNotControlDriveMotor
+		}
+
 		return fmt.Errorf("stop: %w", err)
 	}
 

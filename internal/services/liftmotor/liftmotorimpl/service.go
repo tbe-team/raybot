@@ -2,6 +2,7 @@ package liftmotorimpl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/tbe-team/raybot/internal/hardware/picserial"
@@ -46,6 +47,9 @@ func (s *service) SetCargoPosition(ctx context.Context, params liftmotor.SetCarg
 	}
 
 	if err := s.picSerialController.SetCargoPosition(ctx, params.Position); err != nil {
+		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
+			return liftmotor.ErrCanNotControlLiftMotor
+		}
 		return fmt.Errorf("set cargo position: %w", err)
 	}
 
@@ -61,6 +65,9 @@ func (s *service) SetCargoPosition(ctx context.Context, params liftmotor.SetCarg
 
 func (s *service) Stop(ctx context.Context) error {
 	if err := s.picSerialController.StopCargoMotor(ctx); err != nil {
+		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
+			return liftmotor.ErrCanNotControlLiftMotor
+		}
 		return fmt.Errorf("stop cargo motor: %w", err)
 	}
 

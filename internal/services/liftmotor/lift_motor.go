@@ -1,6 +1,13 @@
 package liftmotor
 
-import "context"
+import (
+	"context"
+
+	"github.com/tbe-team/raybot/internal/hardware/picserial"
+	"github.com/tbe-team/raybot/pkg/xerror"
+)
+
+var ErrCanNotControlLiftMotor = xerror.BadRequest(picserial.ErrPICSerialNotConnected, "liftmotor.canNotControl", "can not control lift motor")
 
 type UpdateLiftMotorStateParams struct {
 	CurrentPosition    uint16

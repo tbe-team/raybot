@@ -1,6 +1,13 @@
 package drivemotor
 
-import "context"
+import (
+	"context"
+
+	"github.com/tbe-team/raybot/internal/hardware/picserial"
+	"github.com/tbe-team/raybot/pkg/xerror"
+)
+
+var ErrCanNotControlDriveMotor = xerror.BadRequest(picserial.ErrPICSerialNotConnected, "drivemotor.canNotControl", "can not control drive motor")
 
 type UpdateDriveMotorStateParams struct {
 	Direction    Direction `validate:"required_if=SetDirection true,enum"`
