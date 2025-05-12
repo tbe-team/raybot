@@ -18,6 +18,7 @@ func startHTTPService(app *application.Application, interruptChan <-chan any) er
 		app.PeripheralService,
 		app.CommandService,
 		app.ApperrorcodeService,
+		app.EmergencyService,
 	)
 
 	cleanup, err := service.Run()

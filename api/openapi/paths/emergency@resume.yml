@@ -1,0 +1,15 @@
+post:
+  summary: Resume the robot from an emergency state
+  operationId: resumeEmergency
+  description: Resume the robot from an emergency state
+  tags:
+    - emergency
+  responses:
+    "204":
+      description: No Content
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

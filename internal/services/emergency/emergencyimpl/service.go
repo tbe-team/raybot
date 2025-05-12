@@ -2,6 +2,7 @@ package emergencyimpl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/tbe-team/raybot/internal/services/command"
@@ -45,15 +46,21 @@ func (s Service) StopOperation(ctx context.Context) error {
 	}
 
 	if err := s.commandService.CancelCurrentProcessingCommand(ctx); err != nil {
-		return fmt.Errorf("failed to cancel current processing command: %w", err)
+		if !errors.Is(err, command.ErrNoCommandBeingProcessed) {
+			return fmt.Errorf("failed to cancel current processing command: %w", err)
+		}
 	}
 
 	if err := s.driveMotorService.Stop(ctx); err != nil {
-		return fmt.Errorf("failed to stop drive motor: %w", err)
+		if !errors.Is(err, drivemotor.ErrCanNotControlDriveMotor) {
+			return fmt.Errorf("failed to stop drive motor: %w", err)
+		}
 	}
 
 	if err := s.liftMotorService.Stop(ctx); err != nil {
-		return fmt.Errorf("failed to stop lift motor: %w", err)
+		if !errors.Is(err, liftmotor.ErrCanNotControlLiftMotor) {
+			return fmt.Errorf("failed to stop lift motor: %w", err)
+		}
 	}
 
 	if err := s.emergencyStateRepository.UpdateEmergencyState(ctx, emergency.State{Locked: true}); err != nil {

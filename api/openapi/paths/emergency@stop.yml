@@ -1,0 +1,15 @@
+post:
+  summary: Stop the robot in case of emergency
+  operationId: stopEmergency
+  description: Stop the robot in case of emergency
+  tags:
+    - emergency
+  responses:
+    "204":
+      description: No Content
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
