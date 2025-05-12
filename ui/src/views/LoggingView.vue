@@ -20,7 +20,7 @@ function handleTabChange(value: string | number) {
         Logging
       </h1>
       <p class="text-sm text-muted-foreground">
-        View logs for troubleshooting and system performance optimization
+        Log configuration allows users to set up and manage the logging system
         <RouterLink to="/reboot" class="text-blue-500">
           (Reboot to apply changes)
         </RouterLink>

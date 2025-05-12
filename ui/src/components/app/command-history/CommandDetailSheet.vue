@@ -21,7 +21,7 @@ const isOpen = defineModel<boolean>('isOpen', { required: true })
           Command detail
         </SheetTitle>
         <SheetDescription>
-          Real-time information about the selected command
+          Information about the selected command
         </SheetDescription>
       </SheetHeader>
 
