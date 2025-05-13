@@ -72,7 +72,7 @@ func TestIntegrationCommandService(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			// Because event we don't handle event in service layer
+			// Because we don't handle event in service layer
 			// so we simulate handle [events.CommandCreatedEvent] here
 			go func() {
 				// This should block until executor router unblock
@@ -180,7 +180,7 @@ func TestIntegrationCommandService(t *testing.T) {
 			})
 			require.NoError(t, err)
 
-			// Because event we don't handle event in service layer
+			// Because we don't handle event in service layer
 			// so we simulate handle [events.CommandCreatedEvent] here
 			go func() {
 				// This should block until executor router unblock
@@ -353,6 +353,161 @@ func TestIntegrationCommandService(t *testing.T) {
 		}
 		require.Contains(t, ids, cmd1.ID)
 		require.Contains(t, ids, cmd2.ID)
+	})
+
+	t.Run(`Lock processing command successfully`, func(t *testing.T) {
+		/*
+		   Given a queue with three commands: cmd1, cmd2, and cmd3, created in that order.
+		   - cmd1 enters the PROCESSING state (assumed to be blocking).
+		   - cmd2 and cmd3 remain in the QUEUED state.
+
+		   When a call is made to forcibly lock the processing command:
+		   - cmd1 should be cancelled.
+		   - cmd2 and cmd3 should remain in the QUEUED state.
+		*/
+
+		log := logging.NewNoopLogger()
+		db, err := db.NewTestDB()
+		require.NoError(t, err)
+		defer func() {
+			require.NoError(t, db.Close())
+		}()
+		err = db.AutoMigrate()
+		require.NoError(t, err)
+		queries := sqlc.New()
+		commandRepository := NewCommandRepository(db, queries)
+		runningCmdRepository := newRunningCmdRepository()
+		commandService := Service{
+			deleteOldCmdCfg:      config.DeleteOldCommand{},
+			log:                  log,
+			validator:            validator.New(),
+			publisher:            eventbus.NewInProcEventBus(log),
+			runningCmdRepository: runningCmdRepository,
+			commandRepository:    commandRepository,
+			appStateRepository:   appstateimpl.NewAppStateRepository(),
+			processingLock:       processinglockimpl.New(),
+			executorRouter:       newBlockingExecutorRouter(commandRepository),
+		}
+
+		cmd1, err := commandService.CreateCommand(context.Background(), command.CreateCommandParams{
+			Source: command.SourceCloud,
+			Inputs: command.MoveForwardInputs{},
+		})
+		require.NoError(t, err)
+
+		cmd2, err := commandService.CreateCommand(context.Background(), command.CreateCommandParams{
+			Source: command.SourceCloud,
+			Inputs: command.MoveForwardInputs{},
+		})
+		require.NoError(t, err)
+
+		cmd3, err := commandService.CreateCommand(context.Background(), command.CreateCommandParams{
+			Source: command.SourceCloud,
+			Inputs: command.MoveForwardInputs{},
+		})
+		require.NoError(t, err)
+
+		// Because we don't handle event in service layer
+		// so we simulate handle [events.CommandCreatedEvent] here
+		go func() {
+			// This should block until executor router unblock
+			if err := commandService.ExecuteCreatedCommand(context.Background(), command.ExecuteCreatedCommandParams{
+				CommandID: cmd1.ID,
+			}); err != nil {
+				t.Errorf("failed to execute command: %v", err)
+			}
+		}()
+
+		// Block until we have a running command (cause by ExecuteCreatedCommand)
+		require.Eventually(t, func() bool {
+			return runningCmdRepository.Get() != nil
+		}, 500*time.Millisecond, 10*time.Millisecond)
+
+		err = commandService.LockProcessingCommand(context.Background())
+		require.NoError(t, err)
+
+		require.Eventually(t, func() bool {
+			return runningCmdRepository.Get() == nil
+		}, 500*time.Millisecond, 10*time.Millisecond)
+
+		cmd1, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+			CommandID: cmd1.ID,
+		})
+		require.NoError(t, err)
+		require.Equal(t, command.StatusCanceled, cmd1.Status)
+
+		cmd2, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+			CommandID: cmd2.ID,
+		})
+		require.NoError(t, err)
+		require.Equal(t, command.StatusQueued, cmd2.Status)
+
+		cmd3, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+			CommandID: cmd3.ID,
+		})
+		require.NoError(t, err)
+		require.Equal(t, command.StatusQueued, cmd3.Status)
+	})
+
+	t.Run(`Execute created command should block until processing lock is released`, func(t *testing.T) {
+		/*
+		   Given a cmd1 and processing lock is acquired
+
+		   When ExecuteCreatedCommand is called with cmd1.ID
+		   - It should block until processing lock is released
+		   - cmd1 status should be QUEUED before processing lock is released
+		*/
+
+		log := logging.NewNoopLogger()
+		db, err := db.NewTestDB()
+		require.NoError(t, err)
+		defer func() {
+			require.NoError(t, db.Close())
+		}()
+		err = db.AutoMigrate()
+		require.NoError(t, err)
+		queries := sqlc.New()
+		commandRepository := NewCommandRepository(db, queries)
+		runningCmdRepository := newRunningCmdRepository()
+		commandService := Service{
+			deleteOldCmdCfg:      config.DeleteOldCommand{},
+			log:                  log,
+			validator:            validator.New(),
+			publisher:            eventbus.NewInProcEventBus(log),
+			runningCmdRepository: runningCmdRepository,
+			commandRepository:    commandRepository,
+			appStateRepository:   appstateimpl.NewAppStateRepository(),
+			processingLock:       processinglockimpl.New(),
+			executorRouter:       newBlockingExecutorRouter(commandRepository),
+		}
+
+		cmd1, err := commandService.CreateCommand(context.Background(), command.CreateCommandParams{
+			Source: command.SourceCloud,
+			Inputs: command.MoveForwardInputs{},
+		})
+		require.NoError(t, err)
+
+		err = commandService.LockProcessingCommand(context.Background())
+		require.NoError(t, err)
+
+		errCh := make(chan error)
+		go func() {
+			err := commandService.ExecuteCreatedCommand(context.Background(), command.ExecuteCreatedCommandParams{
+				CommandID: cmd1.ID,
+			})
+			errCh <- err
+		}()
+
+		time.Sleep(100 * time.Millisecond)
+
+		err = commandService.UnlockProcessingCommand(context.Background())
+		require.NoError(t, err)
+
+		cmd1, err = commandService.GetCommandByID(context.Background(), command.GetCommandByIDParams{
+			CommandID: cmd1.ID,
+		})
+		require.NoError(t, err)
+		require.Equal(t, command.StatusQueued, cmd1.Status)
 	})
 }
 
