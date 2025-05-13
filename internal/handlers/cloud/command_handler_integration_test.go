@@ -44,7 +44,8 @@ func TestIntegrationCommandHandler_CreateCommand(t *testing.T) {
 					Inputs: &commandv1.CommandInputs{
 						Inputs: &commandv1.CommandInputs_MoveTo{
 							MoveTo: &commandv1.MoveToInputs{
-								Location: "test-location",
+								Location:  "test-location",
+								Direction: commandv1.MoveToInputs_DIRECTION_FORWARD,
 							},
 						},
 					},
