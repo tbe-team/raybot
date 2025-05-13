@@ -29,7 +29,13 @@ func newCargoLiftExecutor(
 
 	return newCommandExecutor(
 		handler.Handle,
-		Hooks[command.CargoLiftOutputs]{},
+		Hooks[command.CargoLiftOutputs]{
+			OnCancel: func(ctx context.Context) {
+				if err := liftMotorService.Stop(ctx); err != nil {
+					log.Error("failed to stop lift motor", slog.Any("error", err))
+				}
+			},
+		},
 		log,
 		commandRepository,
 	)
