@@ -12,6 +12,8 @@ import (
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
+const defaultMoveToSpeed = 100
+
 func newMoveToExecutor(
 	log *slog.Logger,
 	subscriber eventbus.Subscriber,
@@ -53,7 +55,7 @@ func (h moveToHandler) Handle(ctx context.Context, inputs command.MoveToInputs) 
 	}()
 
 	if err := h.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
-		Speed: 100,
+		Speed: defaultMoveToSpeed,
 	}); err != nil {
 		return command.MoveToOutputs{}, fmt.Errorf("failed to move forward: %w", err)
 	}

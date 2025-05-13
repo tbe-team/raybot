@@ -9,6 +9,8 @@ import (
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 )
 
+const defaultMoveForwardSpeed = 100
+
 func newMoveForwardExecutor(
 	log *slog.Logger,
 	driveMotorService drivemotor.Service,
@@ -34,7 +36,7 @@ type moveForwardHandler struct {
 
 func (h moveForwardHandler) Handle(ctx context.Context, _ command.MoveForwardInputs) (command.MoveForwardOutputs, error) {
 	if err := h.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
-		Speed: 100,
+		Speed: defaultMoveForwardSpeed,
 	}); err != nil {
 		return command.MoveForwardOutputs{}, fmt.Errorf("failed to move forward: %w", err)
 	}

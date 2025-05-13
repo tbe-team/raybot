@@ -9,6 +9,8 @@ import (
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 )
 
+const defaultMoveBackwardSpeed = 100
+
 func newMoveBackwardExecutor(
 	log *slog.Logger,
 	driveMotorService drivemotor.Service,
@@ -34,7 +36,7 @@ type moveBackwardHandler struct {
 
 func (h moveBackwardHandler) Handle(ctx context.Context, _ command.MoveBackwardInputs) (command.MoveBackwardOutputs, error) {
 	if err := h.driveMotorService.MoveBackward(ctx, drivemotor.MoveBackwardParams{
-		Speed: 100,
+		Speed: defaultMoveBackwardSpeed,
 	}); err != nil {
 		return command.MoveBackwardOutputs{}, fmt.Errorf("failed to move backward: %w", err)
 	}
