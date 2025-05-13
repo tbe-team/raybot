@@ -62,8 +62,20 @@ func (commandHandler) convertReqInputsToCommandInputs(req *commandv1.CreateComma
 		if i == nil {
 			return nil, fmt.Errorf("move to inputs is nil")
 		}
+
+		var direction command.MoveDirection
+		switch i.Direction {
+		case commandv1.MoveToInputs_DIRECTION_FORWARD:
+			direction = command.MoveDirectionForward
+		case commandv1.MoveToInputs_DIRECTION_BACKWARD:
+			direction = command.MoveDirectionBackward
+		default:
+			return nil, fmt.Errorf("invalid move direction: %v", i.Direction)
+		}
+
 		return &command.MoveToInputs{
-			Location: i.Location,
+			Location:  i.Location,
+			Direction: direction,
 		}, nil
 
 	case commandv1.CommandType_COMMAND_TYPE_MOVE_FORWARD:
@@ -201,10 +213,21 @@ func (commandHandler) convertCommandInputsToResponse(inputs command.Inputs) *com
 		}
 
 	case *command.MoveToInputs:
+		var direction commandv1.MoveToInputs_Direction
+		switch i.Direction {
+		case command.MoveDirectionForward:
+			direction = commandv1.MoveToInputs_DIRECTION_FORWARD
+		case command.MoveDirectionBackward:
+			direction = commandv1.MoveToInputs_DIRECTION_BACKWARD
+		default:
+			direction = commandv1.MoveToInputs_DIRECTION_UNSPECIFIED
+		}
+
 		return &commandv1.CommandInputs{
 			Inputs: &commandv1.CommandInputs_MoveTo{
 				MoveTo: &commandv1.MoveToInputs{
-					Location: i.Location,
+					Location:  i.Location,
+					Direction: direction,
 				},
 			},
 		}

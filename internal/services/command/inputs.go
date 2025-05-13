@@ -45,8 +45,27 @@ func (MoveBackwardInputs) CommandType() CommandType {
 }
 func (MoveBackwardInputs) isInputs() {}
 
+type MoveDirection string
+
+func (m MoveDirection) Validate() error {
+	if m != MoveDirectionForward && m != MoveDirectionBackward {
+		return fmt.Errorf("invalid move direction: %s", m)
+	}
+	return nil
+}
+
+func (m MoveDirection) String() string {
+	return string(m)
+}
+
+const (
+	MoveDirectionForward  MoveDirection = "FORWARD"
+	MoveDirectionBackward MoveDirection = "BACKWARD"
+)
+
 type MoveToInputs struct {
-	Location string `json:"location" validate:"required"`
+	Location  string        `json:"location" validate:"required"`
+	Direction MoveDirection `json:"direction" validate:"required,enum"`
 }
 
 func (MoveToInputs) CommandType() CommandType {

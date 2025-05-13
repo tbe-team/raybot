@@ -54,10 +54,23 @@ func (h moveToHandler) Handle(ctx context.Context, inputs command.MoveToInputs) 
 		h.trackingLocationUntilReached(ctx, inputs.Location)
 	}()
 
-	if err := h.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
-		Speed: defaultMoveToSpeed,
-	}); err != nil {
-		return command.MoveToOutputs{}, fmt.Errorf("failed to move forward: %w", err)
+	switch inputs.Direction {
+	case command.MoveDirectionForward:
+		if err := h.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
+			Speed: defaultMoveToSpeed,
+		}); err != nil {
+			return command.MoveToOutputs{}, fmt.Errorf("failed to move forward: %w", err)
+		}
+
+	case command.MoveDirectionBackward:
+		if err := h.driveMotorService.MoveBackward(ctx, drivemotor.MoveBackwardParams{
+			Speed: defaultMoveToSpeed,
+		}); err != nil {
+			return command.MoveToOutputs{}, fmt.Errorf("failed to move backward: %w", err)
+		}
+
+	default:
+		return command.MoveToOutputs{}, fmt.Errorf("invalid move direction: %s", inputs.Direction)
 	}
 
 	wg.Wait()

@@ -1493,6 +1493,13 @@ components:
       type: object
     MoveBackwardInputs:
       type: object
+    MoveDirection:
+      type: string
+      enum:
+        - FORWARD
+        - BACKWARD
+      description: The direction when moving
+      x-go-type: string
     MoveToInputs:
       type: object
       properties:
@@ -1500,8 +1507,13 @@ components:
           type: string
           description: The location to move to
           example: 1e8asj
+        direction:
+          $ref: '#/components/schemas/MoveDirection'
+          description: The direction when moving
+          x-order: 2
       required:
         - location
+        - direction
     CargoOpenInputs:
       type: object
     CargoCloseInputs:

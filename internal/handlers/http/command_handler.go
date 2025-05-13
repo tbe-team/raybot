@@ -187,7 +187,8 @@ func (commandHandler) convertInputsToResponse(inputs command.Inputs) (gen.Comman
 
 	case *command.MoveToInputs:
 		if err := res.FromMoveToInputs(gen.MoveToInputs{
-			Location: v.Location,
+			Location:  v.Location,
+			Direction: v.Direction.String(),
 		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from move to inputs: %w", err)
 		}
@@ -336,7 +337,8 @@ func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, i
 			return nil, fmt.Errorf("as move to inputs: %w", err)
 		}
 		return &command.MoveToInputs{
-			Location: i.Location,
+			Location:  i.Location,
+			Direction: command.MoveDirection(i.Direction),
 		}, nil
 
 	case command.CommandTypeMoveForward:
