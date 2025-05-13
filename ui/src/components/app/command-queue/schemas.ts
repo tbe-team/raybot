@@ -9,6 +9,7 @@ export const createCommandSchema = z.discriminatedUnion('type', [
     type: z.literal('MOVE_TO'),
     inputs: z.object({
       location: z.string(),
+      direction: z.union([z.literal('FORWARD'), z.literal('BACKWARD')]),
     }),
   }),
   z.object({

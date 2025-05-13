@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCreateCommandMutation } from '@/composables/use-command'
 import { RaybotError } from '@/types/error'
 import { toTypedSchema } from '@vee-validate/zod'
-import { ArrowDown, ArrowUp, Clock, Loader2, MapPin, Package, QrCode, Scan, StopCircle } from 'lucide-vue-next'
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Clock, Loader2, MapPin, Package, QrCode, Scan, StopCircle } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { createCommandSchema } from './schemas'
 
@@ -152,6 +152,32 @@ function clearForm() {
                 <FormLabel>Location</FormLabel>
                 <Input v-bind="componentField" placeholder="Enter location" />
                 <FormMessage />
+              </FormItem>
+            </FormField>
+            <FormField v-slot="{ componentField }" name="inputs.direction">
+              <FormItem>
+                <FormLabel>Move direction</FormLabel>
+                <Select v-bind="componentField">
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select direction" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="FORWARD">
+                      <div class="flex items-center gap-2">
+                        <ArrowRight class="w-4 h-4" />
+                        <span>Forward</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="BACKWARD">
+                      <div class="flex items-center gap-2">
+                        <ArrowLeft class="w-4 h-4" />
+                        <span>Backward</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </FormItem>
             </FormField>
           </template>

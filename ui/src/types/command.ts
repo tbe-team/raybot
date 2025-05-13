@@ -3,6 +3,7 @@ export interface MoveForwardInputs {}
 export interface MoveBackwardInputs {}
 export interface MoveToInputs {
   location: string
+  direction: 'FORWARD' | 'BACKWARD'
 }
 export interface CargoOpenInputs {}
 export interface CargoCloseInputs {}
