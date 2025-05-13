@@ -32,12 +32,12 @@ func TestController(t *testing.T) {
 		assert.JSONEq(t, expected, string(actual))
 	})
 
-	t.Run("Stop cargo motor successfully", func(t *testing.T) {
+	t.Run("Stop lift cargo motor successfully", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
 		client := NewClient(config.Serial{})
 		client.port = mockPort
 
-		err := client.StopCargoMotor(context.Background())
+		err := client.StopLiftCargoMotor(context.Background())
 		assert.NoError(t, err)
 
 		actual := overrideIDAndRemoveMarkers(t, mockPort.WriteBuffer.Bytes(), "abc")

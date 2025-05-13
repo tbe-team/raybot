@@ -10,10 +10,12 @@ import (
 
 type Controller interface {
 	SetCargoPosition(ctx context.Context, targetPosition uint16) error
-	StopCargoMotor(ctx context.Context) error
+	StopLiftCargoMotor(ctx context.Context) error
+
 	MoveForward(ctx context.Context, speed uint8) error
 	MoveBackward(ctx context.Context, speed uint8) error
 	StopDriveMotor(ctx context.Context) error
+
 	ConfigBatteryCharge(ctx context.Context, currentLimit uint16, enable bool) error
 	ConfigBatteryDischarge(ctx context.Context, currentLimit uint16, enable bool) error
 }
@@ -42,7 +44,7 @@ func (c *DefaultClient) SetCargoPosition(ctx context.Context, targetPosition uin
 	return nil
 }
 
-func (c *DefaultClient) StopCargoMotor(ctx context.Context) error {
+func (c *DefaultClient) StopLiftCargoMotor(ctx context.Context) error {
 	cmd := picCommand{
 		ID:   shortuuid.New(),
 		Type: picCommandTypeLiftMotor,

@@ -64,7 +64,7 @@ func (s *service) SetCargoPosition(ctx context.Context, params liftmotor.SetCarg
 }
 
 func (s *service) Stop(ctx context.Context) error {
-	if err := s.picSerialController.StopCargoMotor(ctx); err != nil {
+	if err := s.picSerialController.StopLiftCargoMotor(ctx); err != nil {
 		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
 			return liftmotor.ErrCanNotControlLiftMotor
 		}
