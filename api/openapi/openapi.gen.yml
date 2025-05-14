@@ -934,12 +934,20 @@ components:
           description: The lower position for the cargo
           minimum: 0
           x-order: 2
+        liftMotorSpeed:
+          type: integer
+          example: 100
+          description: The speed for the lift motor
+          minimum: 0
+          maximum: 100
+          x-order: 3
         bottomDistanceHysteresis:
           $ref: '#/components/schemas/CargoBottomDistanceHysteresis'
-          x-order: 3
+          x-order: 4
       required:
         - liftPosition
         - lowerPosition
+        - liftMotorSpeed
         - bottomDistanceHysteresis
     APConfig:
       type: object
