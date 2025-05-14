@@ -18,9 +18,27 @@ const props = defineProps<Props>()
 const cargoConfigSchema = z.object({
   liftPosition: z.number().min(0, 'Lift position must be at least 0'),
   lowerPosition: z.number().min(0, 'Lower position must be at least 0'),
+  bottomDistanceHysteresis: z.object({
+    lowerThreshold: z.number().int('Lower threshold must be an integer').positive('Lower threshold must be positive').default(15),
+    upperThreshold: z.number().int('Upper threshold must be an integer').positive('Upper threshold must be positive').default(20),
+  }),
 }).refine(data => data.liftPosition < data.lowerPosition, {
   message: 'Lift position must be less than lower position',
   path: ['liftPosition'],
+}).superRefine((data, ctx) => {
+  if (data.bottomDistanceHysteresis.lowerThreshold >= data.bottomDistanceHysteresis.upperThreshold) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Lower threshold must be less than upper threshold',
+      path: ['bottomDistanceHysteresis', 'lowerThreshold'],
+    });
+
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'Upper threshold must be greater than lower threshold',
+      path: ['bottomDistanceHysteresis', 'upperThreshold'],
+    });
+  }
 })
 
 const queryClient = useQueryClient()
@@ -32,6 +50,7 @@ const form = useForm({
 })
 
 const onSubmit = form.handleSubmit((values) => {
+  console.log(values)
   mutate(values, {
     onSuccess: () => {
       queryClient.setQueryData([CARGO_CONFIG_QUERY_KEY], values)
@@ -73,6 +92,40 @@ const onSubmit = form.handleSubmit((values) => {
             v-bind="componentField"
             type="number"
             placeholder="Enter lower position"
+            :disabled="isPending"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+    <div class="flex flex-col gap-2">
+      <h3 class="pb-2 text-lg font-medium border-b">
+        Bottom Distance Hysteresis
+      </h3>
+    </div>
+
+    <FormField v-slot="{ componentField }" name="bottomDistanceHysteresis.lowerThreshold">
+      <FormItem>
+        <FormLabel>Lower Threshold</FormLabel>
+        <FormControl>
+          <Input
+            v-bind="componentField"
+            type="number"
+            placeholder="Enter lower threshold"
+            :disabled="isPending"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+    <FormField v-slot="{ componentField }" name="bottomDistanceHysteresis.upperThreshold">
+      <FormItem>
+        <FormLabel>Upper Threshold</FormLabel>
+        <FormControl>
+          <Input
+            v-bind="componentField"
+            type="number"
+            placeholder="Enter upper threshold"
             :disabled="isPending"
           />
         </FormControl>
