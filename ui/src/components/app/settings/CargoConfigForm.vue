@@ -18,6 +18,7 @@ const props = defineProps<Props>()
 const cargoConfigSchema = z.object({
   liftPosition: z.number().min(0, 'Lift position must be at least 0'),
   lowerPosition: z.number().min(0, 'Lower position must be at least 0'),
+  liftMotorSpeed: z.number().min(0, 'Motor speed must be at least 0').max(100, 'Motor speed must be at most 100').default(100),
   bottomDistanceHysteresis: z.object({
     lowerThreshold: z.number().int('Lower threshold must be an integer').positive('Lower threshold must be positive').default(15),
     upperThreshold: z.number().int('Upper threshold must be an integer').positive('Upper threshold must be positive').default(20),
@@ -92,6 +93,20 @@ const onSubmit = form.handleSubmit((values) => {
             type="number"
             placeholder="Enter lower position"
             :disabled="isPending"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+
+    <FormField v-slot="{ componentField }" name="liftMotorSpeed">
+      <FormItem>
+        <FormLabel>Lift Motor Speed</FormLabel>
+        <FormControl>
+          <Input
+            v-bind="componentField"
+            type="number"
+            placeholder="Enter motor speed"
           />
         </FormControl>
         <FormMessage />

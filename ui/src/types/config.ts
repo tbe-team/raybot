@@ -73,6 +73,7 @@ export interface CargoConfig {
   liftPosition: number
   lowerPosition: number
   bottomDistanceHysteresis: BottomDistanceHysteresisConfig
+  liftMotorSpeed: number
 }
 
 export interface WifiConfig {
