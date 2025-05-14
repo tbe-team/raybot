@@ -63,6 +63,12 @@ func (h cargoLowerHandler) Handle(ctx context.Context, _ command.CargoLowerInput
 		return command.CargoLowerOutputs{}, fmt.Errorf("failed to set cargo position: %w", err)
 	}
 
+	wg.Add(1)
+	go func() {
+		defer wg.Done()
+		h.trackingBottomObstacle(ctx)
+	}()
+
 	// wait for tracking to finish
 	wg.Wait()
 
@@ -88,7 +94,7 @@ func (h cargoLowerHandler) trackingLowerPositionUntilReached(ctx context.Context
 		// 10% tolerance
 		acceptableDistance := lowerPosition - lowerPosition*10/100
 		if ev.DownDistance >= acceptableDistance {
-			h.log.Debug("lower position reached", slog.Int64("lower_position", int64(lowerPosition)))
+			h.log.Info("lower position reached", slog.Int64("lower_position", int64(lowerPosition)))
 			close(doneCh)
 		}
 	})
@@ -96,5 +102,66 @@ func (h cargoLowerHandler) trackingLowerPositionUntilReached(ctx context.Context
 	select {
 	case <-doneCh:
 	case <-ctx.Done():
+	}
+}
+
+// trackingBottomObstacle tracks the bottom obstacle and stops the motor if it is detected.
+// It also starts the motor again if the obstacle is cleared.
+// Caller must ensure that the motor is running before calling this function and cancel the context to stop the tracking.
+func (h cargoLowerHandler) trackingBottomObstacle(ctx context.Context) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer func() {
+		h.log.Debug("stop tracking bottom obstacle")
+		cancel()
+	}()
+
+	bottomDistanceCh := make(chan uint16, 1)
+
+	h.log.Debug("start tracking bottom obstacle")
+	h.subscriber.Subscribe(ctx, events.CargoBottomDistanceUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+		ev, ok := msg.Payload.(events.CargoBottomDistanceUpdatedEvent)
+		if !ok {
+			h.log.Error("invalid event", slog.Any("event", msg.Payload))
+			return
+		}
+
+		select {
+		case bottomDistanceCh <- ev.BottomDistance:
+		default:
+			h.log.Error("dropped message from bottom distance channel", slog.Uint64("bottom_distance", uint64(ev.BottomDistance)))
+		}
+	})
+
+	isMotorRunning := true
+
+	for {
+		select {
+		case <-ctx.Done():
+			return
+
+		case bottomDistance := <-bottomDistanceCh:
+			// If the bottom distance is less than the lower threshold, we stop the motor
+			if bottomDistance <= h.cfg.BottomDistanceHysteresis.LowerThreshold && isMotorRunning {
+				h.log.Info("obstacle detected, stopping motor", slog.Uint64("bottom_distance", uint64(bottomDistance)))
+				if err := h.liftMotorService.Stop(ctx); err != nil {
+					h.log.Error("failed to stop lift motor", slog.Any("error", err))
+				}
+
+				isMotorRunning = false
+				continue
+			}
+
+			// If the bottom distance is greater than the upper threshold, we run motor again
+			if bottomDistance >= h.cfg.BottomDistanceHysteresis.UpperThreshold && !isMotorRunning {
+				h.log.Info("obstacle cleared, running motor again", slog.Uint64("bottom_distance", uint64(bottomDistance)))
+				if err := h.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
+					Position: h.cfg.LowerPosition,
+				}); err != nil {
+					h.log.Error("failed to set cargo position", slog.Any("error", err))
+				}
+
+				isMotorRunning = true
+			}
+		}
 	}
 }

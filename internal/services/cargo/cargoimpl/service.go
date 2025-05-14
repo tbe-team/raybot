@@ -79,7 +79,17 @@ func (s *service) UpdateCargoBottomDistance(ctx context.Context, params cargo.Up
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	return s.cargoRepo.UpdateCargoBottomDistance(ctx, params)
+	if err := s.cargoRepo.UpdateCargoBottomDistance(ctx, params); err != nil {
+		return fmt.Errorf("update cargo bottom distance: %w", err)
+	}
+
+	s.publisher.Publish(events.CargoBottomDistanceUpdatedTopic, eventbus.NewMessage(
+		events.CargoBottomDistanceUpdatedEvent{
+			BottomDistance: params.BottomDistance,
+		},
+	))
+
+	return nil
 }
 
 func (s *service) UpdateCargoDoorMotorState(ctx context.Context, params cargo.UpdateCargoDoorMotorStateParams) error {
