@@ -170,6 +170,10 @@ func (h configHandler) UpdateCargoConfig(ctx context.Context, request gen.Update
 	cfg, err := h.configService.UpdateCargoConfig(ctx, config.Cargo{
 		LiftPosition:  uint16(request.Body.LiftPosition),
 		LowerPosition: uint16(request.Body.LowerPosition),
+		BottomDistanceHysteresis: config.CargoBottomDistanceHysteresis{
+			LowerThreshold: uint16(request.Body.BottomDistanceHysteresis.LowerThreshold),
+			UpperThreshold: uint16(request.Body.BottomDistanceHysteresis.UpperThreshold),
+		},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("config service update cargo config: %w", err)
@@ -272,6 +276,10 @@ func (configHandler) convertCargoConfigToResponse(cfg config.Cargo) gen.CargoCon
 	return gen.CargoConfig{
 		LiftPosition:  int(cfg.LiftPosition),
 		LowerPosition: int(cfg.LowerPosition),
+		BottomDistanceHysteresis: gen.CargoBottomDistanceHysteresis{
+			LowerThreshold: int(cfg.BottomDistanceHysteresis.LowerThreshold),
+			UpperThreshold: int(cfg.BottomDistanceHysteresis.UpperThreshold),
+		},
 	}
 }
 

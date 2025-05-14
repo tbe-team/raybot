@@ -901,6 +901,24 @@ components:
       required:
         - port
         - swagger
+    CargoBottomDistanceHysteresis:
+      type: object
+      properties:
+        lowerThreshold:
+          type: integer
+          example: 15
+          description: The lower threshold for the bottom distance
+          minimum: 0
+          x-order: 1
+        upperThreshold:
+          type: integer
+          example: 20
+          description: The upper threshold for the bottom distance
+          minimum: 0
+          x-order: 2
+      required:
+        - lowerThreshold
+        - upperThreshold
     CargoConfig:
       type: object
       properties:
@@ -916,9 +934,13 @@ components:
           description: The lower position for the cargo
           minimum: 0
           x-order: 2
+        bottomDistanceHysteresis:
+          $ref: '#/components/schemas/CargoBottomDistanceHysteresis'
+          x-order: 3
       required:
         - liftPosition
         - lowerPosition
+        - bottomDistanceHysteresis
     APConfig:
       type: object
       properties:
