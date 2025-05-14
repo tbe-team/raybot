@@ -31,13 +31,13 @@ const cargoConfigSchema = z.object({
       code: z.ZodIssueCode.custom,
       message: 'Lower threshold must be less than upper threshold',
       path: ['bottomDistanceHysteresis', 'lowerThreshold'],
-    });
+    })
 
     ctx.addIssue({
       code: z.ZodIssueCode.custom,
       message: 'Upper threshold must be greater than lower threshold',
       path: ['bottomDistanceHysteresis', 'upperThreshold'],
-    });
+    })
   }
 })
 
@@ -50,7 +50,6 @@ const form = useForm({
 })
 
 const onSubmit = form.handleSubmit((values) => {
-  console.log(values)
   mutate(values, {
     onSuccess: () => {
       queryClient.setQueryData([CARGO_CONFIG_QUERY_KEY], values)

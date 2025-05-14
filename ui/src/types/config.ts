@@ -75,7 +75,6 @@ export interface CargoConfig {
   bottomDistanceHysteresis: BottomDistanceHysteresisConfig
 }
 
-
 export interface WifiConfig {
   ap: APConfig
   sta: STAConfig
