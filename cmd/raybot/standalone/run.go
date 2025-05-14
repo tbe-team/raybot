@@ -2,7 +2,6 @@ package standalone
 
 import (
 	"log"
-	"os"
 	"sync"
 
 	"github.com/tbe-team/raybot/internal/application"
@@ -12,12 +11,11 @@ import (
 func Run(configFilePath, dbPath string) {
 	app, cleanup, err := application.New(configFilePath, dbPath)
 	if err != nil {
-		log.Printf("error creating application: %v", err)
-		os.Exit(1)
+		log.Fatalf("error creating application: %v", err)
 	}
 	defer func() {
 		if err := cleanup(); err != nil {
-			log.Printf("error cleaning up: %v", err)
+			log.Fatalf("error cleaning up: %v", err)
 		}
 	}()
 
@@ -29,7 +27,7 @@ func Run(configFilePath, dbPath string) {
 	go func() {
 		defer wg.Done()
 		if err := startEventService(app, interruptChan); err != nil {
-			log.Printf("error starting event service: %v", err)
+			log.Fatalf("error starting event service: %v", err)
 		}
 	}()
 
@@ -40,7 +38,7 @@ func Run(configFilePath, dbPath string) {
 	go func() {
 		defer wg.Done()
 		if err := startPICSerial(app, interruptChan, &hardwareWgReady); err != nil {
-			log.Printf("error starting PIC serial service: %v", err)
+			log.Fatalf("error starting PIC serial service: %v", err)
 		}
 	}()
 
@@ -48,7 +46,7 @@ func Run(configFilePath, dbPath string) {
 	go func() {
 		defer wg.Done()
 		if err := startESPSerial(app, interruptChan, &hardwareWgReady); err != nil {
-			log.Printf("error starting ESP serial service: %v", err)
+			log.Fatalf("error starting ESP serial service: %v", err)
 		}
 	}()
 
@@ -56,7 +54,7 @@ func Run(configFilePath, dbPath string) {
 	go func() {
 		defer wg.Done()
 		if err := startRFIDUSB(app, interruptChan, &hardwareWgReady); err != nil {
-			log.Printf("error starting RFID USB service: %v", err)
+			log.Fatalf("error starting RFID USB service: %v", err)
 		}
 	}()
 
@@ -67,7 +65,7 @@ func Run(configFilePath, dbPath string) {
 	go func() {
 		defer wg.Done()
 		if err := startJobs(app, interruptChan); err != nil {
-			log.Printf("error starting job service: %v", err)
+			log.Fatalf("error starting job service: %v", err)
 		}
 	}()
 
@@ -75,7 +73,7 @@ func Run(configFilePath, dbPath string) {
 	go func() {
 		defer wg.Done()
 		if err := startCloud(app, interruptChan); err != nil {
-			log.Printf("error starting cloud service: %v", err)
+			log.Fatalf("error starting cloud service: %v", err)
 		}
 	}()
 
@@ -83,7 +81,7 @@ func Run(configFilePath, dbPath string) {
 	go func() {
 		defer wg.Done()
 		if err := startHTTPService(app, interruptChan); err != nil {
-			log.Printf("error starting HTTP service: %v", err)
+			log.Fatalf("error starting HTTP service: %v", err)
 		}
 	}()
 
