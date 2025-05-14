@@ -22,7 +22,7 @@ require (
 	github.com/stretchr/testify v1.10.0
 	go.bug.st/serial v1.6.4
 	golang.org/x/sync v0.14.0
-	google.golang.org/grpc v1.72.0
+	google.golang.org/grpc v1.72.1
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
