@@ -38,6 +38,9 @@ http:
 cargo:
   lift_position: 10
   lower_position: 100
+  bottom_distance_hysteresis:
+    lower_threshold: 15
+    upper_threshold: 20
 wifi:
   ap:
     enable: false
