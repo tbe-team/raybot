@@ -9,7 +9,7 @@ import (
 )
 
 type Controller interface {
-	SetCargoPosition(ctx context.Context, targetPosition uint16) error
+	SetCargoPosition(ctx context.Context, motorSpeed uint8, targetPosition uint16) error
 	StopLiftCargoMotor(ctx context.Context) error
 
 	MoveForward(ctx context.Context, speed uint8) error
@@ -22,12 +22,13 @@ type Controller interface {
 
 var _ Controller = (*DefaultClient)(nil)
 
-func (c *DefaultClient) SetCargoPosition(ctx context.Context, targetPosition uint16) error {
+func (c *DefaultClient) SetCargoPosition(ctx context.Context, motorSpeed uint8, targetPosition uint16) error {
 	cmd := picCommand{
 		ID:   shortuuid.New(),
 		Type: picCommandTypeLiftMotor,
 		Data: picCommandLiftMotorData{
 			TargetPosition: targetPosition,
+			Speed:          motorSpeed,
 			Enable:         true,
 		},
 	}
@@ -239,16 +240,19 @@ func (picCommandBatteryDischargeData) isPICCommandData() {}
 
 type picCommandLiftMotorData struct {
 	TargetPosition uint16
+	Speed          uint8
 	Enable         bool
 }
 
 func (d picCommandLiftMotorData) MarshalJSON() ([]byte, error) {
 	var temp struct {
 		TargetPosition uint16 `json:"target_position"`
+		MaxOutput      uint16 `json:"max_output"`
 		Enable         uint8  `json:"enable"`
 	}
 
 	temp.TargetPosition = d.TargetPosition
+	temp.MaxOutput = uint16(d.Speed)
 	temp.Enable = boolToUint8(d.Enable)
 	return json.Marshal(temp)
 }

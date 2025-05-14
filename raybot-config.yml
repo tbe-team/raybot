@@ -38,6 +38,7 @@ http:
 cargo:
   lift_position: 10
   lower_position: 100
+  lift_motor_speed: 100
   bottom_distance_hysteresis:
     lower_threshold: 15
     upper_threshold: 20

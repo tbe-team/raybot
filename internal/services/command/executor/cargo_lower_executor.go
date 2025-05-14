@@ -58,7 +58,8 @@ func (h cargoLowerHandler) Handle(ctx context.Context, _ command.CargoLowerInput
 	}()
 
 	if err := h.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
-		Position: h.cfg.LowerPosition,
+		MotorSpeed: h.cfg.LiftMotorSpeed,
+		Position:   h.cfg.LowerPosition,
 	}); err != nil {
 		return command.CargoLowerOutputs{}, fmt.Errorf("failed to set cargo position: %w", err)
 	}
@@ -155,7 +156,8 @@ func (h cargoLowerHandler) trackingBottomObstacle(ctx context.Context) {
 			if bottomDistance >= h.cfg.BottomDistanceHysteresis.UpperThreshold && !isMotorRunning {
 				h.log.Info("obstacle cleared, running motor again", slog.Uint64("bottom_distance", uint64(bottomDistance)))
 				if err := h.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
-					Position: h.cfg.LowerPosition,
+					MotorSpeed: h.cfg.LiftMotorSpeed,
+					Position:   h.cfg.LowerPosition,
 				}); err != nil {
 					h.log.Error("failed to set cargo position", slog.Any("error", err))
 				}

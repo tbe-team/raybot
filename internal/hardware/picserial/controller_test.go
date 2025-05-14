@@ -16,7 +16,7 @@ func TestController(t *testing.T) {
 		client := NewClient(config.Serial{})
 		client.port = mockPort
 
-		err := client.SetCargoPosition(context.Background(), 10)
+		err := client.SetCargoPosition(context.Background(), 100, 10)
 		assert.NoError(t, err)
 
 		actual := overrideIDAndRemoveMarkers(t, mockPort.WriteBuffer.Bytes(), "abc")
@@ -26,6 +26,7 @@ func TestController(t *testing.T) {
 			"type":2,
 			"data":{
 				"target_position":10,
+				"max_output":100,
 				"enable":1
 			}
 		}`
@@ -47,6 +48,7 @@ func TestController(t *testing.T) {
 			"type":2,
 			"data":{
 				"enable":0,
+				"max_output":0,
 				"target_position":0
 			}
 		}`

@@ -21,7 +21,8 @@ type UpdateLiftMotorStateParams struct {
 }
 
 type SetCargoPositionParams struct {
-	Position uint16
+	MotorSpeed uint8 `validate:"min=0,max=100"`
+	Position   uint16
 }
 
 type Service interface {

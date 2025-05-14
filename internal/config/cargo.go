@@ -3,8 +3,9 @@ package config
 import "fmt"
 
 type Cargo struct {
-	LiftPosition  uint16 `yaml:"lift_position"`
-	LowerPosition uint16 `yaml:"lower_position"`
+	LiftPosition   uint16 `yaml:"lift_position"`
+	LowerPosition  uint16 `yaml:"lower_position"`
+	LiftMotorSpeed uint8  `yaml:"lift_motor_speed"`
 
 	// BottomDistanceHysteresis is the hysteresis for the bottom distance when executing CARGO_LOWER command.
 	BottomDistanceHysteresis CargoBottomDistanceHysteresis `yaml:"bottom_distance_hysteresis"`
@@ -13,6 +14,10 @@ type Cargo struct {
 func (c Cargo) Validate() error {
 	if c.LiftPosition >= c.LowerPosition {
 		return fmt.Errorf("lift position must be less than lower position: %d", c.LowerPosition)
+	}
+
+	if c.LiftMotorSpeed > 100 {
+		return fmt.Errorf("lift motor speed must be between 0 and 100: %d", c.LiftMotorSpeed)
 	}
 
 	if err := c.BottomDistanceHysteresis.Validate(); err != nil {

@@ -46,7 +46,7 @@ func (s *service) SetCargoPosition(ctx context.Context, params liftmotor.SetCarg
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	if err := s.picSerialController.SetCargoPosition(ctx, params.Position); err != nil {
+	if err := s.picSerialController.SetCargoPosition(ctx, params.MotorSpeed, params.Position); err != nil {
 		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
 			return liftmotor.ErrCanNotControlLiftMotor
 		}

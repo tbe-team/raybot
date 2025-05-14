@@ -58,7 +58,8 @@ func (h cargoLiftHandler) Handle(ctx context.Context, _ command.CargoLiftInputs)
 	}()
 
 	if err := h.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
-		Position: h.cfg.LiftPosition,
+		MotorSpeed: h.cfg.LiftMotorSpeed,
+		Position:   h.cfg.LiftPosition,
 	}); err != nil {
 		return command.CargoLiftOutputs{}, fmt.Errorf("failed to set cargo position: %w", err)
 	}
