@@ -381,6 +381,22 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /system/stop-emergency:
+    post:
+      summary: Stop all motors and cancel all running, queued and processing commands
+      operationId: stopEmergency
+      description: Stop all motors and cancel all running, queued and processing commands
+      tags:
+        - system
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /robot-state:
     get:
       summary: Get robot state
@@ -577,58 +593,6 @@ paths:
           description: The command was canceled
         '400':
           description: There is no command being processed
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /emergency/state:
-    get:
-      summary: Get the emergency state of the robot
-      operationId: getEmergencyState
-      description: Get the emergency state of the robot
-      tags:
-        - emergency
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/EmergencyState'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /emergency/stop:
-    post:
-      summary: Stop the robot in case of emergency
-      operationId: stopEmergency
-      description: Stop the robot in case of emergency
-      tags:
-        - emergency
-      responses:
-        '204':
-          description: No Content
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-  /emergency/resume:
-    post:
-      summary: Resume the robot from an emergency state
-      operationId: resumeEmergency
-      description: Resume the robot from an emergency state
-      tags:
-        - emergency
-      responses:
-        '204':
-          description: No Content
-        '400':
-          description: Bad Request
           content:
             application/json:
               schema:
@@ -1739,14 +1703,6 @@ components:
       required:
         - type
         - inputs
-    EmergencyState:
-      type: object
-      properties:
-        locked:
-          type: boolean
-          description: Whether the robot is locked in an emergency state
-      required:
-        - locked
   parameters:
     Page:
       name: page

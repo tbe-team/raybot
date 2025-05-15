@@ -1,9 +1,9 @@
 post:
-  summary: Resume the robot from an emergency state
-  operationId: resumeEmergency
-  description: Resume the robot from an emergency state
+  summary: Stop all motors and cancel all running, queued and processing commands
+  operationId: stopEmergency
+  description: Stop all motors and cancel all running, queued and processing commands
   tags:
-    - emergency
+    - system
   responses:
     "204":
       description: No Content

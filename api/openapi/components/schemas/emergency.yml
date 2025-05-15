@@ -1,8 +1,0 @@
-EmergencyState:
-  type: object
-  properties:
-    locked:
-      type: boolean
-      description: Whether the robot is locked in an emergency state
-  required:
-    - locked

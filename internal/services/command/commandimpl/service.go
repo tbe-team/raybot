@@ -134,28 +134,6 @@ func (s *Service) CancelActiveCloudCommands(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) LockProcessingCommand(ctx context.Context) error {
-	if err := s.processingLock.Lock(); err != nil {
-		return fmt.Errorf("lock processing command: %w", err)
-	}
-
-	if err := s.CancelCurrentProcessingCommand(ctx); err != nil {
-		if !errors.Is(err, command.ErrNoCommandBeingProcessed) {
-			return fmt.Errorf("cancel current processing command: %w", err)
-		}
-	}
-
-	return nil
-}
-
-func (s *Service) UnlockProcessingCommand(_ context.Context) error {
-	if err := s.processingLock.Unlock(); err != nil {
-		return fmt.Errorf("unlock processing command: %w", err)
-	}
-
-	return nil
-}
-
 func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
 	cmd, err := s.commandRepository.GetCommandByID(ctx, params.CommandID)
 	if err != nil {
@@ -176,6 +154,25 @@ func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.Exec
 	}
 
 	s.executeCommand(ctx, cmd)
+
+	return nil
+}
+
+func (s *Service) CancelAllRunningCommands(ctx context.Context) error {
+	if err := s.processingLock.WithLock(func() error {
+		runningCmd := s.runningCmdRepository.Get()
+		if runningCmd != nil {
+			runningCmd.Cancel()
+		}
+
+		if err := s.commandRepository.CancelQueuedAndProcessingCommands(ctx); err != nil {
+			return fmt.Errorf("cancel queued and processing commands: %w", err)
+		}
+
+		return nil
+	}); err != nil {
+		return fmt.Errorf("with processing lock: %w", err)
+	}
 
 	return nil
 }

@@ -23,3 +23,11 @@ func (h systemHandler) RebootSystem(ctx context.Context, _ gen.RebootSystemReque
 
 	return gen.RebootSystem204Response{}, nil
 }
+
+func (h systemHandler) StopEmergency(ctx context.Context, _ gen.StopEmergencyRequestObject) (gen.StopEmergencyResponseObject, error) {
+	if err := h.systemService.StopEmergency(ctx); err != nil {
+		return nil, fmt.Errorf("system service stop emergency: %w", err)
+	}
+
+	return gen.StopEmergency204Response{}, nil
+}

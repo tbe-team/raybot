@@ -31,6 +31,8 @@ paths:
     $ref: "./paths/configs@wifi.yml"
   /system/reboot:
     $ref: "./paths/system@reboot.yml"
+  /system/stop-emergency:
+    $ref: "./paths/system@stop-emergency.yml"
   /robot-state:
     $ref: "./paths/robot-state.yml"
   /peripherals/serials:
@@ -43,9 +45,4 @@ paths:
     $ref: "./paths/commands@processing.yml"
   /commands/processing/cancel:
     $ref: "./paths/commands@processing@cancel.yml"
-  /emergency/state:
-    $ref: "./paths/emergency@state.yml"
-  /emergency/stop:
-    $ref: "./paths/emergency@stop.yml"
-  /emergency/resume:
-    $ref: "./paths/emergency@resume.yml"
+

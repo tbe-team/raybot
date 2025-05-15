@@ -30,8 +30,6 @@ import (
 	"github.com/tbe-team/raybot/internal/services/distancesensor/distancesensorimpl"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor/drivemotorimpl"
-	"github.com/tbe-team/raybot/internal/services/emergency"
-	"github.com/tbe-team/raybot/internal/services/emergency/emergencyimpl"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 	"github.com/tbe-team/raybot/internal/services/liftmotor/liftmotorimpl"
 	"github.com/tbe-team/raybot/internal/services/location"
@@ -72,7 +70,6 @@ type Application struct {
 	PeripheralService     peripheral.Service
 	CommandService        command.Service
 	ApperrorcodeService   apperrorcode.Service
-	EmergencyService      emergency.Service
 }
 
 type CleanupFunc func() error
@@ -123,7 +120,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	distanceSensorStateRepository := distancesensorimpl.NewDistanceSensorStateRepository()
 	appStateRepository := appstateimpl.NewAppStateRepository()
 	commandRepository := commandimpl.NewCommandRepository(db, queries)
-	emergencyRepository := emergencyimpl.NewEmergencyStateRepository()
 
 	// Initialize hardware components
 	espSerialClient := espserial.NewClient(cfg.Hardware.ESP.Serial)
@@ -186,7 +182,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	cargoService := cargoimpl.NewService(validator, eventBus, cargoRepository, espSerialClient)
 	locationService := locationimpl.NewService(validator, eventBus, locationRepository)
 	configService := configimpl.NewService(cfg, fileClient)
-	systemService := systemimpl.NewService(log)
 	dashboardDataService := dashboarddataimpl.NewService(
 		batteryStateRepository,
 		batterySettingRepository,
@@ -224,12 +219,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	}
 
 	apperrorcodeService := apperrorcodeimpl.NewService()
-	emergencyService := emergencyimpl.NewService(
-		commandService,
-		driveMotorService,
-		liftMotorService,
-		emergencyRepository,
-	)
+	systemService := systemimpl.NewService(log, commandService, driveMotorService, liftMotorService)
 
 	cleanup := func() error {
 		var err error
@@ -276,6 +266,5 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		PeripheralService:     peripheralService,
 		CommandService:        commandService,
 		ApperrorcodeService:   apperrorcodeService,
-		EmergencyService:      emergencyService,
 	}, cleanup, nil
 }

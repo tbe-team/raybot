@@ -49,14 +49,11 @@ type Service interface {
 	// CancelActiveCloudCommands cancels all QUEUED and PROCESSING commands created by the cloud.
 	CancelActiveCloudCommands(ctx context.Context) error
 
-	// LockProcessingCommand locks the processing command.
-	// It also cancels the current processing command.
-	LockProcessingCommand(ctx context.Context) error
-
-	// UnlockProcessingCommand unlocks the processing command.
-	UnlockProcessingCommand(ctx context.Context) error
-
 	ExecuteCreatedCommand(ctx context.Context, params ExecuteCreatedCommandParams) error
+
+	// CancelAllRunningCommands cancels all running commands including the current processing command
+	// and the commands in the queue.
+	CancelAllRunningCommands(ctx context.Context) error
 
 	DeleteCommandByID(ctx context.Context, params DeleteCommandByIDParams) error
 	DeleteOldCommands(ctx context.Context) error
@@ -101,12 +98,6 @@ type ProcessingLock interface {
 	// WithLock acquires the lock and executes the function.
 	// The lock is released when the function returns.
 	WithLock(fn func() error) error
-
-	// Lock acquires the lock.
-	Lock() error
-
-	// Unlock releases the lock.
-	Unlock() error
 
 	// WaitUntilUnlocked blocks the execution until the lock is released.
 	// If the context is canceled, the function returns immediately.
