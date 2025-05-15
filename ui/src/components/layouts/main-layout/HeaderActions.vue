@@ -1,61 +1,44 @@
 <script setup lang="ts">
 import { Button } from '@/components/ui/button'
-import { useEmergencyResumeMutation, useEmergencyStateQuery, useEmergencyStopMutation } from '@/composables/use-emergency'
+import { useSystemStopEmergencyMutation } from '@/composables/use-system'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { useColorMode } from '@vueuse/core'
-import { Moon, Pause, Play, Sun } from 'lucide-vue-next'
+import { Moon, Pause, Sun } from 'lucide-vue-next'
 
 const { store } = useColorMode()
 
-const { data: emergencyState, refetch: refetchEmergencyState } = useEmergencyStateQuery()
-
-const { mutate: stopEmergency } = useEmergencyStopMutation()
-const { mutate: resumeEmergency } = useEmergencyResumeMutation()
-
+const { mutate: stopEmergency } = useSystemStopEmergencyMutation()
 const { openConfirmation } = useConfirmationStore()
 
 function handleEmergencyStop() {
-  if (emergencyState.value?.locked) {
-    resumeEmergency(undefined, {
-      onSuccess: () => {
-        refetchEmergencyState()
-      },
-      onError: () => {
-        notification.error('Failed to resume emergency')
-      },
-    })
-  }
-  else {
-    openConfirmation({
-      title: 'Stop emergency',
-      description: 'Are you sure you want to stop the emergency?',
-      actionLabel: 'Confirm',
-      cancelLabel: 'Cancel',
-      onAction: () => {
-        stopEmergency(undefined, {
-          onSuccess: () => {
-            refetchEmergencyState()
-          },
-          onError: () => {
-            notification.error('Failed to stop emergency')
-          },
-        })
-      },
-      onCancel: () => {
-      },
-    })
-  }
+  openConfirmation({
+    title: 'Stop Emergency',
+    description: 'Stopping emergency will stop all motors, canceling all commands. Are you sure you want to continue?',
+    actionLabel: 'Confirm',
+    cancelLabel: 'Cancel',
+    onAction: () => {
+      stopEmergency(undefined, {
+        onSuccess: () => {
+          notification.success('Stop emergency successfully')
+        },
+        onError: () => {
+          notification.error('Failed to stop emergency')
+        },
+      })
+    },
+    onCancel: () => {
+    },
+  })
 }
 </script>
 
 <template>
   <div class="flex items-center gap-2">
-    <Button variant="ghost" @click="handleEmergencyStop">
-      <div class="flex items-center gap-2">
-        <span v-if="emergencyState?.locked" class="flex items-center gap-2 font-bold text-destructive"><Play class="w-4 h-4" /> RESUME EMERGENCY</span>
-        <span v-else class="flex items-center gap-2 font-bold text-destructive"><Pause class="w-4 h-4" /> STOP EMERGENCY</span>
-      </div>
+    <Button class="text-destructive" variant="ghost" @click="handleEmergencyStop">
+      <Pause class="w-4 h-4" />
+      STOP EMERGENCY
     </Button>
+
     <Button
       class="rounded-lg bg-muted hover:bg-muted-hover"
       variant="ghost"

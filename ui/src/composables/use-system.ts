@@ -6,3 +6,9 @@ export function useSystemRebootMutation() {
     mutationFn: systemAPI.reboot,
   })
 }
+
+export function useSystemStopEmergencyMutation() {
+  return useMutation({
+    mutationFn: systemAPI.stopEmergency,
+  })
+}
