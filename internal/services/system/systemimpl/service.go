@@ -2,6 +2,7 @@ package systemimpl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os/exec"
@@ -53,11 +54,15 @@ func (s service) StopEmergency(ctx context.Context) error {
 	}
 
 	if err := s.driveMotorService.Stop(ctx); err != nil {
-		return fmt.Errorf("stop drive motor: %w", err)
+		if !errors.Is(err, drivemotor.ErrCanNotControlDriveMotor) {
+			return fmt.Errorf("failed to stop drive motor: %w", err)
+		}
 	}
 
 	if err := s.liftMotorService.Stop(ctx); err != nil {
-		return fmt.Errorf("stop lift motor: %w", err)
+		if !errors.Is(err, liftmotor.ErrCanNotControlLiftMotor) {
+			return fmt.Errorf("failed to stop lift motor: %w", err)
+		}
 	}
 
 	return nil
