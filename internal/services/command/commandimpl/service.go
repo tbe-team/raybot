@@ -26,7 +26,7 @@ type Service struct {
 
 	publisher eventbus.Publisher
 
-	runningCmdRepository *runningCmdRepository
+	runningCmdRepository command.RunningCommandRepository
 	commandRepository    command.Repository
 	appStateRepository   appstate.Repository
 
@@ -39,6 +39,7 @@ func NewService(
 	log *slog.Logger,
 	validator validator.Validator,
 	publisher eventbus.Publisher,
+	runningCmdRepository command.RunningCommandRepository,
 	commandRepository command.Repository,
 	appStateRepository appstate.Repository,
 	processingLock command.ProcessingLock,
@@ -49,7 +50,7 @@ func NewService(
 		log:                  log.With("service", "command"),
 		validator:            validator,
 		publisher:            publisher,
-		runningCmdRepository: newRunningCmdRepository(),
+		runningCmdRepository: runningCmdRepository,
 		commandRepository:    commandRepository,
 		appStateRepository:   appStateRepository,
 		processingLock:       processingLock,
@@ -102,10 +103,13 @@ func (s *Service) CreateCommand(ctx context.Context, params command.CreateComman
 	return cmd, nil
 }
 
-func (s *Service) CancelCurrentProcessingCommand(_ context.Context) error {
-	runningCmd := s.runningCmdRepository.Get()
-	if runningCmd == nil {
-		return command.ErrNoCommandBeingProcessed
+func (s *Service) CancelCurrentProcessingCommand(ctx context.Context) error {
+	runningCmd, err := s.runningCmdRepository.Get(ctx)
+	if err != nil {
+		if errors.Is(err, command.ErrRunningCommandNotFound) {
+			return command.ErrNoCommandBeingProcessed
+		}
+		return fmt.Errorf("get running command: %w", err)
 	}
 
 	runningCmd.Cancel()
@@ -116,10 +120,12 @@ func (s *Service) CancelCurrentProcessingCommand(_ context.Context) error {
 func (s *Service) CancelActiveCloudCommands(ctx context.Context) error {
 	if err := s.processingLock.WithLock(func() error {
 		// Cancel current processing command
-		runningCmd := s.runningCmdRepository.Get()
-		if runningCmd != nil {
-			runningCmd.Cancel()
+		runningCmd, err := s.runningCmdRepository.Get(ctx)
+		if err != nil {
+
+			return fmt.Errorf("get running command: %w", err)
 		}
+		runningCmd.Cancel()
 
 		// Cancel all queued and processing commands created by the cloud
 		if err := s.commandRepository.CancelQueuedAndProcessingCommandsCreatedByCloud(ctx); err != nil {
@@ -135,7 +141,9 @@ func (s *Service) CancelActiveCloudCommands(ctx context.Context) error {
 }
 
 func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
-	if currentCmd := s.runningCmdRepository.Get(); currentCmd != nil {
+	_, err := s.runningCmdRepository.Get(ctx)
+	// no error means the running command exists, so we don't need to execute the command
+	if err == nil {
 		s.log.Info("command is already being processed, this command will be queued")
 		return nil
 	}
@@ -156,10 +164,11 @@ func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.Exec
 
 func (s *Service) CancelAllRunningCommands(ctx context.Context) error {
 	if err := s.processingLock.WithLock(func() error {
-		runningCmd := s.runningCmdRepository.Get()
-		if runningCmd != nil {
-			runningCmd.Cancel()
+		runningCmd, err := s.runningCmdRepository.Get(ctx)
+		if err != nil {
+			return fmt.Errorf("get running command: %w", err)
 		}
+		runningCmd.Cancel()
 
 		if err := s.commandRepository.CancelQueuedAndProcessingCommands(ctx); err != nil {
 			return fmt.Errorf("cancel queued and processing commands: %w", err)
@@ -231,15 +240,23 @@ func (s *Service) executeCommand(ctx context.Context, cmd command.Command) {
 		}
 	}
 
-	runningCmd := newRunningCommand(cmd)
-	s.runningCmdRepository.Add(runningCmd)
+	runningCmd := command.NewCancelableCommand(ctx, cmd)
+	if err := s.runningCmdRepository.Add(ctx, runningCmd); err != nil {
+		s.log.Error("failed to add running command", slog.Any("error", err))
+		return
+	}
 
 	// pass the context of the running command to the executor router
 	if err := s.executorRouter.Route(runningCmd.Context(), cmd); err != nil {
 		s.log.Error("failed to execute command", slog.Any("command", cmd), slog.Any("error", err))
 	}
 
-	s.runningCmdRepository.Remove()
-	time.Sleep(100 * time.Millisecond)
-	s.runNextExecutableCommand(ctx)
+	if err := s.runningCmdRepository.Remove(ctx); err != nil {
+		s.log.Error("failed to remove running command", slog.Any("error", err))
+	}
+
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		s.runNextExecutableCommand(ctx)
+	}()
 }

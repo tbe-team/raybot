@@ -200,6 +200,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		log,
 		validator,
 		eventBus,
+		commandimpl.NewRunningCmdRepository(),
 		commandRepository,
 		appStateRepository,
 		processinglockimpl.New(),

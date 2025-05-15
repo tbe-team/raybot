@@ -37,7 +37,7 @@ func TestIntegrationCommandService(t *testing.T) {
 			err = db.AutoMigrate()
 			require.NoError(t, err)
 			queries := sqlc.New()
-			runningCmdRepository := newRunningCmdRepository()
+			runningCmdRepository := NewRunningCmdRepository()
 			commandRepository := NewCommandRepository(db, queries)
 			router := newBlockingExecutorRouter(commandRepository)
 
@@ -85,7 +85,8 @@ func TestIntegrationCommandService(t *testing.T) {
 
 			// Block until we have a running command (cause by ExecuteCreatedCommand)
 			require.Eventually(t, func() bool {
-				return runningCmdRepository.Get() != nil
+				_, err := runningCmdRepository.Get(context.Background())
+				return err == nil
 			}, 500*time.Millisecond, 10*time.Millisecond)
 
 			// Get command to validate state
@@ -108,7 +109,8 @@ func TestIntegrationCommandService(t *testing.T) {
 			require.Equal(t, command.StatusQueued, cmd3.Status)
 
 			// Current running should be cmd1
-			runningCmd := runningCmdRepository.Get()
+			runningCmd, err := runningCmdRepository.Get(context.Background())
+			require.NoError(t, err)
 			require.NotNil(t, runningCmd)
 			require.Equal(t, cmd1.ID, runningCmd.ID)
 
@@ -117,7 +119,8 @@ func TestIntegrationCommandService(t *testing.T) {
 
 			// Block until no running command (cause by CancelActiveCloudCommands)
 			require.Eventually(t, func() bool {
-				return runningCmdRepository.Get() == nil
+				_, err := runningCmdRepository.Get(context.Background())
+				return err != nil
 			}, 500*time.Millisecond, 10*time.Millisecond)
 
 			// Get command to validate state
@@ -154,7 +157,7 @@ func TestIntegrationCommandService(t *testing.T) {
 			require.NoError(t, err)
 			queries := sqlc.New()
 			commandRepository := NewCommandRepository(db, queries)
-			runningCmdRepository := newRunningCmdRepository()
+			runningCmdRepository := NewRunningCmdRepository()
 			commandService := Service{
 				deleteOldCmdCfg:      config.DeleteOldCommand{},
 				log:                  log,
@@ -193,7 +196,8 @@ func TestIntegrationCommandService(t *testing.T) {
 
 			// Block until we have a running command (cause by ExecuteCreatedCommand)
 			require.Eventually(t, func() bool {
-				return runningCmdRepository.Get() != nil
+				_, err := runningCmdRepository.Get(context.Background())
+				return err == nil
 			}, 500*time.Millisecond, 10*time.Millisecond)
 
 			// Get command to validate state
@@ -214,8 +218,8 @@ func TestIntegrationCommandService(t *testing.T) {
 
 			// Block until next command is in running (cause by ExecuteCreatedCommand)
 			require.Eventually(t, func() bool {
-				cmd := runningCmdRepository.Get()
-				return cmd != nil && cmd.ID == cmd2.ID && cmd.Status == command.StatusProcessing
+				cmd, err := runningCmdRepository.Get(context.Background())
+				return err == nil && cmd.ID == cmd2.ID && cmd.Status == command.StatusProcessing
 			}, 500*time.Millisecond, 10*time.Millisecond)
 		})
 
@@ -249,6 +253,7 @@ func TestIntegrationCommandService(t *testing.T) {
 			log,
 			validator.New(),
 			eventbus.NewInProcEventBus(log),
+			NewRunningCmdRepository(),
 			commandRepository,
 			appstateimpl.NewAppStateRepository(),
 			processinglockimpl.New(),
@@ -281,7 +286,7 @@ func TestIntegrationCommandService(t *testing.T) {
 		require.NoError(t, err)
 		queries := sqlc.New()
 		commandRepository := NewCommandRepository(db, queries)
-		runningCmdRepository := newRunningCmdRepository()
+		runningCmdRepository := NewRunningCmdRepository()
 		commandService := Service{
 			deleteOldCmdCfg:      config.DeleteOldCommand{},
 			log:                  log,
@@ -317,7 +322,7 @@ func TestIntegrationCommandService(t *testing.T) {
 		require.NoError(t, err)
 		queries := sqlc.New()
 		commandRepository := NewCommandRepository(db, queries)
-		runningCmdRepository := newRunningCmdRepository()
+		runningCmdRepository := NewRunningCmdRepository()
 		commandService := Service{
 			deleteOldCmdCfg:      config.DeleteOldCommand{},
 			log:                  log,

@@ -68,6 +68,7 @@ func SetupTunnelTestEnv(t *testing.T) TunnelTestEnv {
 		log,
 		validator,
 		bus,
+		commandimpl.NewRunningCmdRepository(),
 		commandimpl.NewCommandRepository(db, queries),
 		appstateimpl.NewAppStateRepository(),
 		processinglockimpl.New(),

@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"fmt"
 	"time"
 )
@@ -104,4 +105,29 @@ func NewCommand(source Source, inputs Inputs) Command {
 		CreatedAt: now,
 		UpdatedAt: now,
 	}
+}
+
+// CancelableCommand is a command that can be canceled.
+type CancelableCommand struct {
+	Command
+
+	ctx        context.Context
+	cancelFunc context.CancelFunc
+}
+
+func NewCancelableCommand(ctx context.Context, cmd Command) CancelableCommand {
+	ctx, cancel := context.WithCancel(ctx)
+	return CancelableCommand{
+		Command:    cmd,
+		ctx:        ctx,
+		cancelFunc: cancel,
+	}
+}
+
+func (c *CancelableCommand) Cancel() {
+	c.cancelFunc()
+}
+
+func (c *CancelableCommand) Context() context.Context {
+	return c.ctx
 }
