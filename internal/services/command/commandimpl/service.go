@@ -135,6 +135,11 @@ func (s *Service) CancelActiveCloudCommands(ctx context.Context) error {
 }
 
 func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
+	if currentCmd := s.runningCmdRepository.Get(); currentCmd != nil {
+		s.log.Info("command is already being processed, this command will be queued")
+		return nil
+	}
+
 	cmd, err := s.commandRepository.GetCommandByID(ctx, params.CommandID)
 	if err != nil {
 		return fmt.Errorf("get command by id: %w", err)
@@ -142,15 +147,6 @@ func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.Exec
 
 	if cmd.Status != command.StatusQueued {
 		return fmt.Errorf("command is not in queued status")
-	}
-
-	processingExists, err := s.commandRepository.CommandProcessingExists(ctx)
-	if err != nil {
-		return fmt.Errorf("check if command processing exists: %w", err)
-	}
-	if processingExists {
-		s.log.Info("command in PROCESSING status already exists, this command will be queued")
-		return nil
 	}
 
 	s.executeCommand(ctx, cmd)
