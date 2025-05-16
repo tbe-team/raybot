@@ -62,6 +62,10 @@ type Service interface {
 	DeleteOldCommands(ctx context.Context) error
 }
 
+type ExecutorService interface {
+	Execute(ctx context.Context, cmd Command) error
+}
+
 type UpdateCommandParams struct {
 	ID             int64
 	Status         Status

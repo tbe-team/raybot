@@ -11,10 +11,8 @@ import (
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/command"
-	"github.com/tbe-team/raybot/internal/services/command/executor"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 	"github.com/tbe-team/raybot/pkg/paging"
-	"github.com/tbe-team/raybot/pkg/ptr"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -30,8 +28,8 @@ type Service struct {
 	commandRepository    command.Repository
 	appStateRepository   appstate.Repository
 
-	processingLock command.ProcessingLock
-	executorRouter executor.Router
+	processingLock  command.ProcessingLock
+	executorService command.ExecutorService
 }
 
 func NewService(
@@ -43,7 +41,7 @@ func NewService(
 	commandRepository command.Repository,
 	appStateRepository appstate.Repository,
 	processingLock command.ProcessingLock,
-	executorRouter executor.Router,
+	executorService command.ExecutorService,
 ) command.Service {
 	s := &Service{
 		deleteOldCmdCfg:      deleteOldCmdCfg,
@@ -54,7 +52,7 @@ func NewService(
 		commandRepository:    commandRepository,
 		appStateRepository:   appStateRepository,
 		processingLock:       processingLock,
-		executorRouter:       executorRouter,
+		executorService:      executorService,
 	}
 
 	go s.cancelQueuedAndProcessingCommands(context.Background())
@@ -122,10 +120,14 @@ func (s *Service) CancelActiveCloudCommands(ctx context.Context) error {
 		// Cancel current processing command
 		runningCmd, err := s.runningCmdRepository.Get(ctx)
 		if err != nil {
-
-			return fmt.Errorf("get running command: %w", err)
+			if !errors.Is(err, command.ErrRunningCommandNotFound) {
+				return fmt.Errorf("get running command: %w", err)
+			}
+		} else {
+			if runningCmd.Source == command.SourceCloud {
+				runningCmd.Cancel()
+			}
 		}
-		runningCmd.Cancel()
 
 		// Cancel all queued and processing commands created by the cloud
 		if err := s.commandRepository.CancelQueuedAndProcessingCommandsCreatedByCloud(ctx); err != nil {
@@ -166,9 +168,15 @@ func (s *Service) CancelAllRunningCommands(ctx context.Context) error {
 	if err := s.processingLock.WithLock(func() error {
 		runningCmd, err := s.runningCmdRepository.Get(ctx)
 		if err != nil {
-			return fmt.Errorf("get running command: %w", err)
+			if !errors.Is(err, command.ErrRunningCommandNotFound) {
+				return fmt.Errorf("get running command: %w", err)
+			}
+		} else {
+			runningCmd.Cancel()
+			if err := s.runningCmdRepository.Remove(ctx); err != nil {
+				return fmt.Errorf("remove running command: %w", err)
+			}
 		}
-		runningCmd.Cancel()
 
 		if err := s.commandRepository.CancelQueuedAndProcessingCommands(ctx); err != nil {
 			return fmt.Errorf("cancel queued and processing commands: %w", err)
@@ -224,35 +232,8 @@ func (s *Service) executeCommand(ctx context.Context, cmd command.Command) {
 		s.log.Error("failed to wait for processing lock to be unlocked", slog.Any("error", err))
 	}
 
-	if cmd.Status == command.StatusQueued {
-		var err error
-		cmd, err = s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
-			ID:           cmd.ID,
-			Status:       command.StatusProcessing,
-			SetStatus:    true,
-			StartedAt:    ptr.New(time.Now()),
-			SetStartedAt: true,
-			UpdatedAt:    time.Now(),
-		})
-		if err != nil {
-			s.log.Error("failed to update command to PROCESSING status", slog.Any("error", err))
-			return
-		}
-	}
-
-	runningCmd := command.NewCancelableCommand(ctx, cmd)
-	if err := s.runningCmdRepository.Add(ctx, runningCmd); err != nil {
-		s.log.Error("failed to add running command", slog.Any("error", err))
-		return
-	}
-
-	// pass the context of the running command to the executor router
-	if err := s.executorRouter.Route(runningCmd.Context(), cmd); err != nil {
+	if err := s.executorService.Execute(ctx, cmd); err != nil {
 		s.log.Error("failed to execute command", slog.Any("command", cmd), slog.Any("error", err))
-	}
-
-	if err := s.runningCmdRepository.Remove(ctx); err != nil {
-		s.log.Error("failed to remove running command", slog.Any("error", err))
 	}
 
 	go func() {
