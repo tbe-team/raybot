@@ -9,7 +9,6 @@ import (
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/logging"
-	"github.com/tbe-team/raybot/internal/services/appstate/appstateimpl"
 	"github.com/tbe-team/raybot/internal/services/command"
 	commandmocks "github.com/tbe-team/raybot/internal/services/command/mocks"
 	"github.com/tbe-team/raybot/internal/services/command/processinglockimpl"
@@ -58,7 +57,6 @@ func TestIntegrationCommandService(t *testing.T) {
 			eventbus.NewInProcEventBus(log),
 			runningCmdRepository,
 			commandRepository,
-			appstateimpl.NewAppStateRepository(),
 			processinglockimpl.New(),
 			commandmocks.NewFakeExecutorService(t),
 		)
@@ -97,7 +95,6 @@ func TestIntegrationCommandService(t *testing.T) {
 			publisher:            eventbus.NewInProcEventBus(log),
 			runningCmdRepository: runningCmdRepository,
 			commandRepository:    commandRepository,
-			appStateRepository:   appstateimpl.NewAppStateRepository(),
 			processingLock:       processinglockimpl.New(),
 			executorService:      commandmocks.NewFakeExecutorService(t),
 		}
@@ -133,7 +130,6 @@ func TestIntegrationCommandService(t *testing.T) {
 			publisher:            eventbus.NewInProcEventBus(log),
 			runningCmdRepository: runningCmdRepository,
 			commandRepository:    commandRepository,
-			appStateRepository:   appstateimpl.NewAppStateRepository(),
 			processingLock:       processinglockimpl.New(),
 		}
 

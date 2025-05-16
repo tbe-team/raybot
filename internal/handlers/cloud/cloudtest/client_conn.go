@@ -13,7 +13,6 @@ import (
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/handlers/cloud"
 	"github.com/tbe-team/raybot/internal/logging"
-	"github.com/tbe-team/raybot/internal/services/appstate/appstateimpl"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/command/commandimpl"
 	"github.com/tbe-team/raybot/internal/services/command/processinglockimpl"
@@ -69,7 +68,6 @@ func SetupTunnelTestEnv(t *testing.T) TunnelTestEnv {
 		bus,
 		commandimpl.NewRunningCmdRepository(),
 		commandimpl.NewCommandRepository(db, queries),
-		appstateimpl.NewAppStateRepository(),
 		processinglockimpl.New(),
 		noopExecutorService{},
 	)

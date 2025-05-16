@@ -13,17 +13,24 @@ type repository struct {
 
 	subscribers      map[chan appstate.AppState]struct{}
 	appStateChangeCh chan appstate.AppState
+
+	closeCh chan struct{}
 }
 
 func NewAppStateRepository() appstate.Repository {
 	r := &repository{
 		subscribers:      make(map[chan appstate.AppState]struct{}),
 		appStateChangeCh: make(chan appstate.AppState),
+		closeCh:          make(chan struct{}),
 	}
 
 	go r.notifySubscribersLoop()
 
 	return r
+}
+
+func (r *repository) Cleanup() {
+	close(r.closeCh)
 }
 
 func (r *repository) GetAppState(_ context.Context) (appstate.AppState, error) {
@@ -148,14 +155,20 @@ func (r *repository) ListenForAppStateChanges(ctx context.Context) <-chan appsta
 }
 
 func (r *repository) notifySubscribersLoop() {
-	for state := range r.appStateChangeCh {
-		r.mu.RLock()
-		for ch := range r.subscribers {
-			select {
-			case ch <- state:
-			default:
+	for {
+		select {
+		case <-r.closeCh:
+			return
+
+		case state := <-r.appStateChangeCh:
+			r.mu.RLock()
+			for ch := range r.subscribers {
+				select {
+				case ch <- state:
+				default:
+				}
 			}
+			r.mu.RUnlock()
 		}
-		r.mu.RUnlock()
 	}
 }

@@ -9,7 +9,6 @@ import (
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
-	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 	"github.com/tbe-team/raybot/pkg/paging"
@@ -26,7 +25,6 @@ type Service struct {
 
 	runningCmdRepository command.RunningCommandRepository
 	commandRepository    command.Repository
-	appStateRepository   appstate.Repository
 
 	processingLock  command.ProcessingLock
 	executorService command.ExecutorService
@@ -39,7 +37,6 @@ func NewService(
 	publisher eventbus.Publisher,
 	runningCmdRepository command.RunningCommandRepository,
 	commandRepository command.Repository,
-	appStateRepository appstate.Repository,
 	processingLock command.ProcessingLock,
 	executorService command.ExecutorService,
 ) command.Service {
@@ -50,7 +47,6 @@ func NewService(
 		publisher:            publisher,
 		runningCmdRepository: runningCmdRepository,
 		commandRepository:    commandRepository,
-		appStateRepository:   appStateRepository,
 		processingLock:       processingLock,
 		executorService:      executorService,
 	}

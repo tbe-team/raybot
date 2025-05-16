@@ -203,7 +203,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		eventBus,
 		runningCmdRepository,
 		commandRepository,
-		appStateRepository,
 		processinglockimpl.New(),
 		executor.NewService(
 			cfg.Cargo,
@@ -225,6 +224,8 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	systemService := systemimpl.NewService(log, commandService, driveMotorService, liftMotorService)
 
 	cleanup := func() error {
+		appStateRepository.Cleanup()
+
 		var err error
 		if espSerialClient.Connected() {
 			if espErr := espSerialClient.Close(); espErr != nil {
