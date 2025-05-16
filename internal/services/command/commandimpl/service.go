@@ -225,10 +225,6 @@ func (s *Service) runNextExecutableCommand(ctx context.Context) {
 
 func (s *Service) executeCommand(ctx context.Context, cmd command.Command) {
 	if err := s.processingLock.WaitUntilUnlocked(ctx); err != nil {
-		// if the context is canceled, we don't need to run the next executable command
-		if errors.Is(err, context.Canceled) {
-			return
-		}
 		s.log.Error("failed to wait for processing lock to be unlocked", slog.Any("error", err))
 	}
 

@@ -15,6 +15,7 @@ packages:
     interfaces:
       Service:
       ExecutorService:
+      RunningCommandRepository:
       Repository:
       ProcessingLock:
   github.com/tbe-team/raybot/internal/services/drivemotor:
@@ -25,3 +26,7 @@ packages:
     config:
     interfaces:
       Service:
+  github.com/tbe-team/raybot/pkg/eventbus:
+    config:
+    interfaces:
+      Publisher:
