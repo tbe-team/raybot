@@ -50,7 +50,7 @@ type service struct {
 	scanLocationExecutor CommandExecutor[command.ScanLocationInputs, command.ScanLocationOutputs]
 	waitExecutor         CommandExecutor[command.WaitInputs, command.WaitOutputs]
 
-	cancelableExecutors map[command.CommandType]Cancelable
+	cancelableMap map[command.CommandType]Cancelable
 }
 
 func NewService(
@@ -96,7 +96,7 @@ func NewService(
 		scanLocationExecutor: scanLocationExecutor,
 		waitExecutor:         waitExecutor,
 
-		cancelableExecutors: map[command.CommandType]Cancelable{
+		cancelableMap: map[command.CommandType]Cancelable{
 			command.CommandTypeStopMovement: stopMovementExecutor,
 			command.CommandTypeMoveBackward: moveBackwardExecutor,
 			command.CommandTypeMoveForward:  moveForwardExecutor,
@@ -142,19 +142,17 @@ func (s *service) Execute(ctx context.Context, cmd command.Command) error {
 	outputs, err := s.route(runningCmd.Context(), cmd)
 	switch {
 	case err == nil:
-		s.handleSuccess(ctx, runningCmd.ID, outputs)
+		return s.handleSuccess(ctx, runningCmd.ID, outputs)
 
 	case errors.Is(err, context.Canceled):
-		s.handleCancel(ctx, runningCmd.ID, cmd.Type)
+		return s.handleCancel(ctx, runningCmd.ID, cmd.Type, outputs)
 
 	default:
-		s.handleFailure(ctx, runningCmd.ID, err)
+		return s.handleFailure(ctx, runningCmd.ID, err)
 	}
-
-	return nil
 }
 
-func (s *service) handleSuccess(ctx context.Context, id int64, outputs command.Outputs) {
+func (s *service) handleSuccess(ctx context.Context, id int64, outputs command.Outputs) error {
 	log := s.log.With(slog.Int64("command_id", id), slog.Any("outputs", outputs))
 	log.Info("command executed successfully")
 
@@ -169,19 +167,21 @@ func (s *service) handleSuccess(ctx context.Context, id int64, outputs command.O
 		SetCompletedAt: true,
 		UpdatedAt:      now,
 	})
+
 	if err != nil {
-		log.Error("failed to update command status", slog.Any("error", err))
+		return fmt.Errorf("failed to update command status: %w", err)
 	}
+
+	return nil
 }
 
-func (s *service) handleCancel(ctx context.Context, id int64, cmdType command.CommandType) {
+func (s *service) handleCancel(ctx context.Context, id int64, cmdType command.CommandType, outputs command.Outputs) error {
 	log := s.log.With(slog.Int64("command_id", id))
 	log.Info("command cancelled")
 
-	executor, ok := s.cancelableExecutors[cmdType]
+	executor, ok := s.cancelableMap[cmdType]
 	if !ok {
-		log.Error("command type not found in cancelable executors", slog.String("command_type", string(cmdType)))
-		return
+		return fmt.Errorf("command type not found in cancelable executors: %s", string(cmdType))
 	}
 	if err := executor.OnCancel(ctx); err != nil {
 		log.Error("failed to cancel command", slog.Any("error", err))
@@ -192,16 +192,20 @@ func (s *service) handleCancel(ctx context.Context, id int64, cmdType command.Co
 		ID:             id,
 		Status:         command.StatusCanceled,
 		SetStatus:      true,
+		Outputs:        outputs,
+		SetOutputs:     true,
 		CompletedAt:    ptr.New(now),
 		SetCompletedAt: true,
 		UpdatedAt:      now,
 	})
 	if err != nil {
-		log.Error("failed to update command status", slog.Any("error", err))
+		return fmt.Errorf("failed to update command status: %w", err)
 	}
+
+	return nil
 }
 
-func (s *service) handleFailure(ctx context.Context, id int64, execErr error) {
+func (s *service) handleFailure(ctx context.Context, id int64, execErr error) error {
 	log := s.log.With(slog.Int64("command_id", id), slog.Any("exec_error", execErr))
 	log.Error("command execution failed")
 
@@ -217,6 +221,8 @@ func (s *service) handleFailure(ctx context.Context, id int64, execErr error) {
 		UpdatedAt:      now,
 	})
 	if err != nil {
-		log.Error("failed to update command status", slog.Any("error", err))
+		return fmt.Errorf("failed to update command status: %w", err)
 	}
+
+	return nil
 }
