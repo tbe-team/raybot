@@ -115,6 +115,23 @@ func NewService(
 }
 
 func (s *service) Execute(ctx context.Context, cmd command.Command) error {
+	outputs, err := s.execute(ctx, cmd)
+	switch {
+	case err == nil:
+		return s.handleSuccess(ctx, cmd.ID, outputs)
+
+	case errors.Is(err, context.Canceled):
+		return s.handleCancel(ctx, cmd.ID, outputs)
+
+	default:
+		return s.handleFailure(ctx, cmd.ID, err)
+	}
+}
+
+func (s *service) execute(ctx context.Context, cmd command.Command) (command.Outputs, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
 	cmd, err := s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
 		ID:           cmd.ID,
 		Status:       command.StatusProcessing,
@@ -124,31 +141,41 @@ func (s *service) Execute(ctx context.Context, cmd command.Command) error {
 		UpdatedAt:    time.Now(),
 	})
 	if err != nil {
-		return fmt.Errorf("failed to update command status: %w", err)
+		return nil, fmt.Errorf("failed to update command status: %w", err)
 	}
 
 	runningCmd := command.NewCancelableCommand(ctx, cmd)
 	defer func() {
-		runningCmd.Cancel()
 		if err := s.runningCommandRepository.Remove(ctx); err != nil {
 			s.log.Error("failed to remove running command", slog.Any("error", err))
 		}
 	}()
 
 	if err := s.runningCommandRepository.Add(ctx, runningCmd); err != nil {
-		return fmt.Errorf("failed to add running command: %w", err)
+		return nil, fmt.Errorf("failed to add running command: %w", err)
 	}
 
-	outputs, err := s.route(runningCmd.Context(), cmd)
-	switch {
-	case err == nil:
-		return s.handleSuccess(ctx, runningCmd.ID, outputs)
+	cmdCtx := runningCmd.Context()
+	out, err := s.route(cmdCtx, cmd)
 
-	case errors.Is(err, context.Canceled):
-		return s.handleCancel(ctx, runningCmd.ID, cmd.Type, outputs)
+	select {
+	case <-cmdCtx.Done():
+		s.runCancelHook(ctx, cmd)
+		return out, cmdCtx.Err()
 
 	default:
-		return s.handleFailure(ctx, runningCmd.ID, err)
+		return out, err
+	}
+}
+
+func (s *service) runCancelHook(ctx context.Context, cmd command.Command) {
+	c, ok := s.cancelableMap[cmd.Type]
+	if !ok {
+		s.log.Error("cancelable executor not found", slog.Any("command", cmd))
+		return
+	}
+	if err := c.OnCancel(ctx); err != nil {
+		s.log.Error("failed to cancel command", slog.Any("command", cmd), slog.Any("error", err))
 	}
 }
 
@@ -175,17 +202,9 @@ func (s *service) handleSuccess(ctx context.Context, id int64, outputs command.O
 	return nil
 }
 
-func (s *service) handleCancel(ctx context.Context, id int64, cmdType command.CommandType, outputs command.Outputs) error {
+func (s *service) handleCancel(ctx context.Context, id int64, outputs command.Outputs) error {
 	log := s.log.With(slog.Int64("command_id", id))
 	log.Info("command cancelled")
-
-	executor, ok := s.cancelableMap[cmdType]
-	if !ok {
-		return fmt.Errorf("command type not found in cancelable executors: %s", string(cmdType))
-	}
-	if err := executor.OnCancel(ctx); err != nil {
-		log.Error("failed to cancel command", slog.Any("error", err))
-	}
 
 	now := time.Now()
 	_, err := s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
