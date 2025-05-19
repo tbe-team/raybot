@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CargoCheckQRInputs, MoveToInputs } from '@/types/command'
+import type { CargoCheckQRInputs, Command, MoveToInputs } from '@/types/command'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useCancelProcessingCommandMutation, useCurrentProcessingCommandQuery } from '@/composables/use-command'
+import { CURRENT_PROCESSING_COMMAND_QUERY_KEY, useCancelProcessingCommandMutation, useCurrentProcessingCommandQuery } from '@/composables/use-command'
 import { formatDate } from '@/lib/date'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { RaybotError } from '@/types/error'
@@ -17,11 +17,12 @@ import { Clock, Loader, MoreHorizontal } from 'lucide-vue-next'
 import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
 import { getCommandIcon, getCommandName } from './utils'
+import { useQueryClient } from '@tanstack/vue-query'
 
 const emit = defineEmits<{
   (e: 'viewDetails', commandId: number): void
 }>()
-
+const queryClient = useQueryClient()
 const { openConfirmation } = useConfirmationStore()
 
 const { data: command, refetch, isError } = useCurrentProcessingCommandQuery({ axiosOpts: { doNotShowLoading: true } })
@@ -43,6 +44,9 @@ function handleCancelCommand() {
       cancelProcessingCommand(undefined, {
         onSuccess: () => {
           notification.success('Command cancelled successfully')
+          queryClient.setQueryData([CURRENT_PROCESSING_COMMAND_QUERY_KEY], (old: Command) => {
+            return null
+          })
         },
         onError: (error) => {
           if (error instanceof RaybotError) {
