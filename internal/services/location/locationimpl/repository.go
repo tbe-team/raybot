@@ -28,7 +28,7 @@ func (r repository) GetLocation(ctx context.Context) (location.Location, error) 
 		return location.Location{}, fmt.Errorf("failed to get location: %w", err)
 	}
 
-	updatedAt, err := time.Parse(time.RFC3339, row.UpdatedAt)
+	updatedAt, err := time.Parse(time.RFC3339Nano, row.UpdatedAt)
 	if err != nil {
 		return location.Location{}, fmt.Errorf("failed to parse updated at: %w", err)
 	}
@@ -43,7 +43,7 @@ func (r repository) GetLocation(ctx context.Context) (location.Location, error) 
 func (r repository) UpdateLocation(ctx context.Context, location string) error {
 	if err := r.queries.LocationUpdate(ctx, r.db, sqlc.LocationUpdateParams{
 		CurrentLocation: location,
-		UpdatedAt:       time.Now().Format(time.RFC3339),
+		UpdatedAt:       time.Now().Format(time.RFC3339Nano),
 	}); err != nil {
 		return fmt.Errorf("queries update location: %w", err)
 	}
