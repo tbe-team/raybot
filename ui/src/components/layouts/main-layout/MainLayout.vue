@@ -6,6 +6,8 @@ import { useLocalStorage } from '@vueuse/core'
 import { Notification, Notivue } from 'notivue'
 import AppSidebar from './AppSidebar.vue'
 import HeaderActions from './HeaderActions.vue'
+import ScrollToTopButton from '@/components/shared/ScrollToTopButton.vue'
+import clsx from 'clsx'
 
 const open = useLocalStorage('sidebar', true)
 </script>
@@ -18,16 +20,22 @@ const open = useLocalStorage('sidebar', true)
   <SidebarProvider v-model:open="open">
     <AppSidebar />
     <SidebarInset>
-      <header class="flex items-center justify-between h-12 border-b shrink-0">
+      <header
+    class="fixed top-0 right-0 z-10 transition-[left,right,width] !duration-200 ease-linear bg-white shadow"
+    :class="clsx( open ? 'lg:left-56 left-0' : 'lg:left-12 left-0' )"
+  >
+      <div class="flex items-center justify-between h-12 border-b shrink-0">
         <div class="flex items-center gap-2 px-4">
           <SidebarTrigger class="-ml-1" />
           <Separator orientation="vertical" class="h-4 mr-2" />
         </div>
         <HeaderActions class="mr-4" />
+      </div>
       </header>
-      <main class="flex flex-col flex-1">
+      <main class="flex flex-col flex-1 mt-12">
         <RouterView />
       </main>
     </SidebarInset>
+    <ScrollToTopButton />
   </SidebarProvider>
 </template>
