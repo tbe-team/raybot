@@ -195,21 +195,23 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	appStateService := appstateimpl.NewService(appStateRepository)
 	peripheralService := peripheralimpl.NewService()
 
+	runningCmdRepository := commandimpl.NewRunningCmdRepository()
 	commandService := commandimpl.NewService(
 		cfg.Cron.DeleteOldCommand,
 		log,
 		validator,
 		eventBus,
+		runningCmdRepository,
 		commandRepository,
-		appStateRepository,
 		processinglockimpl.New(),
-		executor.NewRouter(
+		executor.NewService(
 			cfg.Cargo,
 			log,
 			eventBus,
 			driveMotorService,
 			liftMotorService,
 			cargoService,
+			runningCmdRepository,
 			commandRepository,
 		),
 	)
@@ -222,6 +224,8 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	systemService := systemimpl.NewService(log, commandService, driveMotorService, liftMotorService)
 
 	cleanup := func() error {
+		appStateRepository.Cleanup()
+
 		var err error
 		if espSerialClient.Connected() {
 			if espErr := espSerialClient.Close(); espErr != nil {

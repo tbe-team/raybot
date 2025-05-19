@@ -14,56 +14,43 @@ import (
 
 const defaultMoveToSpeed = 100
 
-func newMoveToExecutor(
-	log *slog.Logger,
-	subscriber eventbus.Subscriber,
-	driveMotorService drivemotor.Service,
-	commandRepository command.Repository,
-) *commandExecutor[command.MoveToInputs, command.MoveToOutputs] {
-	handler := moveToHandler{
-		log:               log,
-		subscriber:        subscriber,
-		driveMotorService: driveMotorService,
-	}
-
-	return newCommandExecutor(
-		handler.Handle,
-		Hooks[command.MoveToOutputs]{
-			OnCancel: func(ctx context.Context) {
-				if err := driveMotorService.Stop(ctx); err != nil {
-					log.Error("failed to stop drive motor", slog.Any("error", err))
-				}
-			},
-		},
-		log,
-		commandRepository,
-	)
-}
-
-type moveToHandler struct {
+type moveToExecutor struct {
 	log               *slog.Logger
 	subscriber        eventbus.Subscriber
 	driveMotorService drivemotor.Service
 }
 
-func (h moveToHandler) Handle(ctx context.Context, inputs command.MoveToInputs) (command.MoveToOutputs, error) {
+func newMoveToExecutor(
+	log *slog.Logger,
+	subscriber eventbus.Subscriber,
+	driveMotorService drivemotor.Service,
+) CommandExecutor[command.MoveToInputs, command.MoveToOutputs] {
+	return moveToExecutor{
+		log:               log,
+		subscriber:        subscriber,
+		driveMotorService: driveMotorService,
+	}
+}
+
+func (e moveToExecutor) Execute(ctx context.Context, inputs command.MoveToInputs) (command.MoveToOutputs, error) {
 	wg := sync.WaitGroup{}
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		h.trackingLocationUntilReached(ctx, inputs.Location)
+		e.trackingLocationUntilReached(ctx, inputs.Location)
 	}()
 
 	switch inputs.Direction {
 	case command.MoveDirectionForward:
-		if err := h.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
+		if err := e.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
 			Speed: defaultMoveToSpeed,
 		}); err != nil {
 			return command.MoveToOutputs{}, fmt.Errorf("failed to move forward: %w", err)
 		}
 
 	case command.MoveDirectionBackward:
-		if err := h.driveMotorService.MoveBackward(ctx, drivemotor.MoveBackwardParams{
+		if err := e.driveMotorService.MoveBackward(ctx, drivemotor.MoveBackwardParams{
 			Speed: defaultMoveToSpeed,
 		}); err != nil {
 			return command.MoveToOutputs{}, fmt.Errorf("failed to move backward: %w", err)
@@ -75,31 +62,38 @@ func (h moveToHandler) Handle(ctx context.Context, inputs command.MoveToInputs) 
 
 	wg.Wait()
 
-	if err := h.driveMotorService.Stop(ctx); err != nil {
+	if err := e.driveMotorService.Stop(ctx); err != nil {
 		return command.MoveToOutputs{}, fmt.Errorf("failed to stop drive motor: %w", err)
 	}
 
 	return command.MoveToOutputs{}, nil
 }
 
-func (h moveToHandler) trackingLocationUntilReached(ctx context.Context, location string) {
+func (e moveToExecutor) OnCancel(ctx context.Context) error {
+	if err := e.driveMotorService.Stop(ctx); err != nil {
+		return fmt.Errorf("failed to stop drive motor: %w", err)
+	}
+	return nil
+}
+
+func (e moveToExecutor) trackingLocationUntilReached(ctx context.Context, location string) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		h.log.Debug("stop tracking location", slog.String("location", location))
+		e.log.Debug("stop tracking location", slog.String("location", location))
 		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	h.log.Debug("start tracking location", slog.String("target_location", location))
-	h.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	e.log.Debug("start tracking location", slog.String("target_location", location))
+	e.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateLocationEvent)
 		if !ok {
-			h.log.Error("invalid event", slog.Any("event", msg.Payload))
+			e.log.Error("invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
 		if ev.Location == location {
-			h.log.Debug("location reached", slog.String("location", ev.Location))
+			e.log.Debug("location reached", slog.String("location", ev.Location))
 			close(doneCh)
 		}
 	})

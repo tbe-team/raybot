@@ -28,7 +28,7 @@ func (r cargoRepository) GetCargo(ctx context.Context) (cargo.Cargo, error) {
 		return cargo.Cargo{}, fmt.Errorf("failed to get cargo: %w", err)
 	}
 
-	updatedAt, err := time.Parse(time.RFC3339, row.UpdatedAt)
+	updatedAt, err := time.Parse(time.RFC3339Nano, row.UpdatedAt)
 	if err != nil {
 		return cargo.Cargo{}, fmt.Errorf("failed to parse updated at: %w", err)
 	}
@@ -48,7 +48,7 @@ func (r cargoRepository) GetCargoDoorMotorState(ctx context.Context) (cargo.Door
 		return cargo.DoorMotorState{}, fmt.Errorf("failed to get cargo door motor state: %w", err)
 	}
 
-	updatedAt, err := time.Parse(time.RFC3339, row.UpdatedAt)
+	updatedAt, err := time.Parse(time.RFC3339Nano, row.UpdatedAt)
 	if err != nil {
 		return cargo.DoorMotorState{}, fmt.Errorf("failed to parse updated at: %w", err)
 	}
@@ -71,7 +71,7 @@ func (r cargoRepository) GetCargoDoorMotorState(ctx context.Context) (cargo.Door
 func (r cargoRepository) UpdateCargoDoor(ctx context.Context, params cargo.UpdateCargoDoorParams) error {
 	if _, err := r.queries.CargoUpdateIsOpen(ctx, r.db, sqlc.CargoUpdateIsOpenParams{
 		IsOpen:    boolToInt64(params.IsOpen),
-		UpdatedAt: time.Now().Format(time.RFC3339),
+		UpdatedAt: time.Now().Format(time.RFC3339Nano),
 	}); err != nil {
 		return fmt.Errorf("failed to update cargo door: %w", err)
 	}
@@ -82,7 +82,7 @@ func (r cargoRepository) UpdateCargoDoor(ctx context.Context, params cargo.Updat
 func (r cargoRepository) UpdateCargoQRCode(ctx context.Context, params cargo.UpdateCargoQRCodeParams) error {
 	if _, err := r.queries.CargoUpdateQRCode(ctx, r.db, sqlc.CargoUpdateQRCodeParams{
 		QrCode:    params.QRCode,
-		UpdatedAt: time.Now().Format(time.RFC3339),
+		UpdatedAt: time.Now().Format(time.RFC3339Nano),
 	}); err != nil {
 		return fmt.Errorf("failed to update cargo qr code: %w", err)
 	}
@@ -93,7 +93,7 @@ func (r cargoRepository) UpdateCargoQRCode(ctx context.Context, params cargo.Upd
 func (r cargoRepository) UpdateCargoBottomDistance(ctx context.Context, params cargo.UpdateCargoBottomDistanceParams) error {
 	if _, err := r.queries.CargoUpdateBottomDistance(ctx, r.db, sqlc.CargoUpdateBottomDistanceParams{
 		BottomDistance: int64(params.BottomDistance),
-		UpdatedAt:      time.Now().Format(time.RFC3339),
+		UpdatedAt:      time.Now().Format(time.RFC3339Nano),
 	}); err != nil {
 		return fmt.Errorf("failed to update cargo bottom distance: %w", err)
 	}
@@ -117,7 +117,7 @@ func (r cargoRepository) UpdateCargoDoorMotorState(ctx context.Context, params c
 		Speed:     int64(params.Speed),
 		IsRunning: boolToInt64(params.IsRunning),
 		Enabled:   boolToInt64(params.Enabled),
-		UpdatedAt: time.Now().Format(time.RFC3339),
+		UpdatedAt: time.Now().Format(time.RFC3339Nano),
 	}); err != nil {
 		return fmt.Errorf("failed to update cargo door motor state: %w", err)
 	}

@@ -59,4 +59,6 @@ type Repository interface {
 	// The channel is buffered and will not block the caller.
 	// The channel will be closed when the context is done.
 	ListenForAppStateChanges(ctx context.Context) <-chan AppState
+
+	Cleanup()
 }

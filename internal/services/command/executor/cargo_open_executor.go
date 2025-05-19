@@ -12,42 +12,34 @@ import (
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
-func newCargoOpenExecutor(
-	log *slog.Logger,
-	subscriber eventbus.Subscriber,
-	cargoService cargo.Service,
-	commandRepository command.Repository,
-) *commandExecutor[command.CargoOpenInputs, command.CargoOpenOutputs] {
-	handler := cargoOpenHandler{
-		log:          log,
-		subscriber:   subscriber,
-		cargoService: cargoService,
-	}
-
-	return newCommandExecutor(
-		handler.Handle,
-		Hooks[command.CargoOpenOutputs]{},
-		log,
-		commandRepository,
-	)
-}
-
-type cargoOpenHandler struct {
+type cargoOpenExecutor struct {
 	log          *slog.Logger
 	subscriber   eventbus.Subscriber
 	cargoService cargo.Service
 }
 
-func (h cargoOpenHandler) Handle(ctx context.Context, _ command.CargoOpenInputs) (command.CargoOpenOutputs, error) {
+func newCargoOpenExecutor(
+	log *slog.Logger,
+	subscriber eventbus.Subscriber,
+	cargoService cargo.Service,
+) CommandExecutor[command.CargoOpenInputs, command.CargoOpenOutputs] {
+	return cargoOpenExecutor{
+		log:          log,
+		subscriber:   subscriber,
+		cargoService: cargoService,
+	}
+}
+
+func (e cargoOpenExecutor) Execute(ctx context.Context, _ command.CargoOpenInputs) (command.CargoOpenOutputs, error) {
 	wg := sync.WaitGroup{}
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		h.trackingCargoDoorUntilOpen(ctx)
+		e.trackingCargoDoorUntilOpen(ctx)
 	}()
 
-	if err := h.cargoService.OpenCargoDoor(ctx); err != nil {
+	if err := e.cargoService.OpenCargoDoor(ctx); err != nil {
 		return command.CargoOpenOutputs{}, fmt.Errorf("failed to open cargo: %w", err)
 	}
 
@@ -57,24 +49,28 @@ func (h cargoOpenHandler) Handle(ctx context.Context, _ command.CargoOpenInputs)
 	return command.CargoOpenOutputs{}, nil
 }
 
-func (h cargoOpenHandler) trackingCargoDoorUntilOpen(ctx context.Context) {
+func (e cargoOpenExecutor) OnCancel(_ context.Context) error {
+	return nil
+}
+
+func (e cargoOpenExecutor) trackingCargoDoorUntilOpen(ctx context.Context) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		h.log.Debug("stop tracking cargo door open")
+		e.log.Debug("stop tracking cargo door open")
 		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	h.log.Debug("start tracking cargo door open")
-	h.subscriber.Subscribe(ctx, events.CargoDoorUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	e.log.Debug("start tracking cargo door open")
+	e.subscriber.Subscribe(ctx, events.CargoDoorUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.CargoDoorUpdatedEvent)
 		if !ok {
-			h.log.Error("invalid event", slog.Any("event", msg.Payload))
+			e.log.Error("invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
 		if ev.IsOpen {
-			h.log.Debug("cargo door open completed")
+			e.log.Debug("cargo door open completed")
 			close(doneCh)
 		}
 	})

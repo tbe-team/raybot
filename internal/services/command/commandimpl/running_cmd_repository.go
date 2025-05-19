@@ -7,57 +7,39 @@ import (
 	"github.com/tbe-team/raybot/internal/services/command"
 )
 
-type runningCommand struct {
-	command.Command
-
-	ctx        context.Context
-	cancelFunc context.CancelFunc
-}
-
-func newRunningCommand(cmd command.Command) *runningCommand {
-	ctx, cancel := context.WithCancel(context.Background())
-	return &runningCommand{
-		Command:    cmd,
-		ctx:        ctx,
-		cancelFunc: cancel,
-	}
-}
-
-// Cancel cancels the running command.
-func (c *runningCommand) Cancel() {
-	c.cancelFunc()
-}
-
-// Context returns the context of the running command.
-func (c *runningCommand) Context() context.Context {
-	return c.ctx
-}
-
 type runningCmdRepository struct {
-	cmd *runningCommand
+	cmd *command.CancelableCommand
 	mu  sync.RWMutex
 }
 
-func newRunningCmdRepository() *runningCmdRepository {
+func NewRunningCmdRepository() command.RunningCommandRepository {
 	return &runningCmdRepository{
 		cmd: nil,
 	}
 }
 
-func (r *runningCmdRepository) Add(cmd *runningCommand) {
+func (r *runningCmdRepository) Add(_ context.Context, cmd command.CancelableCommand) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-	r.cmd = cmd
+	if r.cmd != nil {
+		return command.ErrRunningCommandExists
+	}
+	r.cmd = &cmd
+	return nil
 }
 
-func (r *runningCmdRepository) Get() *runningCommand {
+func (r *runningCmdRepository) Get(_ context.Context) (command.CancelableCommand, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
-	return r.cmd
+	if r.cmd == nil {
+		return command.CancelableCommand{}, command.ErrRunningCommandNotFound
+	}
+	return *r.cmd, nil
 }
 
-func (r *runningCmdRepository) Remove() {
+func (r *runningCmdRepository) Remove(_ context.Context) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 	r.cmd = nil
+	return nil
 }

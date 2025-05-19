@@ -14,6 +14,9 @@ var (
 	ErrNoNextExecutableCommand            = xerror.NotFound(nil, "command.noNextExecutable", "no next executable command")
 	ErrNoCommandBeingProcessed            = xerror.BadRequest(nil, "command.noCommandBeingProcessed", "no command being processed")
 	ErrCommandInProcessingCanNotBeDeleted = xerror.BadRequest(nil, "command.inProcessingCanNotBeDeleted", "command in processing can not be deleted")
+
+	ErrRunningCommandNotFound = xerror.NotFound(nil, "command.runningCommandNotFound", "running command not found")
+	ErrRunningCommandExists   = xerror.BadRequest(nil, "command.runningCommandExists", "running command already exists")
 )
 
 type CreateCommandParams struct {
@@ -59,6 +62,10 @@ type Service interface {
 	DeleteOldCommands(ctx context.Context) error
 }
 
+type ExecutorService interface {
+	Execute(ctx context.Context, cmd Command) error
+}
+
 type UpdateCommandParams struct {
 	ID             int64
 	Status         Status
@@ -86,6 +93,12 @@ type Repository interface {
 	CancelQueuedAndProcessingCommandsCreatedByCloud(ctx context.Context) error
 	DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error
 	DeleteOldCommands(ctx context.Context, cutoffTime time.Time) error
+}
+
+type RunningCommandRepository interface {
+	Add(ctx context.Context, cmd CancelableCommand) error
+	Get(ctx context.Context) (CancelableCommand, error)
+	Remove(ctx context.Context) error
 }
 
 // ProcessingLock is responsible for controlling a lock mechanism

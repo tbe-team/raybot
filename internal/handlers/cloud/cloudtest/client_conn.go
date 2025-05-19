@@ -13,10 +13,8 @@ import (
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/handlers/cloud"
 	"github.com/tbe-team/raybot/internal/logging"
-	"github.com/tbe-team/raybot/internal/services/appstate/appstateimpl"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/command/commandimpl"
-	"github.com/tbe-team/raybot/internal/services/command/executor"
 	"github.com/tbe-team/raybot/internal/services/command/processinglockimpl"
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
@@ -68,10 +66,10 @@ func SetupTunnelTestEnv(t *testing.T) TunnelTestEnv {
 		log,
 		validator,
 		bus,
+		commandimpl.NewRunningCmdRepository(),
 		commandimpl.NewCommandRepository(db, queries),
-		appstateimpl.NewAppStateRepository(),
 		processinglockimpl.New(),
-		executor.NewNoopRouter(),
+		noopExecutorService{},
 	)
 
 	cloudSvc := cloud.New(
@@ -99,4 +97,10 @@ func SetupTunnelTestEnv(t *testing.T) TunnelTestEnv {
 		CommandService: commandService,
 		TunnelChannel:  tc,
 	}
+}
+
+type noopExecutorService struct{}
+
+func (e noopExecutorService) Execute(_ context.Context, _ command.Command) error {
+	return nil
 }

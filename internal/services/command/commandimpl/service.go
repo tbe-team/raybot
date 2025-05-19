@@ -9,12 +9,9 @@ import (
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
-	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/command"
-	"github.com/tbe-team/raybot/internal/services/command/executor"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 	"github.com/tbe-team/raybot/pkg/paging"
-	"github.com/tbe-team/raybot/pkg/ptr"
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
@@ -26,12 +23,11 @@ type Service struct {
 
 	publisher eventbus.Publisher
 
-	runningCmdRepository *runningCmdRepository
+	runningCmdRepository command.RunningCommandRepository
 	commandRepository    command.Repository
-	appStateRepository   appstate.Repository
 
-	processingLock command.ProcessingLock
-	executorRouter executor.Router
+	processingLock  command.ProcessingLock
+	executorService command.ExecutorService
 }
 
 func NewService(
@@ -39,21 +35,20 @@ func NewService(
 	log *slog.Logger,
 	validator validator.Validator,
 	publisher eventbus.Publisher,
+	runningCmdRepository command.RunningCommandRepository,
 	commandRepository command.Repository,
-	appStateRepository appstate.Repository,
 	processingLock command.ProcessingLock,
-	executorRouter executor.Router,
+	executorService command.ExecutorService,
 ) command.Service {
 	s := &Service{
 		deleteOldCmdCfg:      deleteOldCmdCfg,
 		log:                  log.With("service", "command"),
 		validator:            validator,
 		publisher:            publisher,
-		runningCmdRepository: newRunningCmdRepository(),
+		runningCmdRepository: runningCmdRepository,
 		commandRepository:    commandRepository,
-		appStateRepository:   appStateRepository,
 		processingLock:       processingLock,
-		executorRouter:       executorRouter,
+		executorService:      executorService,
 	}
 
 	go s.cancelQueuedAndProcessingCommands(context.Background())
@@ -102,10 +97,13 @@ func (s *Service) CreateCommand(ctx context.Context, params command.CreateComman
 	return cmd, nil
 }
 
-func (s *Service) CancelCurrentProcessingCommand(_ context.Context) error {
-	runningCmd := s.runningCmdRepository.Get()
-	if runningCmd == nil {
-		return command.ErrNoCommandBeingProcessed
+func (s *Service) CancelCurrentProcessingCommand(ctx context.Context) error {
+	runningCmd, err := s.runningCmdRepository.Get(ctx)
+	if err != nil {
+		if errors.Is(err, command.ErrRunningCommandNotFound) {
+			return command.ErrNoCommandBeingProcessed
+		}
+		return fmt.Errorf("get running command: %w", err)
 	}
 
 	runningCmd.Cancel()
@@ -116,9 +114,15 @@ func (s *Service) CancelCurrentProcessingCommand(_ context.Context) error {
 func (s *Service) CancelActiveCloudCommands(ctx context.Context) error {
 	if err := s.processingLock.WithLock(func() error {
 		// Cancel current processing command
-		runningCmd := s.runningCmdRepository.Get()
-		if runningCmd != nil {
-			runningCmd.Cancel()
+		runningCmd, err := s.runningCmdRepository.Get(ctx)
+		if err != nil {
+			if !errors.Is(err, command.ErrRunningCommandNotFound) {
+				return fmt.Errorf("get running command: %w", err)
+			}
+		} else {
+			if runningCmd.Source == command.SourceCloud {
+				runningCmd.Cancel()
+			}
 		}
 
 		// Cancel all queued and processing commands created by the cloud
@@ -135,7 +139,9 @@ func (s *Service) CancelActiveCloudCommands(ctx context.Context) error {
 }
 
 func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
-	if currentCmd := s.runningCmdRepository.Get(); currentCmd != nil {
+	_, err := s.runningCmdRepository.Get(ctx)
+	// no error means the running command exists, so we don't need to execute the command
+	if err == nil {
 		s.log.Info("command is already being processed, this command will be queued")
 		return nil
 	}
@@ -156,9 +162,16 @@ func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.Exec
 
 func (s *Service) CancelAllRunningCommands(ctx context.Context) error {
 	if err := s.processingLock.WithLock(func() error {
-		runningCmd := s.runningCmdRepository.Get()
-		if runningCmd != nil {
+		runningCmd, err := s.runningCmdRepository.Get(ctx)
+		if err != nil {
+			if !errors.Is(err, command.ErrRunningCommandNotFound) {
+				return fmt.Errorf("get running command: %w", err)
+			}
+		} else {
 			runningCmd.Cancel()
+			if err := s.runningCmdRepository.Remove(ctx); err != nil {
+				return fmt.Errorf("remove running command: %w", err)
+			}
 		}
 
 		if err := s.commandRepository.CancelQueuedAndProcessingCommands(ctx); err != nil {
@@ -208,38 +221,15 @@ func (s *Service) runNextExecutableCommand(ctx context.Context) {
 
 func (s *Service) executeCommand(ctx context.Context, cmd command.Command) {
 	if err := s.processingLock.WaitUntilUnlocked(ctx); err != nil {
-		// if the context is canceled, we don't need to run the next executable command
-		if errors.Is(err, context.Canceled) {
-			return
-		}
 		s.log.Error("failed to wait for processing lock to be unlocked", slog.Any("error", err))
 	}
 
-	if cmd.Status == command.StatusQueued {
-		var err error
-		cmd, err = s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
-			ID:           cmd.ID,
-			Status:       command.StatusProcessing,
-			SetStatus:    true,
-			StartedAt:    ptr.New(time.Now()),
-			SetStartedAt: true,
-			UpdatedAt:    time.Now(),
-		})
-		if err != nil {
-			s.log.Error("failed to update command to PROCESSING status", slog.Any("error", err))
-			return
-		}
-	}
-
-	runningCmd := newRunningCommand(cmd)
-	s.runningCmdRepository.Add(runningCmd)
-
-	// pass the context of the running command to the executor router
-	if err := s.executorRouter.Route(runningCmd.Context(), cmd); err != nil {
+	if err := s.executorService.Execute(ctx, cmd); err != nil {
 		s.log.Error("failed to execute command", slog.Any("command", cmd), slog.Any("error", err))
 	}
 
-	s.runningCmdRepository.Remove()
-	time.Sleep(100 * time.Millisecond)
-	s.runNextExecutableCommand(ctx)
+	go func() {
+		time.Sleep(100 * time.Millisecond)
+		s.runNextExecutableCommand(ctx)
+	}()
 }
