@@ -27,11 +27,9 @@ hardware:
       parity: NONE
       read_timeout: 1s
 cloud:
+  enable: false
   address: localhost:50051
   token: 4d24e88b41374b34a54806c0124b4052
-grpc:
-  port: 50051
-  enable: true
 http:
   swagger: true
   port: 3000

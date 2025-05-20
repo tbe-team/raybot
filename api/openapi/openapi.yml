@@ -21,8 +21,6 @@ paths:
     $ref: "./paths/configs@hardware.yml"
   /configs/cloud:
     $ref: "./paths/configs@cloud.yml"
-  /configs/grpc:
-    $ref: "./paths/configs@grpc.yml"
   /configs/http:
     $ref: "./paths/configs@http.yml"
   /configs/cargo:

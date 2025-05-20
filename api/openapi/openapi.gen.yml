@@ -187,51 +187,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-  /configs/grpc:
-    get:
-      summary: Get the gRPC configuration
-      operationId: getGRPCConfig
-      description: Get the gRPC configuration
-      tags:
-        - config
-      responses:
-        '200':
-          description: The gRPC configuration
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GRPCConfig'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
-    put:
-      summary: Update the gRPC configuration
-      operationId: updateGRPCConfig
-      description: Update the gRPC configuration
-      tags:
-        - config
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GRPCConfig'
-      responses:
-        '200':
-          description: The updated gRPC configuration
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/GRPCConfig'
-        '400':
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorResponse'
   /configs/http:
     get:
       summary: Get the HTTP configuration
@@ -820,35 +775,25 @@ components:
     CloudConfig:
       type: object
       properties:
+        enable:
+          type: boolean
+          example: true
+          description: Whether to enable the cloud service
+          x-order: 1
         address:
           type: string
           example: localhost:50051
           description: The address for the cloud service
-          x-order: 1
+          x-order: 2
         token:
           type: string
           example: 4d24e88b41374b34a54806c0124b4052
           description: The token for the cloud service
-          x-order: 2
+          x-order: 3
       required:
+        - enable
         - address
         - token
-    GRPCConfig:
-      type: object
-      properties:
-        port:
-          type: integer
-          example: 50051
-          description: The port for the gRPC server
-          x-order: 1
-        enable:
-          type: boolean
-          example: true
-          description: Whether to enable the gRPC server
-          x-order: 2
-      required:
-        - port
-        - enable
     HTTPConfig:
       type: object
       properties:

@@ -102,6 +102,7 @@ func (h configHandler) GetCloudConfig(ctx context.Context, _ gen.GetCloudConfigR
 
 func (h configHandler) UpdateCloudConfig(ctx context.Context, request gen.UpdateCloudConfigRequestObject) (gen.UpdateCloudConfigResponseObject, error) {
 	cfg, err := h.configService.UpdateCloudConfig(ctx, config.Cloud{
+		Enable:  request.Body.Enable,
 		Address: request.Body.Address,
 		Token:   request.Body.Token,
 	})
@@ -110,28 +111,6 @@ func (h configHandler) UpdateCloudConfig(ctx context.Context, request gen.Update
 	}
 
 	return gen.UpdateCloudConfig200JSONResponse(h.convertCloudConfigToResponse(cfg)), nil
-}
-
-func (h configHandler) GetGRPCConfig(ctx context.Context, _ gen.GetGRPCConfigRequestObject) (gen.GetGRPCConfigResponseObject, error) {
-	cfg, err := h.configService.GetGRPCConfig(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("config service get grpc config: %w", err)
-	}
-
-	return gen.GetGRPCConfig200JSONResponse(h.convertGRPCConfigToResponse(cfg)), nil
-}
-
-func (h configHandler) UpdateGRPCConfig(ctx context.Context, request gen.UpdateGRPCConfigRequestObject) (gen.UpdateGRPCConfigResponseObject, error) {
-	//nolint:gosec
-	cfg, err := h.configService.UpdateGRPCConfig(ctx, config.GRPC{
-		Port:   uint32(request.Body.Port),
-		Enable: request.Body.Enable,
-	})
-	if err != nil {
-		return nil, fmt.Errorf("config service update grpc config: %w", err)
-	}
-
-	return gen.UpdateGRPCConfig200JSONResponse(h.convertGRPCConfigToResponse(cfg)), nil
 }
 
 func (h configHandler) GetHTTPConfig(ctx context.Context, _ gen.GetHTTPConfigRequestObject) (gen.GetHTTPConfigResponseObject, error) {
@@ -254,15 +233,9 @@ func (configHandler) convertSerialConfigToResponse(cfg config.Serial) gen.Serial
 
 func (configHandler) convertCloudConfigToResponse(cfg config.Cloud) gen.CloudConfig {
 	return gen.CloudConfig{
+		Enable:  cfg.Enable,
 		Address: cfg.Address,
 		Token:   cfg.Token,
-	}
-}
-
-func (configHandler) convertGRPCConfigToResponse(cfg config.GRPC) gen.GRPCConfig {
-	return gen.GRPCConfig{
-		Port:   int(cfg.Port),
-		Enable: cfg.Enable,
 	}
 }
 
