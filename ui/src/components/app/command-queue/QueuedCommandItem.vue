@@ -84,7 +84,6 @@ function handleRemoveFromQueue() {
             <DropdownMenuItem @click="emit('viewDetails', props.command.id)">
               View details
             </DropdownMenuItem>
-            <DropdownMenuItem>Edit command</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem class="text-red-500" @click="handleRemoveFromQueue">
               Remove from queue
