@@ -4,23 +4,24 @@ import type { AxiosRequestConfig } from 'axios'
 import commandsAPI from '@/api/commands'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 
-export const COMMAND_QUEUE_QUERY_KEY = 'queuedComand'
+export const COMMAND_QUEUE_QUERY_KEY = 'queuedCommmand'
 export const CURRENT_PROCESSING_COMMAND_QUERY_KEY = 'currentProcessingCommand'
-export const COMMANDS_QUERY_KEY = 'comands'
+export const COMMANDS_QUERY_KEY = 'commands'
 export const COMMAND_QUERY_KEY = 'command'
 export function useCurrentProcessingCommandQuery(
-  opts?: { axiosOpts?: Partial<AxiosRequestConfig> },
+  opts?: { axiosOpts?: Partial<AxiosRequestConfig>, refetchInterval?: number  },
 ) {
   return useQuery({
     queryKey: [CURRENT_PROCESSING_COMMAND_QUERY_KEY],
     queryFn: () => commandsAPI.getCurrentProcessingCommand(opts?.axiosOpts),
+    refetchInterval: opts?.refetchInterval,
   })
 }
 
 export function useListQueuedCommandsQuery(
   page: Ref<number>,
   pageSize: Ref<number>,
-  opts?: { axiosOpts?: Partial<AxiosRequestConfig> },
+  opts?: { axiosOpts?: Partial<AxiosRequestConfig> , refetchInterval?: number },
 ) {
   return useQuery({
     queryKey: [COMMAND_QUEUE_QUERY_KEY, page, pageSize],
@@ -30,6 +31,7 @@ export function useListQueuedCommandsQuery(
       sorts: ['created_at'],
       statuses: ['QUEUED'],
     }, opts?.axiosOpts),
+    refetchInterval: opts?.refetchInterval,
   })
 }
 
@@ -74,8 +76,5 @@ export function useDeleteCommandMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: commandsAPI.deleteCommand,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['comands'] })
-    },
   })
 }

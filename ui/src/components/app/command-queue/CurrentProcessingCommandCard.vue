@@ -19,20 +19,16 @@ import StatusBadge from './StatusBadge.vue'
 import { getCommandIcon, getCommandName } from './utils'
 import { useQueryClient } from '@tanstack/vue-query'
 
+const REFRESH_INTERVAL = 1000
+
 const emit = defineEmits<{
   (e: 'viewDetails', commandId: number): void
 }>()
 const queryClient = useQueryClient()
 const { openConfirmation } = useConfirmationStore()
 
-const { data: command, refetch, isError } = useCurrentProcessingCommandQuery({ axiosOpts: { doNotShowLoading: true } })
+const { data: command, isError } = useCurrentProcessingCommandQuery({ axiosOpts: { doNotShowLoading: true}, refetchInterval: REFRESH_INTERVAL })
 const { mutate: cancelProcessingCommand, isPending: isCancellingCommand } = useCancelProcessingCommandMutation()
-const REFRESH_INTERVAL = 1000
-const interval = setInterval(refetch, REFRESH_INTERVAL)
-
-onUnmounted(() => {
-  clearInterval(interval)
-})
 
 function handleCancelCommand() {
   openConfirmation({

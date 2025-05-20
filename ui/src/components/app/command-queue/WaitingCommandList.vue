@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useListQueuedCommandsQuery } from '@/composables/use-command'
 import QueuedCommandItem from './QueuedCommandItem.vue'
 
+const REFRESH_INTERVAL = 1000
+
 const emit = defineEmits<{
   (e: 'viewDetails', commandId: number): void
 }>()
@@ -16,6 +18,7 @@ const { data: commands, refetch } = useListQueuedCommandsQuery(page, pageSize, {
   axiosOpts: {
     doNotShowLoading: true,
   },
+  refetchInterval: REFRESH_INTERVAL,
 })
 
 function handlePageSizeChange() {
@@ -25,12 +28,6 @@ function handlePageChange(p: number) {
   page.value = p
 }
 
-const REFRESH_INTERVAL = 2000
-const interval = setInterval(refetch, REFRESH_INTERVAL)
-
-onUnmounted(() => {
-  clearInterval(interval)
-})
 </script>
 
 <template>
@@ -49,6 +46,7 @@ onUnmounted(() => {
           v-for="command in commands.items"
           :key="command.id"
           :command="command"
+          @refresh="refetch"
           @view-details="emit('viewDetails', command.id)"
         />
       </template>
