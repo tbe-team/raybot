@@ -50,13 +50,9 @@ export interface SerialConfig {
 }
 
 export interface CloudConfig {
+  enable: boolean
   address: string
   token: string
-}
-
-export interface GRPCConfig {
-  port: number
-  enable: boolean
 }
 
 export interface HTTPConfig {

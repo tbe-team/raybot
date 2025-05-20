@@ -8,6 +8,7 @@ export const GRPC_CONFIG_QUERY_KEY = 'grpcConfig'
 export const HTTP_CONFIG_QUERY_KEY = 'httpConfig'
 export const CARGO_CONFIG_QUERY_KEY = 'cargoConfig'
 export const WIFI_CONFIG_QUERY_KEY = 'wifiConfig'
+
 export function useLogConfigQuery() {
   return useQuery({
     queryKey: [LOG_CONFIG_QUERY_KEY],
@@ -44,19 +45,6 @@ export function useCloudConfigQuery() {
 export function useCloudConfigMutation() {
   return useMutation({
     mutationFn: configAPI.updateCloudConfig,
-  })
-}
-
-export function useGRPCConfigQuery() {
-  return useQuery({
-    queryKey: [GRPC_CONFIG_QUERY_KEY],
-    queryFn: configAPI.getGrpcConfig,
-  })
-}
-
-export function useGRPCConfigMutation() {
-  return useMutation({
-    mutationFn: configAPI.updateGrpcConfig,
   })
 }
 
