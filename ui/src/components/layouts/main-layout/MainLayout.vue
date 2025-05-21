@@ -21,7 +21,7 @@ const open = useLocalStorage('sidebar', true)
     <AppSidebar />
     <SidebarInset>
       <header
-    class="fixed top-0 right-0 z-10 transition-[left,right,width] !duration-200 ease-linear bg-white shadow"
+    class="fixed top-0 right-0 z-10 transition-[left,right,width] !duration-200 ease-linear bg-white dark:bg-background shadow"
     :class="clsx( open ? 'lg:left-56 left-0' : 'lg:left-12 left-0' )"
   >
       <div class="flex items-center justify-between h-12 border-b shrink-0">

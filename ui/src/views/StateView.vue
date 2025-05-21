@@ -1,6 +1,11 @@
 <script setup lang="ts">
+import BatteryTabContent from '@/components/app/state/BatteryTabContent.vue'
+import CargoTabContent from '@/components/app/state/CargoTabContent.vue'
+import ConnectionsTabContent from '@/components/app/state/ConnectionsTabContent.vue'
+import ControlCard from '@/components/app/state/ControlCard.vue'
+import DistanceSensorsTabContent from '@/components/app/state/DistanceSensorsTabContent.vue'
+import MotorsTabContent from '@/components/app/state/MotorsTabContent.vue'
 import StateOverview from '@/components/app/state/StateOverview.vue'
-import TabContent from '@/components/app/state/TabContent.vue'
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Card } from '@/components/ui/card'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
@@ -83,8 +88,27 @@ const { data: robotState, isPending, isError, error } = useQueryRobotState({
       <!-- Overview Cards -->
       <StateOverview v-if="robotState" :robot-state="robotState" />
 
-      <!-- Tabs -->
-      <TabContent v-if="robotState" :robot-state="robotState" />
+      <!-- Content Cards -->
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <MotorsTabContent
+          v-if="robotState"
+          :lift-motor="robotState.liftMotor"
+          :drive-motor="robotState.driveMotor"
+          :cargo-door-motor="robotState.cargoDoorMotor"
+        />
+        <ControlCard />
+
+        <DistanceSensorsTabContent
+          v-if="robotState"
+          :distance-sensor="robotState.distanceSensor"
+        />
+
+        <CargoTabContent
+          v-if="robotState"
+          :cargo="robotState.cargo"
+          :cargo-door-motor="robotState.cargoDoorMotor"
+        />
+      </div>
     </div>
   </PageContainer>
 </template>

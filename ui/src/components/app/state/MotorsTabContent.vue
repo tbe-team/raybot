@@ -124,42 +124,6 @@ const liftMotorProgress = computed(() => {
         </div>
       </div>
 
-      <Separator class="my-6" />
-
-      <!-- Cargo Door Motor -->
-      <div>
-        <h3 class="mb-4 font-medium">
-          Cargo Door Motor
-        </h3>
-        <div class="flex flex-col gap-6 sm:flex-row">
-          <div class="flex items-center gap-4">
-            <div
-              class="p-3 rounded-full"
-              :class="props.cargoDoorMotor.direction === 'OPEN' ? 'bg-green-100' : 'bg-yellow-100'"
-            >
-              <Unlock
-                v-if="props.cargoDoorMotor.direction === 'OPEN'"
-                class="w-6 h-6 text-green-600"
-              />
-              <Lock
-                v-else
-                class="w-6 h-6 text-yellow-600"
-              />
-            </div>
-            <div>
-              <p class="font-medium">
-                Door Status
-              </p>
-              <p class="text-lg">
-                {{ props.cargoDoorMotor.direction === 'OPEN' ? 'Open' : 'Closed' }}
-              </p>
-            </div>
-            <div class="self-end text-xs text-muted-foreground">
-              Last updated: {{ formatDate(props.cargoDoorMotor.updatedAt) }}
-            </div>
-          </div>
-        </div>
-      </div>
     </CardContent>
   </Card>
 </template>
