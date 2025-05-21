@@ -9,7 +9,7 @@ export const CURRENT_PROCESSING_COMMAND_QUERY_KEY = 'currentProcessingCommand'
 export const COMMANDS_QUERY_KEY = 'commands'
 export const COMMAND_QUERY_KEY = 'command'
 export function useCurrentProcessingCommandQuery(
-  opts?: { axiosOpts?: Partial<AxiosRequestConfig>, refetchInterval?: number  },
+  opts?: { axiosOpts?: Partial<AxiosRequestConfig>, refetchInterval?: number },
 ) {
   return useQuery({
     queryKey: [CURRENT_PROCESSING_COMMAND_QUERY_KEY],
@@ -21,7 +21,7 @@ export function useCurrentProcessingCommandQuery(
 export function useListQueuedCommandsQuery(
   page: Ref<number>,
   pageSize: Ref<number>,
-  opts?: { axiosOpts?: Partial<AxiosRequestConfig> , refetchInterval?: number },
+  opts?: { axiosOpts?: Partial<AxiosRequestConfig>, refetchInterval?: number },
 ) {
   return useQuery({
     queryKey: [COMMAND_QUEUE_QUERY_KEY, page, pageSize],
@@ -76,5 +76,8 @@ export function useDeleteCommandMutation() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: commandsAPI.deleteCommand,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [COMMANDS_QUERY_KEY] })
+    },
   })
 }
