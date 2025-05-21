@@ -8,7 +8,7 @@ import (
 )
 
 func startCloud(app *application.Application, interruptChan <-chan any) error {
-	if app.Cfg.Wifi.AP.Enable {
+	if app.Cfg.Wifi.AP.Enable || !app.Cfg.Cloud.Enable {
 		return nil
 	}
 

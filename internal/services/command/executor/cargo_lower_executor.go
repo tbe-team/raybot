@@ -37,9 +37,21 @@ func newCargoLowerExecutor(
 func (e cargoLowerExecutor) Execute(ctx context.Context, _ command.CargoLowerInputs) (command.CargoLowerOutputs, error) {
 	wg := sync.WaitGroup{}
 
+	obstacleCtx, cancelObstacleTracking := context.WithCancel(ctx)
+	defer cancelObstacleTracking()
+
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
+		e.trackingBottomObstacle(obstacleCtx)
+	}()
+
+	wg.Add(1)
+	go func() {
+		defer func() {
+			wg.Done()
+			cancelObstacleTracking()
+		}()
 		e.trackingLowerPositionUntilReached(ctx, e.cfg.LowerPosition)
 	}()
 
@@ -49,12 +61,6 @@ func (e cargoLowerExecutor) Execute(ctx context.Context, _ command.CargoLowerInp
 	}); err != nil {
 		return command.CargoLowerOutputs{}, fmt.Errorf("failed to set cargo position: %w", err)
 	}
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		e.trackingBottomObstacle(ctx)
-	}()
 
 	// wait for tracking to finish
 	wg.Wait()
@@ -101,7 +107,7 @@ func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Contex
 
 // trackingBottomObstacle tracks the bottom obstacle and stops the motor if it is detected.
 // It also starts the motor again if the obstacle is cleared.
-// Caller must ensure that the motor is running before calling this function and cancel the context to stop the tracking.
+// Cancel the context to stop the tracking.
 func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {

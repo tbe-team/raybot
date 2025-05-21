@@ -11,7 +11,6 @@ type Config struct {
 	Log      Log      `yaml:"log"`
 	Hardware Hardware `yaml:"hardware"`
 	Cloud    Cloud    `yaml:"cloud"`
-	GRPC     GRPC     `yaml:"grpc"`
 	HTTP     HTTP     `yaml:"http"`
 
 	Cargo Cargo `yaml:"cargo"`
@@ -34,10 +33,6 @@ func (c *Config) Validate() error {
 
 	if err := c.Cloud.Validate(); err != nil {
 		return fmt.Errorf("validate cloud: %w", err)
-	}
-
-	if err := c.GRPC.Validate(); err != nil {
-		return fmt.Errorf("validate grpc: %w", err)
 	}
 
 	if err := c.HTTP.Validate(); err != nil {

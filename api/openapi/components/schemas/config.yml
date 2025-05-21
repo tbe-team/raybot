@@ -169,36 +169,25 @@ SerialConfig:
 CloudConfig:
   type: object
   properties:
+    enable:
+      type: boolean
+      example: true
+      description: Whether to enable the cloud service
+      x-order: 1
     address:
       type: string
       example: "localhost:50051"
       description: The address for the cloud service
-      x-order: 1
+      x-order: 2
     token:
       type: string
       example: "4d24e88b41374b34a54806c0124b4052"
       description: The token for the cloud service
-      x-order: 2
+      x-order: 3
   required:
+    - enable
     - address
     - token
-
-GRPCConfig:
-  type: object
-  properties:
-    port:
-      type: integer
-      example: 50051
-      description: The port for the gRPC server
-      x-order: 1
-    enable:
-      type: boolean
-      example: true
-      description: Whether to enable the gRPC server
-      x-order: 2
-  required:
-    - port
-    - enable
 
 HTTPConfig:
   type: object

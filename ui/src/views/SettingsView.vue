@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import CargoConfigTab from '@/components/app/settings/CargoConfigTab.vue'
 import CloudConfigTab from '@/components/app/settings/CloudConfigTab.vue'
-import GRPCConfigTab from '@/components/app/settings/GRPCConfigTab.vue'
 import HardwareConfigTab from '@/components/app/settings/HardwareConfigTab.vue'
 import HTTPConfigTab from '@/components/app/settings/HTTPConfigTab.vue'
 import WifiConfigTab from '@/components/app/settings/WifiConfigTab.vue'
@@ -38,9 +37,6 @@ function handleTabChange(value: string | number) {
         <TabsTrigger value="cloud">
           Cloud
         </TabsTrigger>
-        <TabsTrigger value="grpc">
-          GRPC
-        </TabsTrigger>
         <TabsTrigger value="http">
           HTTP
         </TabsTrigger>
@@ -57,9 +53,6 @@ function handleTabChange(value: string | number) {
       </TabsContent>
       <TabsContent value="cloud">
         <CloudConfigTab />
-      </TabsContent>
-      <TabsContent value="grpc">
-        <GRPCConfigTab />
       </TabsContent>
       <TabsContent value="http">
         <HTTPConfigTab />

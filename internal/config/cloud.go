@@ -3,6 +3,7 @@ package config
 import "fmt"
 
 type Cloud struct {
+	Enable  bool   `yaml:"enable"`
 	Address string `yaml:"address"`
 	Token   string `yaml:"token"`
 }

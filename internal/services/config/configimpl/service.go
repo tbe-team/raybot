@@ -102,31 +102,6 @@ func (s *service) UpdateCloudConfig(ctx context.Context, cloudCfg config.Cloud) 
 	return cloudCfg, nil
 }
 
-func (s *service) GetGRPCConfig(_ context.Context) (config.GRPC, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.cfg.GRPC, nil
-}
-
-func (s *service) UpdateGRPCConfig(ctx context.Context, grpcCfg config.GRPC) (config.GRPC, error) {
-	if err := grpcCfg.Validate(); err != nil {
-		return config.GRPC{}, fmt.Errorf("validate grpc config: %w", err)
-	}
-
-	cfg := *s.cfg
-	cfg.GRPC = grpcCfg
-
-	if err := s.writeConfig(ctx, cfg); err != nil {
-		return config.GRPC{}, fmt.Errorf("write config: %w", err)
-	}
-
-	s.mu.Lock()
-	s.cfg = &cfg
-	s.mu.Unlock()
-
-	return grpcCfg, nil
-}
-
 func (s *service) GetHTTPConfig(_ context.Context) (config.HTTP, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

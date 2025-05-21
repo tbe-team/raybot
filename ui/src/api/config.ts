@@ -1,4 +1,4 @@
-import type { CargoConfig, CloudConfig, GRPCConfig, HardwareConfig, HTTPConfig, LogConfig, WifiConfig } from '@/types/config'
+import type { CargoConfig, CloudConfig, HardwareConfig, HTTPConfig, LogConfig, WifiConfig } from '@/types/config'
 import http from '@/lib/http'
 
 const configAPI = {
@@ -13,9 +13,6 @@ const configAPI = {
 
   getHttpConfig: (): Promise<HTTPConfig> => http.get('/configs/http'),
   updateHttpConfig: (config: HTTPConfig): Promise<void> => http.put('/configs/http', config),
-
-  getGrpcConfig: (): Promise<GRPCConfig> => http.get('/configs/grpc'),
-  updateGrpcConfig: (config: GRPCConfig): Promise<void> => http.put('/configs/grpc', config),
 
   getCargoConfig: (): Promise<CargoConfig> => http.get('/configs/cargo'),
   updateCargoConfig: (config: CargoConfig): Promise<void> => http.put('/configs/cargo', config),
