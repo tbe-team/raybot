@@ -135,33 +135,6 @@ func (h configHandler) UpdateHTTPConfig(ctx context.Context, request gen.UpdateH
 	return gen.UpdateHTTPConfig200JSONResponse(h.convertHTTPConfigToResponse(cfg)), nil
 }
 
-func (h configHandler) GetCargoConfig(ctx context.Context, _ gen.GetCargoConfigRequestObject) (gen.GetCargoConfigResponseObject, error) {
-	cfg, err := h.configService.GetCargoConfig(ctx)
-	if err != nil {
-		return nil, fmt.Errorf("config service get cargo config: %w", err)
-	}
-
-	return gen.GetCargoConfig200JSONResponse(h.convertCargoConfigToResponse(cfg)), nil
-}
-
-func (h configHandler) UpdateCargoConfig(ctx context.Context, request gen.UpdateCargoConfigRequestObject) (gen.UpdateCargoConfigResponseObject, error) {
-	//nolint:gosec
-	cfg, err := h.configService.UpdateCargoConfig(ctx, config.Cargo{
-		LiftPosition:   uint16(request.Body.LiftPosition),
-		LowerPosition:  uint16(request.Body.LowerPosition),
-		LiftMotorSpeed: uint8(request.Body.LiftMotorSpeed),
-		BottomDistanceHysteresis: config.CargoBottomDistanceHysteresis{
-			LowerThreshold: uint16(request.Body.BottomDistanceHysteresis.LowerThreshold),
-			UpperThreshold: uint16(request.Body.BottomDistanceHysteresis.UpperThreshold),
-		},
-	})
-	if err != nil {
-		return nil, fmt.Errorf("config service update cargo config: %w", err)
-	}
-
-	return gen.UpdateCargoConfig200JSONResponse(h.convertCargoConfigToResponse(cfg)), nil
-}
-
 func (h configHandler) GetWifiConfig(ctx context.Context, _ gen.GetWifiConfigRequestObject) (gen.GetWifiConfigResponseObject, error) {
 	cfg, err := h.configService.GetWifiConfig(ctx)
 	if err != nil {
@@ -243,18 +216,6 @@ func (configHandler) convertHTTPConfigToResponse(cfg config.HTTP) gen.HTTPConfig
 	return gen.HTTPConfig{
 		Port:    int(cfg.Port),
 		Swagger: cfg.Swagger,
-	}
-}
-
-func (configHandler) convertCargoConfigToResponse(cfg config.Cargo) gen.CargoConfig {
-	return gen.CargoConfig{
-		LiftPosition:   int(cfg.LiftPosition),
-		LowerPosition:  int(cfg.LowerPosition),
-		LiftMotorSpeed: int(cfg.LiftMotorSpeed),
-		BottomDistanceHysteresis: gen.CargoBottomDistanceHysteresis{
-			LowerThreshold: int(cfg.BottomDistanceHysteresis.LowerThreshold),
-			UpperThreshold: int(cfg.BottomDistanceHysteresis.UpperThreshold),
-		},
 	}
 }
 

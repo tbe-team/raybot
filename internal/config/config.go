@@ -13,8 +13,7 @@ type Config struct {
 	Cloud    Cloud    `yaml:"cloud"`
 	HTTP     HTTP     `yaml:"http"`
 
-	Cargo Cargo `yaml:"cargo"`
-	Wifi  Wifi  `yaml:"wifi"`
+	Wifi Wifi `yaml:"wifi"`
 
 	Cron Cron `yaml:"cron"`
 
@@ -37,10 +36,6 @@ func (c *Config) Validate() error {
 
 	if err := c.HTTP.Validate(); err != nil {
 		return fmt.Errorf("validate http: %w", err)
-	}
-
-	if err := c.Cargo.Validate(); err != nil {
-		return fmt.Errorf("validate cargo: %w", err)
 	}
 
 	if err := c.Wifi.Validate(); err != nil {

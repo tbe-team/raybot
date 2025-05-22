@@ -30,13 +30,13 @@ func newCargoOpenExecutor(
 	}
 }
 
-func (e cargoOpenExecutor) Execute(ctx context.Context, _ command.CargoOpenInputs) (command.CargoOpenOutputs, error) {
-	cargo, err := e.cargoService.GetCargo(ctx)
+func (e cargoOpenExecutor) Execute(ctx context.Context, inputs command.CargoOpenInputs) (command.CargoOpenOutputs, error) {
+	c, err := e.cargoService.GetCargo(ctx)
 	if err != nil {
 		return command.CargoOpenOutputs{}, fmt.Errorf("failed to get cargo: %w", err)
 	}
 
-	if cargo.IsOpen {
+	if c.IsOpen {
 		return command.CargoOpenOutputs{}, nil
 	}
 
@@ -48,7 +48,9 @@ func (e cargoOpenExecutor) Execute(ctx context.Context, _ command.CargoOpenInput
 		e.trackingCargoDoorUntilOpen(ctx)
 	}()
 
-	if err := e.cargoService.OpenCargoDoor(ctx); err != nil {
+	if err := e.cargoService.OpenCargoDoor(ctx, cargo.OpenCargoDoorParams{
+		Speed: inputs.MotorSpeed,
+	}); err != nil {
 		return command.CargoOpenOutputs{}, fmt.Errorf("failed to open cargo: %w", err)
 	}
 

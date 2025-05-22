@@ -205,7 +205,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		commandRepository,
 		processinglockimpl.New(),
 		executor.NewService(
-			cfg.Cargo,
 			log,
 			eventBus,
 			driveMotorService,

@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
@@ -14,27 +13,24 @@ import (
 )
 
 type cargoLowerExecutor struct {
-	cfg              config.Cargo
 	log              *slog.Logger
 	subscriber       eventbus.Subscriber
 	liftMotorService liftmotor.Service
 }
 
 func newCargoLowerExecutor(
-	cfg config.Cargo,
 	log *slog.Logger,
 	subscriber eventbus.Subscriber,
 	liftMotorService liftmotor.Service,
 ) CommandExecutor[command.CargoLowerInputs, command.CargoLowerOutputs] {
 	return cargoLowerExecutor{
-		cfg:              cfg,
 		log:              log,
 		subscriber:       subscriber,
 		liftMotorService: liftMotorService,
 	}
 }
 
-func (e cargoLowerExecutor) Execute(ctx context.Context, _ command.CargoLowerInputs) (command.CargoLowerOutputs, error) {
+func (e cargoLowerExecutor) Execute(ctx context.Context, inputs command.CargoLowerInputs) (command.CargoLowerOutputs, error) {
 	wg := sync.WaitGroup{}
 
 	obstacleCtx, cancelObstacleTracking := context.WithCancel(ctx)
@@ -43,7 +39,7 @@ func (e cargoLowerExecutor) Execute(ctx context.Context, _ command.CargoLowerInp
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		e.trackingBottomObstacle(obstacleCtx)
+		e.trackingBottomObstacle(obstacleCtx, inputs)
 	}()
 
 	wg.Add(1)
@@ -52,12 +48,12 @@ func (e cargoLowerExecutor) Execute(ctx context.Context, _ command.CargoLowerInp
 			wg.Done()
 			cancelObstacleTracking()
 		}()
-		e.trackingLowerPositionUntilReached(ctx, e.cfg.LowerPosition)
+		e.trackingLowerPositionUntilReached(ctx, inputs.Position)
 	}()
 
 	if err := e.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
-		MotorSpeed: e.cfg.LiftMotorSpeed,
-		Position:   e.cfg.LowerPosition,
+		MotorSpeed: inputs.MotorSpeed,
+		Position:   inputs.Position,
 	}); err != nil {
 		return command.CargoLowerOutputs{}, fmt.Errorf("failed to set cargo position: %w", err)
 	}
@@ -108,7 +104,7 @@ func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Contex
 // trackingBottomObstacle tracks the bottom obstacle and stops the motor if it is detected.
 // It also starts the motor again if the obstacle is cleared.
 // Cancel the context to stop the tracking.
-func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context) {
+func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs command.CargoLowerInputs) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
 		e.log.Debug("stop tracking bottom obstacle")
@@ -140,8 +136,8 @@ func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context) {
 			return
 
 		case bottomDistance := <-bottomDistanceCh:
-			// If the bottom distance is less than the lower threshold, we stop the motor
-			if bottomDistance <= e.cfg.BottomDistanceHysteresis.LowerThreshold && isMotorRunning {
+			// If the bottom distance is less than the enter distance, we stop the motor
+			if bottomDistance <= inputs.BottomObstacleTracking.EnterDistance && isMotorRunning {
 				e.log.Info("obstacle detected, stopping motor", slog.Uint64("bottom_distance", uint64(bottomDistance)))
 				if err := e.liftMotorService.Stop(ctx); err != nil {
 					e.log.Error("failed to stop lift motor", slog.Any("error", err))
@@ -151,12 +147,12 @@ func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context) {
 				continue
 			}
 
-			// If the bottom distance is greater than the upper threshold, we run motor again
-			if bottomDistance >= e.cfg.BottomDistanceHysteresis.UpperThreshold && !isMotorRunning {
+			// If the bottom distance is greater than the exit distance, we run motor again
+			if bottomDistance >= inputs.BottomObstacleTracking.ExitDistance && !isMotorRunning {
 				e.log.Info("obstacle cleared, running motor again", slog.Uint64("bottom_distance", uint64(bottomDistance)))
 				if err := e.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
-					MotorSpeed: e.cfg.LiftMotorSpeed,
-					Position:   e.cfg.LowerPosition,
+					MotorSpeed: inputs.MotorSpeed,
+					Position:   inputs.Position,
 				}); err != nil {
 					e.log.Error("failed to set cargo position", slog.Any("error", err))
 				}

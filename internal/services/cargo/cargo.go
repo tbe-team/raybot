@@ -25,6 +25,14 @@ type UpdateCargoDoorMotorStateParams struct {
 	SetEnabled   bool
 }
 
+type OpenCargoDoorParams struct {
+	Speed uint8 `validate:"max=100"`
+}
+
+type CloseCargoDoorParams struct {
+	Speed uint8 `validate:"max=100"`
+}
+
 type Service interface {
 	GetCargo(ctx context.Context) (Cargo, error)
 
@@ -33,8 +41,8 @@ type Service interface {
 	UpdateCargoBottomDistance(ctx context.Context, params UpdateCargoBottomDistanceParams) error
 	UpdateCargoDoorMotorState(ctx context.Context, params UpdateCargoDoorMotorStateParams) error
 
-	OpenCargoDoor(ctx context.Context) error
-	CloseCargoDoor(ctx context.Context) error
+	OpenCargoDoor(ctx context.Context, params OpenCargoDoorParams) error
+	CloseCargoDoor(ctx context.Context, params CloseCargoDoorParams) error
 }
 
 type Repository interface {

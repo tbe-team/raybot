@@ -6,7 +6,6 @@ import (
 	"log/slog"
 	"sync"
 
-	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
@@ -14,38 +13,35 @@ import (
 )
 
 type cargoLiftExecutor struct {
-	cfg              config.Cargo
 	log              *slog.Logger
 	subscriber       eventbus.Subscriber
 	liftMotorService liftmotor.Service
 }
 
 func newCargoLiftExecutor(
-	cfg config.Cargo,
 	log *slog.Logger,
 	subscriber eventbus.Subscriber,
 	liftMotorService liftmotor.Service,
 ) CommandExecutor[command.CargoLiftInputs, command.CargoLiftOutputs] {
 	return cargoLiftExecutor{
-		cfg:              cfg,
 		log:              log,
 		subscriber:       subscriber,
 		liftMotorService: liftMotorService,
 	}
 }
 
-func (e cargoLiftExecutor) Execute(ctx context.Context, _ command.CargoLiftInputs) (command.CargoLiftOutputs, error) {
+func (e cargoLiftExecutor) Execute(ctx context.Context, inputs command.CargoLiftInputs) (command.CargoLiftOutputs, error) {
 	wg := sync.WaitGroup{}
 
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		e.trackingLiftPositionUntilReached(ctx, e.cfg.LiftPosition)
+		e.trackingLiftPositionUntilReached(ctx, inputs.Position)
 	}()
 
 	if err := e.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
-		MotorSpeed: e.cfg.LiftMotorSpeed,
-		Position:   e.cfg.LiftPosition,
+		MotorSpeed: inputs.MotorSpeed,
+		Position:   inputs.Position,
 	}); err != nil {
 		return command.CargoLiftOutputs{}, fmt.Errorf("failed to set cargo position: %w", err)
 	}

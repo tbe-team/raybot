@@ -12,8 +12,6 @@ import (
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
-const defaultMoveToSpeed = 100
-
 type moveToExecutor struct {
 	log               *slog.Logger
 	subscriber        eventbus.Subscriber
@@ -44,14 +42,14 @@ func (e moveToExecutor) Execute(ctx context.Context, inputs command.MoveToInputs
 	switch inputs.Direction {
 	case command.MoveDirectionForward:
 		if err := e.driveMotorService.MoveForward(ctx, drivemotor.MoveForwardParams{
-			Speed: defaultMoveToSpeed,
+			Speed: inputs.MotorSpeed,
 		}); err != nil {
 			return command.MoveToOutputs{}, fmt.Errorf("failed to move forward: %w", err)
 		}
 
 	case command.MoveDirectionBackward:
 		if err := e.driveMotorService.MoveBackward(ctx, drivemotor.MoveBackwardParams{
-			Speed: defaultMoveToSpeed,
+			Speed: inputs.MotorSpeed,
 		}); err != nil {
 			return command.MoveToOutputs{}, fmt.Errorf("failed to move backward: %w", err)
 		}

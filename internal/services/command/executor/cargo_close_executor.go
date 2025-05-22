@@ -30,13 +30,13 @@ func newCargoCloseExecutor(
 	}
 }
 
-func (e cargoCloseExecutor) Execute(ctx context.Context, _ command.CargoCloseInputs) (command.CargoCloseOutputs, error) {
-	cargo, err := e.cargoService.GetCargo(ctx)
+func (e cargoCloseExecutor) Execute(ctx context.Context, inputs command.CargoCloseInputs) (command.CargoCloseOutputs, error) {
+	c, err := e.cargoService.GetCargo(ctx)
 	if err != nil {
 		return command.CargoCloseOutputs{}, fmt.Errorf("failed to get cargo: %w", err)
 	}
 
-	if !cargo.IsOpen {
+	if !c.IsOpen {
 		return command.CargoCloseOutputs{}, nil
 	}
 
@@ -48,7 +48,9 @@ func (e cargoCloseExecutor) Execute(ctx context.Context, _ command.CargoCloseInp
 		e.trackingCargoDoorUntilClosed(ctx)
 	}()
 
-	if err := e.cargoService.CloseCargoDoor(ctx); err != nil {
+	if err := e.cargoService.CloseCargoDoor(ctx, cargo.CloseCargoDoorParams{
+		Speed: inputs.MotorSpeed,
+	}); err != nil {
 		return command.CargoCloseOutputs{}, fmt.Errorf("failed to close cargo door: %w", err)
 	}
 

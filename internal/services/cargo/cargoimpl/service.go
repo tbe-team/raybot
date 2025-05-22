@@ -11,11 +11,6 @@ import (
 	"github.com/tbe-team/raybot/pkg/validator"
 )
 
-const (
-	openCargoDoorSpeed  = 50
-	closeCargoDoorSpeed = 50
-)
-
 type service struct {
 	validator validator.Validator
 	publisher eventbus.Publisher
@@ -104,15 +99,15 @@ func (s *service) UpdateCargoDoorMotorState(ctx context.Context, params cargo.Up
 	return s.cargoRepo.UpdateCargoDoorMotorState(ctx, params)
 }
 
-func (s *service) OpenCargoDoor(ctx context.Context) error {
-	if err := s.espSerialController.OpenCargoDoor(ctx, openCargoDoorSpeed); err != nil {
+func (s *service) OpenCargoDoor(ctx context.Context, params cargo.OpenCargoDoorParams) error {
+	if err := s.espSerialController.OpenCargoDoor(ctx, params.Speed); err != nil {
 		return fmt.Errorf("open cargo door: %w", err)
 	}
 
 	return s.cargoRepo.UpdateCargoDoorMotorState(ctx, cargo.UpdateCargoDoorMotorStateParams{
 		Direction:    cargo.DirectionOpen,
 		SetDirection: true,
-		Speed:        openCargoDoorSpeed,
+		Speed:        params.Speed,
 		SetSpeed:     true,
 		IsRunning:    true,
 		SetIsRunning: true,
@@ -121,15 +116,15 @@ func (s *service) OpenCargoDoor(ctx context.Context) error {
 	})
 }
 
-func (s *service) CloseCargoDoor(ctx context.Context) error {
-	if err := s.espSerialController.CloseCargoDoor(ctx, closeCargoDoorSpeed); err != nil {
+func (s *service) CloseCargoDoor(ctx context.Context, params cargo.CloseCargoDoorParams) error {
+	if err := s.espSerialController.CloseCargoDoor(ctx, params.Speed); err != nil {
 		return fmt.Errorf("close cargo door: %w", err)
 	}
 
 	return s.cargoRepo.UpdateCargoDoorMotorState(ctx, cargo.UpdateCargoDoorMotorStateParams{
 		Direction:    cargo.DirectionClose,
 		SetDirection: true,
-		Speed:        closeCargoDoorSpeed,
+		Speed:        params.Speed,
 		SetSpeed:     true,
 		IsRunning:    true,
 		SetIsRunning: true,

@@ -23,17 +23,17 @@ func (_m *FakeService) EXPECT() *FakeService_Expecter {
 	return &FakeService_Expecter{mock: &_m.Mock}
 }
 
-// CloseCargoDoor provides a mock function with given fields: ctx
-func (_m *FakeService) CloseCargoDoor(ctx context.Context) error {
-	ret := _m.Called(ctx)
+// CloseCargoDoor provides a mock function with given fields: ctx, params
+func (_m *FakeService) CloseCargoDoor(ctx context.Context, params cargo.CloseCargoDoorParams) error {
+	ret := _m.Called(ctx, params)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CloseCargoDoor")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
-		r0 = rf(ctx)
+	if rf, ok := ret.Get(0).(func(context.Context, cargo.CloseCargoDoorParams) error); ok {
+		r0 = rf(ctx, params)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -48,13 +48,14 @@ type FakeService_CloseCargoDoor_Call struct {
 
 // CloseCargoDoor is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *FakeService_Expecter) CloseCargoDoor(ctx interface{}) *FakeService_CloseCargoDoor_Call {
-	return &FakeService_CloseCargoDoor_Call{Call: _e.mock.On("CloseCargoDoor", ctx)}
+//   - params cargo.CloseCargoDoorParams
+func (_e *FakeService_Expecter) CloseCargoDoor(ctx interface{}, params interface{}) *FakeService_CloseCargoDoor_Call {
+	return &FakeService_CloseCargoDoor_Call{Call: _e.mock.On("CloseCargoDoor", ctx, params)}
 }
 
-func (_c *FakeService_CloseCargoDoor_Call) Run(run func(ctx context.Context)) *FakeService_CloseCargoDoor_Call {
+func (_c *FakeService_CloseCargoDoor_Call) Run(run func(ctx context.Context, params cargo.CloseCargoDoorParams)) *FakeService_CloseCargoDoor_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context))
+		run(args[0].(context.Context), args[1].(cargo.CloseCargoDoorParams))
 	})
 	return _c
 }
@@ -64,7 +65,7 @@ func (_c *FakeService_CloseCargoDoor_Call) Return(_a0 error) *FakeService_CloseC
 	return _c
 }
 
-func (_c *FakeService_CloseCargoDoor_Call) RunAndReturn(run func(context.Context) error) *FakeService_CloseCargoDoor_Call {
+func (_c *FakeService_CloseCargoDoor_Call) RunAndReturn(run func(context.Context, cargo.CloseCargoDoorParams) error) *FakeService_CloseCargoDoor_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -125,17 +126,17 @@ func (_c *FakeService_GetCargo_Call) RunAndReturn(run func(context.Context) (car
 	return _c
 }
 
-// OpenCargoDoor provides a mock function with given fields: ctx
-func (_m *FakeService) OpenCargoDoor(ctx context.Context) error {
-	ret := _m.Called(ctx)
+// OpenCargoDoor provides a mock function with given fields: ctx, params
+func (_m *FakeService) OpenCargoDoor(ctx context.Context, params cargo.OpenCargoDoorParams) error {
+	ret := _m.Called(ctx, params)
 
 	if len(ret) == 0 {
 		panic("no return value specified for OpenCargoDoor")
 	}
 
 	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
-		r0 = rf(ctx)
+	if rf, ok := ret.Get(0).(func(context.Context, cargo.OpenCargoDoorParams) error); ok {
+		r0 = rf(ctx, params)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -150,13 +151,14 @@ type FakeService_OpenCargoDoor_Call struct {
 
 // OpenCargoDoor is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *FakeService_Expecter) OpenCargoDoor(ctx interface{}) *FakeService_OpenCargoDoor_Call {
-	return &FakeService_OpenCargoDoor_Call{Call: _e.mock.On("OpenCargoDoor", ctx)}
+//   - params cargo.OpenCargoDoorParams
+func (_e *FakeService_Expecter) OpenCargoDoor(ctx interface{}, params interface{}) *FakeService_OpenCargoDoor_Call {
+	return &FakeService_OpenCargoDoor_Call{Call: _e.mock.On("OpenCargoDoor", ctx, params)}
 }
 
-func (_c *FakeService_OpenCargoDoor_Call) Run(run func(ctx context.Context)) *FakeService_OpenCargoDoor_Call {
+func (_c *FakeService_OpenCargoDoor_Call) Run(run func(ctx context.Context, params cargo.OpenCargoDoorParams)) *FakeService_OpenCargoDoor_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context))
+		run(args[0].(context.Context), args[1].(cargo.OpenCargoDoorParams))
 	})
 	return _c
 }
@@ -166,7 +168,7 @@ func (_c *FakeService_OpenCargoDoor_Call) Return(_a0 error) *FakeService_OpenCar
 	return _c
 }
 
-func (_c *FakeService_OpenCargoDoor_Call) RunAndReturn(run func(context.Context) error) *FakeService_OpenCargoDoor_Call {
+func (_c *FakeService_OpenCargoDoor_Call) RunAndReturn(run func(context.Context, cargo.OpenCargoDoorParams) error) *FakeService_OpenCargoDoor_Call {
 	_c.Call.Return(run)
 	return _c
 }

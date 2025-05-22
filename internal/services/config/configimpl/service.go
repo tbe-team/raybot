@@ -127,31 +127,6 @@ func (s *service) UpdateHTTPConfig(ctx context.Context, httpCfg config.HTTP) (co
 	return httpCfg, nil
 }
 
-func (s *service) GetCargoConfig(_ context.Context) (config.Cargo, error) {
-	s.mu.RLock()
-	defer s.mu.RUnlock()
-	return s.cfg.Cargo, nil
-}
-
-func (s *service) UpdateCargoConfig(ctx context.Context, cargoCfg config.Cargo) (config.Cargo, error) {
-	if err := cargoCfg.Validate(); err != nil {
-		return config.Cargo{}, fmt.Errorf("validate cargo config: %w", err)
-	}
-
-	cfg := *s.cfg
-	cfg.Cargo = cargoCfg
-
-	if err := s.writeConfig(ctx, cfg); err != nil {
-		return config.Cargo{}, fmt.Errorf("write config: %w", err)
-	}
-
-	s.mu.Lock()
-	s.cfg = &cfg
-	s.mu.Unlock()
-
-	return cargoCfg, nil
-}
-
 func (s *service) GetWifiConfig(_ context.Context) (config.Wifi, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()

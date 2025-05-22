@@ -9,7 +9,6 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/logging"
 	cargomocks "github.com/tbe-team/raybot/internal/services/cargo/mocks"
 	"github.com/tbe-team/raybot/internal/services/command"
@@ -21,7 +20,6 @@ import (
 
 func TestService_NewService(t *testing.T) {
 	service := NewService(
-		config.Cargo{},
 		logging.NewNoopLogger(),
 		&eventbus.NoopEventBus{},
 		drivemotormocks.NewFakeService(t),
