@@ -1461,10 +1461,27 @@ components:
       x-go-type: string
     StopInputs:
       type: object
+    MotorSpeed:
+      type: integer
+      description: The speed of the motor
+      example: 100
+      minimum: 0
+      maximum: 100
+      x-go-type: uint8
     MoveForwardInputs:
       type: object
+      properties:
+        motorSpeed:
+          $ref: '#/components/schemas/MotorSpeed'
+      required:
+        - motorSpeed
     MoveBackwardInputs:
       type: object
+      properties:
+        motorSpeed:
+          $ref: '#/components/schemas/MotorSpeed'
+      required:
+        - motorSpeed
     MoveDirection:
       type: string
       enum:
@@ -1483,17 +1500,77 @@ components:
           $ref: '#/components/schemas/MoveDirection'
           description: The direction when moving
           x-order: 2
+        motorSpeed:
+          $ref: '#/components/schemas/MotorSpeed'
+          x-order: 3
       required:
         - location
         - direction
+        - motorSpeed
     CargoOpenInputs:
       type: object
+      properties:
+        motorSpeed:
+          $ref: '#/components/schemas/MotorSpeed'
+      required:
+        - motorSpeed
     CargoCloseInputs:
       type: object
+      properties:
+        motorSpeed:
+          $ref: '#/components/schemas/MotorSpeed'
+      required:
+        - motorSpeed
     CargoLiftInputs:
       type: object
+      properties:
+        position:
+          type: integer
+          description: The position to lift the cargo
+          example: 100
+          x-order: 1
+          x-go-type: uint16
+        motorSpeed:
+          $ref: '#/components/schemas/MotorSpeed'
+          x-order: 2
+      required:
+        - position
+        - motorSpeed
+    BottomObstacleTracking:
+      type: object
+      properties:
+        enterDistance:
+          type: integer
+          description: Start detecting obstacle when distance is below this value
+          example: 100
+          x-order: 1
+          x-go-type: uint16
+        exitDistance:
+          type: integer
+          description: Stop detecting obstacle when distance is above this value
+          example: 200
+          x-order: 2
+          x-go-type: uint16
+      required:
+        - enterDistance
+        - exitDistance
     CargoLowerInputs:
       type: object
+      properties:
+        position:
+          type: integer
+          description: The position to lower the cargo
+          example: 100
+          x-order: 1
+          x-go-type: uint16
+        motorSpeed:
+          $ref: '#/components/schemas/MotorSpeed'
+        bottomObstacleTracking:
+          $ref: '#/components/schemas/BottomObstacleTracking'
+      required:
+        - position
+        - motorSpeed
+        - bottomObstacleTracking
     CargoCheckQRInputs:
       type: object
       properties:

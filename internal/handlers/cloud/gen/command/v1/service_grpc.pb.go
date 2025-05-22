@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             (unknown)
-// source: command/v1/command.proto
+// source: command/v1/service.proto
 
 package commandv1
 
@@ -155,5 +155,5 @@ var CommandService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "command/v1/command.proto",
+	Metadata: "command/v1/service.proto",
 }

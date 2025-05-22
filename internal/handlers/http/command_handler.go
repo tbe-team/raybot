@@ -187,39 +187,58 @@ func (commandHandler) convertInputsToResponse(inputs command.Inputs) (gen.Comman
 
 	case *command.MoveToInputs:
 		if err := res.FromMoveToInputs(gen.MoveToInputs{
-			Location:  v.Location,
-			Direction: v.Direction.String(),
+			Location:   v.Location,
+			Direction:  v.Direction.String(),
+			MotorSpeed: v.MotorSpeed,
 		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from move to inputs: %w", err)
 		}
 
 	case *command.MoveForwardInputs:
-		if err := res.FromMoveForwardInputs(gen.MoveForwardInputs{}); err != nil {
+		if err := res.FromMoveForwardInputs(gen.MoveForwardInputs{
+			MotorSpeed: v.MotorSpeed,
+		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from move forward inputs: %w", err)
 		}
 
 	case *command.MoveBackwardInputs:
-		if err := res.FromMoveBackwardInputs(gen.MoveBackwardInputs{}); err != nil {
+		if err := res.FromMoveBackwardInputs(gen.MoveBackwardInputs{
+			MotorSpeed: v.MotorSpeed,
+		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from move backward inputs: %w", err)
 		}
 
 	case *command.CargoOpenInputs:
-		if err := res.FromCargoOpenInputs(gen.CargoOpenInputs{}); err != nil {
+		if err := res.FromCargoOpenInputs(gen.CargoOpenInputs{
+			MotorSpeed: v.MotorSpeed,
+		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from cargo open inputs: %w", err)
 		}
 
 	case *command.CargoCloseInputs:
-		if err := res.FromCargoCloseInputs(gen.CargoCloseInputs{}); err != nil {
+		if err := res.FromCargoCloseInputs(gen.CargoCloseInputs{
+			MotorSpeed: v.MotorSpeed,
+		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from cargo close inputs: %w", err)
 		}
 
 	case *command.CargoLiftInputs:
-		if err := res.FromCargoLiftInputs(gen.CargoLiftInputs{}); err != nil {
+		if err := res.FromCargoLiftInputs(gen.CargoLiftInputs{
+			Position:   v.Position,
+			MotorSpeed: v.MotorSpeed,
+		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from cargo lift inputs: %w", err)
 		}
 
 	case *command.CargoLowerInputs:
-		if err := res.FromCargoLowerInputs(gen.CargoLowerInputs{}); err != nil {
+		if err := res.FromCargoLowerInputs(gen.CargoLowerInputs{
+			Position:   v.Position,
+			MotorSpeed: v.MotorSpeed,
+			BottomObstacleTracking: gen.BottomObstacleTracking{
+				EnterDistance: v.BottomObstacleTracking.EnterDistance,
+				ExitDistance:  v.BottomObstacleTracking.ExitDistance,
+			},
+		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from cargo lower inputs: %w", err)
 		}
 
@@ -337,27 +356,70 @@ func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, i
 			return nil, fmt.Errorf("as move to inputs: %w", err)
 		}
 		return &command.MoveToInputs{
-			Location:  i.Location,
-			Direction: command.MoveDirection(i.Direction),
+			Location:   i.Location,
+			Direction:  command.MoveDirection(i.Direction),
+			MotorSpeed: i.MotorSpeed,
 		}, nil
 
 	case command.CommandTypeMoveForward:
-		return &command.MoveForwardInputs{}, nil
+		i, err := inputs.AsMoveForwardInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as move forward inputs: %w", err)
+		}
+		return &command.MoveForwardInputs{
+			MotorSpeed: i.MotorSpeed,
+		}, nil
 
 	case command.CommandTypeMoveBackward:
-		return &command.MoveBackwardInputs{}, nil
+		i, err := inputs.AsMoveBackwardInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as move backward inputs: %w", err)
+		}
+		return &command.MoveBackwardInputs{
+			MotorSpeed: i.MotorSpeed,
+		}, nil
 
 	case command.CommandTypeCargoOpen:
-		return &command.CargoOpenInputs{}, nil
+		i, err := inputs.AsCargoOpenInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as cargo open inputs: %w", err)
+		}
+		return &command.CargoOpenInputs{
+			MotorSpeed: i.MotorSpeed,
+		}, nil
 
 	case command.CommandTypeCargoClose:
-		return &command.CargoCloseInputs{}, nil
+		i, err := inputs.AsCargoCloseInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as cargo close inputs: %w", err)
+		}
+		return &command.CargoCloseInputs{
+			MotorSpeed: i.MotorSpeed,
+		}, nil
 
 	case command.CommandTypeCargoLift:
-		return &command.CargoLiftInputs{}, nil
+		i, err := inputs.AsCargoLiftInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as cargo lift inputs: %w", err)
+		}
+		return &command.CargoLiftInputs{
+			Position:   i.Position,
+			MotorSpeed: i.MotorSpeed,
+		}, nil
 
 	case command.CommandTypeCargoLower:
-		return &command.CargoLowerInputs{}, nil
+		i, err := inputs.AsCargoLowerInputs()
+		if err != nil {
+			return nil, fmt.Errorf("as cargo lower inputs: %w", err)
+		}
+		return &command.CargoLowerInputs{
+			Position:   i.Position,
+			MotorSpeed: i.MotorSpeed,
+			BottomObstacleTracking: command.BottomObstacleTracking{
+				EnterDistance: i.BottomObstacleTracking.EnterDistance,
+				ExitDistance:  i.BottomObstacleTracking.ExitDistance,
+			},
+		}, nil
 
 	case command.CommandTypeCargoCheckQR:
 		i, err := inputs.AsCargoCheckQRInputs()

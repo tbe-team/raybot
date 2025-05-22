@@ -2,14 +2,9 @@ syntax = "proto3";
 
 package command.v1;
 
+import "command/v1/inputs.proto";
+import "command/v1/outputs.proto";
 import "google/protobuf/timestamp.proto";
-
-option go_package = "github.com/tbe-team/raybot/proto/command/v1;commandv1";
-
-service CommandService {
-  rpc CreateCommand(CreateCommandRequest) returns (CreateCommandResponse) {}
-  rpc GetCommand(GetCommandRequest) returns (GetCommandResponse) {}
-}
 
 message GetCommandRequest {
   int64 id = 1;
@@ -71,86 +66,3 @@ enum CommandSource {
   COMMAND_SOURCE_CLOUD = 1;
   COMMAND_SOURCE_APP = 2;
 }
-
-message CommandInputs {
-  oneof inputs {
-    StopInputs stop = 2;
-    MoveForwardInputs move_forward = 3;
-    MoveBackwardInputs move_backward = 4;
-    MoveToInputs move_to = 5;
-    CargoOpenInputs cargo_open = 6;
-    CargoCloseInputs cargo_close = 7;
-    CargoLiftInputs cargo_lift = 8;
-    CargoLowerInputs cargo_lower = 9;
-    CargoCheckQRInputs cargo_check_qr = 10;
-    ScanLocationInputs scan_location = 11;
-    WaitInputs wait = 12;
-  }
-}
-
-message CommandOutputs {
-  oneof outputs {
-    StopOutputs stop = 16;
-    MoveForwardOutputs move_forward = 17;
-    MoveBackwardOutputs move_backward = 18;
-    MoveToOutputs move_to = 19;
-    CargoOpenOutputs cargo_open = 20;
-    CargoCloseOutputs cargo_close = 21;
-    CargoLiftOutputs cargo_lift = 22;
-    CargoLowerOutputs cargo_lower = 23;
-    CargoCheckQROutputs cargo_check_qr = 24;
-    ScanLocationOutputs scan_location = 25;
-    WaitOutputs wait = 26;
-  }
-}
-
-message StopInputs {}
-message MoveForwardInputs {}
-message MoveBackwardInputs {}
-
-message MoveToInputs {
-  string location = 1;
-
-  enum Direction {
-    DIRECTION_UNSPECIFIED = 0;
-    DIRECTION_FORWARD = 1;
-    DIRECTION_BACKWARD = 2;
-  }
-  Direction direction = 2;
-}
-
-message CargoOpenInputs {}
-message CargoCloseInputs {}
-message CargoLiftInputs {}
-message CargoLowerInputs {}
-
-message CargoCheckQRInputs {
-  string qr_code = 1;
-}
-
-message ScanLocationInputs {}
-
-message WaitInputs {
-  int64 duration_ms = 1;
-}
-
-message StopOutputs {}
-message MoveForwardOutputs {}
-message MoveBackwardOutputs {}
-message MoveToOutputs {}
-message CargoOpenOutputs {}
-message CargoCloseOutputs {}
-message CargoLiftOutputs {}
-message CargoLowerOutputs {}
-message CargoCheckQROutputs {}
-
-message Location {
-  string location = 1;
-  google.protobuf.Timestamp scanned_at = 2;
-}
-
-message ScanLocationOutputs {
-  repeated Location locations = 1;
-}
-
-message WaitOutputs {}

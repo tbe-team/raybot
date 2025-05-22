@@ -1,5 +1,10 @@
 version: v2
 clean: true
+managed:
+  enabled: true
+  override:
+    - file_option: go_package_prefix
+      value: github.com/tbe-team/raybot/proto
 plugins:
   - remote: buf.build/protocolbuffers/go:v1.31.0
     out: internal/handlers/cloud/gen

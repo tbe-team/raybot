@@ -52,6 +52,7 @@ func (h commandHandler) GetCommand(ctx context.Context, req *commandv1.GetComman
 	}, nil
 }
 
+//nolint:gosec
 func (commandHandler) convertReqInputsToCommandInputs(req *commandv1.CreateCommandRequest) (command.Inputs, error) {
 	switch req.Type {
 	case commandv1.CommandType_COMMAND_TYPE_STOP_MOVEMENT:
@@ -74,27 +75,70 @@ func (commandHandler) convertReqInputsToCommandInputs(req *commandv1.CreateComma
 		}
 
 		return &command.MoveToInputs{
-			Location:  i.Location,
-			Direction: direction,
+			Location:   i.Location,
+			Direction:  direction,
+			MotorSpeed: uint8(i.MotorSpeed),
 		}, nil
 
 	case commandv1.CommandType_COMMAND_TYPE_MOVE_FORWARD:
-		return &command.MoveForwardInputs{}, nil
+		i := req.Inputs.GetMoveForward()
+		if i == nil {
+			return nil, fmt.Errorf("move forward inputs is nil")
+		}
+		return &command.MoveForwardInputs{
+			MotorSpeed: uint8(i.MotorSpeed),
+		}, nil
 
 	case commandv1.CommandType_COMMAND_TYPE_MOVE_BACKWARD:
-		return &command.MoveBackwardInputs{}, nil
+		i := req.Inputs.GetMoveBackward()
+		if i == nil {
+			return nil, fmt.Errorf("move backward inputs is nil")
+		}
+		return &command.MoveBackwardInputs{
+			MotorSpeed: uint8(i.MotorSpeed),
+		}, nil
 
 	case commandv1.CommandType_COMMAND_TYPE_CARGO_OPEN:
-		return &command.CargoOpenInputs{}, nil
+		i := req.Inputs.GetCargoOpen()
+		if i == nil {
+			return nil, fmt.Errorf("cargo open inputs is nil")
+		}
+		return &command.CargoOpenInputs{
+			MotorSpeed: uint8(i.MotorSpeed),
+		}, nil
 
 	case commandv1.CommandType_COMMAND_TYPE_CARGO_CLOSE:
-		return &command.CargoCloseInputs{}, nil
+		i := req.Inputs.GetCargoClose()
+		if i == nil {
+			return nil, fmt.Errorf("cargo close inputs is nil")
+		}
+		return &command.CargoCloseInputs{
+			MotorSpeed: uint8(i.MotorSpeed),
+		}, nil
 
 	case commandv1.CommandType_COMMAND_TYPE_CARGO_LIFT:
-		return &command.CargoLiftInputs{}, nil
+		i := req.Inputs.GetCargoLift()
+		if i == nil {
+			return nil, fmt.Errorf("cargo lift inputs is nil")
+		}
+		return &command.CargoLiftInputs{
+			Position:   uint16(i.Position),
+			MotorSpeed: uint8(i.MotorSpeed),
+		}, nil
 
 	case commandv1.CommandType_COMMAND_TYPE_CARGO_LOWER:
-		return &command.CargoLowerInputs{}, nil
+		i := req.Inputs.GetCargoLower()
+		if i == nil {
+			return nil, fmt.Errorf("cargo lower inputs is nil")
+		}
+		return &command.CargoLowerInputs{
+			Position:   uint16(i.Position),
+			MotorSpeed: uint8(i.MotorSpeed),
+			BottomObstacleTracking: command.BottomObstacleTracking{
+				EnterDistance: uint16(i.BottomObstacleTracking.EnterDistance),
+				ExitDistance:  uint16(i.BottomObstacleTracking.ExitDistance),
+			},
+		}, nil
 
 	case commandv1.CommandType_COMMAND_TYPE_CARGO_CHECK_QR:
 		i := req.Inputs.GetCargoCheckQr()
@@ -201,14 +245,18 @@ func (commandHandler) convertCommandInputsToResponse(inputs command.Inputs) *com
 	case *command.MoveForwardInputs:
 		return &commandv1.CommandInputs{
 			Inputs: &commandv1.CommandInputs_MoveForward{
-				MoveForward: &commandv1.MoveForwardInputs{},
+				MoveForward: &commandv1.MoveForwardInputs{
+					MotorSpeed: uint32(i.MotorSpeed),
+				},
 			},
 		}
 
 	case *command.MoveBackwardInputs:
 		return &commandv1.CommandInputs{
 			Inputs: &commandv1.CommandInputs_MoveBackward{
-				MoveBackward: &commandv1.MoveBackwardInputs{},
+				MoveBackward: &commandv1.MoveBackwardInputs{
+					MotorSpeed: uint32(i.MotorSpeed),
+				},
 			},
 		}
 
@@ -226,8 +274,9 @@ func (commandHandler) convertCommandInputsToResponse(inputs command.Inputs) *com
 		return &commandv1.CommandInputs{
 			Inputs: &commandv1.CommandInputs_MoveTo{
 				MoveTo: &commandv1.MoveToInputs{
-					Location:  i.Location,
-					Direction: direction,
+					Location:   i.Location,
+					Direction:  direction,
+					MotorSpeed: uint32(i.MotorSpeed),
 				},
 			},
 		}
@@ -235,28 +284,42 @@ func (commandHandler) convertCommandInputsToResponse(inputs command.Inputs) *com
 	case *command.CargoOpenInputs:
 		return &commandv1.CommandInputs{
 			Inputs: &commandv1.CommandInputs_CargoOpen{
-				CargoOpen: &commandv1.CargoOpenInputs{},
+				CargoOpen: &commandv1.CargoOpenInputs{
+					MotorSpeed: uint32(i.MotorSpeed),
+				},
 			},
 		}
 
 	case *command.CargoCloseInputs:
 		return &commandv1.CommandInputs{
 			Inputs: &commandv1.CommandInputs_CargoClose{
-				CargoClose: &commandv1.CargoCloseInputs{},
+				CargoClose: &commandv1.CargoCloseInputs{
+					MotorSpeed: uint32(i.MotorSpeed),
+				},
 			},
 		}
 
 	case *command.CargoLiftInputs:
 		return &commandv1.CommandInputs{
 			Inputs: &commandv1.CommandInputs_CargoLift{
-				CargoLift: &commandv1.CargoLiftInputs{},
+				CargoLift: &commandv1.CargoLiftInputs{
+					Position:   uint32(i.Position),
+					MotorSpeed: uint32(i.MotorSpeed),
+				},
 			},
 		}
 
 	case *command.CargoLowerInputs:
 		return &commandv1.CommandInputs{
 			Inputs: &commandv1.CommandInputs_CargoLower{
-				CargoLower: &commandv1.CargoLowerInputs{},
+				CargoLower: &commandv1.CargoLowerInputs{
+					Position:   uint32(i.Position),
+					MotorSpeed: uint32(i.MotorSpeed),
+					BottomObstacleTracking: &commandv1.BottomObstacleTracking{
+						EnterDistance: uint32(i.BottomObstacleTracking.EnterDistance),
+						ExitDistance:  uint32(i.BottomObstacleTracking.ExitDistance),
+					},
+				},
 			},
 		}
 

@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+package command.v1;
+
+message CommandInputs {
+  oneof inputs {
+    StopInputs stop = 2;
+    MoveForwardInputs move_forward = 3;
+    MoveBackwardInputs move_backward = 4;
+    MoveToInputs move_to = 5;
+    CargoOpenInputs cargo_open = 6;
+    CargoCloseInputs cargo_close = 7;
+    CargoLiftInputs cargo_lift = 8;
+    CargoLowerInputs cargo_lower = 9;
+    CargoCheckQRInputs cargo_check_qr = 10;
+    ScanLocationInputs scan_location = 11;
+    WaitInputs wait = 12;
+  }
+}
+
+message StopInputs {}
+
+message MoveForwardInputs {
+  uint32 motor_speed = 1;
+}
+
+message MoveBackwardInputs {
+  uint32 motor_speed = 1;
+}
+
+message MoveToInputs {
+  string location = 1;
+
+  enum Direction {
+    DIRECTION_UNSPECIFIED = 0;
+    DIRECTION_FORWARD = 1;
+    DIRECTION_BACKWARD = 2;
+  }
+  Direction direction = 2;
+
+  uint32 motor_speed = 3;
+}
+
+message CargoOpenInputs {
+  uint32 motor_speed = 1;
+}
+
+message CargoCloseInputs {
+  uint32 motor_speed = 1;
+}
+
+message CargoLiftInputs {
+  uint32 position = 1;
+  uint32 motor_speed = 2;
+}
+
+message BottomObstacleTracking {
+  uint32 enter_distance = 1;
+  uint32 exit_distance = 2;
+}
+
+message CargoLowerInputs {
+  uint32 position = 1;
+  uint32 motor_speed = 2;
+  BottomObstacleTracking bottom_obstacle_tracking = 3;
+}
+
+message CargoCheckQRInputs {
+  string qr_code = 1;
+}
+
+message ScanLocationInputs {}
+
+message WaitInputs {
+  int64 duration_ms = 1;
+}

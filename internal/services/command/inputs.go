@@ -31,14 +31,18 @@ func (StopMovementInputs) CommandType() CommandType {
 }
 func (StopMovementInputs) isInputs() {}
 
-type MoveForwardInputs struct{}
+type MoveForwardInputs struct {
+	MotorSpeed uint8 `json:"motor_speed" validate:"required,max=100"`
+}
 
 func (MoveForwardInputs) CommandType() CommandType {
 	return CommandTypeMoveForward
 }
 func (MoveForwardInputs) isInputs() {}
 
-type MoveBackwardInputs struct{}
+type MoveBackwardInputs struct {
+	MotorSpeed uint8 `json:"motor_speed" validate:"required,max=100"`
+}
 
 func (MoveBackwardInputs) CommandType() CommandType {
 	return CommandTypeMoveBackward
@@ -64,8 +68,9 @@ const (
 )
 
 type MoveToInputs struct {
-	Location  string        `json:"location" validate:"required"`
-	Direction MoveDirection `json:"direction" validate:"required,enum"`
+	Location   string        `json:"location" validate:"required"`
+	Direction  MoveDirection `json:"direction" validate:"required,enum"`
+	MotorSpeed uint8         `json:"motor_speed" validate:"required,max=100"`
 }
 
 func (MoveToInputs) CommandType() CommandType {
@@ -73,28 +78,46 @@ func (MoveToInputs) CommandType() CommandType {
 }
 func (MoveToInputs) isInputs() {}
 
-type CargoOpenInputs struct{}
+type CargoOpenInputs struct {
+	MotorSpeed uint8 `json:"motor_speed" validate:"required,max=100"`
+}
 
 func (CargoOpenInputs) CommandType() CommandType {
 	return CommandTypeCargoOpen
 }
 func (CargoOpenInputs) isInputs() {}
 
-type CargoCloseInputs struct{}
+type CargoCloseInputs struct {
+	MotorSpeed uint8 `json:"motor_speed" validate:"required,max=100"`
+}
 
 func (CargoCloseInputs) CommandType() CommandType {
 	return CommandTypeCargoClose
 }
 func (CargoCloseInputs) isInputs() {}
 
-type CargoLiftInputs struct{}
+type CargoLiftInputs struct {
+	Position   uint16 `json:"position" validate:"required"`
+	MotorSpeed uint8  `json:"motor_speed" validate:"required,max=100"`
+}
 
 func (CargoLiftInputs) CommandType() CommandType {
 	return CommandTypeCargoLift
 }
 func (CargoLiftInputs) isInputs() {}
 
-type CargoLowerInputs struct{}
+type BottomObstacleTracking struct {
+	// Start detecting obstacle when distance is below this value
+	EnterDistance uint16 `json:"enter_distance" validate:"required"`
+	// Stop detecting obstacle when distance is above this value
+	ExitDistance uint16 `json:"exit_distance" validate:"required"`
+}
+
+type CargoLowerInputs struct {
+	Position               uint16                 `json:"position" validate:"required"`
+	MotorSpeed             uint8                  `json:"motor_speed" validate:"required,max=100"`
+	BottomObstacleTracking BottomObstacleTracking `json:"bottom_obstacle_tracking" validate:"required"`
+}
 
 func (CargoLowerInputs) CommandType() CommandType {
 	return CommandTypeCargoLower
@@ -131,13 +154,25 @@ func UnmarshalInputs(cmdType CommandType, inputsBytes []byte) (Inputs, error) {
 
 	switch cmdType {
 	case CommandTypeStopMovement:
-		inputs = &StopMovementInputs{}
+		i := &StopMovementInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal stop movement inputs: %w", err)
+		}
+		inputs = i
 
 	case CommandTypeMoveForward:
-		inputs = &MoveForwardInputs{}
+		i := &MoveForwardInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal move forward inputs: %w", err)
+		}
+		inputs = i
 
 	case CommandTypeMoveBackward:
-		inputs = &MoveBackwardInputs{}
+		i := &MoveBackwardInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal move backward inputs: %w", err)
+		}
+		inputs = i
 
 	case CommandTypeMoveTo:
 		i := &MoveToInputs{}
@@ -147,16 +182,32 @@ func UnmarshalInputs(cmdType CommandType, inputsBytes []byte) (Inputs, error) {
 		inputs = i
 
 	case CommandTypeCargoOpen:
-		inputs = &CargoOpenInputs{}
+		i := &CargoOpenInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal cargo open inputs: %w", err)
+		}
+		inputs = i
 
 	case CommandTypeCargoClose:
-		inputs = &CargoCloseInputs{}
+		i := &CargoCloseInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal cargo close inputs: %w", err)
+		}
+		inputs = i
 
 	case CommandTypeCargoLift:
-		inputs = &CargoLiftInputs{}
+		i := &CargoLiftInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal cargo lift inputs: %w", err)
+		}
+		inputs = i
 
 	case CommandTypeCargoLower:
-		inputs = &CargoLowerInputs{}
+		i := &CargoLowerInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal cargo lower inputs: %w", err)
+		}
+		inputs = i
 
 	case CommandTypeCargoCheckQR:
 		i := &CargoCheckQRInputs{}
@@ -166,7 +217,11 @@ func UnmarshalInputs(cmdType CommandType, inputsBytes []byte) (Inputs, error) {
 		inputs = i
 
 	case CommandTypeScanLocation:
-		inputs = &ScanLocationInputs{}
+		i := &ScanLocationInputs{}
+		if err := json.Unmarshal(inputsBytes, i); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal scan location inputs: %w", err)
+		}
+		inputs = i
 
 	case CommandTypeWait:
 		i := &WaitInputs{}

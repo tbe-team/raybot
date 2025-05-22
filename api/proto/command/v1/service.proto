@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+package command.v1;
+
+import "command/v1/command.proto";
+
+service CommandService {
+  rpc CreateCommand(CreateCommandRequest) returns (CreateCommandResponse) {}
+  rpc GetCommand(GetCommandRequest) returns (GetCommandResponse) {}
+}

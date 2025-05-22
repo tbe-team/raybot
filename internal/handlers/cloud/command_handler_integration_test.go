@@ -44,8 +44,9 @@ func TestIntegrationCommandHandler_CreateCommand(t *testing.T) {
 					Inputs: &commandv1.CommandInputs{
 						Inputs: &commandv1.CommandInputs_MoveTo{
 							MoveTo: &commandv1.MoveToInputs{
-								Location:  "test-location",
-								Direction: commandv1.MoveToInputs_DIRECTION_FORWARD,
+								Location:   "test-location",
+								Direction:  commandv1.MoveToInputs_DIRECTION_FORWARD,
+								MotorSpeed: 100,
 							},
 						},
 					},
@@ -56,7 +57,11 @@ func TestIntegrationCommandHandler_CreateCommand(t *testing.T) {
 				req: &commandv1.CreateCommandRequest{
 					Type: commandv1.CommandType_COMMAND_TYPE_MOVE_FORWARD,
 					Inputs: &commandv1.CommandInputs{
-						Inputs: &commandv1.CommandInputs_MoveForward{},
+						Inputs: &commandv1.CommandInputs_MoveForward{
+							MoveForward: &commandv1.MoveForwardInputs{
+								MotorSpeed: 100,
+							},
+						},
 					},
 				},
 			},
@@ -65,7 +70,11 @@ func TestIntegrationCommandHandler_CreateCommand(t *testing.T) {
 				req: &commandv1.CreateCommandRequest{
 					Type: commandv1.CommandType_COMMAND_TYPE_MOVE_BACKWARD,
 					Inputs: &commandv1.CommandInputs{
-						Inputs: &commandv1.CommandInputs_MoveBackward{},
+						Inputs: &commandv1.CommandInputs_MoveBackward{
+							MoveBackward: &commandv1.MoveBackwardInputs{
+								MotorSpeed: 100,
+							},
+						},
 					},
 				},
 			},
@@ -74,7 +83,11 @@ func TestIntegrationCommandHandler_CreateCommand(t *testing.T) {
 				req: &commandv1.CreateCommandRequest{
 					Type: commandv1.CommandType_COMMAND_TYPE_CARGO_OPEN,
 					Inputs: &commandv1.CommandInputs{
-						Inputs: &commandv1.CommandInputs_CargoOpen{},
+						Inputs: &commandv1.CommandInputs_CargoOpen{
+							CargoOpen: &commandv1.CargoOpenInputs{
+								MotorSpeed: 100,
+							},
+						},
 					},
 				},
 			},
@@ -83,7 +96,11 @@ func TestIntegrationCommandHandler_CreateCommand(t *testing.T) {
 				req: &commandv1.CreateCommandRequest{
 					Type: commandv1.CommandType_COMMAND_TYPE_CARGO_CLOSE,
 					Inputs: &commandv1.CommandInputs{
-						Inputs: &commandv1.CommandInputs_CargoClose{},
+						Inputs: &commandv1.CommandInputs_CargoClose{
+							CargoClose: &commandv1.CargoCloseInputs{
+								MotorSpeed: 100,
+							},
+						},
 					},
 				},
 			},
@@ -92,7 +109,12 @@ func TestIntegrationCommandHandler_CreateCommand(t *testing.T) {
 				req: &commandv1.CreateCommandRequest{
 					Type: commandv1.CommandType_COMMAND_TYPE_CARGO_LIFT,
 					Inputs: &commandv1.CommandInputs{
-						Inputs: &commandv1.CommandInputs_CargoLift{},
+						Inputs: &commandv1.CommandInputs_CargoLift{
+							CargoLift: &commandv1.CargoLiftInputs{
+								Position:   100,
+								MotorSpeed: 100,
+							},
+						},
 					},
 				},
 			},
@@ -101,7 +123,16 @@ func TestIntegrationCommandHandler_CreateCommand(t *testing.T) {
 				req: &commandv1.CreateCommandRequest{
 					Type: commandv1.CommandType_COMMAND_TYPE_CARGO_LOWER,
 					Inputs: &commandv1.CommandInputs{
-						Inputs: &commandv1.CommandInputs_CargoLower{},
+						Inputs: &commandv1.CommandInputs_CargoLower{
+							CargoLower: &commandv1.CargoLowerInputs{
+								Position:   100,
+								MotorSpeed: 100,
+								BottomObstacleTracking: &commandv1.BottomObstacleTracking{
+									EnterDistance: 100,
+									ExitDistance:  100,
+								},
+							},
+						},
 					},
 				},
 			},

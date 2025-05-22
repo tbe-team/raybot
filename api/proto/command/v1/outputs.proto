@@ -1,0 +1,42 @@
+syntax = "proto3";
+
+package command.v1;
+
+import "google/protobuf/timestamp.proto";
+
+message CommandOutputs {
+  oneof outputs {
+    StopOutputs stop = 1;
+    MoveForwardOutputs move_forward = 2;
+    MoveBackwardOutputs move_backward = 3;
+    MoveToOutputs move_to = 4;
+    CargoOpenOutputs cargo_open = 5;
+    CargoCloseOutputs cargo_close = 6;
+    CargoLiftOutputs cargo_lift = 7;
+    CargoLowerOutputs cargo_lower = 8;
+    CargoCheckQROutputs cargo_check_qr = 9;
+    ScanLocationOutputs scan_location = 10;
+    WaitOutputs wait = 11;
+  }
+}
+
+message StopOutputs {}
+message MoveForwardOutputs {}
+message MoveBackwardOutputs {}
+message MoveToOutputs {}
+message CargoOpenOutputs {}
+message CargoCloseOutputs {}
+message CargoLiftOutputs {}
+message CargoLowerOutputs {}
+message CargoCheckQROutputs {}
+
+message Location {
+  string location = 1;
+  google.protobuf.Timestamp scanned_at = 2;
+}
+
+message ScanLocationOutputs {
+  repeated Location locations = 1;
+}
+
+message WaitOutputs {}

@@ -147,14 +147,32 @@ CommandInputs:
     - $ref: "#/ScanLocationInputs"
     - $ref: "#/WaitInputs"
 
+MotorSpeed:
+  type: integer
+  description: The speed of the motor
+  example: 100
+  minimum: 0
+  maximum: 100
+  x-go-type: uint8
+
 StopInputs:
   type: object
 
 MoveForwardInputs:
   type: object
+  properties:
+    motorSpeed:
+      $ref: "#/MotorSpeed"
+  required:
+    - motorSpeed
 
 MoveBackwardInputs:
   type: object
+  properties:
+    motorSpeed:
+      $ref: "#/MotorSpeed"
+  required:
+    - motorSpeed
 
 MoveDirection:
   type: string
@@ -175,21 +193,82 @@ MoveToInputs:
       $ref: "#/MoveDirection"
       description: The direction when moving
       x-order: 2
+    motorSpeed:
+      $ref: "#/MotorSpeed"
+      x-order: 3
   required:
     - location
     - direction
+    - motorSpeed
 
 CargoOpenInputs:
   type: object
+  properties:
+    motorSpeed:
+      $ref: "#/MotorSpeed"
+  required:
+    - motorSpeed
 
 CargoCloseInputs:
   type: object
+  properties:
+    motorSpeed:
+      $ref: "#/MotorSpeed"
+  required:
+    - motorSpeed
 
 CargoLiftInputs:
   type: object
+  properties:
+    position:
+      type: integer
+      description: The position to lift the cargo
+      example: 100
+      x-order: 1
+      x-go-type: uint16
+    motorSpeed:
+      $ref: "#/MotorSpeed"
+      x-order: 2
+  required:
+    - position
+    - motorSpeed
+
+BottomObstacleTracking:
+  type: object
+  properties:
+    enterDistance:
+      type: integer
+      description: Start detecting obstacle when distance is below this value
+      example: 100
+      x-order: 1
+      x-go-type: uint16
+    exitDistance:
+      type: integer
+      description: Stop detecting obstacle when distance is above this value
+      example: 200
+      x-order: 2
+      x-go-type: uint16
+  required:
+    - enterDistance
+    - exitDistance
 
 CargoLowerInputs:
   type: object
+  properties:
+    position:
+      type: integer
+      description: The position to lower the cargo
+      example: 100
+      x-order: 1
+      x-go-type: uint16
+    motorSpeed:
+      $ref: "#/MotorSpeed"
+    bottomObstacleTracking:
+      $ref: "#/BottomObstacleTracking"
+  required:
+    - position
+    - motorSpeed
+    - bottomObstacleTracking
 
 CargoCheckQRInputs:
   type: object
