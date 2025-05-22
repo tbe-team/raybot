@@ -14,7 +14,9 @@ const open = useLocalStorage('sidebar', true)
   <Notivue v-slot="item">
     <Notification :item="item" />
   </Notivue>
+
   <ConfirmationDialog />
+
   <SidebarProvider v-model:open="open">
     <AppSidebar />
     <SidebarInset>
