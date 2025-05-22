@@ -1,0 +1,1 @@
+import{i as t}from"./http-xk_3xMuy.js";import{u as e}from"./index-DSccp9U9.js";const o={reboot(){return t.post("/system/reboot")},stopEmergency(){return t.post("/system/stop-emergency")}};function r(){return e({mutationFn:o.reboot})}function u(){return e({mutationFn:o.stopEmergency})}export{r as a,u};
