@@ -69,6 +69,62 @@ func (_c *FakeService_CloseCargoDoor_Call) RunAndReturn(run func(context.Context
 	return _c
 }
 
+// GetCargo provides a mock function with given fields: ctx
+func (_m *FakeService) GetCargo(ctx context.Context) (cargo.Cargo, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCargo")
+	}
+
+	var r0 cargo.Cargo
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (cargo.Cargo, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) cargo.Cargo); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(cargo.Cargo)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeService_GetCargo_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCargo'
+type FakeService_GetCargo_Call struct {
+	*mock.Call
+}
+
+// GetCargo is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) GetCargo(ctx interface{}) *FakeService_GetCargo_Call {
+	return &FakeService_GetCargo_Call{Call: _e.mock.On("GetCargo", ctx)}
+}
+
+func (_c *FakeService_GetCargo_Call) Run(run func(ctx context.Context)) *FakeService_GetCargo_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_GetCargo_Call) Return(_a0 cargo.Cargo, _a1 error) *FakeService_GetCargo_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeService_GetCargo_Call) RunAndReturn(run func(context.Context) (cargo.Cargo, error)) *FakeService_GetCargo_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // OpenCargoDoor provides a mock function with given fields: ctx
 func (_m *FakeService) OpenCargoDoor(ctx context.Context) error {
 	ret := _m.Called(ctx)

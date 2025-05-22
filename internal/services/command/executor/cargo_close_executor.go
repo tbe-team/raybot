@@ -31,6 +31,15 @@ func newCargoCloseExecutor(
 }
 
 func (e cargoCloseExecutor) Execute(ctx context.Context, _ command.CargoCloseInputs) (command.CargoCloseOutputs, error) {
+	cargo, err := e.cargoService.GetCargo(ctx)
+	if err != nil {
+		return command.CargoCloseOutputs{}, fmt.Errorf("failed to get cargo: %w", err)
+	}
+
+	if !cargo.IsOpen {
+		return command.CargoCloseOutputs{}, nil
+	}
+
 	wg := sync.WaitGroup{}
 
 	wg.Add(1)

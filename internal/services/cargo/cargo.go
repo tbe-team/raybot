@@ -26,6 +26,8 @@ type UpdateCargoDoorMotorStateParams struct {
 }
 
 type Service interface {
+	GetCargo(ctx context.Context) (Cargo, error)
+
 	UpdateCargoDoor(ctx context.Context, params UpdateCargoDoorParams) error
 	UpdateCargoQRCode(ctx context.Context, params UpdateCargoQRCodeParams) error
 	UpdateCargoBottomDistance(ctx context.Context, params UpdateCargoBottomDistanceParams) error

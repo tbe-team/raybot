@@ -38,6 +38,10 @@ func NewService(
 	}
 }
 
+func (s *service) GetCargo(ctx context.Context) (cargo.Cargo, error) {
+	return s.cargoRepo.GetCargo(ctx)
+}
+
 func (s *service) UpdateCargoDoor(ctx context.Context, params cargo.UpdateCargoDoorParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
