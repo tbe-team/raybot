@@ -11,6 +11,10 @@ RUN pnpm run build
 
 FROM golang:1.24 AS builder
 
+ARG PKG_PREFIX
+ARG VERSION
+ARG BUILD_DATE
+
 WORKDIR /app
 
 COPY go.mod go.sum ./
@@ -19,7 +23,11 @@ RUN go mod download
 COPY . .
 COPY --from=ui-builder /app/ui/dist ui/dist
 
-RUN CGO_ENABLED=1 go build -o bin/raybot cmd/raybot/main.go
+RUN CGO_ENABLED=1 \
+	go build -ldflags "\
+		-X $PKG_PREFIX.Version=$VERSION \
+		-X $PKG_PREFIX.Date=$BUILD_DATE" \
+	-o bin/raybot cmd/raybot/main.go
 
 
 FROM debian:bookworm-slim AS prod

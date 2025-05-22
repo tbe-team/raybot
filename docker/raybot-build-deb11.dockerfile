@@ -11,6 +11,10 @@ RUN pnpm run build
 
 FROM golang:1.24-bullseye AS builder
 
+ARG PKG_PREFIX
+ARG VERSION
+ARG BUILD_DATE
+
 RUN apt-get update && \
     apt-get install -y gcc-aarch64-linux-gnu
 
@@ -27,7 +31,11 @@ ENV CGO_ENABLED=1 \
     GOARCH=arm64 \
     CC=aarch64-linux-gnu-gcc
 
-RUN go build -o bin/raybot cmd/raybot/main.go
+RUN go build -o bin/raybot\
+    -ldflags "\
+        -X $PKG_PREFIX.Version=$VERSION \
+        -X $PKG_PREFIX.Date=$BUILD_DATE" \
+    cmd/raybot/main.go
 
 
 FROM alpine:3.21.3 AS prod
