@@ -56,19 +56,12 @@ jobs:
         with:
           name: ui-dist
           path: ui/dist
-      - name: Build docker image
+      - name: Build binary
         run: |
-          docker build \
-          -t raybot-builder-deb11 \
-          -f docker/raybot-build-deb11.dockerfile .
-      - name: Create container & extract binary
-        run: |
-          docker create --name temp-build raybot-builder-deb11:latest
-          docker cp temp-build:/app/raybot ./raybot
-          docker rm temp-build
+          make build-arm64
       - name: Package binary
         run: |
-          tar -czf raybot-${{ env.VERSION }}-linux-arm64.tar.gz raybot
+          tar -czf raybot-${{ env.VERSION }}-linux-arm64.tar.gz raybot-arm64
       - name: Archive artifact
         uses: actions/upload-artifact@v4
         with:
