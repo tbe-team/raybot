@@ -1,0 +1,14 @@
+name: Spelling
+
+on:
+  pull_request:
+
+jobs:
+  spelling:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+      - name: Typos
+        uses: crate-ci/typos@master
+        continue-on-error: true
