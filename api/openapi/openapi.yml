@@ -11,6 +11,8 @@ servers:
   - url: /api/v1
 security: []
 paths:
+  /version:
+    $ref: "./paths/version.yml"
   /health:
     $ref: "./paths/health.yml"
   /error-codes:

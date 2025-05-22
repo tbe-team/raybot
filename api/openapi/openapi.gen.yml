@@ -10,6 +10,26 @@ servers:
   - url: /api/v1
 security: []
 paths:
+  /version:
+    get:
+      summary: Get application version information
+      operationId: getVersion
+      description: Get application version information
+      tags:
+        - version
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Version'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /health:
     get:
       summary: Get the health of the server
@@ -554,16 +574,19 @@ paths:
                 $ref: '#/components/schemas/ErrorResponse'
 components:
   schemas:
-    HealthResponse:
+    Version:
       type: object
       properties:
-        status:
+        version:
           type: string
-          example: ok
-          description: The status of the health check
-          x-order: 1
+        buildDate:
+          type: string
+        goVersion:
+          type: string
       required:
-        - status
+        - version
+        - buildDate
+        - goVersion
     FieldError:
       type: object
       properties:
@@ -601,6 +624,16 @@ components:
       required:
         - code
         - message
+    HealthResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          example: ok
+          description: The status of the health check
+          x-order: 1
+      required:
+        - status
     ErrorCodeResponse:
       type: object
       properties:

@@ -1,3 +1,10 @@
+PKG_PREFIX=github.com/tbe-team/raybot/internal/build
+VERSION=$(shell git describe --tags --abbrev=8 --dirty --always --long)
+BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+LDFLAGS:= \
+	-X $(PKG_PREFIX).Version=$(VERSION) \
+	-X $(PKG_PREFIX).Date=$(BUILD_DATE)
+
 ########################
 # Code generation
 ########################
@@ -70,13 +77,6 @@ migrate-reset:
 #########################
 # Build
 #########################
-PKG_PREFIX=github.com/tbe-team/raybot/internal/build
-VERSION=$(shell git describe --tags --abbrev=8 --dirty --always --long)
-BUILD_DATE=$(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
-LDFLAGS:= \
-	-X $(PKG_PREFIX).Version=$(VERSION) \
-	-X $(PKG_PREFIX).Date=$(BUILD_DATE)
-
 .PHONY: build
 build:
 	CGO_ENABLED=1 \
@@ -118,7 +118,7 @@ docker-run-raybot:
 #########################
 .PHONY: run
 run:
-	go run cmd/raybot/main.go -config bin/config.yml -db bin/raybot.db
+	go run -ldflags "$(LDFLAGS)" cmd/raybot/main.go -config bin/config.yml -db bin/raybot.db
 
 #########################
 # Testing

@@ -1,0 +1,19 @@
+get:
+  summary: Get application version information
+  operationId: getVersion
+  description: Get application version information
+  tags:
+    - version
+  responses:
+    "200":
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/version.yml#/Version"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

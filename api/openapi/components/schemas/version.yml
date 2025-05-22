@@ -1,0 +1,13 @@
+Version:
+  type: object
+  properties:
+    version:
+      type: string
+    buildDate:
+      type: string
+    goVersion:
+      type: string
+  required:
+    - version
+    - buildDate
+    - goVersion
