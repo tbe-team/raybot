@@ -1,0 +1,35 @@
+name: Buf CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'api/proto/**'
+      - 'buf.yaml'
+      - 'buf.gen.yaml'
+      - '.github/workflows/buf-ci.yml'
+  pull_request:
+    paths:
+      - 'api/proto/**'
+      - 'buf.yaml'
+      - 'buf.gen.yaml'
+      - '.github/workflows/buf-ci.yml'
+    types:
+      - opened
+      - synchronize
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  buf:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v4
+      - name: Buf
+        uses: bufbuild/buf-action@v1
+        with:
+          token: ${{ secrets.BUF_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

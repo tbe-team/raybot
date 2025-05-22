@@ -1,6 +1,7 @@
 version: v2
 modules:
   - path: api/proto
+    name: buf.build/tbe-team/raybot
 breaking:
   use:
     - FILE
