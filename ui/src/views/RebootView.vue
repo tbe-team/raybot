@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { AlertTriangle, Loader, RefreshCw } from 'lucide-vue-next'
 import { PageContainer } from '@/components/shared'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
 import { useSystemRebootMutation } from '@/composables/use-system'
-import { AlertTriangle, Loader, RefreshCw } from 'lucide-vue-next'
 
 const { mutate, isPending } = useSystemRebootMutation()
 const rebootInitiated = ref(false)

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CargoCheckQRInputs, Command, MoveToInputs } from '@/types/command'
+import { Clock, MoreHorizontal } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -11,7 +12,6 @@ import {
 import { useDeleteCommandMutation } from '@/composables/use-command'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { RaybotError } from '@/types/error'
-import { Clock, MoreHorizontal } from 'lucide-vue-next'
 import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
 import { getCommandIcon, getCommandName, timeSince } from './utils'

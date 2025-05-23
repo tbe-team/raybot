@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CargoCheckQRInputs, MoveToInputs } from '@/types/command'
+import { Clock, Loader, MoreHorizontal } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import {
@@ -13,7 +14,6 @@ import { useCancelProcessingCommandMutation, useCurrentProcessingCommandQuery } 
 import { formatDate } from '@/lib/date'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { RaybotError } from '@/types/error'
-import { Clock, Loader, MoreHorizontal } from 'lucide-vue-next'
 import SourceBadge from './SourceBadge.vue'
 import StatusBadge from './StatusBadge.vue'
 import { getCommandIcon, getCommandName } from './utils'

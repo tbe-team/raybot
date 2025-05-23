@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from 'axios'
-import peripheralsAPI from '@/api/peripherals'
 import { useQuery } from '@tanstack/vue-query'
+import peripheralsAPI from '@/api/peripherals'
 
 export function useListAvailableSerialPortsQuery(axiosOpts?: Partial<AxiosRequestConfig>) {
   return useQuery({

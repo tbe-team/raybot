@@ -1,5 +1,5 @@
-import type { CommandType } from '@/types/command'
 import type { LucideIcon } from 'lucide-vue-next'
+import type { CommandType } from '@/types/command'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import {

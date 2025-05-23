@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { CommandStatus } from '@/types/command'
 import type { Component } from 'vue'
-import { Badge } from '@/components/ui/badge'
+import type { CommandStatus } from '@/types/command'
 import { AlertCircle, CheckCircle, Clock, XCircle } from 'lucide-vue-next'
+import { Badge } from '@/components/ui/badge'
 
 interface Props {
   status: CommandStatus

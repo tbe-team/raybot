@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { AppConnection } from '@/types/app-connection'
+import { Cloud, Cpu, Usb } from 'lucide-vue-next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatDate, formatUptime } from '@/lib/date'
-import { Cloud, Cpu, Usb } from 'lucide-vue-next'
 
 const props = defineProps<{
   appConnection: AppConnection

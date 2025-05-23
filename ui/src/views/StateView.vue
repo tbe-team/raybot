@@ -1,11 +1,11 @@
 <script setup lang="ts">
+import { AlertCircle, Loader } from 'lucide-vue-next'
 import StateOverview from '@/components/app/state/StateOverview.vue'
 import TabContent from '@/components/app/state/TabContent.vue'
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Card } from '@/components/ui/card'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useQueryRobotState } from '@/composables/use-robot-state'
-import { AlertCircle, Loader } from 'lucide-vue-next'
 
 const REFRESH_INTERVAL = 1000
 const refetchInterval = ref(REFRESH_INTERVAL)

@@ -1,6 +1,6 @@
 import type { App } from 'vue'
-import router from '@/router'
 import { VueQueryPlugin } from '@tanstack/vue-query'
+import router from '@/router'
 import { notivue } from './notivue'
 import { pinia } from './pinia'
 import { queryPluginOpts } from './vue-query'

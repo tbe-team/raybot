@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import type { Command } from '@/types/command'
+import { MoreHorizontal } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { useDeleteCommandMutation } from '@/composables/use-command'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { RaybotError } from '@/types/error'
-import { MoreHorizontal } from 'lucide-vue-next'
 
 const props = defineProps<{
   command: Command

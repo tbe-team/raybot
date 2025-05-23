@@ -1,6 +1,6 @@
 import type { RouteRecordRaw } from 'vue-router'
-import { useNProgress } from '@/lib/nprogress'
 import { createRouter, createWebHistory } from 'vue-router'
+import { useNProgress } from '@/lib/nprogress'
 
 const MainLayout = () => import('@/components/layouts/main-layout/MainLayout.vue')
 

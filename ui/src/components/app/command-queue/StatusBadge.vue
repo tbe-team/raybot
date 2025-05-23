@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { CommandStatus } from '@/types/command'
 import type { LucideIcon } from 'lucide-vue-next'
-import { Badge } from '@/components/ui/badge'
+import type { CommandStatus } from '@/types/command'
 import { Ban, CheckCircle, Clock, Loader2, XCircle } from 'lucide-vue-next'
+import { Badge } from '@/components/ui/badge'
 
 const props = defineProps<{
   status: CommandStatus

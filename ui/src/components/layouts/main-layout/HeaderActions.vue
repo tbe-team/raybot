@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { useColorMode } from '@vueuse/core'
+import { Moon, Pause, Sun } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { useSystemStopEmergencyMutation } from '@/composables/use-system'
 import { useConfirmationStore } from '@/stores/confirmation-store'
-import { useColorMode } from '@vueuse/core'
-import { Moon, Pause, Sun } from 'lucide-vue-next'
 
 const { store } = useColorMode()
 

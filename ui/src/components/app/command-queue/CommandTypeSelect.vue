@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import type { CommandType } from '@/types/command'
 import type { SelectRootEmits, SelectRootProps } from 'reka-ui'
-import { FormControl } from '@/components/ui/form'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import type { CommandType } from '@/types/command'
 import { ArrowDown, ArrowUp, Clock, MapPin, Package, QrCode, Scan, StopCircle } from 'lucide-vue-next'
 import { useForwardPropsEmits } from 'reka-ui'
+import { FormControl } from '@/components/ui/form'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 const props = defineProps<SelectRootProps>()
 const emits = defineEmits<SelectRootEmits>()

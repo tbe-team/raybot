@@ -1,6 +1,6 @@
 import type { InternalAxiosRequestConfig } from 'axios'
-import { HTTPError, RaybotError } from '@/types/error'
 import axios, { isAxiosError } from 'axios'
+import { HTTPError, RaybotError } from '@/types/error'
 import { useNProgress } from './nprogress'
 
 const nprogress = useNProgress()

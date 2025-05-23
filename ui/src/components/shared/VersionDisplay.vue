@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { Loader2 } from 'lucide-vue-next'
 import CopyButton from '@/components/shared/CopyButton.vue'
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card'
 import { useVersionQuery } from '@/composables/use-version'
-import { Loader2 } from 'lucide-vue-next'
 
 const { data: version, isPending } = useVersionQuery()
 const isOpen = ref(false)

@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import type { Table } from '@tanstack/vue-table'
 import type { CommandSort } from '@/api/commands'
 import type { SortPrefix } from '@/lib/sort'
 import type { Command } from '@/types/command'
-import type { Table } from '@tanstack/vue-table'
+import { AlertCircle, Loader, RefreshCw } from 'lucide-vue-next'
 import CommandDetailSheet from '@/components/app/command-history/CommandDetailSheet.vue'
 import { columns } from '@/components/app/command-history/commands-table'
 import DataTable from '@/components/shared/DataTable.vue'
@@ -10,7 +11,6 @@ import DataTableColumnVisibility from '@/components/shared/DataTableColumnVisibi
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Button } from '@/components/ui/button'
 import { useListComandsQuery } from '@/composables/use-command'
-import { AlertCircle, Loader, RefreshCw } from 'lucide-vue-next'
 
 const route = useRoute()
 const router = useRouter()

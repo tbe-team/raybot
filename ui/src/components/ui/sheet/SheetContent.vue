@@ -2,7 +2,6 @@
 import type { DialogContentEmits, DialogContentProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
 import type { SheetVariants } from '.'
-import { cn } from '@/lib/utils'
 import { X } from 'lucide-vue-next'
 import {
   DialogClose,
@@ -13,6 +12,7 @@ import {
   useForwardPropsEmits,
 } from 'reka-ui'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 import { sheetVariants } from '.'
 
 interface SheetContentProps extends DialogContentProps {

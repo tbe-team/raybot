@@ -1,8 +1,8 @@
 <script setup lang="ts" generic="TData">
 import type { Column } from '@tanstack/vue-table'
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
-import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon } from 'lucide-vue-next'
 
 interface Props {
   column: Column<TData, unknown>

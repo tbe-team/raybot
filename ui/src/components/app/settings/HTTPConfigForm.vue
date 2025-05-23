@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import type { HTTPConfig } from '@/types/config'
-import { Button } from '@/components/ui/button'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Switch } from '@/components/ui/switch'
-import { HTTP_CONFIG_QUERY_KEY, useHTTPConfigMutation } from '@/composables/use-config'
 import { useQueryClient } from '@tanstack/vue-query'
 import { toTypedSchema } from '@vee-validate/zod'
 import { Loader } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
 import { z } from 'zod'
+import { Button } from '@/components/ui/button'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Input } from '@/components/ui/input'
+import { Switch } from '@/components/ui/switch'
+import { HTTP_CONFIG_QUERY_KEY, useHTTPConfigMutation } from '@/composables/use-config'
 
 interface Props {
   initialValues: HTTPConfig

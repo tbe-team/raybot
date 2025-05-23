@@ -1,5 +1,5 @@
-import configAPI from '@/api/config'
 import { useMutation, useQuery } from '@tanstack/vue-query'
+import configAPI from '@/api/config'
 
 export const LOG_CONFIG_QUERY_KEY = 'logConfig'
 export const HARDWARE_CONFIG_QUERY_KEY = 'hardwareConfig'

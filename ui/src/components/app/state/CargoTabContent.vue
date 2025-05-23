@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { Cargo, CargoDoorMotorState } from '@/types/cargo'
+import { Lock, Package, Unlock } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatDate } from '@/lib/date'
-import { Lock, Package, Unlock } from 'lucide-vue-next'
 
 const props = defineProps<{
   cargo: Cargo

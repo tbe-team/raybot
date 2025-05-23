@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { EyeIcon, EyeOffIcon } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
-import { EyeIcon, EyeOffIcon } from 'lucide-vue-next'
 
 const props = defineProps<{
   disabled?: boolean

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { SidebarProps } from '@/components/ui/sidebar'
+import { Bot } from 'lucide-vue-next'
 import VersionDisplay from '@/components/shared/VersionDisplay.vue'
 import { Sidebar, SidebarContent, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar'
-import { Bot } from 'lucide-vue-next'
 import { menus } from './menu'
 import Navigation from './Navigation.vue'
 

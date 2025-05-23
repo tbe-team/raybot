@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { DialogOverlay } from 'reka-ui'
 import { Button } from '@/components/ui/button'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { useConfirmationStore } from '@/stores/confirmation-store'
-import { DialogOverlay } from 'reka-ui'
 
 const confirmation = useConfirmationStore()
 

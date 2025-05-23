@@ -1,7 +1,7 @@
 import type { VueQueryPluginOptions } from '@tanstack/vue-query'
-import { HTTPError } from '@/types/error'
 import { QueryCache, QueryClient } from '@tanstack/vue-query'
 import { HttpStatusCode } from 'axios'
+import { HTTPError } from '@/types/error'
 
 const RETRY_LIMIT = 3
 const STALE_TIME = 1000 * 60 * 5 // 5 minutes

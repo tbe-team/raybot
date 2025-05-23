@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Loader2 } from 'lucide-vue-next'
 import CommandDetailSheet from '@/components/app/command-queue/CommandDetailSheet.vue'
 import CreateCommandForm from '@/components/app/command-queue/CreateCommandForm.vue'
 import CurrentProcessingCommandCard from '@/components/app/command-queue/CurrentProcessingCommandCard.vue'
@@ -6,7 +7,6 @@ import WaitingCommandList from '@/components/app/command-queue/WaitingCommandLis
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
-import { Loader2 } from 'lucide-vue-next'
 
 const isDetailOpen = ref(false)
 

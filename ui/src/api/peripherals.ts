@@ -1,5 +1,5 @@
-import type { SerialPort } from '@/types/peripherals'
 import type { AxiosRequestConfig } from 'axios'
+import type { SerialPort } from '@/types/peripherals'
 import http from '@/lib/http'
 
 const peripheralsAPI = {

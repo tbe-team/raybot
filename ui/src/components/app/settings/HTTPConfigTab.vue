@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useHTTPConfigQuery } from '@/composables/use-config'
 import { Loader } from 'lucide-vue-next'
+import { useHTTPConfigQuery } from '@/composables/use-config'
 import HTTPConfigForm from './HTTPConfigForm.vue'
 
 const { data, isPending } = useHTTPConfigQuery()

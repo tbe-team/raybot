@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { BatteryState, ChargeState, DischargeState } from '@/types/robot-state'
+import { BatteryFull, Thermometer, TriangleAlert, Zap } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { BatteryFull, Thermometer, TriangleAlert, Zap } from 'lucide-vue-next'
 
 const props = defineProps<{
   battery: BatteryState

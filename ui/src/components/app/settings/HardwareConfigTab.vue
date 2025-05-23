@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useHardwareConfigQuery } from '@/composables/use-config'
 import { Loader } from 'lucide-vue-next'
+import { useHardwareConfigQuery } from '@/composables/use-config'
 import HardwareConfigForm from './HardwareConfigForm.vue'
 
 const { data, isPending } = useHardwareConfigQuery()

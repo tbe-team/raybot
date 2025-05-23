@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useWifiConfigQuery } from '@/composables/use-config'
 import { Loader } from 'lucide-vue-next'
+import { useWifiConfigQuery } from '@/composables/use-config'
 import WifiConfigForm from './WifiConfigForm.vue'
 
 const { data, isPending } = useWifiConfigQuery()

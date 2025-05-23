@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useCloudConfigQuery } from '@/composables/use-config'
 import { Loader } from 'lucide-vue-next'
+import { useCloudConfigQuery } from '@/composables/use-config'
 import CloudConfigForm from './CloudConfigForm.vue'
 
 const { data, isPending } = useCloudConfigQuery()

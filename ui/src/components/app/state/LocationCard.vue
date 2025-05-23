@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { LocationState } from '@/types/robot-state'
+import { MapPin } from 'lucide-vue-next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { formatDate } from '@/lib/date'
-import { MapPin } from 'lucide-vue-next'
 
 const props = defineProps<{
   location: LocationState

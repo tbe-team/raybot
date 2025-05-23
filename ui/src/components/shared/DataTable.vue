@@ -1,7 +1,14 @@
 <script setup lang="ts" generic="TData, TValue, TSort extends string">
-import type { SortPrefix } from '@/lib/sort'
 import type { ColumnDef, SortingState, VisibilityState } from '@tanstack/vue-table'
+import type { SortPrefix } from '@/lib/sort'
 
+import {
+  FlexRender,
+  getCoreRowModel,
+  useVueTable,
+} from '@tanstack/vue-table'
+
+import { LoaderCircleIcon } from 'lucide-vue-next'
 import {
   Table,
   TableBody,
@@ -10,16 +17,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-
 import { convertParamsToSorting, convertSortingToParams } from '@/lib/sort'
-import { valueUpdater } from '@/lib/utils'
-import {
-  FlexRender,
-  getCoreRowModel,
-  useVueTable,
-} from '@tanstack/vue-table'
 
-import { LoaderCircleIcon } from 'lucide-vue-next'
+import { valueUpdater } from '@/lib/utils'
 import DataTablePagination from './DataTablePagination.vue'
 
 interface Props {

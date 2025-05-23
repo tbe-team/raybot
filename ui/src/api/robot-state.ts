@@ -1,5 +1,5 @@
-import type { RobotState } from '@/types/robot-state'
 import type { AxiosRequestConfig } from 'axios'
+import type { RobotState } from '@/types/robot-state'
 import http from '@/lib/http'
 
 const robotStateAPI = {

@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { ArrowLeft, ArrowRight } from 'lucide-vue-next'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowLeft, ArrowRight } from 'lucide-vue-next'
 </script>
 
 <template>

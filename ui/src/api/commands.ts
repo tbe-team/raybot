@@ -1,7 +1,7 @@
+import type { AxiosRequestConfig } from 'axios'
 import type { SortPrefix } from '@/lib/sort'
 import type { Command, CommandInputMap, CommandStatus, CommandType } from '@/types/command'
 import type { Paging } from '@/types/paging'
-import type { AxiosRequestConfig } from 'axios'
 import http from '@/lib/http'
 
 export const COMMAND_SORT_VALUES = ['type', 'status', 'source', 'created_at', 'completed_at'] as const

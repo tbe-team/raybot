@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import type { LogConfig } from '@/types/config'
+import { useQueryClient } from '@tanstack/vue-query'
+import { toTypedSchema } from '@vee-validate/zod'
+import { Loader } from 'lucide-vue-next'
+import { useForm } from 'vee-validate'
+import { z } from 'zod'
 import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { LOG_CONFIG_QUERY_KEY, useLogConfigMutation } from '@/composables/use-config'
-import { useQueryClient } from '@tanstack/vue-query'
-import { toTypedSchema } from '@vee-validate/zod'
-import { Loader } from 'lucide-vue-next'
-import { useForm } from 'vee-validate'
-import { z } from 'zod'
 
 const props = defineProps<{
   logConfig: LogConfig

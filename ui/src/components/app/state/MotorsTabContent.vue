@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import type { CargoDoorMotorState } from '@/types/cargo'
 import type { DriveMotorState, LiftMotorState } from '@/types/robot-state'
+import { ArrowLeft, ArrowRight, Lock, Unlock } from 'lucide-vue-next'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { Separator } from '@/components/ui/separator'
 import { formatDate } from '@/lib/date'
-import { ArrowLeft, ArrowRight, Lock, Unlock } from 'lucide-vue-next'
 
 const props = defineProps<{
   liftMotor: LiftMotorState

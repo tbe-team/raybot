@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import type { HoverCardContentProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
-import { cn } from '@/lib/utils'
 import { reactiveOmit } from '@vueuse/core'
 import {
   HoverCardContent,
@@ -9,6 +8,7 @@ import {
   HoverCardPortal,
   useForwardProps,
 } from 'reka-ui'
+import { cn } from '@/lib/utils'
 
 const props = withDefaults(
   defineProps<HoverCardContentProps & { class?: HTMLAttributes['class'] }>(),

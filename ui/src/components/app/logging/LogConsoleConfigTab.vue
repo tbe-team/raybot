@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { useLogConfigQuery } from '@/composables/use-config'
 import { Loader } from 'lucide-vue-next'
+import { useLogConfigQuery } from '@/composables/use-config'
 import LogConsoleConfigForm from './LogConsoleConfigForm.vue'
 
 const { data, isPending } = useLogConfigQuery()

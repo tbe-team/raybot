@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import type { CommandSource } from '@/types/command'
 import type { LucideIcon } from 'lucide-vue-next'
-import { Badge } from '@/components/ui/badge'
+import type { CommandSource } from '@/types/command'
 import { Cloud, Smartphone } from 'lucide-vue-next'
+import { Badge } from '@/components/ui/badge'
 
 const props = defineProps<{
   source: CommandSource

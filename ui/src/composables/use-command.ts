@@ -1,8 +1,8 @@
+import type { AxiosRequestConfig } from 'axios'
 import type { CommandSort } from '@/api/commands'
 import type { SortPrefix } from '@/lib/sort'
-import type { AxiosRequestConfig } from 'axios'
-import commandsAPI from '@/api/commands'
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import commandsAPI from '@/api/commands'
 
 export function useCurrentProcessingCommandQuery(
   opts?: { axiosOpts?: Partial<AxiosRequestConfig> },

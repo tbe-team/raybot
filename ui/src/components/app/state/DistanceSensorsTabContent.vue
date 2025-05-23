@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { DistanceSensorState } from '@/types/robot-state'
+import { ArrowDown, ArrowLeft, ArrowRight } from 'lucide-vue-next'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Progress } from '@/components/ui/progress'
 import { formatDate } from '@/lib/date'
-import { ArrowDown, ArrowLeft, ArrowRight } from 'lucide-vue-next'
 
 const props = defineProps<{
   distanceSensor: DistanceSensorState

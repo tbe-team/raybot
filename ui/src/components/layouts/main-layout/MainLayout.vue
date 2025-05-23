@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { useLocalStorage } from '@vueuse/core'
+import { Notification, Notivue } from 'notivue'
 import ConfirmationDialog from '@/components/shared/ConfirmationDialog.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
-import { useLocalStorage } from '@vueuse/core'
-import { Notification, Notivue } from 'notivue'
 import AppSidebar from './AppSidebar.vue'
 import HeaderActions from './HeaderActions.vue'
 
