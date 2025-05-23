@@ -1,18 +1,19 @@
 <script setup lang="ts">
 import type { CommandType } from '@/types/command'
+import { useCommandConfig } from '@/components/app/command-queue/use-command-config'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Input } from '@/components/ui/input'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { useCreateCommandMutation } from '@/composables/use-command'
 import { RaybotError } from '@/types/error'
 import { toTypedSchema } from '@vee-validate/zod'
-import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp, Clock, Loader2, MapPin, Package, QrCode, Scan, StopCircle } from 'lucide-vue-next'
+import { Loader2 } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
+import CommandTypeSelect from './CommandTypeSelect.vue'
+import DynamicInputs from './inputs/DynamicInputs.vue'
 import { createCommandSchema } from './schemas'
 
-const { values, handleSubmit, setFieldValue, resetForm } = useForm({
+const { values, handleSubmit, setFieldValue } = useForm({
   validationSchema: toTypedSchema(createCommandSchema),
   initialValues: {
     type: 'STOP_MOVEMENT',
@@ -20,12 +21,11 @@ const { values, handleSubmit, setFieldValue, resetForm } = useForm({
   },
 })
 
-const commandType = computed(() => values.type)
-function setCommandType(type: CommandType) {
-  setFieldValue('type', type)
-}
+const commandType = computed(() => values.type!)
 
 const { mutate: createCommand, isPending } = useCreateCommandMutation()
+
+const { commandConfig, updateCommandConfigFromInputs } = useCommandConfig()
 
 const onSubmit = handleSubmit((values) => {
   createCommand(values, {
@@ -44,10 +44,24 @@ const onSubmit = handleSubmit((values) => {
       }
     },
   })
+
+  updateCommandConfigFromInputs(commandType.value, values.inputs)
 })
 
-function clearForm() {
-  resetForm()
+function setCommandType(type: CommandType) {
+  setFieldValue('type', type)
+
+  const configMap: Partial<Record<CommandType, unknown>> = {
+    MOVE_TO: commandConfig.value.moveTo,
+    MOVE_FORWARD: commandConfig.value.moveForward,
+    MOVE_BACKWARD: commandConfig.value.moveBackward,
+    CARGO_OPEN: commandConfig.value.cargoOpen,
+    CARGO_CLOSE: commandConfig.value.cargoClose,
+    CARGO_LIFT: commandConfig.value.cargoLift,
+    CARGO_LOWER: commandConfig.value.cargoLower,
+  }
+  const inputs = configMap[type] ?? {}
+  setFieldValue('inputs', { ...inputs })
 }
 </script>
 
@@ -56,159 +70,29 @@ function clearForm() {
     <CardHeader>
       <CardTitle>Create command</CardTitle>
     </CardHeader>
+
     <form @submit.prevent="onSubmit">
       <CardContent>
         <div class="space-y-4">
           <FormField name="type">
             <FormItem>
               <FormLabel>Command type</FormLabel>
-              <Select
+              <CommandTypeSelect
                 :disabled="isPending"
                 :model-value="commandType"
                 @update:model-value="(val) => setCommandType(val as CommandType)"
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select command type" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="STOP_MOVEMENT">
-                    <div class="flex items-center gap-2">
-                      <StopCircle class="w-4 h-4" />
-                      <span>Stop Movement</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="MOVE_FORWARD">
-                    <div class="flex items-center gap-2">
-                      <ArrowUp class="w-4 h-4" />
-                      <span>Move Forward</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="MOVE_BACKWARD">
-                    <div class="flex items-center gap-2">
-                      <ArrowDown class="w-4 h-4" />
-                      <span>Move Backward</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="MOVE_TO">
-                    <div class="flex items-center gap-2">
-                      <MapPin class="w-4 h-4" />
-                      <span>Move To</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="CARGO_OPEN">
-                    <div class="flex items-center gap-2">
-                      <Package class="w-4 h-4" />
-                      <span>Cargo Open</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="CARGO_CLOSE">
-                    <div class="flex items-center gap-2">
-                      <Package class="w-4 h-4" />
-                      <span>Cargo Close</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="CARGO_LIFT">
-                    <div class="flex items-center gap-2">
-                      <Package class="w-4 h-4" />
-                      <span>Cargo Lift</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="CARGO_LOWER">
-                    <div class="flex items-center gap-2">
-                      <Package class="w-4 h-4" />
-                      <span>Cargo Lower</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="CARGO_CHECK_QR">
-                    <div class="flex items-center gap-2">
-                      <QrCode class="w-4 h-4" />
-                      <span>Cargo Check QR</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="SCAN_LOCATION">
-                    <div class="flex items-center gap-2">
-                      <Scan class="w-4 h-4" />
-                      <span>Scan Location</span>
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="WAIT">
-                    <div class="flex items-center gap-2">
-                      <Clock class="w-4 h-4" />
-                      <span>Wait</span>
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
+              />
               <FormMessage />
             </FormItem>
           </FormField>
-
-          <!-- Dynamic inputs based on command type -->
-          <template v-if="commandType === 'MOVE_TO'">
-            <FormField v-slot="{ componentField }" name="inputs.location">
-              <FormItem>
-                <FormLabel>Location</FormLabel>
-                <Input v-bind="componentField" placeholder="Enter location" />
-                <FormMessage />
-              </FormItem>
-            </FormField>
-            <FormField v-slot="{ componentField }" name="inputs.direction">
-              <FormItem>
-                <FormLabel>Move direction</FormLabel>
-                <Select v-bind="componentField">
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select direction" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="FORWARD">
-                      <div class="flex items-center gap-2">
-                        <ArrowRight class="w-4 h-4" />
-                        <span>Forward</span>
-                      </div>
-                    </SelectItem>
-                    <SelectItem value="BACKWARD">
-                      <div class="flex items-center gap-2">
-                        <ArrowLeft class="w-4 h-4" />
-                        <span>Backward</span>
-                      </div>
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
-              </FormItem>
-            </FormField>
-          </template>
-          <template v-else-if="commandType === 'CARGO_CHECK_QR'">
-            <FormField v-slot="{ componentField }" name="inputs.qrCode">
-              <FormItem>
-                <FormLabel>QR Code</FormLabel>
-                <Input v-bind="componentField" placeholder="Enter QR code" />
-                <FormMessage />
-              </FormItem>
-            </FormField>
-          </template>
-          <template v-else-if="commandType === 'WAIT'">
-            <FormField v-slot="{ componentField }" name="inputs.durationMs">
-              <FormItem>
-                <FormLabel>Duration (ms)</FormLabel>
-                <Input v-bind="componentField" type="number" placeholder="Enter duration" />
-                <FormMessage />
-              </FormItem>
-            </FormField>
-          </template>
+          <DynamicInputs :command-type="commandType" />
         </div>
       </CardContent>
 
       <CardFooter class="flex flex-col gap-2">
         <Button type="submit" class="w-full" :disabled="isPending">
           <Loader2 v-if="isPending" class="w-4 h-4 mr-2 animate-spin" />
-          Add command
-        </Button>
-        <Button type="button" variant="outline" class="w-full" :disabled="isPending" @click="clearForm">
-          Clear form
+          Create
         </Button>
       </CardFooter>
     </form>
