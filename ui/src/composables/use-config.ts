@@ -4,9 +4,7 @@ import { useMutation, useQuery } from '@tanstack/vue-query'
 export const LOG_CONFIG_QUERY_KEY = 'logConfig'
 export const HARDWARE_CONFIG_QUERY_KEY = 'hardwareConfig'
 export const CLOUD_CONFIG_QUERY_KEY = 'cloudConfig'
-export const GRPC_CONFIG_QUERY_KEY = 'grpcConfig'
 export const HTTP_CONFIG_QUERY_KEY = 'httpConfig'
-export const CARGO_CONFIG_QUERY_KEY = 'cargoConfig'
 export const WIFI_CONFIG_QUERY_KEY = 'wifiConfig'
 
 export function useLogConfigQuery() {
@@ -58,19 +56,6 @@ export function useHTTPConfigQuery() {
 export function useHTTPConfigMutation() {
   return useMutation({
     mutationFn: configAPI.updateHttpConfig,
-  })
-}
-
-export function useCargoConfigQuery() {
-  return useQuery({
-    queryKey: [CARGO_CONFIG_QUERY_KEY],
-    queryFn: configAPI.getCargoConfig,
-  })
-}
-
-export function useCargoConfigMutation() {
-  return useMutation({
-    mutationFn: configAPI.updateCargoConfig,
   })
 }
 

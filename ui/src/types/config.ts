@@ -60,18 +60,6 @@ export interface HTTPConfig {
   swagger: boolean
 }
 
-export interface BottomDistanceHysteresisConfig {
-  lowerThreshold: number
-  upperThreshold: number
-}
-
-export interface CargoConfig {
-  liftPosition: number
-  lowerPosition: number
-  bottomDistanceHysteresis: BottomDistanceHysteresisConfig
-  liftMotorSpeed: number
-}
-
 export interface WifiConfig {
   ap: APConfig
   sta: STAConfig

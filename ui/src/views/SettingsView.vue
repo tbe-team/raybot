@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import CargoConfigTab from '@/components/app/settings/CargoConfigTab.vue'
 import CloudConfigTab from '@/components/app/settings/CloudConfigTab.vue'
 import HardwareConfigTab from '@/components/app/settings/HardwareConfigTab.vue'
 import HTTPConfigTab from '@/components/app/settings/HTTPConfigTab.vue'
@@ -40,9 +39,6 @@ function handleTabChange(value: string | number) {
         <TabsTrigger value="http">
           HTTP
         </TabsTrigger>
-        <TabsTrigger value="cargo">
-          Cargo
-        </TabsTrigger>
         <TabsTrigger value="wifi">
           WiFi
         </TabsTrigger>
@@ -56,9 +52,6 @@ function handleTabChange(value: string | number) {
       </TabsContent>
       <TabsContent value="http">
         <HTTPConfigTab />
-      </TabsContent>
-      <TabsContent value="cargo">
-        <CargoConfigTab />
       </TabsContent>
       <TabsContent value="wifi">
         <WifiConfigTab />
