@@ -4,8 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	commandv1 "github.com/tbe-team/raybot/internal/handlers/cloud/gen/command/v1"
@@ -26,14 +24,14 @@ func newCommandHandler(commandService command.Service) commandv1.CommandServiceS
 func (h commandHandler) CreateCommand(ctx context.Context, req *commandv1.CreateCommandRequest) (*commandv1.CreateCommandResponse, error) {
 	inputs, err := h.convertReqInputsToCommandInputs(req)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "convert req inputs to command inputs: %v", err)
+		return nil, fmt.Errorf("convert req inputs to command inputs: %v", err)
 	}
 	cmd, err := h.commandService.CreateCommand(ctx, command.CreateCommandParams{
 		Source: command.SourceCloud,
 		Inputs: inputs,
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "create command: %v", err)
+		return nil, fmt.Errorf("create command: %v", err)
 	}
 	return &commandv1.CreateCommandResponse{
 		Command: h.convertCommandToResponse(cmd),
@@ -45,7 +43,7 @@ func (h commandHandler) GetCommand(ctx context.Context, req *commandv1.GetComman
 		CommandID: req.Id,
 	})
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "get command: %v", err)
+		return nil, fmt.Errorf("get command: %v", err)
 	}
 	return &commandv1.GetCommandResponse{
 		Command: h.convertCommandToResponse(cmd),
