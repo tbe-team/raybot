@@ -14,7 +14,9 @@ type Controller interface {
 
 	MoveForward(ctx context.Context, speed uint8) error
 	MoveBackward(ctx context.Context, speed uint8) error
-	StopDriveMotor(ctx context.Context) error
+	// When moving backward, the robot jerks on stop because the STOP command sets direction to FORWARD.
+	// Fix it respecting the current direction in STOP.
+	StopDriveMotor(ctx context.Context, currentDirection MoveDirection) error
 
 	ConfigBatteryCharge(ctx context.Context, currentLimit uint16, enable bool) error
 	ConfigBatteryDischarge(ctx context.Context, currentLimit uint16, enable bool) error
@@ -71,7 +73,7 @@ func (c *DefaultClient) MoveForward(ctx context.Context, speed uint8) error {
 		ID:   shortuuid.New(),
 		Type: picCommandTypeDriveMotor,
 		Data: picCommandDriveMotorData{
-			Direction: moveDirectionForward,
+			Direction: MoveDirectionForward,
 			Speed:     speed,
 			Enable:    true,
 		},
@@ -94,7 +96,7 @@ func (c *DefaultClient) MoveBackward(ctx context.Context, speed uint8) error {
 		ID:   shortuuid.New(),
 		Type: picCommandTypeDriveMotor,
 		Data: picCommandDriveMotorData{
-			Direction: moveDirectionBackward,
+			Direction: MoveDirectionBackward,
 			Speed:     speed,
 			Enable:    true,
 		},
@@ -112,12 +114,12 @@ func (c *DefaultClient) MoveBackward(ctx context.Context, speed uint8) error {
 	return nil
 }
 
-func (c *DefaultClient) StopDriveMotor(ctx context.Context) error {
+func (c *DefaultClient) StopDriveMotor(ctx context.Context, currentDirection MoveDirection) error {
 	cmd := picCommand{
 		ID:   shortuuid.New(),
 		Type: picCommandTypeDriveMotor,
 		Data: picCommandDriveMotorData{
-			Direction: moveDirectionForward,
+			Direction: currentDirection,
 			Speed:     0,
 			Enable:    false,
 		},
@@ -260,7 +262,7 @@ func (d picCommandLiftMotorData) MarshalJSON() ([]byte, error) {
 func (picCommandLiftMotorData) isPICCommandData() {}
 
 type picCommandDriveMotorData struct {
-	Direction moveDirection
+	Direction MoveDirection
 	Speed     uint8
 	Enable    bool
 }
@@ -280,11 +282,11 @@ func (d picCommandDriveMotorData) MarshalJSON() ([]byte, error) {
 
 func (picCommandDriveMotorData) isPICCommandData() {}
 
-type moveDirection uint8
+type MoveDirection uint8
 
 const (
-	moveDirectionForward  moveDirection = 0
-	moveDirectionBackward moveDirection = 1
+	MoveDirectionForward  MoveDirection = 0
+	MoveDirectionBackward MoveDirection = 1
 )
 
 func boolToUint8(b bool) uint8 {

@@ -104,7 +104,7 @@ func TestController(t *testing.T) {
 		client := NewClient(config.Serial{})
 		client.port = mockPort
 
-		err := client.StopDriveMotor(context.Background())
+		err := client.StopDriveMotor(context.Background(), MoveDirectionForward)
 		assert.NoError(t, err)
 
 		actual := overrideIDAndRemoveMarkers(t, mockPort.WriteBuffer.Bytes(), "abc")

@@ -86,7 +86,20 @@ func (s service) MoveBackward(ctx context.Context, params drivemotor.MoveBackwar
 }
 
 func (s service) Stop(ctx context.Context) error {
-	if err := s.picSerialController.StopDriveMotor(ctx); err != nil {
+	state, err := s.driveMotorStateRepo.GetDriveMotorState(ctx)
+	if err != nil {
+		return fmt.Errorf("get drive motor state: %w", err)
+	}
+
+	var direction picserial.MoveDirection
+	switch state.Direction {
+	case drivemotor.DirectionForward:
+		direction = picserial.MoveDirectionForward
+	case drivemotor.DirectionBackward:
+		direction = picserial.MoveDirectionBackward
+	}
+
+	if err := s.picSerialController.StopDriveMotor(ctx, direction); err != nil {
 		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
 			return drivemotor.ErrCanNotControlDriveMotor
 		}
