@@ -116,7 +116,7 @@ importers:
         version: 5.8.3
       unplugin-auto-import:
         specifier: ^19.1.1
-        version: 19.2.0(@vueuse/core@13.2.0(vue@3.5.14(typescript@5.8.3)))
+        version: 19.3.0(@vueuse/core@13.2.0(vue@3.5.14(typescript@5.8.3)))
       vite:
         specifier: ^6.2.1
         version: 6.3.5(@types/node@22.15.21)(jiti@2.4.2)(yaml@2.7.1)
@@ -2815,6 +2815,10 @@ packages:
     resolution: {integrity: sha512-mEwzpUgrLySlveBwEVDMKk5B57bhLPYovRfPAXD5gA/98Opn0rCDj3GtLwFvCvH5RK9uPCExUROW5NjDwvqkxw==}
     engines: {node: '>=12.0.0'}
 
+  tinyglobby@0.2.14:
+    resolution: {integrity: sha512-tX5e7OM1HnYr2+a2C/4V0htOcSQcoSTH9KgJnVvNm5zm/cyEWKJ7j7YutsH9CxMdtOkkLFy2AHrMci9IM8IPZQ==}
+    engines: {node: '>=12.0.0'}
+
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
@@ -2895,8 +2899,8 @@ packages:
     resolution: {integrity: sha512-gptHNQghINnc/vTGIk0SOFGFNXw7JVrlRUtConJRlvaw6DuX0wO5Jeko9sWrMBhh+PsYAZ7oXAiOnf/UKogyiw==}
     engines: {node: '>= 10.0.0'}
 
-  unplugin-auto-import@19.2.0:
-    resolution: {integrity: sha512-DGRHg86nUDKEYpny1p2kFZjeLg7kHQmknsPQ8krAshvpeypps7dFxNBsAqhBaxYINjetbgQilF8wbjuZxpdomg==}
+  unplugin-auto-import@19.3.0:
+    resolution: {integrity: sha512-iIi0u4Gq2uGkAOGqlPJOAMI8vocvjh1clGTfSK4SOrJKrt+tirrixo/FjgBwXQNNdS7ofcr7OxzmOb/RjWxeEQ==}
     engines: {node: '>=14'}
     peerDependencies:
       '@nuxt/kit': ^3.2.2
@@ -2911,8 +2915,8 @@ packages:
     resolution: {integrity: sha512-8U/MtpkPkkk3Atewj1+RcKIjb5WBimZ/WSLhhR3w6SsIj8XJuKTacSP8g+2JhfSGw0Cb125Y+2zA/IzJZDVbhA==}
     engines: {node: '>=18.12.0'}
 
-  unplugin@2.3.2:
-    resolution: {integrity: sha512-3n7YA46rROb3zSj8fFxtxC/PqoyvYQ0llwz9wtUPUutr9ig09C8gGo5CWCwHrUzlqC1LLR43kxp5vEIyH1ac1w==}
+  unplugin@2.3.4:
+    resolution: {integrity: sha512-m4PjxTurwpWfpMomp8AptjD5yj8qEZN5uQjjGM3TAs9MWWD2tXSSNNj6jGR2FoVGod4293ytyV6SwBbertfyJg==}
     engines: {node: '>=18.12.0'}
 
   unrs-resolver@1.7.2:
@@ -4744,7 +4748,7 @@ snapshots:
       jsonc-eslint-parser: 2.4.0
       pathe: 2.0.3
       pnpm-workspace-yaml: 0.3.1
-      tinyglobby: 0.2.13
+      tinyglobby: 0.2.14
       yaml-eslint-parser: 1.3.0
 
   eslint-plugin-regexp@2.7.0(eslint@9.27.0(jiti@2.4.2)):
@@ -6042,6 +6046,11 @@ snapshots:
       fdir: 6.4.4(picomatch@4.0.2)
       picomatch: 4.0.2
 
+  tinyglobby@0.2.14:
+    dependencies:
+      fdir: 6.4.4(picomatch@4.0.2)
+      picomatch: 4.0.2
+
   to-regex-range@5.0.1:
     dependencies:
       is-number: 7.0.0
@@ -6101,8 +6110,8 @@ snapshots:
       pkg-types: 2.1.0
       scule: 1.3.0
       strip-literal: 3.0.0
-      tinyglobby: 0.2.13
-      unplugin: 2.3.2
+      tinyglobby: 0.2.14
+      unplugin: 2.3.4
       unplugin-utils: 0.2.4
 
   unist-util-is@6.0.0:
@@ -6126,13 +6135,13 @@ snapshots:
 
   universalify@2.0.1: {}
 
-  unplugin-auto-import@19.2.0(@vueuse/core@13.2.0(vue@3.5.14(typescript@5.8.3))):
+  unplugin-auto-import@19.3.0(@vueuse/core@13.2.0(vue@3.5.14(typescript@5.8.3))):
     dependencies:
       local-pkg: 1.1.1
       magic-string: 0.30.17
       picomatch: 4.0.2
       unimport: 4.2.0
-      unplugin: 2.3.2
+      unplugin: 2.3.4
       unplugin-utils: 0.2.4
     optionalDependencies:
       '@vueuse/core': 13.2.0(vue@3.5.14(typescript@5.8.3))
@@ -6142,7 +6151,7 @@ snapshots:
       pathe: 2.0.3
       picomatch: 4.0.2
 
-  unplugin@2.3.2:
+  unplugin@2.3.4:
     dependencies:
       acorn: 8.14.1
       picomatch: 4.0.2
