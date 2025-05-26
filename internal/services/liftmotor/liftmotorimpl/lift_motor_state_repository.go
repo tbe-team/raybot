@@ -3,6 +3,7 @@ package liftmotorimpl
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 )
@@ -45,6 +46,7 @@ func (r *liftMotorStateRepository) UpdateLiftMotorState(_ context.Context, param
 	if params.SetEnabled {
 		state.Enabled = params.Enabled
 	}
+	state.UpdatedAt = time.Now()
 
 	r.mu.Lock()
 	r.liftMotor = state

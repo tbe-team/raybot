@@ -3,6 +3,7 @@ package drivemotorimpl
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 )
@@ -45,6 +46,7 @@ func (r *driveMotorStateRepository) UpdateDriveMotorState(_ context.Context, par
 	if params.SetEnabled {
 		state.Enabled = params.Enabled
 	}
+	state.UpdatedAt = time.Now()
 
 	r.mu.Lock()
 	r.driveMotor = state
