@@ -2,6 +2,7 @@
 import { useLocalStorage } from '@vueuse/core'
 import { Notification, Notivue } from 'notivue'
 import ConfirmationDialog from '@/components/shared/ConfirmationDialog.vue'
+import ScrollToTopButton from '@/components/shared/ScrollToTopButton.vue'
 import { Separator } from '@/components/ui/separator'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import AppSidebar from './AppSidebar.vue'
@@ -31,5 +32,6 @@ const open = useLocalStorage('sidebar', true)
         <RouterView />
       </main>
     </SidebarInset>
+    <ScrollToTopButton />
   </SidebarProvider>
 </template>
