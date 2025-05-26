@@ -21,6 +21,7 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   (e: 'viewDetails', commandId: number): void
+  (e: 'refresh'): void
 }>()
 
 const { openConfirmation } = useConfirmationStore()
@@ -37,6 +38,7 @@ function handleRemoveFromQueue() {
       deleteCommand(props.command.id, {
         onSuccess: () => {
           notification.success('Command removed from queue')
+          emit('refresh')
         },
         onError: (error) => {
           if (error instanceof RaybotError) {
@@ -82,7 +84,6 @@ function handleRemoveFromQueue() {
             <DropdownMenuItem @click="emit('viewDetails', props.command.id)">
               View details
             </DropdownMenuItem>
-            <DropdownMenuItem>Edit command</DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem class="text-red-500" @click="handleRemoveFromQueue">
               Remove from queue

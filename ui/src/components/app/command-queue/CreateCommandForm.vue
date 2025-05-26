@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CommandType } from '@/types/command'
+import { useQueryClient } from '@tanstack/vue-query'
 import { toTypedSchema } from '@vee-validate/zod'
 import { Loader2 } from 'lucide-vue-next'
 import { useForm } from 'vee-validate'
@@ -7,11 +8,13 @@ import { useCommandConfig } from '@/components/app/command-queue/use-command-con
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { useCreateCommandMutation } from '@/composables/use-command'
+import { COMMAND_QUEUE_QUERY_KEY, CURRENT_PROCESSING_COMMAND_QUERY_KEY, useCreateCommandMutation } from '@/composables/use-command'
 import { RaybotError } from '@/types/error'
 import CommandTypeSelect from './CommandTypeSelect.vue'
 import DynamicInputs from './inputs/DynamicInputs.vue'
 import { createCommandSchema } from './schemas'
+
+const queryClient = useQueryClient()
 
 const { values, handleSubmit, setFieldValue } = useForm({
   validationSchema: toTypedSchema(createCommandSchema),
@@ -31,6 +34,8 @@ const onSubmit = handleSubmit((values) => {
   createCommand(values, {
     onSuccess: () => {
       notification.success('Command created successfully')
+      queryClient.invalidateQueries({ queryKey: [COMMAND_QUEUE_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [CURRENT_PROCESSING_COMMAND_QUERY_KEY] })
     },
     onError: (error) => {
       if (error instanceof RaybotError) {

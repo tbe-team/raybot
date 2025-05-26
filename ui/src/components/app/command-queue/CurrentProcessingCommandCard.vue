@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CargoCheckQRInputs, MoveToInputs } from '@/types/command'
+import { useQueryClient } from '@tanstack/vue-query'
 import { Clock, Loader, MoreHorizontal } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
@@ -10,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { useCancelProcessingCommandMutation, useCurrentProcessingCommandQuery } from '@/composables/use-command'
+import { CURRENT_PROCESSING_COMMAND_QUERY_KEY, useCancelProcessingCommandMutation, useCurrentProcessingCommandQuery } from '@/composables/use-command'
 import { formatDate } from '@/lib/date'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { RaybotError } from '@/types/error'
@@ -21,17 +22,12 @@ import { getCommandIcon, getCommandName } from './utils'
 const emit = defineEmits<{
   (e: 'viewDetails', commandId: number): void
 }>()
-
+const REFRESH_INTERVAL = 1000
+const queryClient = useQueryClient()
 const { openConfirmation } = useConfirmationStore()
 
-const { data: command, refetch, isError } = useCurrentProcessingCommandQuery({ axiosOpts: { doNotShowLoading: true } })
+const { data: command, isError } = useCurrentProcessingCommandQuery({ axiosOpts: { doNotShowLoading: true }, refetchInterval: REFRESH_INTERVAL })
 const { mutate: cancelProcessingCommand, isPending: isCancellingCommand } = useCancelProcessingCommandMutation()
-const REFRESH_INTERVAL = 1000
-const interval = setInterval(refetch, REFRESH_INTERVAL)
-
-onUnmounted(() => {
-  clearInterval(interval)
-})
 
 function handleCancelCommand() {
   openConfirmation({
@@ -43,6 +39,9 @@ function handleCancelCommand() {
       cancelProcessingCommand(undefined, {
         onSuccess: () => {
           notification.success('Command cancelled successfully')
+          queryClient.setQueryData([CURRENT_PROCESSING_COMMAND_QUERY_KEY], () => {
+            return null
+          })
         },
         onError: (error) => {
           if (error instanceof RaybotError) {
