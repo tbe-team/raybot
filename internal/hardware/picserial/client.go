@@ -89,6 +89,12 @@ func (c *DefaultClient) Connected() bool {
 }
 
 func (c *DefaultClient) Write(ctx context.Context, data []byte) error {
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	default:
+	}
+
 	if c.port == nil {
 		return ErrPICSerialNotConnected
 	}
@@ -96,21 +102,11 @@ func (c *DefaultClient) Write(ctx context.Context, data []byte) error {
 	data = append([]byte(">"), data...)
 	data = append(data, '\r', '\n')
 
-	done := make(chan error, 1)
-	go func() {
-		c.writeMu.Lock()
-		defer c.writeMu.Unlock()
+	c.writeMu.Lock()
+	_, err := c.port.Write(data)
+	c.writeMu.Unlock()
 
-		_, err := c.port.Write(data)
-		done <- err
-	}()
-
-	select {
-	case <-ctx.Done():
-		return ctx.Err()
-	case err := <-done:
-		return err
-	}
+	return err
 }
 
 // Read reads data from the serial port.
