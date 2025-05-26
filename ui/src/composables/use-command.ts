@@ -8,6 +8,7 @@ export const COMMAND_QUEUE_QUERY_KEY = 'queuedCommand'
 export const CURRENT_PROCESSING_COMMAND_QUERY_KEY = 'currentProcessingCommand'
 export const COMMANDS_QUERY_KEY = 'commands'
 export const COMMAND_QUERY_KEY = 'command'
+
 export function useCurrentProcessingCommandQuery(
   opts?: { axiosOpts?: Partial<AxiosRequestConfig>, refetchInterval?: number },
 ) {

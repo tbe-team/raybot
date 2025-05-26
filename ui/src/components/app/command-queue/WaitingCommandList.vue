@@ -43,7 +43,7 @@ function handlePageChange(p: number) {
           v-for="command in commands.items"
           :key="command.id"
           :command="command"
-          @refresh="refetch"
+          @on-remove="refetch"
           @view-details="emit('viewDetails', command.id)"
         />
       </template>
