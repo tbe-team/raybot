@@ -8,9 +8,9 @@ import (
 )
 
 func startJobs(app *application.Application, interruptChan <-chan any) error {
-	service := jobs.New(app.Cfg.Cron, app.Log, app.CommandService)
+	service := jobs.New(app.Cfg.Cron, app.Log, app.EventBus, app.CommandService)
 
-	cleanup, err := service.Run()
+	cleanup, err := service.Run(app.Context)
 	if err != nil {
 		return fmt.Errorf("failed to run job service: %w", err)
 	}

@@ -34,10 +34,6 @@ type ListCommandsParams struct {
 	Statuses     []Status      `validate:"dive,enum"`
 }
 
-type ExecuteCreatedCommandParams struct {
-	CommandID int64 `validate:"required,min=1"`
-}
-
 type DeleteCommandByIDParams struct {
 	CommandID int64 `validate:"required,min=1"`
 }
@@ -52,7 +48,7 @@ type Service interface {
 	// CancelActiveCloudCommands cancels all QUEUED and PROCESSING commands created by the cloud.
 	CancelActiveCloudCommands(ctx context.Context) error
 
-	ExecuteCreatedCommand(ctx context.Context, params ExecuteCreatedCommandParams) error
+	RunNextExecutableCommand(ctx context.Context) error
 
 	// CancelAllRunningCommands cancels all running commands including the current processing command
 	// and the commands in the queue.

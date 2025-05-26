@@ -138,26 +138,8 @@ func (s *Service) CancelActiveCloudCommands(ctx context.Context) error {
 	return nil
 }
 
-func (s *Service) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
-	_, err := s.runningCmdRepository.Get(ctx)
-	// no error means the running command exists, so we don't need to execute the command
-	if err == nil {
-		s.log.Info("command is already being processed, this command will be queued")
-		return nil
-	}
-
-	cmd, err := s.commandRepository.GetCommandByID(ctx, params.CommandID)
-	if err != nil {
-		return fmt.Errorf("get command by id: %w", err)
-	}
-
-	if cmd.Status != command.StatusQueued {
-		return fmt.Errorf("command is not in queued status")
-	}
-
-	s.executeCommand(ctx, cmd)
-
-	return nil
+func (s *Service) RunNextExecutableCommand(ctx context.Context) error {
+	return s.runNextExecutableCommand(ctx)
 }
 
 func (s *Service) CancelAllRunningCommands(ctx context.Context) error {
@@ -205,31 +187,27 @@ func (s *Service) cancelQueuedAndProcessingCommands(ctx context.Context) {
 	}
 }
 
-func (s *Service) runNextExecutableCommand(ctx context.Context) {
+func (s *Service) runNextExecutableCommand(ctx context.Context) error {
 	cmd, err := s.commandRepository.GetNextExecutableCommand(ctx)
 	if err != nil {
 		if errors.Is(err, command.ErrNoNextExecutableCommand) {
-			return
+			return nil
 		}
-		s.log.Error("failed to get next executable command", slog.Any("error", err))
-		return
+		return fmt.Errorf("get next executable command: %w", err)
 	}
 
 	s.log.Info("found executable command, executing", slog.Any("command", cmd))
-	s.executeCommand(ctx, cmd)
+	return s.executeCommand(ctx, cmd)
 }
 
-func (s *Service) executeCommand(ctx context.Context, cmd command.Command) {
+func (s *Service) executeCommand(ctx context.Context, cmd command.Command) error {
 	if err := s.processingLock.WaitUntilUnlocked(ctx); err != nil {
-		s.log.Error("failed to wait for processing lock to be unlocked", slog.Any("error", err))
+		return fmt.Errorf("wait for processing lock: %w", err)
 	}
 
 	if err := s.executorService.Execute(ctx, cmd); err != nil {
-		s.log.Error("failed to execute command", slog.Any("command", cmd), slog.Any("error", err))
+		return fmt.Errorf("execute command: %w", err)
 	}
 
-	go func() {
-		time.Sleep(100 * time.Millisecond)
-		s.runNextExecutableCommand(ctx)
-	}()
+	return nil
 }

@@ -313,53 +313,6 @@ func (_c *FakeService_DeleteOldCommands_Call) RunAndReturn(run func(context.Cont
 	return _c
 }
 
-// ExecuteCreatedCommand provides a mock function with given fields: ctx, params
-func (_m *FakeService) ExecuteCreatedCommand(ctx context.Context, params command.ExecuteCreatedCommandParams) error {
-	ret := _m.Called(ctx, params)
-
-	if len(ret) == 0 {
-		panic("no return value specified for ExecuteCreatedCommand")
-	}
-
-	var r0 error
-	if rf, ok := ret.Get(0).(func(context.Context, command.ExecuteCreatedCommandParams) error); ok {
-		r0 = rf(ctx, params)
-	} else {
-		r0 = ret.Error(0)
-	}
-
-	return r0
-}
-
-// FakeService_ExecuteCreatedCommand_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ExecuteCreatedCommand'
-type FakeService_ExecuteCreatedCommand_Call struct {
-	*mock.Call
-}
-
-// ExecuteCreatedCommand is a helper method to define mock.On call
-//   - ctx context.Context
-//   - params command.ExecuteCreatedCommandParams
-func (_e *FakeService_Expecter) ExecuteCreatedCommand(ctx interface{}, params interface{}) *FakeService_ExecuteCreatedCommand_Call {
-	return &FakeService_ExecuteCreatedCommand_Call{Call: _e.mock.On("ExecuteCreatedCommand", ctx, params)}
-}
-
-func (_c *FakeService_ExecuteCreatedCommand_Call) Run(run func(ctx context.Context, params command.ExecuteCreatedCommandParams)) *FakeService_ExecuteCreatedCommand_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(command.ExecuteCreatedCommandParams))
-	})
-	return _c
-}
-
-func (_c *FakeService_ExecuteCreatedCommand_Call) Return(_a0 error) *FakeService_ExecuteCreatedCommand_Call {
-	_c.Call.Return(_a0)
-	return _c
-}
-
-func (_c *FakeService_ExecuteCreatedCommand_Call) RunAndReturn(run func(context.Context, command.ExecuteCreatedCommandParams) error) *FakeService_ExecuteCreatedCommand_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // GetCommandByID provides a mock function with given fields: ctx, params
 func (_m *FakeService) GetCommandByID(ctx context.Context, params command.GetCommandByIDParams) (command.Command, error) {
 	ret := _m.Called(ctx, params)
@@ -526,6 +479,52 @@ func (_c *FakeService_ListCommands_Call) Return(_a0 paging.List[command.Command]
 }
 
 func (_c *FakeService_ListCommands_Call) RunAndReturn(run func(context.Context, command.ListCommandsParams) (paging.List[command.Command], error)) *FakeService_ListCommands_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RunNextExecutableCommand provides a mock function with given fields: ctx
+func (_m *FakeService) RunNextExecutableCommand(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RunNextExecutableCommand")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeService_RunNextExecutableCommand_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RunNextExecutableCommand'
+type FakeService_RunNextExecutableCommand_Call struct {
+	*mock.Call
+}
+
+// RunNextExecutableCommand is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) RunNextExecutableCommand(ctx interface{}) *FakeService_RunNextExecutableCommand_Call {
+	return &FakeService_RunNextExecutableCommand_Call{Call: _e.mock.On("RunNextExecutableCommand", ctx)}
+}
+
+func (_c *FakeService_RunNextExecutableCommand_Call) Run(run func(ctx context.Context)) *FakeService_RunNextExecutableCommand_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_RunNextExecutableCommand_Call) Return(_a0 error) *FakeService_RunNextExecutableCommand_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeService_RunNextExecutableCommand_Call) RunAndReturn(run func(context.Context) error) *FakeService_RunNextExecutableCommand_Call {
 	_c.Call.Return(run)
 	return _c
 }
