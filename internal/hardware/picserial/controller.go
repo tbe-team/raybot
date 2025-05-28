@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-
-	"github.com/lithammer/shortuuid/v4"
 )
 
 type Controller interface {
@@ -22,11 +20,9 @@ type Controller interface {
 	ConfigBatteryDischarge(ctx context.Context, currentLimit uint16, enable bool) error
 }
 
-var _ Controller = (*DefaultClient)(nil)
-
-func (c *DefaultClient) SetCargoPosition(ctx context.Context, motorSpeed uint8, targetPosition uint16) error {
+func (c *DefaultClient) SetCargoPosition(ctx context.Context, id string, motorSpeed uint8, targetPosition uint16) error {
 	cmd := picCommand{
-		ID:   shortuuid.New(),
+		ID:   id,
 		Type: picCommandTypeLiftMotor,
 		Data: picCommandLiftMotorData{
 			TargetPosition: targetPosition,
@@ -47,9 +43,9 @@ func (c *DefaultClient) SetCargoPosition(ctx context.Context, motorSpeed uint8, 
 	return nil
 }
 
-func (c *DefaultClient) StopLiftCargoMotor(ctx context.Context) error {
+func (c *DefaultClient) StopLiftCargoMotor(ctx context.Context, id string) error {
 	cmd := picCommand{
-		ID:   shortuuid.New(),
+		ID:   id,
 		Type: picCommandTypeLiftMotor,
 		Data: picCommandLiftMotorData{
 			Enable: false,
@@ -68,9 +64,9 @@ func (c *DefaultClient) StopLiftCargoMotor(ctx context.Context) error {
 	return nil
 }
 
-func (c *DefaultClient) MoveForward(ctx context.Context, speed uint8) error {
+func (c *DefaultClient) MoveForward(ctx context.Context, id string, speed uint8) error {
 	cmd := picCommand{
-		ID:   shortuuid.New(),
+		ID:   id,
 		Type: picCommandTypeDriveMotor,
 		Data: picCommandDriveMotorData{
 			Direction: MoveDirectionForward,
@@ -91,9 +87,9 @@ func (c *DefaultClient) MoveForward(ctx context.Context, speed uint8) error {
 	return nil
 }
 
-func (c *DefaultClient) MoveBackward(ctx context.Context, speed uint8) error {
+func (c *DefaultClient) MoveBackward(ctx context.Context, id string, speed uint8) error {
 	cmd := picCommand{
-		ID:   shortuuid.New(),
+		ID:   id,
 		Type: picCommandTypeDriveMotor,
 		Data: picCommandDriveMotorData{
 			Direction: MoveDirectionBackward,
@@ -114,9 +110,9 @@ func (c *DefaultClient) MoveBackward(ctx context.Context, speed uint8) error {
 	return nil
 }
 
-func (c *DefaultClient) StopDriveMotor(ctx context.Context, currentDirection MoveDirection) error {
+func (c *DefaultClient) StopDriveMotor(ctx context.Context, id string, currentDirection MoveDirection) error {
 	cmd := picCommand{
-		ID:   shortuuid.New(),
+		ID:   id,
 		Type: picCommandTypeDriveMotor,
 		Data: picCommandDriveMotorData{
 			Direction: currentDirection,
@@ -137,9 +133,9 @@ func (c *DefaultClient) StopDriveMotor(ctx context.Context, currentDirection Mov
 	return nil
 }
 
-func (c *DefaultClient) ConfigBatteryCharge(ctx context.Context, currentLimit uint16, enable bool) error {
+func (c *DefaultClient) ConfigBatteryCharge(ctx context.Context, id string, currentLimit uint16, enable bool) error {
 	cmd := picCommand{
-		ID:   shortuuid.New(),
+		ID:   id,
 		Type: picCommandTypeBatteryCharge,
 		Data: picCommandBatteryChargeData{
 			CurrentLimit: currentLimit,
@@ -159,9 +155,9 @@ func (c *DefaultClient) ConfigBatteryCharge(ctx context.Context, currentLimit ui
 	return nil
 }
 
-func (c *DefaultClient) ConfigBatteryDischarge(ctx context.Context, currentLimit uint16, enable bool) error {
+func (c *DefaultClient) ConfigBatteryDischarge(ctx context.Context, id string, currentLimit uint16, enable bool) error {
 	cmd := picCommand{
-		ID:   shortuuid.New(),
+		ID:   id,
 		Type: picCommandTypeBatteryDischarge,
 		Data: picCommandBatteryDischargeData{
 			CurrentLimit: currentLimit,

@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const defaultCommandACKTimeout = 1 * time.Second
+
 type Hardware struct {
 	ESP ESP `yaml:"esp"`
 	PIC PIC `yaml:"pic"`
@@ -28,24 +30,34 @@ func (h *Hardware) Validate() error {
 }
 
 type ESP struct {
-	Serial Serial `yaml:"serial"`
+	Serial            Serial        `yaml:"serial"`
+	CommandACKTimeout time.Duration `yaml:"command_ack_timeout"`
 }
 
-func (e ESP) Validate() error {
+func (e *ESP) Validate() error {
 	if err := e.Serial.Validate(); err != nil {
 		return fmt.Errorf("validate esp serial: %w", err)
+	}
+
+	if e.CommandACKTimeout == 0 {
+		e.CommandACKTimeout = defaultCommandACKTimeout
 	}
 
 	return nil
 }
 
 type PIC struct {
-	Serial Serial `yaml:"serial"`
+	Serial            Serial        `yaml:"serial"`
+	CommandACKTimeout time.Duration `yaml:"command_ack_timeout"`
 }
 
-func (p PIC) Validate() error {
+func (p *PIC) Validate() error {
 	if err := p.Serial.Validate(); err != nil {
 		return fmt.Errorf("validate pic serial: %w", err)
+	}
+
+	if p.CommandACKTimeout == 0 {
+		p.CommandACKTimeout = defaultCommandACKTimeout
 	}
 
 	return nil

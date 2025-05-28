@@ -18,6 +18,7 @@ hardware:
       stop_bits: 1
       parity: NONE
       read_timeout: 1s
+    command_ack_timeout: 1s
   pic:
     serial:
       port: /dev/ttyUSB1
@@ -26,6 +27,7 @@ hardware:
       stop_bits: 1
       parity: NONE
       read_timeout: 1s
+    command_ack_timeout: 1s
 cloud:
   enable: false
   address: localhost:50051

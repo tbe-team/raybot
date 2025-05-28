@@ -2,7 +2,6 @@ package picserial
 
 import (
 	"context"
-	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -16,10 +15,10 @@ func TestController(t *testing.T) {
 		client := NewClient(config.Serial{})
 		client.port = mockPort
 
-		err := client.SetCargoPosition(context.Background(), 100, 10)
+		err := client.SetCargoPosition(context.Background(), "abc", 100, 10)
 		assert.NoError(t, err)
 
-		actual := overrideIDAndRemoveMarkers(t, mockPort.WriteBuffer.Bytes(), "abc")
+		actual := removeMarkers(mockPort.WriteBuffer.Bytes())
 		expected := `
 		{
 			"id":"abc",
@@ -38,10 +37,10 @@ func TestController(t *testing.T) {
 		client := NewClient(config.Serial{})
 		client.port = mockPort
 
-		err := client.StopLiftCargoMotor(context.Background())
+		err := client.StopLiftCargoMotor(context.Background(), "abc")
 		assert.NoError(t, err)
 
-		actual := overrideIDAndRemoveMarkers(t, mockPort.WriteBuffer.Bytes(), "abc")
+		actual := removeMarkers(mockPort.WriteBuffer.Bytes())
 		expected := `
 		{
 			"id":"abc",
@@ -60,10 +59,10 @@ func TestController(t *testing.T) {
 		client := NewClient(config.Serial{})
 		client.port = mockPort
 
-		err := client.MoveForward(context.Background(), 10)
+		err := client.MoveForward(context.Background(), "abc", 10)
 		assert.NoError(t, err)
 
-		actual := overrideIDAndRemoveMarkers(t, mockPort.WriteBuffer.Bytes(), "abc")
+		actual := removeMarkers(mockPort.WriteBuffer.Bytes())
 		expected := `
 		{
 			"id":"abc",
@@ -82,10 +81,10 @@ func TestController(t *testing.T) {
 		client := NewClient(config.Serial{})
 		client.port = mockPort
 
-		err := client.MoveBackward(context.Background(), 10)
+		err := client.MoveBackward(context.Background(), "abc", 10)
 		assert.NoError(t, err)
 
-		actual := overrideIDAndRemoveMarkers(t, mockPort.WriteBuffer.Bytes(), "abc")
+		actual := removeMarkers(mockPort.WriteBuffer.Bytes())
 		expected := `
 		{
 			"id":"abc",
@@ -104,10 +103,10 @@ func TestController(t *testing.T) {
 		client := NewClient(config.Serial{})
 		client.port = mockPort
 
-		err := client.StopDriveMotor(context.Background(), MoveDirectionForward)
+		err := client.StopDriveMotor(context.Background(), "abc", MoveDirectionForward)
 		assert.NoError(t, err)
 
-		actual := overrideIDAndRemoveMarkers(t, mockPort.WriteBuffer.Bytes(), "abc")
+		actual := removeMarkers(mockPort.WriteBuffer.Bytes())
 		expected := `
 		{
 			"id":"abc",
@@ -126,10 +125,10 @@ func TestController(t *testing.T) {
 		client := NewClient(config.Serial{})
 		client.port = mockPort
 
-		err := client.ConfigBatteryCharge(context.Background(), 10, true)
+		err := client.ConfigBatteryCharge(context.Background(), "abc", 10, true)
 		assert.NoError(t, err)
 
-		actual := overrideIDAndRemoveMarkers(t, mockPort.WriteBuffer.Bytes(), "abc")
+		actual := removeMarkers(mockPort.WriteBuffer.Bytes())
 		expected := `
 		{
 			"id":"abc",
@@ -147,10 +146,10 @@ func TestController(t *testing.T) {
 		client := NewClient(config.Serial{})
 		client.port = mockPort
 
-		err := client.ConfigBatteryDischarge(context.Background(), 10, true)
+		err := client.ConfigBatteryDischarge(context.Background(), "abc", 10, true)
 		assert.NoError(t, err)
 
-		actual := overrideIDAndRemoveMarkers(t, mockPort.WriteBuffer.Bytes(), "abc")
+		actual := removeMarkers(mockPort.WriteBuffer.Bytes())
 		expected := `
 		{
 			"id":"abc",
@@ -164,17 +163,8 @@ func TestController(t *testing.T) {
 	})
 }
 
-// overrideIDAndRemoveMarkers overrides the id of the command, and remove the markers
-func overrideIDAndRemoveMarkers(t *testing.T, data []byte, id string) []byte {
+// removeMarkers removes the markers
+func removeMarkers(data []byte) []byte {
 	b := data[1 : len(data)-2] // remove > and \r\n
-
-	var m map[string]any
-	err := json.Unmarshal(b, &m)
-	assert.NoError(t, err)
-	m["id"] = id
-
-	b, err = json.Marshal(m)
-	assert.NoError(t, err)
-
 	return b
 }

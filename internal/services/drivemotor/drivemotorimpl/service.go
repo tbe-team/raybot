@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/tbe-team/raybot/internal/events"
+	"github.com/tbe-team/raybot/internal/hardware/controller"
 	"github.com/tbe-team/raybot/internal/hardware/picserial"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 	"github.com/tbe-team/raybot/pkg/eventbus"
@@ -16,21 +17,21 @@ type service struct {
 	validator validator.Validator
 	publisher eventbus.Publisher
 
-	driveMotorStateRepo drivemotor.DriveMotorStateRepository
-	picSerialController picserial.Controller
+	driveMotorStateRepo  drivemotor.DriveMotorStateRepository
+	driveMotorController controller.DriveMotorController
 }
 
 func NewService(
 	validator validator.Validator,
 	publisher eventbus.Publisher,
 	driveMotorStateRepo drivemotor.DriveMotorStateRepository,
-	picSerialController picserial.Controller,
+	driveMotorController controller.DriveMotorController,
 ) drivemotor.Service {
 	return &service{
-		validator:           validator,
-		publisher:           publisher,
-		driveMotorStateRepo: driveMotorStateRepo,
-		picSerialController: picSerialController,
+		validator:            validator,
+		publisher:            publisher,
+		driveMotorStateRepo:  driveMotorStateRepo,
+		driveMotorController: driveMotorController,
 	}
 }
 
@@ -60,7 +61,7 @@ func (s service) MoveForward(ctx context.Context, params drivemotor.MoveForwardP
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	if err := s.picSerialController.MoveForward(ctx, params.Speed); err != nil {
+	if err := s.driveMotorController.MoveForward(ctx, params.Speed); err != nil {
 		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
 			return drivemotor.ErrCanNotControlDriveMotor
 		}
@@ -75,7 +76,7 @@ func (s service) MoveBackward(ctx context.Context, params drivemotor.MoveBackwar
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	if err := s.picSerialController.MoveBackward(ctx, params.Speed); err != nil {
+	if err := s.driveMotorController.MoveBackward(ctx, params.Speed); err != nil {
 		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
 			return drivemotor.ErrCanNotControlDriveMotor
 		}
@@ -91,15 +92,15 @@ func (s service) Stop(ctx context.Context) error {
 		return fmt.Errorf("get drive motor state: %w", err)
 	}
 
-	var direction picserial.MoveDirection
+	var moveForward bool
 	switch state.Direction {
 	case drivemotor.DirectionForward:
-		direction = picserial.MoveDirectionForward
+		moveForward = true
 	case drivemotor.DirectionBackward:
-		direction = picserial.MoveDirectionBackward
+		moveForward = false
 	}
 
-	if err := s.picSerialController.StopDriveMotor(ctx, direction); err != nil {
+	if err := s.driveMotorController.StopDriveMotor(ctx, moveForward); err != nil {
 		if errors.Is(err, picserial.ErrPICSerialNotConnected) {
 			return drivemotor.ErrCanNotControlDriveMotor
 		}

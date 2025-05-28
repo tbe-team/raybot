@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/tbe-team/raybot/internal/config"
+	"github.com/tbe-team/raybot/internal/hardware/controller"
 	"github.com/tbe-team/raybot/internal/hardware/espserial"
 	"github.com/tbe-team/raybot/internal/hardware/picserial"
 	"github.com/tbe-team/raybot/internal/logging"
@@ -173,12 +174,13 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 			log.Error("failed to update PIC serial connection", slog.Any("error", err))
 		}
 	}
+	hardwareController := controller.New(cfg.Hardware, log, eventBus, picSerialClient)
 
 	// Initialize services
 	batteryService := batteryimpl.NewService(validator, batteryStateRepository, batterySettingRepository)
 	distanceSensorService := distancesensorimpl.NewService(validator, eventBus, distanceSensorStateRepository)
-	driveMotorService := drivemotorimpl.NewService(validator, eventBus, driveMotorStateRepository, picSerialClient)
-	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, picSerialClient)
+	driveMotorService := drivemotorimpl.NewService(validator, eventBus, driveMotorStateRepository, hardwareController)
+	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, hardwareController)
 	cargoService := cargoimpl.NewService(validator, eventBus, cargoRepository, espSerialClient)
 	locationService := locationimpl.NewService(validator, eventBus, locationRepository)
 	configService := configimpl.NewService(cfg, fileClient)

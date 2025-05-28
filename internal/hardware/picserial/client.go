@@ -62,6 +62,12 @@ func NewClient(cfg config.Serial) *DefaultClient {
 	}
 }
 
+func NewClientWithPort(port serial.Port) *DefaultClient {
+	return &DefaultClient{
+		port: port,
+	}
+}
+
 func (c *DefaultClient) Open() error {
 	port, err := serial.Open(c.cfg.Port, &c.mode)
 	if err != nil {
