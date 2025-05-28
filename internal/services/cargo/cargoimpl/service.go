@@ -104,16 +104,7 @@ func (s *service) OpenCargoDoor(ctx context.Context, params cargo.OpenCargoDoorP
 		return fmt.Errorf("open cargo door: %w", err)
 	}
 
-	return s.cargoRepo.UpdateCargoDoorMotorState(ctx, cargo.UpdateCargoDoorMotorStateParams{
-		Direction:    cargo.DirectionOpen,
-		SetDirection: true,
-		Speed:        params.Speed,
-		SetSpeed:     true,
-		IsRunning:    true,
-		SetIsRunning: true,
-		Enabled:      true,
-		SetEnabled:   true,
-	})
+	return nil
 }
 
 func (s *service) CloseCargoDoor(ctx context.Context, params cargo.CloseCargoDoorParams) error {
@@ -121,14 +112,5 @@ func (s *service) CloseCargoDoor(ctx context.Context, params cargo.CloseCargoDoo
 		return fmt.Errorf("close cargo door: %w", err)
 	}
 
-	return s.cargoRepo.UpdateCargoDoorMotorState(ctx, cargo.UpdateCargoDoorMotorStateParams{
-		Direction:    cargo.DirectionClose,
-		SetDirection: true,
-		Speed:        params.Speed,
-		SetSpeed:     true,
-		IsRunning:    true,
-		SetIsRunning: true,
-		Enabled:      true,
-		SetEnabled:   true,
-	})
+	return nil
 }

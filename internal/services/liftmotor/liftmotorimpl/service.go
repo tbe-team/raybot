@@ -58,14 +58,7 @@ func (s *service) SetCargoPosition(ctx context.Context, params liftmotor.SetCarg
 		return fmt.Errorf("set cargo position: %w", err)
 	}
 
-	return s.liftMotorStateRepo.UpdateLiftMotorState(ctx, liftmotor.UpdateLiftMotorStateParams{
-		TargetPosition:    params.Position,
-		SetTargetPosition: true,
-		SetIsRunning:      true,
-		IsRunning:         true,
-		SetEnabled:        true,
-		Enabled:           true,
-	})
+	return nil
 }
 
 func (s *service) Stop(ctx context.Context) error {
