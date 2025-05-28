@@ -31,9 +31,11 @@ const serialConfigSchema = z.object({
 const hardwareConfigSchema = z.object({
   esp: z.object({
     serial: serialConfigSchema,
+    commandAckTimeout: z.number().int().nonnegative('Command ack timeout must be non-negative'),
   }),
   pic: z.object({
     serial: serialConfigSchema,
+    commandAckTimeout: z.number().int().nonnegative('Command ack timeout must be non-negative'),
   }),
 }).superRefine((data, ctx) => {
   if (data.esp.serial.port === data.pic.serial.port) {
@@ -81,290 +83,353 @@ function fetchPorts(newValue: boolean) {
   <form class="flex flex-col w-full space-y-6" @submit="onSubmit">
     <div class="grid grid-cols-1 gap-8">
       <!-- ESP Controller Section -->
-      <div class="space-y-6">
-        <h3 class="pb-2 text-lg font-medium border-b">
-          ESP Serial Configuration
-        </h3>
-
-        <!-- Port and Timeout in same row -->
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField v-slot="{ componentField, value }" name="esp.serial.port">
-            <FormItem>
-              <FormLabel>Port</FormLabel>
-              <Select v-bind="componentField" required @update:open="fetchPorts">
-                <FormControl>
-                  <SelectTrigger :disabled="isPending">
-                    <SelectValue :placeholder="value" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent v-if="ports">
-                  <SelectItem v-for="port in ports" :key="port.port" :value="port.port">
-                    {{ port.port }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <FormField v-slot="{ field }" name="esp.serial.readTimeout">
-            <FormItem>
-              <FormLabel>Read Timeout (s)</FormLabel>
-              <FormControl>
-                <Input
-                  v-model="field.value"
-                  type="number"
-                  :disabled="isPending"
-                  placeholder="e.g. 1"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+      <div class="space-y-3">
+        <div>
+          <h4 class="text-lg font-medium tracking-tight">
+            ESP Controller
+          </h4>
+          <p class="text-sm text-muted-foreground">
+            Configure the ESP controller
+          </p>
         </div>
 
-        <!-- Other settings in a 4-column grid -->
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <FormField v-slot="{ componentField }" name="esp.serial.baudRate">
-            <FormItem>
-              <FormLabel>Baud Rate</FormLabel>
-              <Select v-bind="componentField">
-                <FormControl>
-                  <SelectTrigger :disabled="isPending">
-                    <SelectValue placeholder="Select baud rate" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem v-for="baudRate in BAUD_RATES" :key="baudRate" :value="baudRate">
-                    {{ baudRate }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+        <div class="px-4 space-y-6">
+          <div class="space-y-6">
+            <h4 class="pb-2 text-lg font-medium border-b">
+              Serial Configuration
+            </h4>
 
-          <FormField v-slot="{ componentField }" name="esp.serial.parity">
-            <FormItem>
-              <FormLabel>Parity</FormLabel>
-              <Select v-bind="componentField">
-                <FormControl>
-                  <SelectTrigger :disabled="isPending">
-                    <SelectValue placeholder="Select parity" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="NONE">
-                    None
-                  </SelectItem>
-                  <SelectItem value="EVEN">
-                    Even
-                  </SelectItem>
-                  <SelectItem value="ODD">
-                    Odd
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+            <!-- Port and Timeout in same row -->
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField v-slot="{ componentField, value }" name="esp.serial.port">
+                <FormItem>
+                  <FormLabel>Port</FormLabel>
+                  <Select v-bind="componentField" required @update:open="fetchPorts">
+                    <FormControl>
+                      <SelectTrigger :disabled="isPending">
+                        <SelectValue :placeholder="value" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="NONEESP">
+                        None
+                      </SelectItem>
+                      <template v-if="ports">
+                        <SelectItem v-for="port in ports" :key="port.port" :value="port.port">
+                          {{ port.port }}
+                        </SelectItem>
+                      </template>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
 
-          <FormField v-slot="{ componentField }" name="esp.serial.dataBits">
-            <FormItem>
-              <FormLabel>Data Bits</FormLabel>
-              <Select v-bind="componentField">
-                <FormControl>
-                  <SelectTrigger :disabled="isPending">
-                    <SelectValue placeholder="Select data bits" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem :value="5">
-                    5
-                  </SelectItem>
-                  <SelectItem :value="6">
-                    6
-                  </SelectItem>
-                  <SelectItem :value="7">
-                    7
-                  </SelectItem>
-                  <SelectItem :value="8">
-                    8
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+              <FormField v-slot="{ componentField }" name="esp.serial.readTimeout">
+                <FormItem>
+                  <FormLabel>Read Timeout (s)</FormLabel>
+                  <FormControl>
+                    <Input v-bind="componentField" type="number" :disabled="isPending" placeholder="e.g. 1" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+            </div>
 
-          <FormField v-slot="{ componentField }" name="esp.serial.stopBits">
-            <FormItem>
-              <FormLabel>Stop Bits</FormLabel>
-              <Select v-bind="componentField">
-                <FormControl>
-                  <SelectTrigger :disabled="isPending">
-                    <SelectValue placeholder="Select stop bits" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem :value="1">
-                    1
-                  </SelectItem>
-                  <SelectItem :value="1.5">
-                    1.5
-                  </SelectItem>
-                  <SelectItem :value="2">
-                    2
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+            <!-- Other settings in a 4-column grid -->
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <FormField v-slot="{ componentField }" name="esp.serial.baudRate">
+                <FormItem>
+                  <FormLabel>Baud Rate</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger :disabled="isPending">
+                        <SelectValue placeholder="Select baud rate" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem v-for="baudRate in BAUD_RATES" :key="baudRate" :value="baudRate">
+                        {{ baudRate }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+
+              <FormField v-slot="{ componentField }" name="esp.serial.parity">
+                <FormItem>
+                  <FormLabel>Parity</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger :disabled="isPending">
+                        <SelectValue placeholder="Select parity" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="NONE">
+                        None
+                      </SelectItem>
+                      <SelectItem value="EVEN">
+                        Even
+                      </SelectItem>
+                      <SelectItem value="ODD">
+                        Odd
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+
+              <FormField v-slot="{ componentField }" name="esp.serial.dataBits">
+                <FormItem>
+                  <FormLabel>Data Bits</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger :disabled="isPending">
+                        <SelectValue placeholder="Select data bits" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem :value="5">
+                        5
+                      </SelectItem>
+                      <SelectItem :value="6">
+                        6
+                      </SelectItem>
+                      <SelectItem :value="7">
+                        7
+                      </SelectItem>
+                      <SelectItem :value="8">
+                        8
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+
+              <FormField v-slot="{ componentField }" name="esp.serial.stopBits">
+                <FormItem>
+                  <FormLabel>Stop Bits</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger :disabled="isPending">
+                        <SelectValue placeholder="Select stop bits" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem :value="1">
+                        1
+                      </SelectItem>
+                      <SelectItem :value="1.5">
+                        1.5
+                      </SelectItem>
+                      <SelectItem :value="2">
+                        2
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <h4 class="pb-2 text-lg font-medium border-b">
+              Command Acknowledgment
+            </h4>
+
+            <!-- Port and Timeout in same row -->
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField v-slot="{ componentField }" name="esp.commandAckTimeout">
+                <FormItem>
+                  <FormLabel>Ack Timeout (ms)</FormLabel>
+                  <FormControl>
+                    <Input v-bind="componentField" type="number" :disabled="isPending" placeholder="e.g. 1" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+            </div>
+          </div>
         </div>
       </div>
 
       <!-- PIC Controller Section -->
-      <div class="space-y-6">
-        <h3 class="pb-2 text-lg font-medium border-b">
-          PIC Serial Configuration
-        </h3>
-
-        <!-- Port and Timeout in same row -->
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-          <FormField v-slot="{ componentField, value }" name="pic.serial.port">
-            <FormItem>
-              <FormLabel>Port</FormLabel>
-              <Select v-bind="componentField" required @update:open="fetchPorts">
-                <FormControl>
-                  <SelectTrigger :disabled="isPending">
-                    <SelectValue :placeholder="value" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem v-for="port in ports" :key="port.port" :value="port.port">
-                    {{ port.port }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
-
-          <FormField v-slot="{ field }" name="pic.serial.readTimeout">
-            <FormItem>
-              <FormLabel>Read Timeout (s)</FormLabel>
-              <FormControl>
-                <Input
-                  v-model="field.value"
-                  type="number"
-                  :disabled="isPending"
-                  placeholder="e.g. 1"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+      <div class="space-y-3">
+        <div>
+          <h4 class="text-lg font-medium tracking-tight">
+            PIC Controller
+          </h4>
+          <p class="text-sm text-muted-foreground">
+            Configure the PIC controller
+          </p>
         </div>
+        <div class="px-4 space-y-6">
+          <div class="space-y-6">
+            <h4 class="pb-2 text-lg font-medium border-b">
+              Serial Configuration
+            </h4>
 
-        <!-- Other settings in a 4-column grid -->
-        <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <FormField v-slot="{ componentField }" name="pic.serial.baudRate">
-            <FormItem>
-              <FormLabel>Baud Rate</FormLabel>
-              <Select v-bind="componentField">
-                <FormControl>
-                  <SelectTrigger :disabled="isPending">
-                    <SelectValue placeholder="Select baud rate" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem v-for="baudRate in BAUD_RATES" :key="baudRate" :value="baudRate">
-                    {{ baudRate }}
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+            <!-- Port and Timeout in same row -->
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField v-slot="{ componentField, value }" name="pic.serial.port">
+                <FormItem>
+                  <FormLabel>Port</FormLabel>
+                  <Select v-bind="componentField" required @update:open="fetchPorts">
+                    <FormControl>
+                      <SelectTrigger :disabled="isPending">
+                        <SelectValue :placeholder="value" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="NONEPIC">
+                        None
+                      </SelectItem>
+                      <template v-if="ports">
+                        <SelectItem v-for="port in ports" :key="port.port" :value="port.port">
+                          {{ port.port }}
+                        </SelectItem>
+                      </template>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
 
-          <FormField v-slot="{ componentField }" name="pic.serial.parity">
-            <FormItem>
-              <FormLabel>Parity</FormLabel>
-              <Select v-bind="componentField">
-                <FormControl>
-                  <SelectTrigger :disabled="isPending">
-                    <SelectValue placeholder="Select parity" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem value="NONE">
-                    None
-                  </SelectItem>
-                  <SelectItem value="EVEN">
-                    Even
-                  </SelectItem>
-                  <SelectItem value="ODD">
-                    Odd
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+              <FormField v-slot="{ componentField }" name="pic.serial.readTimeout">
+                <FormItem>
+                  <FormLabel>Read Timeout (s)</FormLabel>
+                  <FormControl>
+                    <Input v-bind="componentField" type="number" :disabled="isPending" placeholder="e.g. 1" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+            </div>
 
-          <FormField v-slot="{ componentField }" name="pic.serial.dataBits">
-            <FormItem>
-              <FormLabel>Data Bits</FormLabel>
-              <Select v-bind="componentField">
-                <FormControl>
-                  <SelectTrigger :disabled="isPending">
-                    <SelectValue placeholder="Select data bits" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem :value="5">
-                    5
-                  </SelectItem>
-                  <SelectItem :value="6">
-                    6
-                  </SelectItem>
-                  <SelectItem :value="7">
-                    7
-                  </SelectItem>
-                  <SelectItem :value="8">
-                    8
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+            <!-- Other settings in a 4-column grid -->
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <FormField v-slot="{ componentField }" name="pic.serial.baudRate">
+                <FormItem>
+                  <FormLabel>Baud Rate</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger :disabled="isPending">
+                        <SelectValue placeholder="Select baud rate" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem v-for="baudRate in BAUD_RATES" :key="baudRate" :value="baudRate">
+                        {{ baudRate }}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
 
-          <FormField v-slot="{ componentField }" name="pic.serial.stopBits">
-            <FormItem>
-              <FormLabel>Stop Bits</FormLabel>
-              <Select v-bind="componentField">
-                <FormControl>
-                  <SelectTrigger :disabled="isPending">
-                    <SelectValue placeholder="Select stop bits" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  <SelectItem :value="1">
-                    1
-                  </SelectItem>
-                  <SelectItem :value="1.5">
-                    1.5
-                  </SelectItem>
-                  <SelectItem :value="2">
-                    2
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          </FormField>
+              <FormField v-slot="{ componentField }" name="pic.serial.parity">
+                <FormItem>
+                  <FormLabel>Parity</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger :disabled="isPending">
+                        <SelectValue placeholder="Select parity" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="NONE">
+                        None
+                      </SelectItem>
+                      <SelectItem value="EVEN">
+                        Even
+                      </SelectItem>
+                      <SelectItem value="ODD">
+                        Odd
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+
+              <FormField v-slot="{ componentField }" name="pic.serial.dataBits">
+                <FormItem>
+                  <FormLabel>Data Bits</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger :disabled="isPending">
+                        <SelectValue placeholder="Select data bits" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem :value="5">
+                        5
+                      </SelectItem>
+                      <SelectItem :value="6">
+                        6
+                      </SelectItem>
+                      <SelectItem :value="7">
+                        7
+                      </SelectItem>
+                      <SelectItem :value="8">
+                        8
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+
+              <FormField v-slot="{ componentField }" name="pic.serial.stopBits">
+                <FormItem>
+                  <FormLabel>Stop Bits</FormLabel>
+                  <Select v-bind="componentField">
+                    <FormControl>
+                      <SelectTrigger :disabled="isPending">
+                        <SelectValue placeholder="Select stop bits" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem :value="1">
+                        1
+                      </SelectItem>
+                      <SelectItem :value="1.5">
+                        1.5
+                      </SelectItem>
+                      <SelectItem :value="2">
+                        2
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <h3 class="pb-2 text-lg font-medium border-b">
+              Command Acknowledgment
+            </h3>
+
+            <!-- Port and Timeout in same row -->
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField v-slot="{ componentField }" name="pic.commandAckTimeout">
+                <FormItem>
+                  <FormLabel>Ack Timeout (s)</FormLabel>
+                  <FormControl>
+                    <Input v-bind="componentField" type="number" :disabled="isPending" placeholder="e.g. 1" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
+            </div>
+          </div>
         </div>
       </div>
     </div>
