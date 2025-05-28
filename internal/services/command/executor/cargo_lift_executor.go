@@ -31,6 +31,15 @@ func newCargoLiftExecutor(
 }
 
 func (e cargoLiftExecutor) Execute(ctx context.Context, inputs command.CargoLiftInputs) (command.CargoLiftOutputs, error) {
+	liftMotorState, err := e.liftMotorService.GetLiftMotorState(ctx)
+	if err != nil {
+		return command.CargoLiftOutputs{}, fmt.Errorf("failed to get lift motor state: %w", err)
+	}
+
+	if e.isLiftPositionReached(liftMotorState.CurrentPosition, inputs.Position) {
+		return command.CargoLiftOutputs{}, nil
+	}
+
 	wg := sync.WaitGroup{}
 
 	wg.Add(1)
@@ -75,9 +84,7 @@ func (e cargoLiftExecutor) trackingLiftPositionUntilReached(ctx context.Context,
 			return
 		}
 
-		// 10% tolerance
-		acceptableDistance := liftPosition + liftPosition*10/100
-		if ev.DownDistance <= acceptableDistance {
+		if e.isLiftPositionReached(ev.DownDistance, liftPosition) {
 			e.log.Debug("lift position reached", slog.Int64("lift_position", int64(liftPosition)))
 			close(doneCh)
 		}
@@ -87,4 +94,9 @@ func (e cargoLiftExecutor) trackingLiftPositionUntilReached(ctx context.Context,
 	case <-doneCh:
 	case <-ctx.Done():
 	}
+}
+
+func (cargoLiftExecutor) isLiftPositionReached(current, target uint16) bool {
+	acceptableDistance := target + target*10/100 // 10% tolerance
+	return current <= acceptableDistance
 }
