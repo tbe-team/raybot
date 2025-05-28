@@ -174,14 +174,14 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 			log.Error("failed to update PIC serial connection", slog.Any("error", err))
 		}
 	}
-	hardwareController := controller.New(cfg.Hardware, log, eventBus, picSerialClient)
+	hardwareController := controller.New(cfg.Hardware, log, eventBus, picSerialClient, espSerialClient)
 
 	// Initialize services
 	batteryService := batteryimpl.NewService(validator, batteryStateRepository, batterySettingRepository)
 	distanceSensorService := distancesensorimpl.NewService(validator, eventBus, distanceSensorStateRepository)
 	driveMotorService := drivemotorimpl.NewService(validator, eventBus, driveMotorStateRepository, hardwareController)
 	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, hardwareController)
-	cargoService := cargoimpl.NewService(validator, eventBus, cargoRepository, espSerialClient)
+	cargoService := cargoimpl.NewService(validator, eventBus, cargoRepository, hardwareController)
 	locationService := locationimpl.NewService(validator, eventBus, locationRepository)
 	configService := configimpl.NewService(cfg, fileClient)
 	dashboardDataService := dashboarddataimpl.NewService(
