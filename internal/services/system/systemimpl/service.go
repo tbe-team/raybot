@@ -20,6 +20,8 @@ type service struct {
 	commandService    command.Service
 	driveMotorService drivemotor.Service
 	liftMotorService  liftmotor.Service
+
+	systemInfoRepo system.Repository
 }
 
 func NewService(
@@ -27,12 +29,14 @@ func NewService(
 	commandService command.Service,
 	driveMotorService drivemotor.Service,
 	liftMotorService liftmotor.Service,
+	systemInfoRepo system.Repository,
 ) system.Service {
 	return &service{
 		log:               log,
 		commandService:    commandService,
 		driveMotorService: driveMotorService,
 		liftMotorService:  liftMotorService,
+		systemInfoRepo:    systemInfoRepo,
 	}
 }
 
@@ -66,4 +70,8 @@ func (s service) StopEmergency(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+func (s service) GetInfo(ctx context.Context) (system.Info, error) {
+	return s.systemInfoRepo.GetInfo(ctx)
 }

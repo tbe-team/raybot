@@ -39,6 +39,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/peripheral/peripheralimpl"
 	"github.com/tbe-team/raybot/internal/services/system"
 	"github.com/tbe-team/raybot/internal/services/system/systemimpl"
+	"github.com/tbe-team/raybot/internal/services/system/systeminfocollector"
 	"github.com/tbe-team/raybot/internal/services/wifi/wifiimpl"
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
@@ -121,6 +122,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	distanceSensorStateRepository := distancesensorimpl.NewDistanceSensorStateRepository()
 	appStateRepository := appstateimpl.NewAppStateRepository()
 	commandRepository := commandimpl.NewCommandRepository(db, queries)
+	systemInfoRepository := systemimpl.NewRepository()
 
 	// Initialize hardware components
 	espSerialClient := espserial.NewClient(cfg.Hardware.ESP.Serial)
@@ -222,9 +224,12 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	}
 
 	apperrorcodeService := apperrorcodeimpl.NewService()
-	systemService := systemimpl.NewService(log, commandService, driveMotorService, liftMotorService)
+	systemService := systemimpl.NewService(log, commandService, driveMotorService, liftMotorService, systemInfoRepository)
+	systemInfoCollectorService := systeminfocollector.NewService(log, systemInfoRepository)
+	systemInfoCollectorService.Run(ctx)
 
 	cleanup := func() error {
+		systemInfoCollectorService.Stop()
 		appStateRepository.Cleanup()
 
 		var err error

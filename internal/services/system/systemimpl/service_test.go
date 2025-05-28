@@ -24,7 +24,12 @@ func TestService(t *testing.T) {
 			driveMotorService.EXPECT().Stop(context.Background()).Return(nil)
 			liftMotorService.EXPECT().Stop(context.Background()).Return(nil)
 
-			service := NewService(log, commandService, driveMotorService, liftMotorService)
+			service := service{
+				log:               log,
+				commandService:    commandService,
+				driveMotorService: driveMotorService,
+				liftMotorService:  liftMotorService,
+			}
 
 			err := service.StopEmergency(context.Background())
 			assert.NoError(t, err)
@@ -40,7 +45,12 @@ func TestService(t *testing.T) {
 			driveMotorService.AssertNotCalled(t, "Stop")
 			liftMotorService.AssertNotCalled(t, "Stop")
 
-			service := NewService(log, commandService, driveMotorService, liftMotorService)
+			service := service{
+				log:               log,
+				commandService:    commandService,
+				driveMotorService: driveMotorService,
+				liftMotorService:  liftMotorService,
+			}
 
 			err := service.StopEmergency(context.Background())
 			assert.Error(t, err)
@@ -56,7 +66,12 @@ func TestService(t *testing.T) {
 			driveMotorService.EXPECT().Stop(context.Background()).Return(assert.AnError)
 			liftMotorService.AssertNotCalled(t, "Stop")
 
-			service := NewService(log, commandService, driveMotorService, liftMotorService)
+			service := service{
+				log:               log,
+				commandService:    commandService,
+				driveMotorService: driveMotorService,
+				liftMotorService:  liftMotorService,
+			}
 
 			err := service.StopEmergency(context.Background())
 			assert.Error(t, err)
@@ -72,7 +87,12 @@ func TestService(t *testing.T) {
 			driveMotorService.EXPECT().Stop(context.Background()).Return(nil)
 			liftMotorService.EXPECT().Stop(context.Background()).Return(assert.AnError)
 
-			service := NewService(log, commandService, driveMotorService, liftMotorService)
+			service := service{
+				log:               log,
+				commandService:    commandService,
+				driveMotorService: driveMotorService,
+				liftMotorService:  liftMotorService,
+			}
 
 			err := service.StopEmergency(context.Background())
 			assert.Error(t, err)
