@@ -1,7 +1,7 @@
 import type { AxiosRequestConfig } from 'axios'
 import type { CommandSort } from '@/api/commands'
 import type { SortPrefix } from '@/lib/sort'
-import { keepPreviousData, useMutation, useQuery } from '@tanstack/vue-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import commandsAPI from '@/api/commands'
 
 export const COMMAND_QUEUE_QUERY_KEY = 'queuedCommand'
@@ -74,7 +74,11 @@ export function useCancelProcessingCommandMutation() {
   })
 }
 export function useDeleteCommandMutation() {
+  const queryClient = useQueryClient()
   return useMutation({
     mutationFn: commandsAPI.deleteCommand,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [COMMANDS_QUERY_KEY] })
+    },
   })
 }

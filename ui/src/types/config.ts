@@ -30,10 +30,12 @@ export interface HardwareConfig {
 
 export interface ESPConfig {
   serial: SerialConfig
+  commandAckTimeout: number
 }
 
 export interface PICConfig {
   serial: SerialConfig
+  commandAckTimeout: number
 }
 
 export type Parity = 'NONE' | 'EVEN' | 'ODD'
