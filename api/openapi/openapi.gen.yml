@@ -296,6 +296,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /system/info:
+    get:
+      summary: Get the system information
+      operationId: getSystemInfo
+      description: Get the system information
+      tags:
+        - system
+      responses:
+        '200':
+          description: The system information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemInfo'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /system/reboot:
     post:
       summary: Reboot the system
@@ -875,6 +895,35 @@ components:
       required:
         - ap
         - sta
+    SystemInfo:
+      type: object
+      properties:
+        localIp:
+          type: string
+          description: The local IP address of the system
+          x-order: 1
+        cpuUsage:
+          type: number
+          description: The CPU usage of the system in percentage
+          x-order: 2
+        memoryUsage:
+          type: number
+          description: The memory usage of the system in percentage
+          x-order: 3
+        totalMemory:
+          type: number
+          description: The total memory of the system in MB
+          x-order: 4
+        uptime:
+          type: number
+          description: The uptime of the system in seconds
+          x-order: 5
+      required:
+        - localIp
+        - cpuUsage
+        - memoryUsage
+        - totalMemory
+        - uptime
     BatteryState:
       type: object
       properties:

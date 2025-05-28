@@ -27,6 +27,8 @@ paths:
     $ref: "./paths/configs@http.yml"
   /configs/wifi:
     $ref: "./paths/configs@wifi.yml"
+  /system/info:
+    $ref: "./paths/system@info.yml"
   /system/reboot:
     $ref: "./paths/system@reboot.yml"
   /system/stop-emergency:
@@ -43,4 +45,3 @@ paths:
     $ref: "./paths/commands@processing.yml"
   /commands/processing/cancel:
     $ref: "./paths/commands@processing@cancel.yml"
-

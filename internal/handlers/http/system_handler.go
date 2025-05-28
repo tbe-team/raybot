@@ -16,6 +16,15 @@ func newSystemHandler(systemService system.Service) *systemHandler {
 	return &systemHandler{systemService: systemService}
 }
 
+func (h systemHandler) GetSystemInfo(ctx context.Context, _ gen.GetSystemInfoRequestObject) (gen.GetSystemInfoResponseObject, error) {
+	info, err := h.systemService.GetInfo(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("system service get info: %w", err)
+	}
+
+	return gen.GetSystemInfo200JSONResponse(h.convertSysInfoToResponse(info)), nil
+}
+
 func (h systemHandler) RebootSystem(ctx context.Context, _ gen.RebootSystemRequestObject) (gen.RebootSystemResponseObject, error) {
 	if err := h.systemService.Reboot(ctx); err != nil {
 		return nil, fmt.Errorf("system service reboot: %w", err)
@@ -30,4 +39,14 @@ func (h systemHandler) StopEmergency(ctx context.Context, _ gen.StopEmergencyReq
 	}
 
 	return gen.StopEmergency204Response{}, nil
+}
+
+func (systemHandler) convertSysInfoToResponse(info system.Info) gen.SystemInfo {
+	return gen.SystemInfo{
+		LocalIp:     info.LocalIP,
+		CpuUsage:    float32(info.CPUUsage),
+		MemoryUsage: float32(info.MemoryUsage),
+		TotalMemory: float32(info.TotalMemory),
+		Uptime:      float32(info.Uptime.Seconds()),
+	}
 }

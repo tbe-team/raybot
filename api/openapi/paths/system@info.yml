@@ -1,0 +1,19 @@
+get:
+  summary: Get the system information
+  operationId: getSystemInfo
+  description: Get the system information
+  tags:
+    - system
+  responses:
+    "200":
+      description: The system information
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/system.yml#/SystemInfo"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
