@@ -25,6 +25,7 @@ Cấu trúc JSON:
 |------|--------------|---------------------------|
 | 0    | uint8        | Đồng bộ trạng thái từ PIC |
 | 1    | uint8        | ACK                       |
+| 2    | uint8        | Pong (phản hồi ping)      |
 
 ## 2. Phản hồi đồng bộ trạng thái (response_type = 0)
 
@@ -161,3 +162,36 @@ Cấu trúc JSON:
 |--------|--------------|------------|
 | 0      | uint8        | Lỗi        |
 | 1      | uint8        | Thành công |
+
+Ví dụ phản hồi:
+```
+>{"type":1,"id":"abc","status":1}\r\n
+```
+
+## 4. Phản hồi Pong (response_type = 2)
+
+PIC gửi phản hồi Pong đến ứng dụng khi nhận được lệnh Ping để xác nhận kết nối và định danh thiết bị.
+
+Cấu trúc JSON:
+```json
+{
+  "type": 2,
+  "id": <id>,
+  "dev_id": "pic",
+}
+```
+
+### id
+
+- ID của lệnh
+- Kiểu dữ liệu: string
+
+### dev_id
+
+- Device ID của thiết bị
+- Phải là `pic`
+
+Ví dụ phản hồi:
+```json
+>{"type":2,"id":"abc","dev_id":"pic"}\r\n
+```

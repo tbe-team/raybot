@@ -12,7 +12,7 @@ Chi tiết: [ESP response ACK](esp_response.md#3-phản-hồi-ack)
 - Nội dung tin nhắn ở định dạng JSON
 
 Ví dụ lệnh:
-```
+```json
 >{"type":0,"data":{"speed":100}}\r\n
 ```
 
@@ -37,6 +37,7 @@ Cấu trúc JSON:
 | 0    | uint8        | Cấu hình động cơ đóng mở   |
 | 1    | uint8        | Cấu hình sạc pin           |
 | 2    | uint8        | Cấu hình xả pin            |
+| 3    | uint8        | Ping (kiểm tra kết nối)    |
 
 ### cmd_data
 ### 2.1. Cấu hình động cơ đóng mở cửa (cmd_type = 0)
@@ -73,4 +74,13 @@ Ví dụ:
 Ví dụ:
 ```json
 >{"id":"abc","type":2,"data":{"current_limit":123,"enable":1}}\r\n
+```
+
+### 2.4. Ping (cmd_type = 3)
+
+Lệnh ping dùng để kiểm tra kết nối với thiết bị.
+
+Ví dụ:
+```json
+>{"id":"abc","type":3}\r\n
 ```
