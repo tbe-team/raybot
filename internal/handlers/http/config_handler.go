@@ -55,7 +55,6 @@ func (h configHandler) GetHardwareConfig(ctx context.Context, _ gen.GetHardwareC
 }
 
 func (h configHandler) UpdateHardwareConfig(ctx context.Context, request gen.UpdateHardwareConfigRequestObject) (gen.UpdateHardwareConfigResponseObject, error) {
-
 	//nolint:gosec
 	espSerial := config.Serial{
 		Port:        request.Body.Esp.Serial.Port,
@@ -63,7 +62,7 @@ func (h configHandler) UpdateHardwareConfig(ctx context.Context, request gen.Upd
 		DataBits:    uint8(request.Body.Esp.Serial.DataBits),
 		Parity:      request.Body.Esp.Serial.Parity,
 		StopBits:    float32(request.Body.Esp.Serial.StopBits),
-		ReadTimeout: time.Duration(request.Body.Esp.Serial.ReadTimeout * 1e9),
+		ReadTimeout: time.Duration(request.Body.Esp.Serial.ReadTimeout) * time.Second,
 	}
 
 	//nolint:gosec
@@ -73,15 +72,17 @@ func (h configHandler) UpdateHardwareConfig(ctx context.Context, request gen.Upd
 		DataBits:    uint8(request.Body.Pic.Serial.DataBits),
 		Parity:      request.Body.Pic.Serial.Parity,
 		StopBits:    float32(request.Body.Pic.Serial.StopBits),
-		ReadTimeout: time.Duration(request.Body.Pic.Serial.ReadTimeout * 1e9),
+		ReadTimeout: time.Duration(request.Body.Pic.Serial.ReadTimeout) * time.Second,
 	}
 
 	cfg, err := h.configService.UpdateHardwareConfig(ctx, config.Hardware{
 		ESP: config.ESP{
-			Serial: espSerial,
+			Serial:            espSerial,
+			CommandACKTimeout: time.Duration(request.Body.Esp.CommandAckTimeout) * time.Millisecond,
 		},
 		PIC: config.PIC{
-			Serial: picSerial,
+			Serial:            picSerial,
+			CommandACKTimeout: time.Duration(request.Body.Pic.CommandAckTimeout) * time.Millisecond,
 		},
 	})
 	if err != nil {
@@ -184,11 +185,13 @@ func (configHandler) convertLogConfigToResponse(cfg config.Log) gen.LogConfig {
 
 func (h configHandler) convertHardwareConfigToResponse(cfg config.Hardware) gen.HardwareConfig {
 	return gen.HardwareConfig{
-		Esp: gen.ESPConfig{
-			Serial: h.convertSerialConfigToResponse(cfg.ESP.Serial),
-		},
 		Pic: gen.PICConfig{
-			Serial: h.convertSerialConfigToResponse(cfg.PIC.Serial),
+			Serial:            h.convertSerialConfigToResponse(cfg.PIC.Serial),
+			CommandAckTimeout: int(cfg.PIC.CommandACKTimeout.Milliseconds()),
+		},
+		Esp: gen.ESPConfig{
+			Serial:            h.convertSerialConfigToResponse(cfg.ESP.Serial),
+			CommandAckTimeout: int(cfg.ESP.CommandACKTimeout.Milliseconds()),
 		},
 	}
 }

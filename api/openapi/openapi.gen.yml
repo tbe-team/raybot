@@ -742,15 +742,31 @@ components:
       properties:
         serial:
           $ref: '#/components/schemas/SerialConfig'
+          x-order: 1
+        commandAckTimeout:
+          type: number
+          example: 1
+          description: The timeout for the command ACK in milliseconds
+          x-order: 2
+          x-go-type: int
       required:
         - serial
+        - commandAckTimeout
     PICConfig:
       type: object
       properties:
         serial:
           $ref: '#/components/schemas/SerialConfig'
+          x-order: 1
+        commandAckTimeout:
+          type: number
+          example: 1
+          description: The timeout for the command ACK in milliseconds
+          x-order: 2
+          x-go-type: int
       required:
         - serial
+        - commandAckTimeout
     HardwareConfig:
       type: object
       properties:

@@ -105,16 +105,32 @@ PICConfig:
   properties:
     serial:
       $ref: "#/SerialConfig"
+      x-order: 1
+    commandAckTimeout:
+      type: number
+      example: 1
+      description: The timeout for the command ACK in milliseconds
+      x-order: 2
+      x-go-type: int
   required:
     - serial
+    - commandAckTimeout
 
 ESPConfig:
   type: object
   properties:
     serial:
       $ref: "#/SerialConfig"
+      x-order: 1
+    commandAckTimeout:
+      type: number
+      example: 1
+      description: The timeout for the command ACK in milliseconds
+      x-order: 2
+      x-go-type: int
   required:
     - serial
+    - commandAckTimeout
 
 SerialConfig:
   type: object
