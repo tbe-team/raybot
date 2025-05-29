@@ -9,7 +9,7 @@ import { useQueryRobotState } from '@/composables/use-robot-state'
 import { useSystemGetInfoQuery } from '@/composables/use-system'
 
 const REFRESH_INTERVAL = 1000
-const REFRESH_INTERVAL_INFORMATION = 5000
+const REFRESH_INTERVAL_INFORMATION = 10000
 const refetchInterval = ref(REFRESH_INTERVAL)
 
 const { data: robotState, isPending, isError, error } = useQueryRobotState({
