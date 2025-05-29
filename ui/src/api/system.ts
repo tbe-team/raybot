@@ -1,5 +1,5 @@
 import type { AxiosRequestConfig } from 'axios'
-import type { systemInfo } from '@/types/system-info'
+import type { SystemInfo } from '@/types/system-info'
 import http from '@/lib/http'
 
 const systemAPI = {
@@ -9,7 +9,7 @@ const systemAPI = {
   stopEmergency(): Promise<void> {
     return http.post('/system/stop-emergency')
   },
-  getInfo(axiosOpts?: Partial<AxiosRequestConfig>): Promise<systemInfo> {
+  getInfo(axiosOpts?: Partial<AxiosRequestConfig>): Promise<SystemInfo> {
     return http.get('/system/info', axiosOpts)
   },
 }
