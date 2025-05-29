@@ -1,4 +1,4 @@
-export interface Info {
+export interface systemInfo {
   localIp: string
   cpuUsage: number
   memoryUsage: number

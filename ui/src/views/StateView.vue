@@ -6,20 +6,14 @@ import PageContainer from '@/components/shared/PageContainer.vue'
 import { Card } from '@/components/ui/card'
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { useQueryRobotState } from '@/composables/use-robot-state'
-import { useSystemGetInfoQuery } from '@/composables/use-system'
 
 const REFRESH_INTERVAL = 1000
-const REFRESH_INTERVAL_INFORMATION = 10000
+
 const refetchInterval = ref(REFRESH_INTERVAL)
 
 const { data: robotState, isPending, isError, error } = useQueryRobotState({
   axiosOpts: { doNotShowLoading: true },
   refetchInterval,
-})
-
-const { data: systemInfo } = useSystemGetInfoQuery({
-  axiosOpts: { doNotShowLoading: true },
-  refetchInterval: REFRESH_INTERVAL_INFORMATION,
 })
 </script>
 
@@ -88,7 +82,7 @@ const { data: systemInfo } = useSystemGetInfoQuery({
       </div>
 
       <!-- Overview Cards -->
-      <StateOverview v-if="systemInfo" :robot-state="robotState" :system-info="systemInfo" />
+      <StateOverview v-if="robotState" :robot-state="robotState" />
 
       <!-- Tabs -->
       <TabContent v-if="robotState" :robot-state="robotState" />

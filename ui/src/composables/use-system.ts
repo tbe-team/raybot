@@ -3,6 +3,7 @@ import { useMutation, useQuery } from '@tanstack/vue-query'
 import systemAPI from '@/api/system'
 
 export const SYSTEM_INFO_QUERY_KEY = 'system-info'
+
 export function useSystemRebootMutation() {
   return useMutation({
     mutationFn: systemAPI.reboot,
