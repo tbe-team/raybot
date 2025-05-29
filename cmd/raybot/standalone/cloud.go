@@ -12,7 +12,13 @@ func startCloud(app *application.Application, interruptChan <-chan any) error {
 		return nil
 	}
 
-	service := cloud.New(app.Cfg.Cloud, app.Log, app.EventBus, app.CommandService)
+	service := cloud.New(
+		app.Cfg.Cloud,
+		app.Log,
+		app.EventBus,
+		app.CommandService,
+		app.SystemService,
+	)
 
 	cleanup, err := service.Run(app.Context)
 	if err != nil {

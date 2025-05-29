@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package sys.v1;
+
+message GetVersionRequest {}
+
+message GetVersionResponse {
+  string version = 1;
+  string date = 2;
+  string go_version = 3;
+}
