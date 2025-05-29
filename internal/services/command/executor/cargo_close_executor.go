@@ -73,7 +73,7 @@ func (e cargoCloseExecutor) trackingCargoDoorUntilClosed(ctx context.Context) {
 
 	doneCh := make(chan struct{})
 	e.log.Debug("start tracking cargo door")
-	e.subscriber.Subscribe(ctx, events.CargoDoorUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	e.subscriber.Subscribe(ctx, events.CargoDoorUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.CargoDoorUpdatedEvent)
 		if !ok {
 			e.log.Error("invalid event", slog.Any("event", msg.Payload))

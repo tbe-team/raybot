@@ -80,7 +80,7 @@ func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Contex
 
 	doneCh := make(chan struct{})
 	e.log.Debug("start tracking lower position", slog.Int64("lower_position", int64(lowerPosition)))
-	e.subscriber.Subscribe(ctx, events.DistanceSensorUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	e.subscriber.Subscribe(ctx, events.DistanceSensorUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateDistanceSensorEvent)
 		if !ok {
 			e.log.Error("invalid event", slog.Any("event", msg.Payload))
@@ -114,7 +114,7 @@ func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs c
 	bottomDistanceCh := make(chan uint16, 1)
 
 	e.log.Debug("start tracking bottom obstacle")
-	e.subscriber.Subscribe(ctx, events.CargoBottomDistanceUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	e.subscriber.Subscribe(ctx, events.CargoBottomDistanceUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.CargoBottomDistanceUpdatedEvent)
 		if !ok {
 			e.log.Error("invalid event", slog.Any("event", msg.Payload))
@@ -124,7 +124,8 @@ func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs c
 		select {
 		case bottomDistanceCh <- ev.BottomDistance:
 		default:
-			e.log.Error("dropped message from bottom distance channel", slog.Uint64("bottom_distance", uint64(ev.BottomDistance)))
+			e.log.Error("dropped message from bottom distance channel",
+				slog.Uint64("bottom_distance", uint64(ev.BottomDistance)))
 		}
 	})
 

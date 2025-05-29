@@ -50,7 +50,7 @@ func (e *InProcEventBus) Publish(topic string, message *Message) {
 				}
 			}()
 
-			sub.handle(context.TODO(), message)
+			sub.handle(message)
 		}(sub)
 	}
 }
@@ -71,6 +71,6 @@ type subscriber struct {
 	handler HandlerFunc
 }
 
-func (s subscriber) handle(ctx context.Context, msg *Message) {
-	s.handler(ctx, msg)
+func (s subscriber) handle(msg *Message) {
+	s.handler(msg)
 }

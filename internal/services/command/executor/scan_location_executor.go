@@ -77,7 +77,7 @@ func (e scanLocationExecutor) recordLocationsUntilLoopedBack(ctx context.Context
 
 	doneCh := make(chan struct{})
 	e.log.Debug("start recording location")
-	e.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	e.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateLocationEvent)
 		if !ok {
 			e.log.Error("invalid event", slog.Any("event", msg.Payload))

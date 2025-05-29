@@ -77,7 +77,7 @@ func (e cargoLiftExecutor) trackingLiftPositionUntilReached(ctx context.Context,
 
 	doneCh := make(chan struct{})
 	e.log.Debug("start tracking lift position", slog.Int64("lift_position", int64(liftPosition)))
-	e.subscriber.Subscribe(ctx, events.DistanceSensorUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	e.subscriber.Subscribe(ctx, events.DistanceSensorUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateDistanceSensorEvent)
 		if !ok {
 			e.log.Error("invalid event", slog.Any("event", msg.Payload))

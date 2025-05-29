@@ -95,7 +95,7 @@ func (c *controller) trackingPICCommandACK(ctx context.Context, id string) error
 	log.Debug("start tracking PIC command ack")
 
 	doneCh := make(chan struct{})
-	c.subscriber.Subscribe(ctx, events.PICCmdAckTopic, func(_ context.Context, msg *eventbus.Message) {
+	c.subscriber.Subscribe(ctx, events.PICCmdAckTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.PICCmdAckEvent)
 		if !ok {
 			log.Error("invalid event", slog.Any("event", msg.Payload))
@@ -161,7 +161,7 @@ func (c *controller) trackingESPCommandACK(ctx context.Context, id string) error
 	log.Debug("start tracking ESP command ack")
 
 	doneCh := make(chan struct{})
-	c.subscriber.Subscribe(ctx, events.ESPCmdAckTopic, func(_ context.Context, msg *eventbus.Message) {
+	c.subscriber.Subscribe(ctx, events.ESPCmdAckTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.ESPCmdAckEvent)
 		if !ok {
 			log.Error("invalid event", slog.Any("event", msg.Payload))

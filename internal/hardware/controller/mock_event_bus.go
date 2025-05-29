@@ -14,9 +14,9 @@ type fakeEventBus struct {
 
 func (e *fakeEventBus) Publish(_ string, _ *eventbus.Message) {}
 
-func (e *fakeEventBus) Subscribe(ctx context.Context, _ string, handler eventbus.HandlerFunc) {
+func (e *fakeEventBus) Subscribe(_ context.Context, _ string, handler eventbus.HandlerFunc) {
 	if e.expectedPayload != nil {
-		handler(ctx, &eventbus.Message{
+		handler(&eventbus.Message{
 			Payload: e.expectedPayload,
 		})
 	}

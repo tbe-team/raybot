@@ -51,7 +51,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 	s.subscriber.Subscribe(
 		ctx,
 		events.CloudConnectedTopic,
-		func(ctx context.Context, msg *eventbus.Message) {
+		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.CloudConnectedEvent)
 			if !ok {
 				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
@@ -65,7 +65,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 	s.subscriber.Subscribe(
 		ctx,
 		events.CloudDisconnectedTopic,
-		func(ctx context.Context, msg *eventbus.Message) {
+		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.CloudDisconnectedEvent)
 			if !ok {
 				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
@@ -79,7 +79,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 	s.subscriber.Subscribe(
 		ctx,
 		events.ESPSerialConnectedTopic,
-		func(ctx context.Context, msg *eventbus.Message) {
+		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.ESPSerialConnectedEvent)
 			if !ok {
 				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
@@ -93,7 +93,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 	s.subscriber.Subscribe(
 		ctx,
 		events.ESPSerialDisconnectedTopic,
-		func(ctx context.Context, msg *eventbus.Message) {
+		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.ESPSerialDisconnectedEvent)
 			if !ok {
 				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
@@ -107,7 +107,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 	s.subscriber.Subscribe(
 		ctx,
 		events.PICSerialConnectedTopic,
-		func(ctx context.Context, msg *eventbus.Message) {
+		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.PICSerialConnectedEvent)
 			if !ok {
 				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
@@ -121,7 +121,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 	s.subscriber.Subscribe(
 		ctx,
 		events.PICSerialDisconnectedTopic,
-		func(ctx context.Context, msg *eventbus.Message) {
+		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.PICSerialDisconnectedEvent)
 			if !ok {
 				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
@@ -135,7 +135,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 	s.subscriber.Subscribe(
 		ctx,
 		events.RFIDUSBConnectedTopic,
-		func(ctx context.Context, msg *eventbus.Message) {
+		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.RFIDUSBConnectedEvent)
 			if !ok {
 				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
@@ -149,7 +149,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 	s.subscriber.Subscribe(
 		ctx,
 		events.RFIDUSBDisconnectedTopic,
-		func(ctx context.Context, msg *eventbus.Message) {
+		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.RFIDUSBDisconnectedEvent)
 			if !ok {
 				s.log.Error("received invalid event", slog.Any("event", msg.Payload))

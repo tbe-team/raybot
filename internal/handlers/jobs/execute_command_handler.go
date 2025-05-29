@@ -46,7 +46,7 @@ func (h *executeCommandHandler) Run(ctx context.Context) func() {
 func (h *executeCommandHandler) run(ctx context.Context) {
 	ch := make(chan struct{}, 1)
 
-	h.subscriber.Subscribe(ctx, events.CommandCreatedTopic, func(_ context.Context, _ *eventbus.Message) {
+	h.subscriber.Subscribe(ctx, events.CommandCreatedTopic, func(_ *eventbus.Message) {
 		select {
 		case ch <- struct{}{}:
 		default:

@@ -53,7 +53,7 @@ func (e cargoCheckQRExecutor) trackingCargoQRCodeUntilMatched(ctx context.Contex
 
 	doneCh := make(chan struct{})
 	e.log.Debug("start tracking cargo qr code", slog.Any("qr_code", qrCode))
-	e.subscriber.Subscribe(ctx, events.CargoQRCodeUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+	e.subscriber.Subscribe(ctx, events.CargoQRCodeUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.CargoQRCodeUpdatedEvent)
 		if !ok {
 			e.log.Error("invalid event", slog.Any("event", msg.Payload))

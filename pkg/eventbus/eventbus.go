@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-type HandlerFunc func(ctx context.Context, msg *Message)
+type HandlerFunc func(msg *Message)
 
 type Subscriber interface {
 	// Subscribe subscribes to a topic and returns a channel for receiving messages.
