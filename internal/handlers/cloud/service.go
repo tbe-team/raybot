@@ -13,10 +13,10 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	commandv1 "github.com/tbe-team/raybot-api/command/v1"
+	sysv1 "github.com/tbe-team/raybot-api/sys/v1"
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
-	commandv1 "github.com/tbe-team/raybot/internal/handlers/cloud/gen/command/v1"
-	sysv1 "github.com/tbe-team/raybot/internal/handlers/cloud/gen/sys/v1"
 	"github.com/tbe-team/raybot/internal/handlers/cloud/interceptor"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/system"

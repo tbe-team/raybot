@@ -1,8 +1,6 @@
 module github.com/tbe-team/raybot
 
-go 1.24
-
-toolchain go1.24.1
+go 1.24.2
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
@@ -19,6 +17,7 @@ require (
 	github.com/pressly/goose/v3 v3.24.3
 	github.com/shirou/gopsutil/v4 v4.25.4
 	github.com/stretchr/testify v1.10.0
+	github.com/tbe-team/raybot-api v0.1.0
 	go.bug.st/serial v1.6.4
 	go.uber.org/goleak v1.3.0
 	golang.org/x/sync v0.14.0

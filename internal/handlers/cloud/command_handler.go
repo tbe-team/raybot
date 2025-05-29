@@ -6,7 +6,7 @@ import (
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 
-	commandv1 "github.com/tbe-team/raybot/internal/handlers/cloud/gen/command/v1"
+	commandv1 "github.com/tbe-team/raybot-api/command/v1"
 	"github.com/tbe-team/raybot/internal/services/command"
 )
 

@@ -6,8 +6,8 @@ import (
 
 	"google.golang.org/protobuf/types/known/durationpb"
 
+	sysv1 "github.com/tbe-team/raybot-api/sys/v1"
 	"github.com/tbe-team/raybot/internal/build"
-	sysv1 "github.com/tbe-team/raybot/internal/handlers/cloud/gen/sys/v1"
 	"github.com/tbe-team/raybot/internal/services/system"
 )
 
