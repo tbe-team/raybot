@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 
-	"github.com/tbe-team/raybot/internal/handlers/cloud/cloudtest"
 	commandv1 "github.com/tbe-team/raybot/internal/handlers/cloud/gen/command/v1"
+	"github.com/tbe-team/raybot/internal/handlers/cloud/tunneltest"
 	"github.com/tbe-team/raybot/internal/services/command"
 )
 
@@ -17,7 +17,7 @@ func TestIntegrationCommandHandler_CreateCommand(t *testing.T) {
 		t.Skip("skipping integration test")
 	}
 
-	testEnv := cloudtest.SetupTunnelTestEnv(t)
+	testEnv := tunneltest.SetupTunnelTestEnv(t)
 	client := commandv1.NewCommandServiceClient(testEnv.TunnelChannel)
 
 	t.Run("Create command", func(t *testing.T) {
