@@ -81,19 +81,24 @@ type Repository interface {
 	ListCommands(ctx context.Context, params ListCommandsParams) (paging.List[Command], error)
 	GetNextExecutableCommand(ctx context.Context) (Command, error)
 	GetCurrentProcessingCommand(ctx context.Context) (Command, error)
-	CommandProcessingExists(ctx context.Context) (bool, error)
 	GetCommandByID(ctx context.Context, id int64) (Command, error)
 	CreateCommand(ctx context.Context, command Command) (Command, error)
 	UpdateCommand(ctx context.Context, params UpdateCommandParams) (Command, error)
-	CancelQueuedAndProcessingCommands(ctx context.Context) error
+
+	// CancelPendingCommands cancels all pending commands by status QUEUED, PROCESSING, and CANCELING.
+	CancelPendingCommands(ctx context.Context) error
 	CancelQueuedAndProcessingCommandsCreatedByCloud(ctx context.Context) error
-	DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error
+
+	// DeleteCommandByID deletes a command by id.
+	// It does not delete the command if the status is PROCESSING, CANCELING.
+	DeleteCommandByID(ctx context.Context, id int64) error
 	DeleteOldCommands(ctx context.Context, cutoffTime time.Time) error
 }
 
 type RunningCommandRepository interface {
-	Add(ctx context.Context, cmd CancelableCommand) error
 	Get(ctx context.Context) (CancelableCommand, error)
+	Add(ctx context.Context, cmd CancelableCommand) error
+	Update(ctx context.Context, cmd CancelableCommand) error
 	Remove(ctx context.Context) error
 }
 

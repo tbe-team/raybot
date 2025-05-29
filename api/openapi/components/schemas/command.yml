@@ -120,6 +120,7 @@ CommandStatus:
   enum:
     - QUEUED
     - PROCESSING
+    - CANCELING
     - SUCCEEDED
     - FAILED
     - CANCELED

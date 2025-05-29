@@ -297,29 +297,6 @@ func TestIntegrationCommandService(t *testing.T) {
 		require.Equal(t, command.StatusCanceled, cmd2.Status)
 	})
 
-	t.Run("Cancel current running command successfully", func(t *testing.T) {
-		runningCmdRepository := NewRunningCmdRepository()
-		commandService := Service{
-			runningCmdRepository: runningCmdRepository,
-		}
-
-		cmd := command.NewCommand(command.SourceApp, command.MoveForwardInputs{})
-		err := runningCmdRepository.Add(context.Background(), command.NewCancelableCommand(context.Background(), cmd))
-		require.NoError(t, err)
-
-		err = commandService.CancelCurrentProcessingCommand(context.Background())
-		require.NoError(t, err)
-
-		runningCmd, err := runningCmdRepository.Get(context.Background())
-		require.NoError(t, err)
-
-		select {
-		case <-runningCmd.Context().Done():
-		case <-time.After(1 * time.Millisecond):
-			require.Fail(t, "command should be canceled")
-		}
-	})
-
 	t.Run("Cancel active cloud commands should cancel all QUEUED and PROCESSING commands created by the cloud", func(t *testing.T) {
 		db, err := db.NewTestDB()
 		require.NoError(t, err)

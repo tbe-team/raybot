@@ -106,7 +106,21 @@ func (s *Service) CancelCurrentProcessingCommand(ctx context.Context) error {
 		return fmt.Errorf("get running command: %w", err)
 	}
 
-	runningCmd.Cancel()
+	if runningCmd.CanBeCanceled() {
+		if _, err := s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
+			ID:        runningCmd.ID,
+			Status:    command.StatusCanceling,
+			SetStatus: true,
+			UpdatedAt: time.Now(),
+		}); err != nil {
+			return fmt.Errorf("update command status: %w", err)
+		}
+
+		runningCmd.Cancel()
+		if err := s.runningCmdRepository.Update(ctx, runningCmd); err != nil {
+			return fmt.Errorf("update running command: %w", err)
+		}
+	}
 
 	return nil
 }
@@ -156,7 +170,7 @@ func (s *Service) CancelAllRunningCommands(ctx context.Context) error {
 			}
 		}
 
-		if err := s.commandRepository.CancelQueuedAndProcessingCommands(ctx); err != nil {
+		if err := s.commandRepository.CancelPendingCommands(ctx); err != nil {
 			return fmt.Errorf("cancel queued and processing commands: %w", err)
 		}
 
@@ -173,7 +187,7 @@ func (s *Service) DeleteCommandByID(ctx context.Context, params command.DeleteCo
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	return s.commandRepository.DeleteCommandByIDAndNotProcessing(ctx, params.CommandID)
+	return s.commandRepository.DeleteCommandByID(ctx, params.CommandID)
 }
 
 func (s *Service) DeleteOldCommands(ctx context.Context) error {
@@ -182,7 +196,7 @@ func (s *Service) DeleteOldCommands(ctx context.Context) error {
 }
 
 func (s *Service) cancelQueuedAndProcessingCommands(ctx context.Context) {
-	if err := s.commandRepository.CancelQueuedAndProcessingCommands(ctx); err != nil {
+	if err := s.commandRepository.CancelPendingCommands(ctx); err != nil {
 		s.log.Error("failed to cancel queued and processing commands on startup", slog.Any("error", err))
 	}
 }
@@ -196,7 +210,11 @@ func (s *Service) runNextExecutableCommand(ctx context.Context) error {
 		return fmt.Errorf("get next executable command: %w", err)
 	}
 
-	s.log.Info("found executable command, executing", slog.Any("command", cmd))
+	s.log.Info("found executable command, executing",
+		slog.Int64("command_id", cmd.ID),
+		slog.String("command_type", cmd.Type.String()),
+		slog.Any("command_inputs", cmd.Inputs),
+	)
 	return s.executeCommand(ctx, cmd)
 }
 

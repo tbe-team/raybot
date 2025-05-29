@@ -130,13 +130,14 @@ func (s *service) execute(ctx context.Context, cmd command.Command) (command.Out
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
+	now := time.Now()
 	cmd, err := s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
 		ID:           cmd.ID,
 		Status:       command.StatusProcessing,
 		SetStatus:    true,
-		StartedAt:    ptr.New(time.Now()),
+		StartedAt:    ptr.New(now),
 		SetStartedAt: true,
-		UpdatedAt:    time.Now(),
+		UpdatedAt:    now,
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to update command status: %w", err)
@@ -158,7 +159,10 @@ func (s *service) execute(ctx context.Context, cmd command.Command) (command.Out
 
 	select {
 	case <-cmdCtx.Done():
-		s.runCancelHook(ctx, cmd)
+		err := s.runCancelHook(ctx, cmd)
+		if err != nil {
+			return out, err
+		}
 		return out, cmdCtx.Err()
 
 	default:
@@ -166,15 +170,17 @@ func (s *service) execute(ctx context.Context, cmd command.Command) (command.Out
 	}
 }
 
-func (s *service) runCancelHook(ctx context.Context, cmd command.Command) {
+func (s *service) runCancelHook(ctx context.Context, cmd command.Command) error {
 	c, ok := s.cancelableMap[cmd.Type]
 	if !ok {
-		s.log.Error("cancelable executor not found", slog.Any("command", cmd))
-		return
+		s.log.Error("cancelable executor not found", slog.Any("command_type", cmd.Type))
+		return nil
 	}
 	if err := c.OnCancel(ctx); err != nil {
-		s.log.Error("failed to cancel command", slog.Any("command", cmd), slog.Any("error", err))
+		return fmt.Errorf("failed to cancel command: %w", err)
 	}
+
+	return nil
 }
 
 func (s *service) handleSuccess(ctx context.Context, id int64, outputs command.Outputs) error {

@@ -9,14 +9,14 @@ import (
 	"context"
 )
 
-const commandCancelByStatusQueuedAndProcessing = `-- name: CommandCancelByStatusQueuedAndProcessing :exec
+const commandCancelByStatusQueuedAndProcessingAndCanceling = `-- name: CommandCancelByStatusQueuedAndProcessingAndCanceling :exec
 UPDATE commands
 SET status = 'CANCELED'
-WHERE status IN ('QUEUED', 'PROCESSING')
+WHERE status IN ('QUEUED', 'PROCESSING', 'CANCELING')
 `
 
-func (q *Queries) CommandCancelByStatusQueuedAndProcessing(ctx context.Context, db DBTX) error {
-	_, err := db.ExecContext(ctx, commandCancelByStatusQueuedAndProcessing)
+func (q *Queries) CommandCancelByStatusQueuedAndProcessingAndCanceling(ctx context.Context, db DBTX) error {
+	_, err := db.ExecContext(ctx, commandCancelByStatusQueuedAndProcessingAndCanceling)
 	return err
 }
 
@@ -92,14 +92,15 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 	return i, err
 }
 
-const commandDeleteByIDAndNotProcessing = `-- name: CommandDeleteByIDAndNotProcessing :execrows
+const commandDeleteByID = `-- name: CommandDeleteByID :execrows
 DELETE FROM commands
 WHERE id = ?1
-AND status != 'PROCESSING'
+AND status NOT IN ('PROCESSING', 'CANCELING')
 `
 
-func (q *Queries) CommandDeleteByIDAndNotProcessing(ctx context.Context, db DBTX, id int64) (int64, error) {
-	result, err := db.ExecContext(ctx, commandDeleteByIDAndNotProcessing, id)
+// It does not delete the command if the status is PROCESSING, CANCELING.
+func (q *Queries) CommandDeleteByID(ctx context.Context, db DBTX, id int64) (int64, error) {
+	result, err := db.ExecContext(ctx, commandDeleteByID, id)
 	if err != nil {
 		return 0, err
 	}
@@ -109,9 +110,10 @@ func (q *Queries) CommandDeleteByIDAndNotProcessing(ctx context.Context, db DBTX
 const commandDeleteOldCommands = `-- name: CommandDeleteOldCommands :execrows
 DELETE FROM commands
 WHERE created_at < ?1
-AND status NOT IN ('QUEUED', 'PROCESSING')
+AND status NOT IN ('QUEUED', 'PROCESSING', 'CANCELING')
 `
 
+// It does not delete the command if the status is QUEUED, PROCESSING, CANCELING.
 func (q *Queries) CommandDeleteOldCommands(ctx context.Context, db DBTX, createdAt string) (int64, error) {
 	result, err := db.ExecContext(ctx, commandDeleteOldCommands, createdAt)
 	if err != nil {
@@ -144,16 +146,37 @@ func (q *Queries) CommandGetByID(ctx context.Context, db DBTX, id int64) (Comman
 	return i, err
 }
 
+const commandGetCurrentProcessing = `-- name: CommandGetCurrentProcessing :one
+SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs FROM commands
+WHERE status IN ('PROCESSING', 'CANCELING')
+LIMIT 1
+`
+
+// It returns the command with the status PROCESSING or CANCELING.
+// Should be only one command in status PROCESSING or CANCELING.
+func (q *Queries) CommandGetCurrentProcessing(ctx context.Context, db DBTX) (Command, error) {
+	row := db.QueryRowContext(ctx, commandGetCurrentProcessing)
+	var i Command
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Status,
+		&i.Source,
+		&i.Inputs,
+		&i.Error,
+		&i.CompletedAt,
+		&i.CreatedAt,
+		&i.UpdatedAt,
+		&i.StartedAt,
+		&i.Outputs,
+	)
+	return i, err
+}
+
 const commandGetNextExecutable = `-- name: CommandGetNextExecutable :one
 SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs FROM commands
-WHERE
-	status IN ('QUEUED', 'PROCESSING')
-ORDER BY
-	CASE status
-		WHEN 'PROCESSING' THEN 0
-		WHEN 'QUEUED' THEN 1
-	END ASC,
-	created_at ASC
+WHERE status = 'QUEUED'
+ORDER BY created_at ASC
 LIMIT 1
 `
 
@@ -174,45 +197,6 @@ func (q *Queries) CommandGetNextExecutable(ctx context.Context, db DBTX) (Comman
 		&i.Outputs,
 	)
 	return i, err
-}
-
-const commandGetProcessing = `-- name: CommandGetProcessing :one
-SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs FROM commands
-WHERE status = 'PROCESSING'
-LIMIT 1
-`
-
-func (q *Queries) CommandGetProcessing(ctx context.Context, db DBTX) (Command, error) {
-	row := db.QueryRowContext(ctx, commandGetProcessing)
-	var i Command
-	err := row.Scan(
-		&i.ID,
-		&i.Type,
-		&i.Status,
-		&i.Source,
-		&i.Inputs,
-		&i.Error,
-		&i.CompletedAt,
-		&i.CreatedAt,
-		&i.UpdatedAt,
-		&i.StartedAt,
-		&i.Outputs,
-	)
-	return i, err
-}
-
-const commandProcessingExists = `-- name: CommandProcessingExists :one
-SELECT EXISTS (
-	SELECT 1 FROM commands
-	WHERE status = 'PROCESSING'
-)
-`
-
-func (q *Queries) CommandProcessingExists(ctx context.Context, db DBTX) (int64, error) {
-	row := db.QueryRowContext(ctx, commandProcessingExists)
-	var column_1 int64
-	err := row.Scan(&column_1)
-	return column_1, err
 }
 
 const commandUpdate = `-- name: CommandUpdate :one

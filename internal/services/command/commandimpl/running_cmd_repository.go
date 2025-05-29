@@ -18,6 +18,15 @@ func NewRunningCmdRepository() command.RunningCommandRepository {
 	}
 }
 
+func (r *runningCmdRepository) Get(_ context.Context) (command.CancelableCommand, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+	if r.cmd == nil {
+		return command.CancelableCommand{}, command.ErrRunningCommandNotFound
+	}
+	return *r.cmd, nil
+}
+
 func (r *runningCmdRepository) Add(_ context.Context, cmd command.CancelableCommand) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
@@ -28,13 +37,11 @@ func (r *runningCmdRepository) Add(_ context.Context, cmd command.CancelableComm
 	return nil
 }
 
-func (r *runningCmdRepository) Get(_ context.Context) (command.CancelableCommand, error) {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	if r.cmd == nil {
-		return command.CancelableCommand{}, command.ErrRunningCommandNotFound
-	}
-	return *r.cmd, nil
+func (r *runningCmdRepository) Update(_ context.Context, cmd command.CancelableCommand) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	r.cmd = &cmd
+	return nil
 }
 
 func (r *runningCmdRepository) Remove(_ context.Context) error {

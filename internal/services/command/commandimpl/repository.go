@@ -129,7 +129,7 @@ func (r repository) GetNextExecutableCommand(ctx context.Context) (command.Comma
 }
 
 func (r repository) GetCurrentProcessingCommand(ctx context.Context) (command.Command, error) {
-	row, err := r.queries.CommandGetProcessing(ctx, r.db)
+	row, err := r.queries.CommandGetCurrentProcessing(ctx, r.db)
 	if err != nil {
 		if db.IsNoRowsError(err) {
 			return command.Command{}, command.ErrCommandNotFound
@@ -148,14 +148,6 @@ func (r repository) GetCommandByID(ctx context.Context, id int64) (command.Comma
 		return command.Command{}, fmt.Errorf("failed to get command by id: %w", err)
 	}
 	return r.convertRowToCommand(row)
-}
-
-func (r repository) CommandProcessingExists(ctx context.Context) (bool, error) {
-	exists, err := r.queries.CommandProcessingExists(ctx, r.db)
-	if err != nil {
-		return false, fmt.Errorf("failed to check if command processing exists: %w", err)
-	}
-	return exists == 1, nil
 }
 
 func (r repository) CreateCommand(ctx context.Context, commandArg command.Command) (command.Command, error) {
@@ -239,8 +231,8 @@ func (r repository) UpdateCommand(ctx context.Context, params command.UpdateComm
 	return r.convertRowToCommand(row)
 }
 
-func (r repository) CancelQueuedAndProcessingCommands(ctx context.Context) error {
-	err := r.queries.CommandCancelByStatusQueuedAndProcessing(ctx, r.db)
+func (r repository) CancelPendingCommands(ctx context.Context) error {
+	err := r.queries.CommandCancelByStatusQueuedAndProcessingAndCanceling(ctx, r.db)
 	if err != nil {
 		return fmt.Errorf("failed to cancel queued and processing commands: %w", err)
 	}
@@ -256,8 +248,8 @@ func (r repository) CancelQueuedAndProcessingCommandsCreatedByCloud(ctx context.
 	return nil
 }
 
-func (r repository) DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error {
-	affected, err := r.queries.CommandDeleteByIDAndNotProcessing(ctx, r.db, id)
+func (r repository) DeleteCommandByID(ctx context.Context, id int64) error {
+	affected, err := r.queries.CommandDeleteByID(ctx, r.db, id)
 	if err != nil {
 		return fmt.Errorf("failed to delete command by id and not processing: %w", err)
 	}

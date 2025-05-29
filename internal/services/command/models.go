@@ -63,7 +63,7 @@ type Status string
 
 func (s Status) Validate() error {
 	switch s {
-	case StatusQueued, StatusProcessing, StatusSucceeded, StatusFailed, StatusCanceled:
+	case StatusQueued, StatusProcessing, StatusCanceling, StatusSucceeded, StatusFailed, StatusCanceled:
 		return nil
 	}
 	return fmt.Errorf("invalid status: %s", s)
@@ -76,6 +76,7 @@ func (s Status) String() string {
 const (
 	StatusQueued     Status = "QUEUED"
 	StatusProcessing Status = "PROCESSING"
+	StatusCanceling  Status = "CANCELING"
 	StatusSucceeded  Status = "SUCCEEDED"
 	StatusFailed     Status = "FAILED"
 	StatusCanceled   Status = "CANCELED"
@@ -125,7 +126,13 @@ func NewCancelableCommand(ctx context.Context, cmd Command) CancelableCommand {
 }
 
 func (c *CancelableCommand) Cancel() {
+	c.Status = StatusCanceling
+	c.UpdatedAt = time.Now()
 	c.cancelFunc()
+}
+
+func (c *CancelableCommand) CanBeCanceled() bool {
+	return c.Status == StatusProcessing
 }
 
 func (c *CancelableCommand) Context() context.Context {

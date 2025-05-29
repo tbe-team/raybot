@@ -27,12 +27,12 @@ func (_m *FakeRepository) EXPECT() *FakeRepository_Expecter {
 	return &FakeRepository_Expecter{mock: &_m.Mock}
 }
 
-// CancelQueuedAndProcessingCommands provides a mock function with given fields: ctx
-func (_m *FakeRepository) CancelQueuedAndProcessingCommands(ctx context.Context) error {
+// CancelPendingCommands provides a mock function with given fields: ctx
+func (_m *FakeRepository) CancelPendingCommands(ctx context.Context) error {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
-		panic("no return value specified for CancelQueuedAndProcessingCommands")
+		panic("no return value specified for CancelPendingCommands")
 	}
 
 	var r0 error
@@ -45,30 +45,30 @@ func (_m *FakeRepository) CancelQueuedAndProcessingCommands(ctx context.Context)
 	return r0
 }
 
-// FakeRepository_CancelQueuedAndProcessingCommands_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CancelQueuedAndProcessingCommands'
-type FakeRepository_CancelQueuedAndProcessingCommands_Call struct {
+// FakeRepository_CancelPendingCommands_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CancelPendingCommands'
+type FakeRepository_CancelPendingCommands_Call struct {
 	*mock.Call
 }
 
-// CancelQueuedAndProcessingCommands is a helper method to define mock.On call
+// CancelPendingCommands is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *FakeRepository_Expecter) CancelQueuedAndProcessingCommands(ctx interface{}) *FakeRepository_CancelQueuedAndProcessingCommands_Call {
-	return &FakeRepository_CancelQueuedAndProcessingCommands_Call{Call: _e.mock.On("CancelQueuedAndProcessingCommands", ctx)}
+func (_e *FakeRepository_Expecter) CancelPendingCommands(ctx interface{}) *FakeRepository_CancelPendingCommands_Call {
+	return &FakeRepository_CancelPendingCommands_Call{Call: _e.mock.On("CancelPendingCommands", ctx)}
 }
 
-func (_c *FakeRepository_CancelQueuedAndProcessingCommands_Call) Run(run func(ctx context.Context)) *FakeRepository_CancelQueuedAndProcessingCommands_Call {
+func (_c *FakeRepository_CancelPendingCommands_Call) Run(run func(ctx context.Context)) *FakeRepository_CancelPendingCommands_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context))
 	})
 	return _c
 }
 
-func (_c *FakeRepository_CancelQueuedAndProcessingCommands_Call) Return(_a0 error) *FakeRepository_CancelQueuedAndProcessingCommands_Call {
+func (_c *FakeRepository_CancelPendingCommands_Call) Return(_a0 error) *FakeRepository_CancelPendingCommands_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *FakeRepository_CancelQueuedAndProcessingCommands_Call) RunAndReturn(run func(context.Context) error) *FakeRepository_CancelQueuedAndProcessingCommands_Call {
+func (_c *FakeRepository_CancelPendingCommands_Call) RunAndReturn(run func(context.Context) error) *FakeRepository_CancelPendingCommands_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -115,62 +115,6 @@ func (_c *FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call) R
 }
 
 func (_c *FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call) RunAndReturn(run func(context.Context) error) *FakeRepository_CancelQueuedAndProcessingCommandsCreatedByCloud_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
-// CommandProcessingExists provides a mock function with given fields: ctx
-func (_m *FakeRepository) CommandProcessingExists(ctx context.Context) (bool, error) {
-	ret := _m.Called(ctx)
-
-	if len(ret) == 0 {
-		panic("no return value specified for CommandProcessingExists")
-	}
-
-	var r0 bool
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context) (bool, error)); ok {
-		return rf(ctx)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context) bool); ok {
-		r0 = rf(ctx)
-	} else {
-		r0 = ret.Get(0).(bool)
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(ctx)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// FakeRepository_CommandProcessingExists_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CommandProcessingExists'
-type FakeRepository_CommandProcessingExists_Call struct {
-	*mock.Call
-}
-
-// CommandProcessingExists is a helper method to define mock.On call
-//   - ctx context.Context
-func (_e *FakeRepository_Expecter) CommandProcessingExists(ctx interface{}) *FakeRepository_CommandProcessingExists_Call {
-	return &FakeRepository_CommandProcessingExists_Call{Call: _e.mock.On("CommandProcessingExists", ctx)}
-}
-
-func (_c *FakeRepository_CommandProcessingExists_Call) Run(run func(ctx context.Context)) *FakeRepository_CommandProcessingExists_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context))
-	})
-	return _c
-}
-
-func (_c *FakeRepository_CommandProcessingExists_Call) Return(_a0 bool, _a1 error) *FakeRepository_CommandProcessingExists_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *FakeRepository_CommandProcessingExists_Call) RunAndReturn(run func(context.Context) (bool, error)) *FakeRepository_CommandProcessingExists_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -232,12 +176,12 @@ func (_c *FakeRepository_CreateCommand_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
-// DeleteCommandByIDAndNotProcessing provides a mock function with given fields: ctx, id
-func (_m *FakeRepository) DeleteCommandByIDAndNotProcessing(ctx context.Context, id int64) error {
+// DeleteCommandByID provides a mock function with given fields: ctx, id
+func (_m *FakeRepository) DeleteCommandByID(ctx context.Context, id int64) error {
 	ret := _m.Called(ctx, id)
 
 	if len(ret) == 0 {
-		panic("no return value specified for DeleteCommandByIDAndNotProcessing")
+		panic("no return value specified for DeleteCommandByID")
 	}
 
 	var r0 error
@@ -250,31 +194,31 @@ func (_m *FakeRepository) DeleteCommandByIDAndNotProcessing(ctx context.Context,
 	return r0
 }
 
-// FakeRepository_DeleteCommandByIDAndNotProcessing_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteCommandByIDAndNotProcessing'
-type FakeRepository_DeleteCommandByIDAndNotProcessing_Call struct {
+// FakeRepository_DeleteCommandByID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteCommandByID'
+type FakeRepository_DeleteCommandByID_Call struct {
 	*mock.Call
 }
 
-// DeleteCommandByIDAndNotProcessing is a helper method to define mock.On call
+// DeleteCommandByID is a helper method to define mock.On call
 //   - ctx context.Context
 //   - id int64
-func (_e *FakeRepository_Expecter) DeleteCommandByIDAndNotProcessing(ctx interface{}, id interface{}) *FakeRepository_DeleteCommandByIDAndNotProcessing_Call {
-	return &FakeRepository_DeleteCommandByIDAndNotProcessing_Call{Call: _e.mock.On("DeleteCommandByIDAndNotProcessing", ctx, id)}
+func (_e *FakeRepository_Expecter) DeleteCommandByID(ctx interface{}, id interface{}) *FakeRepository_DeleteCommandByID_Call {
+	return &FakeRepository_DeleteCommandByID_Call{Call: _e.mock.On("DeleteCommandByID", ctx, id)}
 }
 
-func (_c *FakeRepository_DeleteCommandByIDAndNotProcessing_Call) Run(run func(ctx context.Context, id int64)) *FakeRepository_DeleteCommandByIDAndNotProcessing_Call {
+func (_c *FakeRepository_DeleteCommandByID_Call) Run(run func(ctx context.Context, id int64)) *FakeRepository_DeleteCommandByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(int64))
 	})
 	return _c
 }
 
-func (_c *FakeRepository_DeleteCommandByIDAndNotProcessing_Call) Return(_a0 error) *FakeRepository_DeleteCommandByIDAndNotProcessing_Call {
+func (_c *FakeRepository_DeleteCommandByID_Call) Return(_a0 error) *FakeRepository_DeleteCommandByID_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *FakeRepository_DeleteCommandByIDAndNotProcessing_Call) RunAndReturn(run func(context.Context, int64) error) *FakeRepository_DeleteCommandByIDAndNotProcessing_Call {
+func (_c *FakeRepository_DeleteCommandByID_Call) RunAndReturn(run func(context.Context, int64) error) *FakeRepository_DeleteCommandByID_Call {
 	_c.Call.Return(run)
 	return _c
 }

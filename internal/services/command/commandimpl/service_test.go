@@ -57,12 +57,18 @@ func TestService_CreateCommand(t *testing.T) {
 func TestService_CancelCurrentProcessingCommand(t *testing.T) {
 	t.Run("Cancel current processing command successfully", func(t *testing.T) {
 		runningCommandRepository := commandmocks.NewFakeRunningCommandRepository(t)
+		commandRepository := commandmocks.NewFakeRepository(t)
 		commandService := Service{
 			runningCmdRepository: runningCommandRepository,
+			commandRepository:    commandRepository,
 		}
 
-		cancelableCommand := command.NewCancelableCommand(context.Background(), command.Command{})
+		cancelableCommand := command.NewCancelableCommand(context.Background(), command.Command{
+			Status: command.StatusProcessing,
+		})
 		runningCommandRepository.EXPECT().Get(mock.Anything).Return(cancelableCommand, nil)
+		commandRepository.EXPECT().UpdateCommand(mock.Anything, mock.Anything).Return(command.Command{}, nil)
+		runningCommandRepository.EXPECT().Update(mock.Anything, mock.Anything).Return(nil)
 
 		err := commandService.CancelCurrentProcessingCommand(context.Background())
 		require.NoError(t, err)
