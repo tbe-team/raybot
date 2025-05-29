@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { CargoCheckQRInputs, MoveToInputs } from '@/types/command'
+import type { CargoCheckQRInputs, Command, MoveToInputs } from '@/types/command'
 import { useQueryClient } from '@tanstack/vue-query'
 import { Clock, Loader, MoreHorizontal } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
@@ -26,7 +26,10 @@ const REFRESH_INTERVAL = 1000
 const queryClient = useQueryClient()
 const { openConfirmation } = useConfirmationStore()
 
-const { data: command, isError } = useCurrentProcessingCommandQuery({ axiosOpts: { doNotShowLoading: true }, refetchInterval: REFRESH_INTERVAL })
+const { data: command, isError } = useCurrentProcessingCommandQuery({
+  axiosOpts: { doNotShowLoading: true },
+  refetchInterval: REFRESH_INTERVAL,
+})
 const { mutate: cancelProcessingCommand, isPending: isCancellingCommand } = useCancelProcessingCommandMutation()
 
 function handleCancelCommand() {
@@ -39,8 +42,11 @@ function handleCancelCommand() {
       cancelProcessingCommand(undefined, {
         onSuccess: () => {
           notification.success('Command cancelled successfully')
-          queryClient.setQueryData([CURRENT_PROCESSING_COMMAND_QUERY_KEY], () => {
-            return null
+          queryClient.setQueryData([CURRENT_PROCESSING_COMMAND_QUERY_KEY], (oldData: Command) => {
+            return {
+              ...oldData,
+              status: 'CANCELING',
+            }
           })
         },
         onError: (error) => {

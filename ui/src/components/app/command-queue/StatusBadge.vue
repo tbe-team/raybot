@@ -23,6 +23,11 @@ const statusConfig: Record<CommandStatus, {
     label: 'Processing',
     class: 'bg-blue-500/10 text-blue-500 hover:bg-blue-500/20 hover:text-blue-500',
   },
+  CANCELING: {
+    icon: Loader2,
+    label: 'Canceling',
+    class: 'bg-amber-500/10 text-amber-500 hover:bg-amber-500/20 hover:text-amber-500',
+  },
   SUCCEEDED: {
     icon: CheckCircle,
     label: 'Succeeded',
@@ -51,7 +56,7 @@ const statusConfig: Record<CommandStatus, {
     <component
       :is="statusConfig[props.status].icon"
       class="w-3 h-3"
-      :class="{ 'animate-spin': props.status === 'PROCESSING' }"
+      :class="{ 'animate-spin': props.status === 'PROCESSING' || props.status === 'CANCELING' }"
     />
     {{ statusConfig[props.status].label }}
   </Badge>

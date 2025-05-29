@@ -98,7 +98,13 @@ export const CommandTypeValues = [
 ] as const
 export type CommandType = typeof CommandTypeValues[number]
 
-export type CommandStatus = 'QUEUED' | 'PROCESSING' | 'SUCCEEDED' | 'FAILED' | 'CANCELED'
+export type CommandStatus =
+  | 'QUEUED'
+  | 'PROCESSING'
+  | 'CANCELING'
+  | 'SUCCEEDED'
+  | 'FAILED'
+  | 'CANCELED'
 
 export type CommandSource = 'CLOUD' | 'APP'
 
