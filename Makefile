@@ -17,10 +17,6 @@ gen-openapi:
 		-config internal/handlers/http/gen/oapi-codegen.yml \
 		api/openapi/openapi.gen.yml
 
-.PHONY: gen-proto
-gen-proto:
-	pnpm --package=@bufbuild/buf@1.50.1 dlx buf generate
-
 .PHONY: gen-sqlc
 gen-sqlc:
 	go run github.com/sqlc-dev/sqlc/cmd/sqlc@v1.28.0 generate --file internal/storage/db/sqlc/sqlc.yml
@@ -30,7 +26,7 @@ gen-mock:
 	go run github.com/vektra/mockery/v2@v2.53.1 --config .mockery.yml
 
 .PHONY: gen-all
-gen-all: gen-openapi gen-sqlc gen-proto gen-mock
+gen-all: gen-openapi gen-sqlc gen-mock
 
 #########################
 # Database

@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/proto"
 
-	commandv1 "github.com/tbe-team/raybot/internal/handlers/cloud/gen/command/v1"
+	commandv1 "github.com/tbe-team/raybot-api/command/v1"
 	"github.com/tbe-team/raybot/internal/handlers/cloud/tunneltest"
 	"github.com/tbe-team/raybot/internal/services/command"
 )
