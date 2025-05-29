@@ -1,12 +1,14 @@
 <script setup lang="ts">
+import type { Info } from '@/types/info'
 import type { RobotState } from '@/types/robot-state'
 import BatteryCard from './BatteryCard.vue'
 import ConnectionsCard from './ConnectionsCard.vue'
+import InfoCard from './InfoCard.vue'
 import LocationCard from './LocationCard.vue'
-import MotorsCard from './MotorsCard.vue'
 
 const props = defineProps<{
   robotState: RobotState
+  systemInfo: Info
 }>()
 </script>
 
@@ -15,10 +17,8 @@ const props = defineProps<{
     <BatteryCard
       :battery="props.robotState.battery"
     />
-    <MotorsCard
-      :lift-motor="props.robotState.liftMotor"
-      :drive-motor="props.robotState.driveMotor"
-      :cargo-door-motor="props.robotState.cargoDoorMotor"
+    <InfoCard
+      :info="props.systemInfo"
     />
 
     <!-- Location Card -->
