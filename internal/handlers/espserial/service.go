@@ -111,6 +111,14 @@ func (s *Service) routeMessage(ctx context.Context, msg []byte) {
 		}
 
 	case messageTypeACK:
+		var ackMsg ackMessage
+		if err := json.Unmarshal(msg, &ackMsg); err != nil {
+			s.log.Error("failed to unmarshal ack message", slog.Any("error", err), slog.Any("message", msg))
+			return
+		}
+		if err := s.HandleACK(ackMsg); err != nil {
+			s.log.Error("failed to handle ack message", slog.Any("error", err), slog.Any("message", msg))
+		}
 	}
 }
 
