@@ -2,21 +2,13 @@
 import { CircleAlert, Server } from 'lucide-vue-next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSystemGetInfoQuery } from '@/composables/use-system'
-
+import { formatUptimeShort } from '@/lib/date'
 const REFRESH_INTERVAL_INFORMATION = 10000
 
 const { data, isPending, isError, error } = useSystemGetInfoQuery({
   axiosOpts: { doNotShowLoading: true },
   refetchInterval: REFRESH_INTERVAL_INFORMATION,
 })
-
-function formatUptime(seconds: number): string {
-  const hours = Math.floor(seconds / 3600)
-  const minutes = Math.floor((seconds % 3600) / 60)
-  const remainingSeconds = seconds % 60
-
-  return `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
-}
 
 function formatMemory(bytes: number): string {
   const gb = bytes / (1024)
@@ -71,7 +63,7 @@ function getUsageColor(usage: number): string {
         <div class="flex items-center gap-2">
           <span class="text-sm font-medium">Uptime</span>
         </div>
-        <span class="font-mono text-sm font-normal text-muted-foreground">{{ formatUptime(data.uptime) }}</span>
+        <span class="font-mono text-sm font-normal text-muted-foreground">{{ formatUptimeShort(data.uptime) }}</span>
       </div>
 
       <!-- CPU Usage -->
