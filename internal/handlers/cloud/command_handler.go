@@ -359,6 +359,9 @@ func (commandHandler) convertCommandStatusToResponse(status command.Status) comm
 	case command.StatusProcessing:
 		return commandv1.CommandStatus_COMMAND_STATUS_PROCESSING
 
+	case command.StatusCanceling:
+		return commandv1.CommandStatus_COMMAND_STATUS_CANCELING
+
 	case command.StatusSucceeded:
 		return commandv1.CommandStatus_COMMAND_STATUS_SUCCEEDED
 
