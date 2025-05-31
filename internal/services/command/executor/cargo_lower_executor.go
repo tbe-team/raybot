@@ -44,6 +44,12 @@ func (e cargoLowerExecutor) Execute(ctx context.Context, inputs command.CargoLow
 
 	wg.Add(1)
 	go func() {
+		defer wg.Done()
+		e.trackingMotorStopped(ctx)
+	}()
+
+	wg.Add(1)
+	go func() {
 		defer func() {
 			wg.Done()
 			cancelObstacleTracking()
@@ -91,6 +97,32 @@ func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Contex
 		acceptableDistance := lowerPosition - lowerPosition*10/100
 		if ev.DownDistance >= acceptableDistance {
 			e.log.Info("lower position reached", slog.Int64("lower_position", int64(lowerPosition)))
+			close(doneCh)
+		}
+	})
+
+	select {
+	case <-doneCh:
+	case <-ctx.Done():
+	}
+}
+
+func (e cargoLowerExecutor) trackingMotorStopped(ctx context.Context) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer func() {
+		e.log.Debug("stop tracking lift position")
+		cancel()
+	}()
+
+	doneCh := make(chan struct{})
+	e.subscriber.Subscribe(ctx, events.LiftMotorUpdatedTopic, func(_ context.Context, msg *eventbus.Message) {
+		ev, ok := msg.Payload.(events.LiftMotorStateUpdatedEvent)
+		if !ok {
+			e.log.Error("invalid event", slog.Any("event", msg.Payload))
+			return
+		}
+
+		if !ev.IsRunning {
 			close(doneCh)
 		}
 	})

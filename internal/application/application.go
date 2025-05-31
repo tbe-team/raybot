@@ -178,7 +178,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	batteryService := batteryimpl.NewService(validator, batteryStateRepository, batterySettingRepository)
 	distanceSensorService := distancesensorimpl.NewService(validator, eventBus, distanceSensorStateRepository)
 	driveMotorService := drivemotorimpl.NewService(validator, eventBus, driveMotorStateRepository, picSerialClient)
-	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, picSerialClient)
+	liftMotorService := liftmotorimpl.NewService(validator, eventBus, liftMotorStateRepository, picSerialClient)
 	cargoService := cargoimpl.NewService(validator, eventBus, cargoRepository, espSerialClient)
 	locationService := locationimpl.NewService(validator, eventBus, locationRepository)
 	configService := configimpl.NewService(cfg, fileClient)
