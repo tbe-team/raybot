@@ -46,6 +46,10 @@ packages:
     config:
     interfaces:
       Service:
+  github.com/tbe-team/raybot/internal/services/system:
+    config:
+    interfaces:
+      Service:
   github.com/tbe-team/raybot/pkg/eventbus:
     config:
     interfaces:
