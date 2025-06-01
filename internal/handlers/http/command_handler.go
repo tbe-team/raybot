@@ -346,6 +346,14 @@ func (commandHandler) convertOutputsToResponse(outputs command.Outputs) (gen.Com
 }
 
 func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, inputs gen.CommandInputs) (command.Inputs, error) {
+	i, err := inputs.MarshalJSON()
+	if err != nil {
+		return nil, fmt.Errorf("marshal inputs: %w", err)
+	}
+	if string(i) == "null" {
+		return nil, fmt.Errorf("inputs is null")
+	}
+
 	switch command.CommandType(cmdType) {
 	case command.CommandTypeStopMovement:
 		return &command.StopMovementInputs{}, nil
