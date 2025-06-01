@@ -34,6 +34,10 @@ packages:
     config:
     interfaces:
       Service:
+  github.com/tbe-team/raybot/internal/services/dashboarddata:
+    config:
+    interfaces:
+      Service:
   github.com/tbe-team/raybot/pkg/eventbus:
     config:
     interfaces:
