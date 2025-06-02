@@ -10,9 +10,12 @@ import (
 )
 
 const commandCancelByStatusQueuedAndProcessingAndCanceling = `-- name: CommandCancelByStatusQueuedAndProcessingAndCanceling :exec
-UPDATE commands
-SET status = 'CANCELED'
-WHERE status IN ('QUEUED', 'PROCESSING', 'CANCELING')
+UPDATE
+	commands
+SET
+	status = 'CANCELED'
+WHERE
+	status IN ('QUEUED', 'PROCESSING', 'CANCELING')
 `
 
 func (q *Queries) CommandCancelByStatusQueuedAndProcessingAndCanceling(ctx context.Context, db DBTX) error {
@@ -21,10 +24,13 @@ func (q *Queries) CommandCancelByStatusQueuedAndProcessingAndCanceling(ctx conte
 }
 
 const commandCancelByStatusQueuedAndProcessingAndCreatedByCloud = `-- name: CommandCancelByStatusQueuedAndProcessingAndCreatedByCloud :exec
-UPDATE commands
-SET status = 'CANCELED'
-WHERE status IN ('QUEUED', 'PROCESSING')
-AND source = 'CLOUD'
+UPDATE
+	commands
+SET
+	status = 'CANCELED'
+WHERE
+	status IN ('QUEUED', 'PROCESSING')
+	AND source = 'CLOUD'
 `
 
 func (q *Queries) CommandCancelByStatusQueuedAndProcessingAndCreatedByCloud(ctx context.Context, db DBTX) error {
@@ -33,29 +39,31 @@ func (q *Queries) CommandCancelByStatusQueuedAndProcessingAndCreatedByCloud(ctx 
 }
 
 const commandCreate = `-- name: CommandCreate :one
-INSERT INTO commands (
-	type,
-	status,
-	source,
-	inputs,
-	error,
-	started_at,
-	created_at,
-	updated_at,
-	completed_at
-)
-VALUES (
-	?1,
-	?2,
-	?3,
-	?4,
-	?5,
-	?6,
-	?7,
-	?8,
-	?9
-)
-RETURNING id, outputs
+INSERT INTO
+	commands (
+		type,
+		status,
+		source,
+		inputs,
+		error,
+		started_at,
+		created_at,
+		updated_at,
+		completed_at
+	)
+VALUES
+	(
+		?1,
+		?2,
+		?3,
+		?4,
+		?5,
+		?6,
+		?7,
+		?8,
+		?9
+	) RETURNING id,
+	outputs
 `
 
 type CommandCreateParams struct {
@@ -93,9 +101,11 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 }
 
 const commandDeleteByID = `-- name: CommandDeleteByID :execrows
-DELETE FROM commands
-WHERE id = ?1
-AND status NOT IN ('PROCESSING', 'CANCELING')
+DELETE FROM
+	commands
+WHERE
+	id = ?1
+	AND status NOT IN ('PROCESSING', 'CANCELING')
 `
 
 // It does not delete the command if the status is PROCESSING, CANCELING.
@@ -108,9 +118,11 @@ func (q *Queries) CommandDeleteByID(ctx context.Context, db DBTX, id int64) (int
 }
 
 const commandDeleteOldCommands = `-- name: CommandDeleteOldCommands :execrows
-DELETE FROM commands
-WHERE created_at < ?1
-AND status NOT IN ('QUEUED', 'PROCESSING', 'CANCELING')
+DELETE FROM
+	commands
+WHERE
+	created_at < ?1
+	AND status NOT IN ('QUEUED', 'PROCESSING', 'CANCELING')
 `
 
 // It does not delete the command if the status is QUEUED, PROCESSING, CANCELING.
@@ -123,8 +135,12 @@ func (q *Queries) CommandDeleteOldCommands(ctx context.Context, db DBTX, created
 }
 
 const commandGetByID = `-- name: CommandGetByID :one
-SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs FROM commands
-WHERE id = ?1
+SELECT
+	id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs
+FROM
+	commands
+WHERE
+	id = ?1
 `
 
 func (q *Queries) CommandGetByID(ctx context.Context, db DBTX, id int64) (Command, error) {
@@ -147,9 +163,14 @@ func (q *Queries) CommandGetByID(ctx context.Context, db DBTX, id int64) (Comman
 }
 
 const commandGetCurrentProcessing = `-- name: CommandGetCurrentProcessing :one
-SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs FROM commands
-WHERE status IN ('PROCESSING', 'CANCELING')
-LIMIT 1
+SELECT
+	id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs
+FROM
+	commands
+WHERE
+	status IN ('PROCESSING', 'CANCELING')
+LIMIT
+	1
 `
 
 // It returns the command with the status PROCESSING or CANCELING.
@@ -174,10 +195,16 @@ func (q *Queries) CommandGetCurrentProcessing(ctx context.Context, db DBTX) (Com
 }
 
 const commandGetNextExecutable = `-- name: CommandGetNextExecutable :one
-SELECT id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs FROM commands
-WHERE status = 'QUEUED'
-ORDER BY created_at ASC
-LIMIT 1
+SELECT
+	id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs
+FROM
+	commands
+WHERE
+	status = 'QUEUED'
+ORDER BY
+	created_at ASC
+LIMIT
+	1
 `
 
 func (q *Queries) CommandGetNextExecutable(ctx context.Context, db DBTX) (Command, error) {
@@ -200,16 +227,32 @@ func (q *Queries) CommandGetNextExecutable(ctx context.Context, db DBTX) (Comman
 }
 
 const commandUpdate = `-- name: CommandUpdate :one
-UPDATE commands
+UPDATE
+	commands
 SET
-	status = CASE WHEN ?1 = 1 THEN ?2 ELSE status END,
-	outputs = CASE WHEN ?3 = 1 THEN ?4 ELSE outputs END,
-	error = CASE WHEN ?5 = 1 THEN ?6 ELSE error END,
-	started_at = CASE WHEN ?7 = 1 THEN ?8 ELSE started_at END,
-	completed_at = CASE WHEN ?9 = 1 THEN ?10 ELSE completed_at END,
+	status = CASE
+		WHEN ?1 = 1 THEN ?2
+		ELSE status
+	END,
+	outputs = CASE
+		WHEN ?3 = 1 THEN ?4
+		ELSE outputs
+	END,
+	error = CASE
+		WHEN ?5 = 1 THEN ?6
+		ELSE error
+	END,
+	started_at = CASE
+		WHEN ?7 = 1 THEN ?8
+		ELSE started_at
+	END,
+	completed_at = CASE
+		WHEN ?9 = 1 THEN ?10
+		ELSE completed_at
+	END,
 	updated_at = ?11
-WHERE id = ?12
-RETURNING id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs
+WHERE
+	id = ?12 RETURNING id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs
 `
 
 type CommandUpdateParams struct {

@@ -11,9 +11,10 @@ CREATE TABLE commands (
 	created_at TEXT NOT NULL,
 	updated_at TEXT NOT NULL
 );
--- +goose StatementEnd
 
+-- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
 DROP TABLE commands;
+
 -- +goose StatementEnd

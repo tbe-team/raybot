@@ -10,8 +10,12 @@ import (
 )
 
 const locationGetCurrent = `-- name: LocationGetCurrent :one
-SELECT id, current_location, updated_at FROM location
-WHERE id = 1
+SELECT
+	id, current_location, updated_at
+FROM
+	location
+WHERE
+	id = 1
 `
 
 func (q *Queries) LocationGetCurrent(ctx context.Context, db DBTX) (Location, error) {
@@ -22,11 +26,13 @@ func (q *Queries) LocationGetCurrent(ctx context.Context, db DBTX) (Location, er
 }
 
 const locationUpdate = `-- name: LocationUpdate :exec
-UPDATE location
+UPDATE
+	location
 SET
 	current_location = ?,
 	updated_at = ?
-WHERE id = 1
+WHERE
+	id = 1
 `
 
 type LocationUpdateParams struct {

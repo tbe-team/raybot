@@ -10,8 +10,12 @@ import (
 )
 
 const batteryChargeSettingGet = `-- name: BatteryChargeSettingGet :one
-SELECT id, current_limit, enabled, updated_at FROM battery_charge_setting
-WHERE id = 1
+SELECT
+	id, current_limit, enabled, updated_at
+FROM
+	battery_charge_setting
+WHERE
+	id = 1
 `
 
 func (q *Queries) BatteryChargeSettingGet(ctx context.Context, db DBTX) (BatteryChargeSetting, error) {
@@ -27,12 +31,14 @@ func (q *Queries) BatteryChargeSettingGet(ctx context.Context, db DBTX) (Battery
 }
 
 const batteryChargeSettingUpdate = `-- name: BatteryChargeSettingUpdate :exec
-UPDATE battery_charge_setting
+UPDATE
+	battery_charge_setting
 SET
 	current_limit = ?1,
 	enabled = ?2,
 	updated_at = ?3
-WHERE id = 1
+WHERE
+	id = 1
 `
 
 type BatteryChargeSettingUpdateParams struct {
@@ -47,8 +53,12 @@ func (q *Queries) BatteryChargeSettingUpdate(ctx context.Context, db DBTX, arg B
 }
 
 const batteryDischargeSettingGet = `-- name: BatteryDischargeSettingGet :one
-SELECT id, current_limit, enabled, updated_at FROM battery_discharge_setting
-WHERE id = 1
+SELECT
+	id, current_limit, enabled, updated_at
+FROM
+	battery_discharge_setting
+WHERE
+	id = 1
 `
 
 func (q *Queries) BatteryDischargeSettingGet(ctx context.Context, db DBTX) (BatteryDischargeSetting, error) {
@@ -64,12 +74,14 @@ func (q *Queries) BatteryDischargeSettingGet(ctx context.Context, db DBTX) (Batt
 }
 
 const batteryDischargeSettingUpdate = `-- name: BatteryDischargeSettingUpdate :exec
-UPDATE battery_discharge_setting
+UPDATE
+	battery_discharge_setting
 SET
 	current_limit = ?1,
 	enabled = ?2,
 	updated_at = ?3
-WHERE id = 1
+WHERE
+	id = 1
 `
 
 type BatteryDischargeSettingUpdateParams struct {

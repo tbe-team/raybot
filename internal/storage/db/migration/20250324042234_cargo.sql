@@ -17,12 +17,34 @@ CREATE TABLE cargo_door_motor (
 	updated_at TEXT NOT NULL
 );
 
-INSERT INTO cargo (id, is_open, qr_code, bottom_distance, updated_at) VALUES (1, false, '', 0, '2025-01-01T00:00:00Z');
-INSERT INTO cargo_door_motor (id, direction, speed, is_running, enabled, updated_at) VALUES (1, 0, 0, false, false, '2025-01-01T00:00:00Z');
--- +goose StatementEnd
+INSERT INTO
+	cargo (
+		id,
+		is_open,
+		qr_code,
+		bottom_distance,
+		updated_at
+	)
+VALUES
+	(1, false, '', 0, '2025-01-01T00:00:00Z');
 
+INSERT INTO
+	cargo_door_motor (
+		id,
+		direction,
+		speed,
+		is_running,
+		enabled,
+		updated_at
+	)
+VALUES
+	(1, 0, 0, false, false, '2025-01-01T00:00:00Z');
+
+-- +goose StatementEnd
 -- +goose Down
 -- +goose StatementBegin
 DROP TABLE cargo_door_motor;
+
 DROP TABLE cargo;
+
 -- +goose StatementEnd
