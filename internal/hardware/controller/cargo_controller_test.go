@@ -58,7 +58,11 @@ func TestCargoController_SetCargoPosition(t *testing.T) {
 		mockPort := &picserial.FakeSerialPort{}
 		eventBus := &fakeEventBus{}
 		controller := controller{
-			cfg:             config.Hardware{},
+			cfg: config.Hardware{
+				PIC: config.PIC{
+					EnableACK: true,
+				},
+			},
 			log:             log,
 			subscriber:      eventBus,
 			picSerialClient: picserial.NewClientWithPort(mockPort),
@@ -133,7 +137,11 @@ func TestCargoController_StopLiftCargoMotor(t *testing.T) {
 		mockPort := &picserial.FakeSerialPort{}
 		eventBus := &fakeEventBus{}
 		controller := controller{
-			cfg:             config.Hardware{},
+			cfg: config.Hardware{
+				PIC: config.PIC{
+					EnableACK: true,
+				},
+			},
 			log:             log,
 			subscriber:      eventBus,
 			picSerialClient: picserial.NewClientWithPort(mockPort),

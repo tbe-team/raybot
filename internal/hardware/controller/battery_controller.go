@@ -21,7 +21,7 @@ func (c *controller) ConfigBatteryCharge(ctx context.Context, currentLimit uint1
 		},
 	}
 
-	if err := c.createPICCommandWithACK(ctx, cmd); err != nil {
+	if err := c.createPICCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("create PIC command with ACK: %w", err)
 	}
 	return nil
@@ -38,7 +38,7 @@ func (c *controller) ConfigBatteryDischarge(ctx context.Context, currentLimit ui
 		},
 	}
 
-	if err := c.createPICCommandWithACK(ctx, cmd); err != nil {
+	if err := c.createPICCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("create PIC command with ACK: %w", err)
 	}
 

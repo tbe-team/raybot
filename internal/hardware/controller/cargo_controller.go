@@ -22,7 +22,7 @@ func (c *controller) SetCargoPosition(ctx context.Context, motorSpeed uint8, tar
 		},
 	}
 
-	if err := c.createPICCommandWithACK(ctx, cmd); err != nil {
+	if err := c.createPICCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("create PIC command with ACK: %w", err)
 	}
 
@@ -39,7 +39,7 @@ func (c *controller) StopLiftCargoMotor(ctx context.Context) error {
 		},
 	}
 
-	if err := c.createPICCommandWithACK(ctx, cmd); err != nil {
+	if err := c.createPICCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("create PIC command with ACK: %w", err)
 	}
 

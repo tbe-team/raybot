@@ -25,7 +25,7 @@ func (c *controller) MoveForward(ctx context.Context, speed uint8) error {
 		},
 	}
 
-	if err := c.createPICCommandWithACK(ctx, cmd); err != nil {
+	if err := c.createPICCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("create PIC command with ACK: %w", err)
 	}
 
@@ -44,7 +44,7 @@ func (c *controller) MoveBackward(ctx context.Context, speed uint8) error {
 		},
 	}
 
-	if err := c.createPICCommandWithACK(ctx, cmd); err != nil {
+	if err := c.createPICCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("create PIC command with ACK: %w", err)
 	}
 	return nil
@@ -69,7 +69,7 @@ func (c *controller) StopDriveMotor(ctx context.Context, moveForward bool) error
 		},
 	}
 
-	if err := c.createPICCommandWithACK(ctx, cmd); err != nil {
+	if err := c.createPICCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("create PIC command with ACK: %w", err)
 	}
 

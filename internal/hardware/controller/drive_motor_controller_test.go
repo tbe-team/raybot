@@ -57,7 +57,11 @@ func TestDriveMotorController_MoveForward(t *testing.T) {
 		mockPort := &picserial.FakeSerialPort{}
 		eventBus := &fakeEventBus{}
 		controller := controller{
-			cfg:             config.Hardware{},
+			cfg: config.Hardware{
+				PIC: config.PIC{
+					EnableACK: true,
+				},
+			},
 			log:             log,
 			subscriber:      eventBus,
 			picSerialClient: picserial.NewClientWithPort(mockPort),
@@ -132,7 +136,11 @@ func TestDriveMotorController_MoveBackward(t *testing.T) {
 		mockPort := &picserial.FakeSerialPort{}
 		eventBus := &fakeEventBus{}
 		controller := controller{
-			cfg:             config.Hardware{},
+			cfg: config.Hardware{
+				PIC: config.PIC{
+					EnableACK: true,
+				},
+			},
 			log:             log,
 			subscriber:      eventBus,
 			picSerialClient: picserial.NewClientWithPort(mockPort),
@@ -207,7 +215,11 @@ func TestDriveMotorController_StopDriveMotor(t *testing.T) {
 		mockPort := &picserial.FakeSerialPort{}
 		eventBus := &fakeEventBus{}
 		controller := controller{
-			cfg:             config.Hardware{},
+			cfg: config.Hardware{
+				PIC: config.PIC{
+					EnableACK: true,
+				},
+			},
 			log:             log,
 			subscriber:      eventBus,
 			picSerialClient: picserial.NewClientWithPort(mockPort),

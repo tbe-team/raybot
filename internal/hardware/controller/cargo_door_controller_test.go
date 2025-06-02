@@ -57,7 +57,11 @@ func TestCargoDoorController_OpenCargoDoor(t *testing.T) {
 		mockPort := &espserial.FakeSerialPort{}
 		eventBus := &fakeEventBus{}
 		controller := controller{
-			cfg:             config.Hardware{},
+			cfg: config.Hardware{
+				ESP: config.ESP{
+					EnableACK: true,
+				},
+			},
 			log:             log,
 			subscriber:      eventBus,
 			espSerialClient: espserial.NewClientWithPort(mockPort),
@@ -132,7 +136,11 @@ func TestCargoDoorController_CloseCargoDoor(t *testing.T) {
 		mockPort := &espserial.FakeSerialPort{}
 		eventBus := &fakeEventBus{}
 		controller := controller{
-			cfg:             config.Hardware{},
+			cfg: config.Hardware{
+				ESP: config.ESP{
+					EnableACK: true,
+				},
+			},
 			log:             log,
 			subscriber:      eventBus,
 			espSerialClient: espserial.NewClientWithPort(mockPort),

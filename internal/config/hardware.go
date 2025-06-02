@@ -31,6 +31,7 @@ func (h *Hardware) Validate() error {
 
 type ESP struct {
 	Serial            Serial        `yaml:"serial"`
+	EnableACK         bool          `yaml:"enable_ack"`
 	CommandACKTimeout time.Duration `yaml:"command_ack_timeout"`
 }
 
@@ -48,6 +49,7 @@ func (e *ESP) Validate() error {
 
 type PIC struct {
 	Serial            Serial        `yaml:"serial"`
+	EnableACK         bool          `yaml:"enable_ack"`
 	CommandACKTimeout time.Duration `yaml:"command_ack_timeout"`
 }
 

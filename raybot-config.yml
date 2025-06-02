@@ -18,6 +18,7 @@ hardware:
       stop_bits: 1
       parity: NONE
       read_timeout: 1s
+    enable_ack: false
     command_ack_timeout: 1s
   pic:
     serial:
@@ -27,6 +28,7 @@ hardware:
       stop_bits: 1
       parity: NONE
       read_timeout: 1s
+    enable_ack: false
     command_ack_timeout: 1s
 cloud:
   enable: false

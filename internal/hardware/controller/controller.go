@@ -60,21 +60,37 @@ func New(
 	return c
 }
 
-func (c *controller) createPICCommandWithACK(ctx context.Context, cmd picCommand) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel() // ensure cleanup other goroutines
+func (c *controller) createPICCommand(ctx context.Context, cmd picCommand) error {
+	if !c.cfg.PIC.EnableACK {
+		return c.writePICCommand(ctx, cmd)
+	}
 
+	return c.writePICCommandWithACK(ctx, cmd)
+}
+
+func (c *controller) writePICCommand(ctx context.Context, cmd picCommand) error {
 	cmdJSON, err := json.Marshal(cmd)
 	if err != nil {
 		return fmt.Errorf("marshal command: %w", err)
 	}
+
+	if err := c.picSerialClient.Write(ctx, cmdJSON); err != nil {
+		return fmt.Errorf("write command: %w", err)
+	}
+
+	return nil
+}
+
+func (c *controller) writePICCommandWithACK(ctx context.Context, cmd picCommand) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel() // ensure cleanup other goroutines
 
 	errCh := make(chan error, 1)
 	go func() {
 		errCh <- c.trackingPICCommandACK(ctx, cmd.ID)
 	}()
 
-	if err := c.picSerialClient.Write(ctx, cmdJSON); err != nil {
+	if err := c.writePICCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("write command: %w", err)
 	}
 
@@ -92,7 +108,7 @@ func (c *controller) createPICCommandWithACK(ctx context.Context, cmd picCommand
 
 func (c *controller) trackingPICCommandACK(ctx context.Context, id string) error {
 	log := c.log.With(slog.String("id", id))
-	log.Debug("start tracking PIC command ack")
+	log.Info("start tracking PIC command ack")
 
 	doneCh := make(chan struct{})
 	c.subscriber.Subscribe(ctx, events.PICCmdAckTopic, func(msg *eventbus.Message) {
@@ -104,7 +120,7 @@ func (c *controller) trackingPICCommandACK(ctx context.Context, id string) error
 
 		if ev.ID == id {
 			if ev.Success {
-				log.Debug("PIC command ack received")
+				log.Info("PIC command ack success")
 			} else {
 				log.Error("PIC command ack failed")
 			}
@@ -114,7 +130,7 @@ func (c *controller) trackingPICCommandACK(ctx context.Context, id string) error
 
 	select {
 	case <-doneCh:
-		log.Debug("stop tracking PIC command ack")
+		log.Info("stop tracking PIC command ack")
 		return nil
 
 	case <-time.After(c.cfg.PIC.CommandACKTimeout):
@@ -126,21 +142,37 @@ func (c *controller) trackingPICCommandACK(ctx context.Context, id string) error
 	}
 }
 
-func (c *controller) createESPCommandWithACK(ctx context.Context, cmd espCommand) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel() // ensure cleanup other goroutines
+func (c *controller) createESPCommand(ctx context.Context, cmd espCommand) error {
+	if !c.cfg.ESP.EnableACK {
+		return c.writeESPCommand(ctx, cmd)
+	}
 
+	return c.writeESPCommandWithACK(ctx, cmd)
+}
+
+func (c *controller) writeESPCommand(ctx context.Context, cmd espCommand) error {
 	cmdJSON, err := json.Marshal(cmd)
 	if err != nil {
 		return fmt.Errorf("marshal command: %w", err)
 	}
+
+	if err := c.espSerialClient.Write(ctx, cmdJSON); err != nil {
+		return fmt.Errorf("write command: %w", err)
+	}
+
+	return nil
+}
+
+func (c *controller) writeESPCommandWithACK(ctx context.Context, cmd espCommand) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel() // ensure cleanup other goroutines
 
 	errCh := make(chan error, 1)
 	go func() {
 		errCh <- c.trackingESPCommandACK(ctx, cmd.ID)
 	}()
 
-	if err := c.espSerialClient.Write(ctx, cmdJSON); err != nil {
+	if err := c.writeESPCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("write command: %w", err)
 	}
 
@@ -158,7 +190,7 @@ func (c *controller) createESPCommandWithACK(ctx context.Context, cmd espCommand
 
 func (c *controller) trackingESPCommandACK(ctx context.Context, id string) error {
 	log := c.log.With(slog.String("id", id))
-	log.Debug("start tracking ESP command ack")
+	log.Info("start tracking ESP command ack")
 
 	doneCh := make(chan struct{})
 	c.subscriber.Subscribe(ctx, events.ESPCmdAckTopic, func(msg *eventbus.Message) {
@@ -170,7 +202,7 @@ func (c *controller) trackingESPCommandACK(ctx context.Context, id string) error
 
 		if ev.ID == id {
 			if ev.Success {
-				log.Debug("ESP command ack received")
+				log.Info("ESP command ack success")
 			} else {
 				log.Error("ESP command ack failed")
 			}
@@ -180,7 +212,7 @@ func (c *controller) trackingESPCommandACK(ctx context.Context, id string) error
 
 	select {
 	case <-doneCh:
-		log.Debug("stop tracking ESP command ack")
+		log.Info("stop tracking ESP command ack")
 		return nil
 
 	case <-time.After(c.cfg.ESP.CommandACKTimeout):

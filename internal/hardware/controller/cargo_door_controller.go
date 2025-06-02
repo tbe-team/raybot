@@ -22,7 +22,7 @@ func (c *controller) OpenCargoDoor(ctx context.Context, speed uint8) error {
 		},
 	}
 
-	if err := c.createESPCommandWithACK(ctx, cmd); err != nil {
+	if err := c.createESPCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("create ESP command with ACK: %w", err)
 	}
 
@@ -41,7 +41,7 @@ func (c *controller) CloseCargoDoor(ctx context.Context, speed uint8) error {
 		},
 	}
 
-	if err := c.createESPCommandWithACK(ctx, cmd); err != nil {
+	if err := c.createESPCommand(ctx, cmd); err != nil {
 		return fmt.Errorf("create ESP command with ACK: %w", err)
 	}
 
