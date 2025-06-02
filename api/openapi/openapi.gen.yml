@@ -763,14 +763,20 @@ components:
         serial:
           $ref: '#/components/schemas/SerialConfig'
           x-order: 1
+        enableAck:
+          type: boolean
+          example: true
+          description: Whether to enable the command ACK
+          x-order: 2
         commandAckTimeout:
           type: number
           example: 1
           description: The timeout for the command ACK in milliseconds
-          x-order: 2
+          x-order: 3
           x-go-type: int
       required:
         - serial
+        - enableAck
         - commandAckTimeout
     PICConfig:
       type: object
@@ -778,14 +784,20 @@ components:
         serial:
           $ref: '#/components/schemas/SerialConfig'
           x-order: 1
+        enableAck:
+          type: boolean
+          example: true
+          description: Whether to enable the command ACK
+          x-order: 2
         commandAckTimeout:
           type: number
           example: 1
           description: The timeout for the command ACK in milliseconds
-          x-order: 2
+          x-order: 3
           x-go-type: int
       required:
         - serial
+        - enableAck
         - commandAckTimeout
     HardwareConfig:
       type: object

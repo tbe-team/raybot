@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/button'
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import { Switch } from '@/components/ui/switch'
 import { HARDWARE_CONFIG_QUERY_KEY, useHardwareConfigMutation } from '@/composables/use-config'
 import { useListAvailableSerialPortsQuery } from '@/composables/use-peripheral'
 
@@ -31,10 +32,12 @@ const serialConfigSchema = z.object({
 const hardwareConfigSchema = z.object({
   esp: z.object({
     serial: serialConfigSchema,
+    enableAck: z.boolean().default(false),
     commandAckTimeout: z.number().int().nonnegative('Command ack timeout must be non-negative'),
   }),
   pic: z.object({
     serial: serialConfigSchema,
+    enableAck: z.boolean().default(false),
     commandAckTimeout: z.number().int().nonnegative('Command ack timeout must be non-negative'),
   }),
 }).superRefine((data, ctx) => {
@@ -244,15 +247,31 @@ function fetchPorts(newValue: boolean) {
 
             <!-- Port and Timeout in same row -->
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormField v-slot="{ componentField }" name="esp.commandAckTimeout">
-                <FormItem>
-                  <FormLabel>Ack Timeout (ms)</FormLabel>
-                  <FormControl>
-                    <Input v-bind="componentField" type="number" :disabled="isPending" placeholder="e.g. 1" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
+              <div class="space-y-6">
+                <FormField v-slot="{ value, handleChange }" name="esp.enableAck">
+                  <FormItem class="flex flex-row items-center justify-between p-4 border rounded-lg">
+                    <FormLabel>Enable Ack</FormLabel>
+                    <FormControl>
+                      <Switch
+                        :model-value="value"
+                        :disabled="isPending"
+                        aria-readonly
+                        @update:model-value="handleChange"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+                <FormField v-slot="{ componentField }" name="esp.commandAckTimeout">
+                  <FormItem>
+                    <FormLabel>Ack Timeout (ms)</FormLabel>
+                    <FormControl>
+                      <Input v-bind="componentField" type="number" :disabled="isPending" placeholder="e.g. 1" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
             </div>
           </div>
         </div>
@@ -417,17 +436,32 @@ function fetchPorts(newValue: boolean) {
               Command Acknowledgment
             </h3>
 
-            <!-- Port and Timeout in same row -->
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-              <FormField v-slot="{ componentField }" name="pic.commandAckTimeout">
-                <FormItem>
-                  <FormLabel>Ack Timeout (s)</FormLabel>
-                  <FormControl>
-                    <Input v-bind="componentField" type="number" :disabled="isPending" placeholder="e.g. 1" />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              </FormField>
+              <div class="space-y-6">
+                <FormField v-slot="{ value, handleChange }" name="pic.enableAck">
+                  <FormItem class="flex flex-row items-center justify-between p-4 border rounded-lg">
+                    <FormLabel>Enable Ack</FormLabel>
+                    <FormControl>
+                      <Switch
+                        :model-value="value"
+                        :disabled="isPending"
+                        aria-readonly
+                        @update:model-value="handleChange"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+                <FormField v-slot="{ componentField }" name="pic.commandAckTimeout">
+                  <FormItem>
+                    <FormLabel>Ack Timeout (s)</FormLabel>
+                    <FormControl>
+                      <Input v-bind="componentField" type="number" :disabled="isPending" placeholder="e.g. 1" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                </FormField>
+              </div>
             </div>
           </div>
         </div>

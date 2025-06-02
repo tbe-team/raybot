@@ -30,11 +30,13 @@ export interface HardwareConfig {
 
 export interface ESPConfig {
   serial: SerialConfig
+  enableAck: boolean
   commandAckTimeout: number
 }
 
 export interface PICConfig {
   serial: SerialConfig
+  enableAck: boolean
   commandAckTimeout: number
 }
 

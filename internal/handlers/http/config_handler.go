@@ -78,10 +78,12 @@ func (h configHandler) UpdateHardwareConfig(ctx context.Context, request gen.Upd
 	cfg, err := h.configService.UpdateHardwareConfig(ctx, config.Hardware{
 		ESP: config.ESP{
 			Serial:            espSerial,
+			EnableACK:         request.Body.Esp.EnableAck,
 			CommandACKTimeout: time.Duration(request.Body.Esp.CommandAckTimeout) * time.Millisecond,
 		},
 		PIC: config.PIC{
 			Serial:            picSerial,
+			EnableACK:         request.Body.Pic.EnableAck,
 			CommandACKTimeout: time.Duration(request.Body.Pic.CommandAckTimeout) * time.Millisecond,
 		},
 	})
@@ -187,10 +189,12 @@ func (h configHandler) convertHardwareConfigToResponse(cfg config.Hardware) gen.
 	return gen.HardwareConfig{
 		Pic: gen.PICConfig{
 			Serial:            h.convertSerialConfigToResponse(cfg.PIC.Serial),
+			EnableAck:         cfg.PIC.EnableACK,
 			CommandAckTimeout: int(cfg.PIC.CommandACKTimeout.Milliseconds()),
 		},
 		Esp: gen.ESPConfig{
 			Serial:            h.convertSerialConfigToResponse(cfg.ESP.Serial),
+			EnableAck:         cfg.ESP.EnableACK,
 			CommandAckTimeout: int(cfg.ESP.CommandACKTimeout.Milliseconds()),
 		},
 	}
