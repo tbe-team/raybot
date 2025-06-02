@@ -71,12 +71,12 @@ func (e cargoLiftExecutor) OnCancel(ctx context.Context) error {
 func (e cargoLiftExecutor) trackingLiftPositionUntilReached(ctx context.Context, liftPosition uint16) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Debug("stop tracking lift position")
+		e.log.Info("stop tracking lift position")
 		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	e.log.Debug("start tracking lift position", slog.Int64("lift_position", int64(liftPosition)))
+	e.log.Info("start tracking lift position", slog.Int64("lift_position", int64(liftPosition)))
 	e.subscriber.Subscribe(ctx, events.DistanceSensorUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateDistanceSensorEvent)
 		if !ok {
@@ -85,7 +85,9 @@ func (e cargoLiftExecutor) trackingLiftPositionUntilReached(ctx context.Context,
 		}
 
 		if e.isLiftPositionReached(ev.DownDistance, liftPosition) {
-			e.log.Debug("lift position reached", slog.Int64("lift_position", int64(liftPosition)))
+			e.log.Info("lift position reached",
+				slog.Uint64("down_distance", uint64(ev.DownDistance)),
+				slog.Int64("lift_position", int64(liftPosition)))
 			close(doneCh)
 		}
 	})

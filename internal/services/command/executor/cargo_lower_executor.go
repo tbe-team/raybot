@@ -74,12 +74,12 @@ func (e cargoLowerExecutor) OnCancel(ctx context.Context) error {
 func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Context, lowerPosition uint16) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Debug("stop tracking lower position")
+		e.log.Info("stop tracking lower position")
 		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	e.log.Debug("start tracking lower position", slog.Int64("lower_position", int64(lowerPosition)))
+	e.log.Info("start tracking lower position", slog.Int64("lower_position", int64(lowerPosition)))
 	e.subscriber.Subscribe(ctx, events.DistanceSensorUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateDistanceSensorEvent)
 		if !ok {
@@ -90,7 +90,9 @@ func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Contex
 		// 10% tolerance
 		acceptableDistance := lowerPosition - lowerPosition*10/100
 		if ev.DownDistance >= acceptableDistance {
-			e.log.Info("lower position reached", slog.Int64("lower_position", int64(lowerPosition)))
+			e.log.Info("lower position reached",
+				slog.Uint64("down_distance", uint64(ev.DownDistance)),
+				slog.Int64("lower_position", int64(lowerPosition)))
 			close(doneCh)
 		}
 	})
@@ -107,13 +109,13 @@ func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Contex
 func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs command.CargoLowerInputs) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Debug("stop tracking bottom obstacle")
+		e.log.Info("stop tracking bottom obstacle")
 		cancel()
 	}()
 
 	bottomDistanceCh := make(chan uint16, 1)
 
-	e.log.Debug("start tracking bottom obstacle")
+	e.log.Info("start tracking bottom obstacle")
 	e.subscriber.Subscribe(ctx, events.CargoBottomDistanceUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.CargoBottomDistanceUpdatedEvent)
 		if !ok {

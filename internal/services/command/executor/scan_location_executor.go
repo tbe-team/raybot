@@ -69,14 +69,14 @@ func (e scanLocationExecutor) OnCancel(ctx context.Context) error {
 func (e scanLocationExecutor) recordLocationsUntilLoopedBack(ctx context.Context) []command.Location {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Debug("stop recording location")
+		e.log.Info("stop recording location")
 		cancel()
 	}()
 
 	locs := []command.Location{}
 
 	doneCh := make(chan struct{})
-	e.log.Debug("start recording location")
+	e.log.Info("start recording location")
 	e.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateLocationEvent)
 		if !ok {
@@ -90,7 +90,7 @@ func (e scanLocationExecutor) recordLocationsUntilLoopedBack(ctx context.Context
 			return
 		}
 
-		e.log.Debug("record location", slog.String("location", ev.Location))
+		e.log.Info("record location", slog.String("location", ev.Location))
 		locs = append(locs, command.Location{
 			Location:  ev.Location,
 			ScannedAt: time.Now(),

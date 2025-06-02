@@ -67,12 +67,12 @@ func (e cargoOpenExecutor) OnCancel(_ context.Context) error {
 func (e cargoOpenExecutor) trackingCargoDoorUntilOpen(ctx context.Context) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Debug("stop tracking cargo door open")
+		e.log.Info("stop tracking cargo door open")
 		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	e.log.Debug("start tracking cargo door open")
+	e.log.Info("start tracking cargo door open")
 	e.subscriber.Subscribe(ctx, events.CargoDoorUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.CargoDoorUpdatedEvent)
 		if !ok {
@@ -81,7 +81,7 @@ func (e cargoOpenExecutor) trackingCargoDoorUntilOpen(ctx context.Context) {
 		}
 
 		if ev.IsOpen {
-			e.log.Debug("cargo door open completed")
+			e.log.Info("cargo door open completed")
 			close(doneCh)
 		}
 	})

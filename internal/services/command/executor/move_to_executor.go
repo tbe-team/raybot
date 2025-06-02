@@ -77,12 +77,12 @@ func (e moveToExecutor) OnCancel(ctx context.Context) error {
 func (e moveToExecutor) trackingLocationUntilReached(ctx context.Context, location string) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Debug("stop tracking location", slog.String("location", location))
+		e.log.Info("stop tracking location", slog.String("location", location))
 		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	e.log.Debug("start tracking location", slog.String("target_location", location))
+	e.log.Info("start tracking location", slog.String("target_location", location))
 	e.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateLocationEvent)
 		if !ok {
@@ -91,7 +91,7 @@ func (e moveToExecutor) trackingLocationUntilReached(ctx context.Context, locati
 		}
 
 		if ev.Location == location {
-			e.log.Debug("location reached", slog.String("location", ev.Location))
+			e.log.Info("location reached", slog.String("location", ev.Location))
 			close(doneCh)
 		}
 	})
