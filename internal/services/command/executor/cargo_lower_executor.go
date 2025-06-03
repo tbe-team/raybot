@@ -8,6 +8,7 @@ import (
 
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/command"
+	"github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
@@ -15,17 +16,20 @@ import (
 type cargoLowerExecutor struct {
 	log              *slog.Logger
 	subscriber       eventbus.Subscriber
+	configService    config.Service
 	liftMotorService liftmotor.Service
 }
 
 func newCargoLowerExecutor(
 	log *slog.Logger,
 	subscriber eventbus.Subscriber,
+	configService config.Service,
 	liftMotorService liftmotor.Service,
 ) CommandExecutor[command.CargoLowerInputs, command.CargoLowerOutputs] {
 	return cargoLowerExecutor{
 		log:              log,
 		subscriber:       subscriber,
+		configService:    configService,
 		liftMotorService: liftMotorService,
 	}
 }
@@ -42,14 +46,18 @@ func (e cargoLowerExecutor) Execute(ctx context.Context, inputs command.CargoLow
 		e.trackingBottomObstacle(obstacleCtx, inputs)
 	}()
 
+	readyCh := make(chan struct{}, 1)
+
 	wg.Add(1)
 	go func() {
 		defer func() {
 			wg.Done()
 			cancelObstacleTracking()
 		}()
-		e.trackingLowerPositionUntilReached(ctx, inputs.Position)
+		e.trackingLowerPositionUntilReached(ctx, inputs.Position, readyCh)
 	}()
+
+	<-readyCh
 
 	if err := e.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
 		MotorSpeed: inputs.MotorSpeed,
@@ -61,6 +69,10 @@ func (e cargoLowerExecutor) Execute(ctx context.Context, inputs command.CargoLow
 	// wait for tracking to finish
 	wg.Wait()
 
+	if err := e.liftMotorService.Stop(ctx); err != nil {
+		return command.CargoLowerOutputs{}, fmt.Errorf("failed to stop lift motor: %w", err)
+	}
+
 	return command.CargoLowerOutputs{}, nil
 }
 
@@ -71,15 +83,21 @@ func (e cargoLowerExecutor) OnCancel(ctx context.Context) error {
 	return nil
 }
 
-func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Context, lowerPosition uint16) {
+func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Context, lowerPosition uint16, readyCh chan<- struct{}) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
 		e.log.Info("stop tracking lower position")
 		cancel()
 	}()
 
-	doneCh := make(chan struct{})
-	e.log.Info("start tracking lower position", slog.Int64("lower_position", int64(lowerPosition)))
+	requiredStableReadCount := e.getRequiredStableReadCount(ctx)
+	stableReadCount := 0
+
+	e.log.Info("start tracking lower position",
+		slog.Int64("lower_position", int64(lowerPosition)),
+		slog.Int("required_stable_read_count", requiredStableReadCount))
+
+	doneCh := make(chan struct{}, 1)
 	e.subscriber.Subscribe(ctx, events.DistanceSensorUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateDistanceSensorEvent)
 		if !ok {
@@ -87,15 +105,29 @@ func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Contex
 			return
 		}
 
-		// 10% tolerance
-		acceptableDistance := lowerPosition - lowerPosition*10/100
-		if ev.DownDistance >= acceptableDistance {
+		if e.isLowerPositionReached(ev.DownDistance, lowerPosition) {
+			stableReadCount++
 			e.log.Info("lower position reached",
+				slog.Int("stable_read_count", stableReadCount),
+				slog.Int("required_stable_read_count", requiredStableReadCount),
 				slog.Uint64("down_distance", uint64(ev.DownDistance)),
 				slog.Int64("lower_position", int64(lowerPosition)))
-			close(doneCh)
+
+			if stableReadCount >= requiredStableReadCount {
+				select {
+				case doneCh <- struct{}{}:
+				default:
+				}
+			}
+			return
 		}
+
+		e.log.Warn("reset stable read count",
+			slog.Int64("down_distance", int64(ev.DownDistance)))
+		stableReadCount = 0
 	})
+
+	readyCh <- struct{}{}
 
 	select {
 	case <-doneCh:
@@ -164,4 +196,18 @@ func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs c
 			}
 		}
 	}
+}
+
+func (e cargoLowerExecutor) isLowerPositionReached(current, target uint16) bool {
+	acceptableDistance := target - target*10/100 // 10% tolerance
+	return current >= acceptableDistance
+}
+
+func (e cargoLowerExecutor) getRequiredStableReadCount(ctx context.Context) int {
+	commandCfg, err := e.configService.GetCommandConfig(ctx)
+	if err != nil {
+		e.log.Error("failed to get command config", slog.Any("error", err))
+		return 1
+	}
+	return int(commandCfg.CargoLower.StableReadCount)
 }
