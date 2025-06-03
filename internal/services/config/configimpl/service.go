@@ -152,6 +152,31 @@ func (s *service) UpdateWifiConfig(ctx context.Context, wifiCfg config.Wifi) (co
 	return wifiCfg, nil
 }
 
+func (s *service) GetCommandConfig(_ context.Context) (config.Command, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.cfg.Command, nil
+}
+
+func (s *service) UpdateCommandConfig(ctx context.Context, commandCfg config.Command) (config.Command, error) {
+	if err := commandCfg.Validate(); err != nil {
+		return config.Command{}, fmt.Errorf("validate command config: %w", err)
+	}
+
+	cfg := *s.cfg
+	cfg.Command = commandCfg
+
+	if err := s.writeConfig(ctx, cfg); err != nil {
+		return config.Command{}, fmt.Errorf("write config: %w", err)
+	}
+
+	s.mu.Lock()
+	s.cfg = &cfg
+	s.mu.Unlock()
+
+	return commandCfg, nil
+}
+
 func (s *service) writeConfig(ctx context.Context, cfg config.Config) error {
 	writer, err := s.fileClient.Write(ctx, s.cfg.ConfigFilePath)
 	if err != nil {

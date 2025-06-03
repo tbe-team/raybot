@@ -21,4 +21,7 @@ type Service interface {
 
 	GetWifiConfig(ctx context.Context) (config.Wifi, error)
 	UpdateWifiConfig(ctx context.Context, wifiCfg config.Wifi) (config.Wifi, error)
+
+	GetCommandConfig(ctx context.Context) (config.Command, error)
+	UpdateCommandConfig(ctx context.Context, commandCfg config.Command) (config.Command, error)
 }

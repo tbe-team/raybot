@@ -34,10 +34,6 @@ func NewService(
 	}
 }
 
-func (s *service) GetLiftMotorState(ctx context.Context) (liftmotor.LiftMotorState, error) {
-	return s.liftMotorStateRepo.GetLiftMotorState(ctx)
-}
-
 func (s *service) UpdateLiftMotorState(ctx context.Context, params liftmotor.UpdateLiftMotorStateParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)

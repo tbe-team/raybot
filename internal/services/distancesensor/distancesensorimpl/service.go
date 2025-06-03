@@ -29,6 +29,10 @@ func NewService(
 	}
 }
 
+func (s *service) GetDistanceSensorState(ctx context.Context) (distancesensor.DistanceSensorState, error) {
+	return s.distanceSensorStateRepo.GetDistanceSensorState(ctx)
+}
+
 func (s *service) UpdateDistanceSensorState(ctx context.Context, params distancesensor.UpdateDistanceSensorStateParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)

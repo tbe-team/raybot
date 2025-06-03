@@ -51,3 +51,6 @@ cron:
   delete_old_command:
     schedule: "@every 1h"
     threshold: 168h   # 7 days
+command:
+  cargo_lift:
+    stable_read_count: 3

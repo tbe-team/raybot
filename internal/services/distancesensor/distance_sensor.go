@@ -9,6 +9,7 @@ type UpdateDistanceSensorStateParams struct {
 }
 
 type Service interface {
+	GetDistanceSensorState(ctx context.Context) (DistanceSensorState, error)
 	UpdateDistanceSensorState(ctx context.Context, params UpdateDistanceSensorStateParams) error
 }
 

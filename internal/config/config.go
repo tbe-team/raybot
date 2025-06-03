@@ -12,10 +12,9 @@ type Config struct {
 	Hardware Hardware `yaml:"hardware"`
 	Cloud    Cloud    `yaml:"cloud"`
 	HTTP     HTTP     `yaml:"http"`
-
-	Wifi Wifi `yaml:"wifi"`
-
-	Cron Cron `yaml:"cron"`
+	Wifi     Wifi     `yaml:"wifi"`
+	Cron     Cron     `yaml:"cron"`
+	Command  Command  `yaml:"command"`
 
 	ConfigFilePath string `yaml:"-"`
 	DBPath         string `yaml:"-"`
@@ -44,6 +43,10 @@ func (c *Config) Validate() error {
 
 	if err := c.Cron.Validate(); err != nil {
 		return fmt.Errorf("validate cron: %w", err)
+	}
+
+	if err := c.Command.Validate(); err != nil {
+		return fmt.Errorf("validate command: %w", err)
 	}
 
 	return nil

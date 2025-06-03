@@ -79,6 +79,62 @@ func (_c *FakeService_GetCloudConfig_Call) RunAndReturn(run func(context.Context
 	return _c
 }
 
+// GetCommandConfig provides a mock function with given fields: ctx
+func (_m *FakeService) GetCommandConfig(ctx context.Context) (config.Command, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCommandConfig")
+	}
+
+	var r0 config.Command
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (config.Command, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) config.Command); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(config.Command)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeService_GetCommandConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCommandConfig'
+type FakeService_GetCommandConfig_Call struct {
+	*mock.Call
+}
+
+// GetCommandConfig is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) GetCommandConfig(ctx interface{}) *FakeService_GetCommandConfig_Call {
+	return &FakeService_GetCommandConfig_Call{Call: _e.mock.On("GetCommandConfig", ctx)}
+}
+
+func (_c *FakeService_GetCommandConfig_Call) Run(run func(ctx context.Context)) *FakeService_GetCommandConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_GetCommandConfig_Call) Return(_a0 config.Command, _a1 error) *FakeService_GetCommandConfig_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeService_GetCommandConfig_Call) RunAndReturn(run func(context.Context) (config.Command, error)) *FakeService_GetCommandConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetHTTPConfig provides a mock function with given fields: ctx
 func (_m *FakeService) GetHTTPConfig(ctx context.Context) (config.HTTP, error) {
 	ret := _m.Called(ctx)
@@ -356,6 +412,63 @@ func (_c *FakeService_UpdateCloudConfig_Call) Return(_a0 config.Cloud, _a1 error
 }
 
 func (_c *FakeService_UpdateCloudConfig_Call) RunAndReturn(run func(context.Context, config.Cloud) (config.Cloud, error)) *FakeService_UpdateCloudConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateCommandConfig provides a mock function with given fields: ctx, commandCfg
+func (_m *FakeService) UpdateCommandConfig(ctx context.Context, commandCfg config.Command) (config.Command, error) {
+	ret := _m.Called(ctx, commandCfg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateCommandConfig")
+	}
+
+	var r0 config.Command
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, config.Command) (config.Command, error)); ok {
+		return rf(ctx, commandCfg)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, config.Command) config.Command); ok {
+		r0 = rf(ctx, commandCfg)
+	} else {
+		r0 = ret.Get(0).(config.Command)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, config.Command) error); ok {
+		r1 = rf(ctx, commandCfg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeService_UpdateCommandConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateCommandConfig'
+type FakeService_UpdateCommandConfig_Call struct {
+	*mock.Call
+}
+
+// UpdateCommandConfig is a helper method to define mock.On call
+//   - ctx context.Context
+//   - commandCfg config.Command
+func (_e *FakeService_Expecter) UpdateCommandConfig(ctx interface{}, commandCfg interface{}) *FakeService_UpdateCommandConfig_Call {
+	return &FakeService_UpdateCommandConfig_Call{Call: _e.mock.On("UpdateCommandConfig", ctx, commandCfg)}
+}
+
+func (_c *FakeService_UpdateCommandConfig_Call) Run(run func(ctx context.Context, commandCfg config.Command)) *FakeService_UpdateCommandConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(config.Command))
+	})
+	return _c
+}
+
+func (_c *FakeService_UpdateCommandConfig_Call) Return(_a0 config.Command, _a1 error) *FakeService_UpdateCommandConfig_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeService_UpdateCommandConfig_Call) RunAndReturn(run func(context.Context, config.Command) (config.Command, error)) *FakeService_UpdateCommandConfig_Call {
 	_c.Call.Return(run)
 	return _c
 }

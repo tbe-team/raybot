@@ -9,6 +9,8 @@ import (
 
 	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/command"
+	"github.com/tbe-team/raybot/internal/services/config"
+	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 	"github.com/tbe-team/raybot/pkg/eventbus"
@@ -55,9 +57,11 @@ type service struct {
 func NewService(
 	log *slog.Logger,
 	subscriber eventbus.Subscriber,
+	configService config.Service,
 	driveMotorService drivemotor.Service,
 	liftMotorService liftmotor.Service,
 	cargoService cargo.Service,
+	distanceSensorService distancesensor.Service,
 	runningCommandRepository command.RunningCommandRepository,
 	commandRepository command.Repository,
 ) command.ExecutorService {
@@ -68,7 +72,7 @@ func NewService(
 
 	cargoOpenExecutor := newCargoOpenExecutor(log, subscriber, cargoService)
 	cargoCloseExecutor := newCargoCloseExecutor(log, subscriber, cargoService)
-	cargoLiftExecutor := newCargoLiftExecutor(log, subscriber, liftMotorService)
+	cargoLiftExecutor := newCargoLiftExecutor(log, subscriber, configService, liftMotorService, distanceSensorService)
 	cargoLowerExecutor := newCargoLowerExecutor(log, subscriber, liftMotorService)
 	cargoCheckQRExecutor := newCargoCheckQRExecutor(log, subscriber)
 

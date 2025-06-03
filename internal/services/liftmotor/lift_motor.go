@@ -26,8 +26,6 @@ type SetCargoPositionParams struct {
 }
 
 type Service interface {
-	GetLiftMotorState(ctx context.Context) (LiftMotorState, error)
-
 	// UpdateLiftMotorState updates the desired state of the lift motor.
 	// This does not directly interact with the hardware, it just updates the internal state.
 	UpdateLiftMotorState(ctx context.Context, params UpdateLiftMotorStateParams) error

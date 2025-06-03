@@ -211,9 +211,11 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		executor.NewService(
 			log,
 			eventBus,
+			configService,
 			driveMotorService,
 			liftMotorService,
 			cargoService,
+			distanceSensorService,
 			runningCmdRepository,
 			commandRepository,
 		),

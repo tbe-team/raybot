@@ -13,6 +13,8 @@ import (
 	cargomocks "github.com/tbe-team/raybot/internal/services/cargo/mocks"
 	"github.com/tbe-team/raybot/internal/services/command"
 	commandmocks "github.com/tbe-team/raybot/internal/services/command/mocks"
+	configmocks "github.com/tbe-team/raybot/internal/services/config/mocks"
+	distancesensormocks "github.com/tbe-team/raybot/internal/services/distancesensor/mocks"
 	drivemotormocks "github.com/tbe-team/raybot/internal/services/drivemotor/mocks"
 	liftmotormocks "github.com/tbe-team/raybot/internal/services/liftmotor/mocks"
 	"github.com/tbe-team/raybot/pkg/eventbus"
@@ -22,9 +24,11 @@ func TestService_NewService(t *testing.T) {
 	service := NewService(
 		logging.NewNoopLogger(),
 		&eventbus.NoopEventBus{},
+		configmocks.NewFakeService(t),
 		drivemotormocks.NewFakeService(t),
 		liftmotormocks.NewFakeService(t),
 		cargomocks.NewFakeService(t),
+		distancesensormocks.NewFakeService(t),
 		commandmocks.NewFakeRunningCommandRepository(t),
 		commandmocks.NewFakeRepository(t),
 	)
