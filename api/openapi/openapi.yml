@@ -27,6 +27,8 @@ paths:
     $ref: "./paths/configs@http.yml"
   /configs/wifi:
     $ref: "./paths/configs@wifi.yml"
+  /configs/command:
+    $ref: "./paths/configs@command.yml"
   /system/info:
     $ref: "./paths/system@info.yml"
   /system/reboot:

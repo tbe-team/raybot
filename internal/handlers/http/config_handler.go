@@ -168,6 +168,31 @@ func (h configHandler) UpdateWifiConfig(ctx context.Context, request gen.UpdateW
 	return gen.UpdateWifiConfig200JSONResponse(h.convertWifiConfigToResponse(cfg)), nil
 }
 
+func (h configHandler) GetCommandConfig(ctx context.Context, _ gen.GetCommandConfigRequestObject) (gen.GetCommandConfigResponseObject, error) {
+	cfg, err := h.configService.GetCommandConfig(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("config service get command config: %w", err)
+	}
+
+	return gen.GetCommandConfig200JSONResponse(h.convertCommandConfigToResponse(cfg)), nil
+}
+
+func (h configHandler) UpdateCommandConfig(ctx context.Context, request gen.UpdateCommandConfigRequestObject) (gen.UpdateCommandConfigResponseObject, error) {
+	cfg, err := h.configService.UpdateCommandConfig(ctx, config.Command{
+		CargoLift: config.CargoLift{
+			StableReadCount: request.Body.CargoLift.StableReadCount,
+		},
+		CargoLower: config.CargoLower{
+			StableReadCount: request.Body.CargoLower.StableReadCount,
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("config service update command config: %w", err)
+	}
+
+	return gen.UpdateCommandConfig200JSONResponse(h.convertCommandConfigToResponse(cfg)), nil
+}
+
 func (configHandler) convertLogConfigToResponse(cfg config.Log) gen.LogConfig {
 	return gen.LogConfig{
 		File: gen.LogFileHandler{
@@ -306,4 +331,19 @@ func (configHandler) convertLogFormatReqToModel(format string) (config.LogFormat
 	default:
 		return config.LogFormatText, xerror.ValidationFailed(nil, "invalid log format")
 	}
+}
+
+func (configHandler) convertCommandConfigToResponse(cfg config.Command) gen.CommandConfig {
+	return gen.CommandConfig{
+		CargoLift: gen.CargoLiftConfig{
+			StableReadCount: cfg.CargoLift.StableReadCount,
+		},
+		CargoLower: gen.CargoLowerConfig{
+			StableReadCount: cfg.CargoLower.StableReadCount,
+		},
+	}
+}
+
+func (configHandler) convertCommandConfigReqToModel(req gen.CommandConfig) (config.Command, error) {
+	return config.Command{}, nil
 }

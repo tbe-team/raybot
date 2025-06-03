@@ -296,3 +296,38 @@ STAConfig:
     - enable
     - ssid
     - password
+
+CommandConfig:
+  type: object
+  properties:
+    cargo_lift:
+      $ref: "#/CargoLiftConfig"
+    cargo_lower:
+      $ref: "#/CargoLowerConfig"
+  required:
+    - cargo_lift
+    - cargo_lower
+
+CargoLiftConfig:
+  type: object
+  properties:
+    stable_read_count:
+      type: integer
+      example: 3
+      description: The number of stable reads required to consider the lift position reached
+      x-order: 1
+      x-go-type: uint8
+  required:
+    - stable_read_count
+
+CargoLowerConfig:
+  type: object
+  properties:
+    stable_read_count:
+      type: integer
+      example: 3
+      description: The number of stable reads required to consider the lower position reached
+      x-order: 1
+      x-go-type: uint8
+  required:
+    - stable_read_count

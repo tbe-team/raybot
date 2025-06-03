@@ -455,3 +455,86 @@ func TestConfigHandler_UpdateWifiConfig(t *testing.T) {
 		require.Equal(t, http.StatusInternalServerError, rec.Code)
 	})
 }
+
+func TestConfigHandler_GetCommandConfig(t *testing.T) {
+	t.Run("Should get command config successfully", func(t *testing.T) {
+		configService := configmocks.NewFakeService(t)
+		configService.EXPECT().GetCommandConfig(mock.Anything).Return(config.Command{}, nil)
+
+		h := SetupAPITestHandler(t, func(hs *Service) {
+			hs.configService = configService
+		})
+
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/configs/command", nil)
+		rec := httptest.NewRecorder()
+
+		h.ServeHTTP(rec, req)
+		require.Equal(t, http.StatusOK, rec.Code)
+	})
+
+	t.Run("Should not able to get command config if fetching failed", func(t *testing.T) {
+		configService := configmocks.NewFakeService(t)
+		configService.EXPECT().GetCommandConfig(mock.Anything).Return(config.Command{}, errors.New("fetching failed"))
+
+		h := SetupAPITestHandler(t, func(hs *Service) {
+			hs.configService = configService
+		})
+
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/configs/command", nil)
+		rec := httptest.NewRecorder()
+
+		h.ServeHTTP(rec, req)
+		require.Equal(t, http.StatusInternalServerError, rec.Code)
+	})
+}
+
+func TestConfigHandler_UpdateCommandConfig(t *testing.T) {
+	validCommandConfig := gen.CommandConfig{
+		CargoLift: gen.CargoLiftConfig{
+			StableReadCount: 3,
+		},
+		CargoLower: gen.CargoLowerConfig{
+			StableReadCount: 3,
+		},
+	}
+
+	t.Run("Should update command config successfully", func(t *testing.T) {
+		configService := configmocks.NewFakeService(t)
+		configService.EXPECT().UpdateCommandConfig(mock.Anything, mock.Anything).
+			Return(config.Command{}, nil)
+
+		h := SetupAPITestHandler(t, func(hs *Service) {
+			hs.configService = configService
+		})
+
+		body := validCommandConfig
+		jsonBody, err := json.Marshal(body)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodPut, "/api/v1/configs/command", bytes.NewBuffer(jsonBody))
+		rec := httptest.NewRecorder()
+
+		h.ServeHTTP(rec, req)
+		require.Equal(t, http.StatusOK, rec.Code)
+	})
+
+	t.Run("Should not able to update command config if updating failed", func(t *testing.T) {
+		configService := configmocks.NewFakeService(t)
+		configService.EXPECT().UpdateCommandConfig(mock.Anything, mock.Anything).
+			Return(config.Command{}, errors.New("updating failed"))
+
+		h := SetupAPITestHandler(t, func(hs *Service) {
+			hs.configService = configService
+		})
+
+		body := validCommandConfig
+		jsonBody, err := json.Marshal(body)
+		require.NoError(t, err)
+
+		req := httptest.NewRequest(http.MethodPut, "/api/v1/configs/command", bytes.NewBuffer(jsonBody))
+		rec := httptest.NewRecorder()
+
+		h.ServeHTTP(rec, req)
+		require.Equal(t, http.StatusInternalServerError, rec.Code)
+	})
+}

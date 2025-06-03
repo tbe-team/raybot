@@ -296,6 +296,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /configs/command:
+    get:
+      summary: Get the command configuration
+      operationId: getCommandConfig
+      description: Get the command configuration
+      tags:
+        - config
+      responses:
+        '200':
+          description: The command configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update the command configuration
+      operationId: updateCommandConfig
+      description: Update the command configuration
+      tags:
+        - config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommandConfig'
+      responses:
+        '200':
+          description: The updated command configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CommandConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /system/info:
     get:
       summary: Get the system information
@@ -907,6 +952,38 @@ components:
       required:
         - ap
         - sta
+    CargoLiftConfig:
+      type: object
+      properties:
+        stable_read_count:
+          type: integer
+          example: 3
+          description: The number of stable reads required to consider the lift position reached
+          x-order: 1
+          x-go-type: uint8
+      required:
+        - stable_read_count
+    CargoLowerConfig:
+      type: object
+      properties:
+        stable_read_count:
+          type: integer
+          example: 3
+          description: The number of stable reads required to consider the lower position reached
+          x-order: 1
+          x-go-type: uint8
+      required:
+        - stable_read_count
+    CommandConfig:
+      type: object
+      properties:
+        cargo_lift:
+          $ref: '#/components/schemas/CargoLiftConfig'
+        cargo_lower:
+          $ref: '#/components/schemas/CargoLowerConfig'
+      required:
+        - cargo_lift
+        - cargo_lower
     SystemInfo:
       type: object
       properties:

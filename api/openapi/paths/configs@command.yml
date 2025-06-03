@@ -1,0 +1,45 @@
+get:
+  summary: Get the command configuration
+  operationId: getCommandConfig
+  description: Get the command configuration
+  tags:
+    - config
+  responses:
+    "200":
+      description: The command configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/CommandConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
+
+put:
+  summary: Update the command configuration
+  operationId: updateCommandConfig
+  description: Update the command configuration
+  tags:
+    - config
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/config.yml#/CommandConfig"
+  responses:
+    "200":
+      description: The updated command configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/CommandConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
