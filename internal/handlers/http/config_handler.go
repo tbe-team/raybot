@@ -343,7 +343,3 @@ func (configHandler) convertCommandConfigToResponse(cfg config.Command) gen.Comm
 		},
 	}
 }
-
-func (configHandler) convertCommandConfigReqToModel(req gen.CommandConfig) (config.Command, error) {
-	return config.Command{}, nil
-}
