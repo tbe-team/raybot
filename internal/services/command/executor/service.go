@@ -73,7 +73,7 @@ func NewService(
 	cargoOpenExecutor := newCargoOpenExecutor(log, subscriber, cargoService)
 	cargoCloseExecutor := newCargoCloseExecutor(log, subscriber, cargoService)
 	cargoLiftExecutor := newCargoLiftExecutor(log, subscriber, configService, liftMotorService, distanceSensorService)
-	cargoLowerExecutor := newCargoLowerExecutor(log, subscriber, liftMotorService)
+	cargoLowerExecutor := newCargoLowerExecutor(log, subscriber, configService, liftMotorService)
 	cargoCheckQRExecutor := newCargoCheckQRExecutor(log, subscriber)
 
 	scanLocationExecutor := newScanLocationExecutor(log, subscriber, driveMotorService)

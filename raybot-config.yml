@@ -54,3 +54,5 @@ cron:
 command:
   cargo_lift:
     stable_read_count: 3
+  cargo_lower:
+    stable_read_count: 3
