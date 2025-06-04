@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"strings"
 )
 
 type DB interface {
@@ -25,11 +26,18 @@ type SQLiteDB struct {
 	*sql.DB
 }
 
+// NewSQLiteDB creates a new SQLite database connection.
 func NewSQLiteDB(path string) (*SQLiteDB, error) {
+	path = parseDBPath(path)
+	// https://github.com/mattn/go-sqlite3/issues/274
+	path = fmt.Sprintf("file:%s?cache=shared&_journal_mode=WAL&_busy_timeout=5000", path)
+
 	db, err := sql.Open("sqlite3", path)
 	if err != nil {
 		return nil, fmt.Errorf("open db: %w", err)
 	}
+
+	db.SetMaxOpenConns(1)
 
 	return &SQLiteDB{DB: db}, nil
 }
@@ -67,4 +75,14 @@ func NewTestDB() (*SQLiteDB, error) {
 	}
 
 	return db, nil
+}
+
+// parseDBPath parses the database path from a URL.
+// It returns the path without the query parameters.
+func parseDBPath(url string) string {
+	optIndex := strings.Index(url, "?")
+	if optIndex == -1 {
+		return url
+	}
+	return url[:optIndex]
 }
