@@ -159,4 +159,18 @@ func (s *Service) registerHandlers(ctx context.Context) {
 			s.HandleRFIDUSBDisconnectedEvent(ctx, ev)
 		},
 	)
+
+	s.subscriber.Subscribe(
+		ctx,
+		events.LimitSwitch1PressedTopic,
+		func(msg *eventbus.Message) {
+			ev, ok := msg.Payload.(events.LimitSwitch1PressedEvent)
+			if !ok {
+				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
+				return
+			}
+
+			s.HandleLimitSwitch1PressedEvent(ctx, ev)
+		},
+	)
 }

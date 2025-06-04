@@ -16,6 +16,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
+	"github.com/tbe-team/raybot/internal/services/limitswitch"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
@@ -30,6 +31,7 @@ type Service struct {
 	distanceSensorService distancesensor.Service
 	liftMotorService      liftmotor.Service
 	driveMotorService     drivemotor.Service
+	limitSwitchService    limitswitch.Service
 	appStateService       appstate.Service
 }
 
@@ -44,6 +46,7 @@ func New(
 	distanceSensorService distancesensor.Service,
 	liftMotorService liftmotor.Service,
 	driveMotorService drivemotor.Service,
+	limitSwitchService limitswitch.Service,
 	appStateService appstate.Service,
 ) *Service {
 	s := &Service{
@@ -55,6 +58,7 @@ func New(
 		distanceSensorService: distanceSensorService,
 		liftMotorService:      liftMotorService,
 		driveMotorService:     driveMotorService,
+		limitSwitchService:    limitSwitchService,
 		appStateService:       appStateService,
 	}
 

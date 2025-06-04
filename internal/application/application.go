@@ -33,6 +33,8 @@ import (
 	"github.com/tbe-team/raybot/internal/services/drivemotor/drivemotorimpl"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 	"github.com/tbe-team/raybot/internal/services/liftmotor/liftmotorimpl"
+	"github.com/tbe-team/raybot/internal/services/limitswitch"
+	"github.com/tbe-team/raybot/internal/services/limitswitch/limitswitchimpl"
 	"github.com/tbe-team/raybot/internal/services/location"
 	"github.com/tbe-team/raybot/internal/services/location/locationimpl"
 	"github.com/tbe-team/raybot/internal/services/peripheral"
@@ -64,6 +66,7 @@ type Application struct {
 	DriveMotorService     drivemotor.Service
 	LiftMotorService      liftmotor.Service
 	CargoService          cargo.Service
+	LimitSwitchService    limitswitch.Service
 	LocationService       location.Service
 	ConfigService         configsvc.Service
 	SystemService         system.Service
@@ -119,6 +122,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	liftMotorStateRepository := liftmotorimpl.NewLiftMotorStateRepository()
 	cargoRepository := cargoimpl.NewCargoRepository(db, queries)
 	locationRepository := locationimpl.NewLocationRepository(db, queries)
+	limitSwitchStateRepository := limitswitchimpl.NewRepository()
 	distanceSensorStateRepository := distancesensorimpl.NewDistanceSensorStateRepository()
 	appStateRepository := appstateimpl.NewAppStateRepository()
 	commandRepository := commandimpl.NewCommandRepository(db, queries)
@@ -185,6 +189,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, hardwareController)
 	cargoService := cargoimpl.NewService(validator, eventBus, cargoRepository, hardwareController)
 	locationService := locationimpl.NewService(validator, eventBus, locationRepository)
+	limitSwitchService := limitswitchimpl.NewService(log, validator, eventBus, limitSwitchStateRepository)
 	configService := configimpl.NewService(cfg, fileClient)
 	dashboardDataService := dashboarddataimpl.NewService(
 		batteryStateRepository,
@@ -270,6 +275,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		DriveMotorService:     driveMotorService,
 		LiftMotorService:      liftMotorService,
 		CargoService:          cargoService,
+		LimitSwitchService:    limitSwitchService,
 		LocationService:       locationService,
 		ConfigService:         configService,
 		SystemService:         systemService,

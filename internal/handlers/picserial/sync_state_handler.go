@@ -10,6 +10,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
+	"github.com/tbe-team/raybot/internal/services/limitswitch"
 )
 
 func (s *Service) HandleSyncState(ctx context.Context, msg syncStateMessage) error {
@@ -148,6 +149,21 @@ func (s *Service) HandleSyncState(ctx context.Context, msg syncStateMessage) err
 			return fmt.Errorf("failed to update drive motor state: %w", err)
 		}
 
+	case syncStateTypeLimitSwitch1:
+		var temp struct {
+			State uint8 `json:"state"`
+		}
+		if err := json.Unmarshal(msg.Data, &temp); err != nil {
+			return fmt.Errorf("failed to unmarshal limit switch 1 data: %w", err)
+		}
+
+		if err := s.limitSwitchService.UpdateLimitSwitchState(ctx, limitswitch.UpdateLimitSwitchStateParams{
+			ID:      limitswitch.LimitSwitchID1,
+			Pressed: temp.State == 1,
+		}); err != nil {
+			return fmt.Errorf("failed to update limit switch state: %w", err)
+		}
+
 	default:
 		return fmt.Errorf("invalid sync state type: %s", string(msg.Data))
 	}
@@ -178,6 +194,8 @@ func (s *syncStateType) UnmarshalJSON(data []byte) error {
 		*s = syncStateTypeLiftMotor
 	case 5:
 		*s = syncStateTypeDriveMotor
+	case 6:
+		*s = syncStateTypeLimitSwitch1
 	default:
 		return fmt.Errorf("invalid sync state type: %s", string(data))
 	}
@@ -191,6 +209,7 @@ const (
 	syncStateTypeDistanceSensor syncStateType = 3
 	syncStateTypeLiftMotor      syncStateType = 4
 	syncStateTypeDriveMotor     syncStateType = 5
+	syncStateTypeLimitSwitch1   syncStateType = 6
 )
 
 type syncStateMessage struct {
