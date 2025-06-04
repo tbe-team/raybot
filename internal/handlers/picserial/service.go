@@ -76,7 +76,7 @@ func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
 	cleanup := func(_ context.Context) error {
 		// Cancel read loop before closing the serial client
 		cancel()
-		return s.client.Close()
+		return nil
 	}
 
 	return cleanup, nil
