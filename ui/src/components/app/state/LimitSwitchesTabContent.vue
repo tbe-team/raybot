@@ -41,7 +41,7 @@ const { data: limitSwitchState, isPending, isError, error } = useLimitSwitchStat
     </CardContent>
     <CardContent v-else-if="limitSwitchState">
       <div class="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-5">
-        <LimitSwitchItem :switch-data="limitSwitchState.limitSwitch1" />
+        <LimitSwitchItem :switch-data="limitSwitchState.limitSwitch1" name="Limit Switch 1" />
       </div>
     </CardContent>
   </Card>

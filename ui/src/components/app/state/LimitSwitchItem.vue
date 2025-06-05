@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/date'
 
 const props = defineProps<{
+  name: string
   switchData: LimitSwitch
 }>()
 
@@ -14,7 +15,7 @@ function getStatusColor(): string {
 
 <template>
   <div class="p-4 space-y-2 border rounded-md" :class="[getStatusColor()]">
-    <span class="text-sm">Limit Switch 1</span>
+    <span class="text-sm">{{ props.name }}</span>
     <div class="flex items-center justify-between">
       <span class="text-xs text-muted-foreground">
         State:
