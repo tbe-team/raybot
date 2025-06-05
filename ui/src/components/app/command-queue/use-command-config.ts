@@ -46,10 +46,6 @@ const DEFAULT_COMMAND_CONFIG: CommandConfig = {
   cargoLower: {
     motorSpeed: 80,
     position: 100,
-    bottomObstacleTracking: {
-      enterDistance: 10,
-      exitDistance: 20,
-    },
   },
 }
 
@@ -118,7 +114,6 @@ export function useCommandConfig() {
         cargoLower: {
           motorSpeed: inputs.motorSpeed,
           position: inputs.position,
-          bottomObstacleTracking: inputs.bottomObstacleTracking,
         },
       }
     },
