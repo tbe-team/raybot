@@ -454,7 +454,7 @@ function fetchPorts(newValue: boolean) {
                 </FormField>
                 <FormField v-slot="{ componentField }" name="pic.commandAckTimeout">
                   <FormItem>
-                    <FormLabel>Ack Timeout (s)</FormLabel>
+                    <FormLabel>Ack Timeout (ms)</FormLabel>
                     <FormControl>
                       <Input v-bind="componentField" type="number" :disabled="isPending" placeholder="e.g. 1" />
                     </FormControl>
