@@ -1,3 +1,4 @@
+import type { CommandConfig } from '@/types/command-config'
 import type { CloudConfig, HardwareConfig, HTTPConfig, LogConfig, WifiConfig } from '@/types/config'
 import http from '@/lib/http'
 
@@ -16,6 +17,9 @@ const configAPI = {
 
   getWifiConfig: (): Promise<WifiConfig> => http.get('/configs/wifi'),
   updateWifiConfig: (config: WifiConfig): Promise<void> => http.put('/configs/wifi', config),
+
+  getCommandConfig: (): Promise<CommandConfig> => http.get('/configs/command'),
+  updateCommandConfig: (config: CommandConfig): Promise<void> => http.put('/configs/command', config),
 }
 
 export default configAPI

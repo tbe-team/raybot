@@ -6,7 +6,7 @@ export const HARDWARE_CONFIG_QUERY_KEY = 'hardwareConfig'
 export const CLOUD_CONFIG_QUERY_KEY = 'cloudConfig'
 export const HTTP_CONFIG_QUERY_KEY = 'httpConfig'
 export const WIFI_CONFIG_QUERY_KEY = 'wifiConfig'
-
+export const COMMAND_CONFIG_QUERY_KEY = 'commandConfig'
 export function useLogConfigQuery() {
   return useQuery({
     queryKey: [LOG_CONFIG_QUERY_KEY],
@@ -69,5 +69,18 @@ export function useWifiConfigQuery() {
 export function useWifiConfigMutation() {
   return useMutation({
     mutationFn: configAPI.updateWifiConfig,
+  })
+}
+
+export function useCommandConfigQuery() {
+  return useQuery({
+    queryKey: [COMMAND_CONFIG_QUERY_KEY],
+    queryFn: configAPI.getCommandConfig,
+  })
+}
+
+export function useCommandConfigMutation() {
+  return useMutation({
+    mutationFn: configAPI.updateCommandConfig,
   })
 }
