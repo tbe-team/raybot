@@ -413,6 +413,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /states/limit-switch:
+    get:
+      summary: Get the limit switch state
+      operationId: getLimitSwitchState
+      description: Get the limit switch state
+      tags:
+        - state
+      responses:
+        '200':
+          description: The limit switch state
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/LimitSwitchState'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /peripherals/serials:
     get:
       summary: List available serial ports
@@ -1468,6 +1488,30 @@ components:
         - cargo
         - cargoDoorMotor
         - appConnection
+    LimitSwitch:
+      type: object
+      properties:
+        pressed:
+          type: boolean
+          example: true
+          description: Whether the limit switch is pressed
+          x-order: 1
+        updatedAt:
+          type: string
+          format: date-time
+          example: '2025-01-01T00:00:00Z'
+          description: The updated at time of the limit switch
+          x-order: 2
+      required:
+        - pressed
+        - updatedAt
+    LimitSwitchState:
+      type: object
+      properties:
+        limitSwitch1:
+          $ref: '#/components/schemas/LimitSwitch'
+      required:
+        - limitSwitch1
     SerialPort:
       type: object
       properties:

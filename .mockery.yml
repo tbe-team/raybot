@@ -30,6 +30,10 @@ packages:
     config:
     interfaces:
       Service:
+  github.com/tbe-team/raybot/internal/services/limitswitch:
+    config:
+    interfaces:
+      Service:
   github.com/tbe-team/raybot/internal/services/config:
     config:
     interfaces:
