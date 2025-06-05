@@ -3,6 +3,7 @@ import { CircleAlert, Server } from 'lucide-vue-next'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { useSystemGetInfoQuery } from '@/composables/use-system'
 import { formatUptimeShort } from '@/lib/date'
+
 const REFRESH_INTERVAL_INFORMATION = 10000
 
 const { data, isPending, isError, error } = useSystemGetInfoQuery({

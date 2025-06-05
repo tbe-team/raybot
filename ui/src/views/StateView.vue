@@ -85,7 +85,7 @@ const { data: robotState, isPending, isError, error } = useQueryRobotState({
       <StateOverview v-if="robotState" :robot-state="robotState" />
 
       <!-- Tabs -->
-      <TabContent v-if="robotState" :robot-state="robotState" />
+      <TabContent v-if="robotState" :robot-state="robotState" :refresh-interval="refetchInterval" />
     </div>
   </PageContainer>
 </template>

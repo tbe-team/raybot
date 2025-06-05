@@ -5,10 +5,12 @@ import BatteryTabContent from './BatteryTabContent.vue'
 import CargoTabContent from './CargoTabContent.vue'
 import ConnectionsTabContent from './ConnectionsTabContent.vue'
 import DistanceSensorsTabContent from './DistanceSensorsTabContent.vue'
+import LimitSwitchesTabContent from './LimitSwitchesTabContent.vue'
 import MotorsTabContent from './MotorsTabContent.vue'
 
 const props = defineProps<{
   robotState: RobotState
+  refreshInterval: number
 }>()
 
 const route = useRoute()
@@ -33,6 +35,9 @@ function handleTabChange(value: string | number) {
         <TabsTrigger value="sensors">
           Sensors
         </TabsTrigger>
+        <TabsTrigger value="limit-switches">
+          Limit Switches
+        </TabsTrigger>
         <TabsTrigger value="cargo">
           Cargo
         </TabsTrigger>
@@ -43,37 +48,32 @@ function handleTabChange(value: string | number) {
 
       <TabsContent value="battery">
         <BatteryTabContent
-          :battery="props.robotState.battery"
-          :charge="props.robotState.charge"
+          :battery="props.robotState.battery" :charge="props.robotState.charge"
           :discharge="props.robotState.discharge"
         />
       </TabsContent>
 
       <TabsContent value="motors">
         <MotorsTabContent
-          :lift-motor="props.robotState.liftMotor"
-          :drive-motor="props.robotState.driveMotor"
+          :lift-motor="props.robotState.liftMotor" :drive-motor="props.robotState.driveMotor"
           :cargo-door-motor="props.robotState.cargoDoorMotor"
         />
       </TabsContent>
 
       <TabsContent value="sensors">
-        <DistanceSensorsTabContent
-          :distance-sensor="props.robotState.distanceSensor"
-        />
+        <DistanceSensorsTabContent :distance-sensor="props.robotState.distanceSensor" />
+      </TabsContent>
+
+      <TabsContent value="limit-switches">
+        <LimitSwitchesTabContent :refresh-interval="props.refreshInterval" />
       </TabsContent>
 
       <TabsContent value="cargo">
-        <CargoTabContent
-          :cargo="props.robotState.cargo"
-          :cargo-door-motor="props.robotState.cargoDoorMotor"
-        />
+        <CargoTabContent :cargo="props.robotState.cargo" :cargo-door-motor="props.robotState.cargoDoorMotor" />
       </TabsContent>
 
       <TabsContent value="connections">
-        <ConnectionsTabContent
-          :app-connection="props.robotState.appConnection"
-        />
+        <ConnectionsTabContent :app-connection="props.robotState.appConnection" />
       </TabsContent>
     </Tabs>
   </div>
