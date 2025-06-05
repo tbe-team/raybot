@@ -132,10 +132,6 @@ func (commandHandler) convertReqInputsToCommandInputs(req *commandv1.CreateComma
 		return &command.CargoLowerInputs{
 			Position:   uint16(i.Position),
 			MotorSpeed: uint8(i.MotorSpeed),
-			BottomObstacleTracking: command.BottomObstacleTracking{
-				EnterDistance: uint16(i.BottomObstacleTracking.EnterDistance),
-				ExitDistance:  uint16(i.BottomObstacleTracking.ExitDistance),
-			},
 		}, nil
 
 	case commandv1.CommandType_COMMAND_TYPE_CARGO_CHECK_QR:
@@ -313,10 +309,6 @@ func (commandHandler) convertCommandInputsToResponse(inputs command.Inputs) *com
 				CargoLower: &commandv1.CargoLowerInputs{
 					Position:   uint32(i.Position),
 					MotorSpeed: uint32(i.MotorSpeed),
-					BottomObstacleTracking: &commandv1.BottomObstacleTracking{
-						EnterDistance: uint32(i.BottomObstacleTracking.EnterDistance),
-						ExitDistance:  uint32(i.BottomObstacleTracking.ExitDistance),
-					},
 				},
 			},
 		}

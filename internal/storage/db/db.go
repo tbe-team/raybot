@@ -69,12 +69,12 @@ func (p *SQLiteDB) WithTX(ctx context.Context, fn func(DB) error) (err error) {
 }
 
 func NewTestDB() (*SQLiteDB, error) {
-	db, err := NewSQLiteDB("file::memory:?cache=shared")
+	db, err := sql.Open("sqlite3", "file::memory:?cache=shared")
 	if err != nil {
-		return nil, fmt.Errorf("new test db: %w", err)
+		return nil, fmt.Errorf("open db: %w", err)
 	}
 
-	return db, nil
+	return &SQLiteDB{DB: db}, nil
 }
 
 // parseDBPath parses the database path from a URL.

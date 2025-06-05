@@ -106,17 +106,9 @@ func (CargoLiftInputs) CommandType() CommandType {
 }
 func (CargoLiftInputs) isInputs() {}
 
-type BottomObstacleTracking struct {
-	// Start detecting obstacle when distance is below this value
-	EnterDistance uint16 `json:"enter_distance" validate:"required"`
-	// Stop detecting obstacle when distance is above this value
-	ExitDistance uint16 `json:"exit_distance" validate:"required"`
-}
-
 type CargoLowerInputs struct {
-	Position               uint16                 `json:"position" validate:"required"`
-	MotorSpeed             uint8                  `json:"motor_speed" validate:"required,max=100"`
-	BottomObstacleTracking BottomObstacleTracking `json:"bottom_obstacle_tracking" validate:"required"`
+	Position   uint16 `json:"position" validate:"required"`
+	MotorSpeed uint8  `json:"motor_speed" validate:"required,max=100"`
 }
 
 func (CargoLowerInputs) CommandType() CommandType {

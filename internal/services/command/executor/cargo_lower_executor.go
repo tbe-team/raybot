@@ -6,9 +6,10 @@ import (
 	"log/slog"
 	"sync"
 
+	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/command"
-	"github.com/tbe-team/raybot/internal/services/config"
+	configservice "github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
@@ -16,14 +17,14 @@ import (
 type cargoLowerExecutor struct {
 	log              *slog.Logger
 	subscriber       eventbus.Subscriber
-	configService    config.Service
+	configService    configservice.Service
 	liftMotorService liftmotor.Service
 }
 
 func newCargoLowerExecutor(
 	log *slog.Logger,
 	subscriber eventbus.Subscriber,
-	configService config.Service,
+	configService configservice.Service,
 	liftMotorService liftmotor.Service,
 ) CommandExecutor[command.CargoLowerInputs, command.CargoLowerOutputs] {
 	return cargoLowerExecutor{
@@ -145,6 +146,12 @@ func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs c
 		cancel()
 	}()
 
+	obstacleTracking, err := e.getObstacleTracking(ctx)
+	if err != nil {
+		e.log.Error("failed to get obstacle tracking", slog.Any("error", err))
+		return
+	}
+
 	bottomDistanceCh := make(chan uint16, 1)
 
 	e.log.Info("start tracking bottom obstacle")
@@ -172,7 +179,7 @@ func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs c
 
 		case bottomDistance := <-bottomDistanceCh:
 			// If the bottom distance is less than the enter distance, we stop the motor
-			if bottomDistance <= inputs.BottomObstacleTracking.EnterDistance && isMotorRunning {
+			if bottomDistance <= obstacleTracking.EnterDistance && isMotorRunning {
 				e.log.Info("obstacle detected, stopping motor", slog.Uint64("bottom_distance", uint64(bottomDistance)))
 				if err := e.liftMotorService.Stop(ctx); err != nil {
 					e.log.Error("failed to stop lift motor", slog.Any("error", err))
@@ -183,7 +190,7 @@ func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs c
 			}
 
 			// If the bottom distance is greater than the exit distance, we run motor again
-			if bottomDistance >= inputs.BottomObstacleTracking.ExitDistance && !isMotorRunning {
+			if bottomDistance >= obstacleTracking.ExitDistance && !isMotorRunning {
 				e.log.Info("obstacle cleared, running motor again", slog.Uint64("bottom_distance", uint64(bottomDistance)))
 				if err := e.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
 					MotorSpeed: inputs.MotorSpeed,
@@ -210,4 +217,16 @@ func (e cargoLowerExecutor) getRequiredStableReadCount(ctx context.Context) int 
 		return 1
 	}
 	return int(commandCfg.CargoLower.StableReadCount)
+}
+
+func (e cargoLowerExecutor) getObstacleTracking(ctx context.Context) (config.ObstacleTracking, error) {
+	commandCfg, err := e.configService.GetCommandConfig(ctx)
+	if err != nil {
+		e.log.Error("failed to get command config", slog.Any("error", err))
+		return config.ObstacleTracking{
+			EnterDistance: 10,
+			ExitDistance:  20,
+		}, nil
+	}
+	return commandCfg.CargoLower.BottomObstacleTracking, nil
 }

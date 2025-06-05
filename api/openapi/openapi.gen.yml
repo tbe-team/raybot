@@ -975,35 +975,57 @@ components:
     CargoLiftConfig:
       type: object
       properties:
-        stable_read_count:
+        stableReadCount:
           type: integer
           example: 3
           description: The number of stable reads required to consider the lift position reached
           x-order: 1
           x-go-type: uint8
       required:
-        - stable_read_count
+        - stableReadCount
+    ObstacleTracking:
+      type: object
+      properties:
+        enterDistance:
+          type: integer
+          example: 20
+          description: The distance to consider the obstacle present (cm)
+          x-order: 1
+          x-go-type: uint16
+        exitDistance:
+          type: integer
+          example: 30
+          description: The distance to consider the obstacle cleared (cm)
+          x-order: 2
+          x-go-type: uint16
+      required:
+        - enterDistance
+        - exitDistance
     CargoLowerConfig:
       type: object
       properties:
-        stable_read_count:
+        stableReadCount:
           type: integer
           example: 3
           description: The number of stable reads required to consider the lower position reached
           x-order: 1
           x-go-type: uint8
+        bottomObstacleTracking:
+          $ref: '#/components/schemas/ObstacleTracking'
+          x-order: 2
       required:
-        - stable_read_count
+        - stableReadCount
+        - bottomObstacleTracking
     CommandConfig:
       type: object
       properties:
-        cargo_lift:
+        cargoLift:
           $ref: '#/components/schemas/CargoLiftConfig'
-        cargo_lower:
+        cargoLower:
           $ref: '#/components/schemas/CargoLowerConfig'
       required:
-        - cargo_lift
-        - cargo_lower
+        - cargoLift
+        - cargoLower
     SystemInfo:
       type: object
       properties:
@@ -1673,11 +1695,13 @@ components:
         motorSpeed:
           $ref: '#/components/schemas/MotorSpeed'
         bottomObstacleTracking:
-          $ref: '#/components/schemas/BottomObstacleTracking'
+          allOf:
+            - $ref: '#/components/schemas/BottomObstacleTracking'
+          description: This field is deprecated and will be removed in the future, use command config instead
+          deprecated: true
       required:
         - position
         - motorSpeed
-        - bottomObstacleTracking
     CargoCheckQRInputs:
       type: object
       properties:
