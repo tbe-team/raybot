@@ -22,15 +22,9 @@ export interface CargoLiftInputs {
   motorSpeed: number
   position: number
 }
-
-export interface BottomObstacleTracking {
-  enterDistance: number
-  exitDistance: number
-}
 export interface CargoLowerInputs {
   motorSpeed: number
   position: number
-  bottomObstacleTracking: BottomObstacleTracking
 }
 export interface CargoCheckQRInputs {
   qrCode: string
