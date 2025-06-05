@@ -234,10 +234,6 @@ func (commandHandler) convertInputsToResponse(inputs command.Inputs) (gen.Comman
 		if err := res.FromCargoLowerInputs(gen.CargoLowerInputs{
 			Position:   v.Position,
 			MotorSpeed: v.MotorSpeed,
-			BottomObstacleTracking: gen.BottomObstacleTracking{
-				EnterDistance: v.BottomObstacleTracking.EnterDistance,
-				ExitDistance:  v.BottomObstacleTracking.ExitDistance,
-			},
 		}); err != nil {
 			return gen.CommandInputs{}, fmt.Errorf("from cargo lower inputs: %w", err)
 		}
@@ -423,10 +419,6 @@ func (commandHandler) convertReqInputsToCommandInputs(cmdType gen.CommandType, i
 		return &command.CargoLowerInputs{
 			Position:   i.Position,
 			MotorSpeed: i.MotorSpeed,
-			BottomObstacleTracking: command.BottomObstacleTracking{
-				EnterDistance: i.BottomObstacleTracking.EnterDistance,
-				ExitDistance:  i.BottomObstacleTracking.ExitDistance,
-			},
 		}, nil
 
 	case command.CommandTypeCargoCheckQR:

@@ -265,11 +265,13 @@ CargoLowerInputs:
     motorSpeed:
       $ref: "#/MotorSpeed"
     bottomObstacleTracking:
-      $ref: "#/BottomObstacleTracking"
+      allOf:
+        - $ref: "#/BottomObstacleTracking"
+      description: This field is deprecated and will be removed in the future, use command config instead
+      deprecated: true
   required:
     - position
     - motorSpeed
-    - bottomObstacleTracking
 
 CargoCheckQRInputs:
   type: object

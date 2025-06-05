@@ -300,34 +300,57 @@ STAConfig:
 CommandConfig:
   type: object
   properties:
-    cargo_lift:
+    cargoLift:
       $ref: "#/CargoLiftConfig"
-    cargo_lower:
+    cargoLower:
       $ref: "#/CargoLowerConfig"
   required:
-    - cargo_lift
-    - cargo_lower
+    - cargoLift
+    - cargoLower
 
 CargoLiftConfig:
   type: object
   properties:
-    stable_read_count:
+    stableReadCount:
       type: integer
       example: 3
       description: The number of stable reads required to consider the lift position reached
       x-order: 1
       x-go-type: uint8
   required:
-    - stable_read_count
+    - stableReadCount
 
 CargoLowerConfig:
   type: object
   properties:
-    stable_read_count:
+    stableReadCount:
       type: integer
       example: 3
       description: The number of stable reads required to consider the lower position reached
       x-order: 1
       x-go-type: uint8
+    bottomObstacleTracking:
+      $ref: "#/ObstacleTracking"
+      x-order: 2
   required:
-    - stable_read_count
+    - stableReadCount
+    - bottomObstacleTracking
+
+ObstacleTracking:
+  type: object
+  properties:
+    enterDistance:
+      type: integer
+      example: 20
+      description: The distance to consider the obstacle present (cm)
+      x-order: 1
+      x-go-type: uint16
+    exitDistance:
+      type: integer
+      example: 30
+      description: The distance to consider the obstacle cleared (cm)
+      x-order: 2
+      x-go-type: uint16
+  required:
+    - enterDistance
+    - exitDistance
