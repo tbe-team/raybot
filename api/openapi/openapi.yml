@@ -37,6 +37,8 @@ paths:
     $ref: "./paths/system@stop-emergency.yml"
   /robot-state:
     $ref: "./paths/robot-state.yml"
+  /states/limit-switch:
+    $ref: "./paths/states@limit-switch.yml"
   /peripherals/serials:
     $ref: "./paths/peripherals@serials.yml"
   /commands/{commandId}:

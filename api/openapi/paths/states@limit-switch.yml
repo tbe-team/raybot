@@ -1,0 +1,19 @@
+get:
+  summary: Get the limit switch state
+  operationId: getLimitSwitchState
+  description: Get the limit switch state
+  tags:
+    - state
+  responses:
+    "200":
+      description: The limit switch state
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/state.yml#/LimitSwitchState"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

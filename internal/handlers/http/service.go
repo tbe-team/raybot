@@ -17,6 +17,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/command"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/services/dashboarddata"
+	"github.com/tbe-team/raybot/internal/services/limitswitch"
 	"github.com/tbe-team/raybot/internal/services/peripheral"
 	"github.com/tbe-team/raybot/internal/services/system"
 )
@@ -31,6 +32,7 @@ type Service struct {
 	peripheralService    peripheral.Service
 	commandService       command.Service
 	apperrorcodeService  apperrorcode.Service
+	limitSwitchService   limitswitch.Service
 }
 
 type CleanupFunc func(ctx context.Context) error
@@ -44,6 +46,7 @@ func New(
 	peripheralService peripheral.Service,
 	commandService command.Service,
 	apperrorcodeService apperrorcode.Service,
+	limitSwitchService limitswitch.Service,
 ) *Service {
 	return &Service{
 		cfg:                  cfg,
@@ -54,6 +57,7 @@ func New(
 		peripheralService:    peripheralService,
 		commandService:       commandService,
 		apperrorcodeService:  apperrorcodeService,
+		limitSwitchService:   limitSwitchService,
 	}
 }
 
@@ -127,6 +131,7 @@ type handler struct {
 	*dashboardDataHandler
 	*peripheralHandler
 	*commandHandler
+	*stateHandler
 }
 
 func (s *Service) newHandler() *handler {
@@ -139,5 +144,6 @@ func (s *Service) newHandler() *handler {
 		dashboardDataHandler: newDashboardDataHandler(s.dashboardDataService),
 		peripheralHandler:    newPeripheralHandler(s.peripheralService),
 		commandHandler:       newCommandHandler(s.commandService),
+		stateHandler:         newStateHandler(s.limitSwitchService),
 	}
 }

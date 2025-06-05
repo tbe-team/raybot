@@ -19,14 +19,14 @@ func NewRepository() limitswitch.Repository {
 	}
 }
 
-func (r *Repository) GetLimitSwitchState(_ context.Context, id limitswitch.LimitSwitchID) (limitswitch.LimitSwitch, error) {
+func (r *Repository) GetLimitSwitchByID(_ context.Context, id limitswitch.LimitSwitchID) (limitswitch.LimitSwitch, error) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
 	return r.LimitSwitchs[id], nil
 }
 
-func (r *Repository) UpdateLimitSwitchState(_ context.Context, id limitswitch.LimitSwitchID, pressed bool) error {
+func (r *Repository) UpdateLimitSwitchByID(_ context.Context, id limitswitch.LimitSwitchID, pressed bool) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
