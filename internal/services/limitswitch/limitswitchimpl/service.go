@@ -32,12 +32,23 @@ func NewService(
 	}
 }
 
-func (s Service) UpdateLimitSwitchState(ctx context.Context, params limitswitch.UpdateLimitSwitchStateParams) error {
+func (s Service) GetLimitSwitchState(ctx context.Context) (limitswitch.GetLimitSwitchStateOutput, error) {
+	limitSwitch1, err := s.repo.GetLimitSwitchByID(ctx, limitswitch.LimitSwitchID1)
+	if err != nil {
+		return limitswitch.GetLimitSwitchStateOutput{}, fmt.Errorf("get limit switch state: %w", err)
+	}
+
+	return limitswitch.GetLimitSwitchStateOutput{
+		LimitSwitch1: limitSwitch1,
+	}, nil
+}
+
+func (s Service) UpdateLimitSwitchByID(ctx context.Context, params limitswitch.UpdateLimitSwitchByIDParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
 	}
 
-	cur, err := s.repo.GetLimitSwitchState(ctx, params.ID)
+	cur, err := s.repo.GetLimitSwitchByID(ctx, params.ID)
 	if err != nil {
 		return fmt.Errorf("get limit switch state: %w", err)
 	}
@@ -47,7 +58,7 @@ func (s Service) UpdateLimitSwitchState(ctx context.Context, params limitswitch.
 		return nil
 	}
 
-	if err := s.repo.UpdateLimitSwitchState(ctx, params.ID, params.Pressed); err != nil {
+	if err := s.repo.UpdateLimitSwitchByID(ctx, params.ID, params.Pressed); err != nil {
 		return fmt.Errorf("update limit switch state: %w", err)
 	}
 

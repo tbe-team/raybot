@@ -157,7 +157,7 @@ func (s *Service) HandleSyncState(ctx context.Context, msg syncStateMessage) err
 			return fmt.Errorf("failed to unmarshal limit switch 1 data: %w", err)
 		}
 
-		if err := s.limitSwitchService.UpdateLimitSwitchState(ctx, limitswitch.UpdateLimitSwitchStateParams{
+		if err := s.limitSwitchService.UpdateLimitSwitchByID(ctx, limitswitch.UpdateLimitSwitchByIDParams{
 			ID:      limitswitch.LimitSwitchID1,
 			Pressed: temp.State == 1,
 		}); err != nil {

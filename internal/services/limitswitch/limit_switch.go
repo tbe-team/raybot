@@ -2,16 +2,21 @@ package limitswitch
 
 import "context"
 
-type UpdateLimitSwitchStateParams struct {
+type UpdateLimitSwitchByIDParams struct {
 	ID      LimitSwitchID
 	Pressed bool
 }
 
+type GetLimitSwitchStateOutput struct {
+	LimitSwitch1 LimitSwitch
+}
+
 type Service interface {
-	UpdateLimitSwitchState(ctx context.Context, params UpdateLimitSwitchStateParams) error
+	GetLimitSwitchState(ctx context.Context) (GetLimitSwitchStateOutput, error)
+	UpdateLimitSwitchByID(ctx context.Context, params UpdateLimitSwitchByIDParams) error
 }
 
 type Repository interface {
-	GetLimitSwitchState(ctx context.Context, id LimitSwitchID) (LimitSwitch, error)
-	UpdateLimitSwitchState(ctx context.Context, id LimitSwitchID, pressed bool) error
+	GetLimitSwitchByID(ctx context.Context, id LimitSwitchID) (LimitSwitch, error)
+	UpdateLimitSwitchByID(ctx context.Context, id LimitSwitchID, pressed bool) error
 }
