@@ -48,10 +48,6 @@ export const createCommandSchema = z.discriminatedUnion('type', [
     type: z.literal('CARGO_LOWER'),
     inputs: z.object({
       motorSpeed: z.number().min(0).max(100),
-      bottomObstacleTracking: z.object({
-        enterDistance: z.number().min(0),
-        exitDistance: z.number().min(0),
-      }),
       position: z.number().min(0),
     }),
   }),
