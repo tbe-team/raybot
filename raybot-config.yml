@@ -56,3 +56,6 @@ command:
     stable_read_count: 3
   cargo_lower:
     stable_read_count: 3
+    bottom_obstacle_tracking:
+      enter_distance: 20
+      exit_distance: 30

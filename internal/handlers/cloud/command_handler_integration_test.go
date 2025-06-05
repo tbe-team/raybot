@@ -126,10 +126,6 @@ func TestIntegrationCommandHandler_CreateCommand(t *testing.T) {
 						CargoLower: &commandv1.CargoLowerInputs{
 							Position:   100,
 							MotorSpeed: 100,
-							BottomObstacleTracking: &commandv1.BottomObstacleTracking{
-								EnterDistance: 100,
-								ExitDistance:  100,
-							},
 						},
 					},
 				},
