@@ -47,9 +47,9 @@ func (c *CargoLower) Validate() error {
 }
 
 type ObstacleTracking struct {
-	// Obstacle is considered present when distance <= EnterDistance
+	// Obstacle is considered present when distance <= EnterDistance (cm)
 	EnterDistance uint16 `yaml:"enter_distance"`
-	// Obstacle is considered cleared when distance >= ExitDistance
+	// Obstacle is considered cleared when distance >= ExitDistance (cm)
 	ExitDistance uint16 `yaml:"exit_distance"`
 }
 

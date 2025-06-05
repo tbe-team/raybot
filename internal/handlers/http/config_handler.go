@@ -177,13 +177,17 @@ func (h configHandler) GetCommandConfig(ctx context.Context, _ gen.GetCommandCon
 	return gen.GetCommandConfig200JSONResponse(h.convertCommandConfigToResponse(cfg)), nil
 }
 
-func (h configHandler) UpdateCommandConfig(ctx context.Context, request gen.UpdateCommandConfigRequestObject) (gen.UpdateCommandConfigResponseObject, error) {
+func (h configHandler) UpdateCommandConfig(ctx context.Context, req gen.UpdateCommandConfigRequestObject) (gen.UpdateCommandConfigResponseObject, error) {
 	cfg, err := h.configService.UpdateCommandConfig(ctx, config.Command{
 		CargoLift: config.CargoLift{
-			StableReadCount: request.Body.CargoLift.StableReadCount,
+			StableReadCount: req.Body.CargoLift.StableReadCount,
 		},
 		CargoLower: config.CargoLower{
-			StableReadCount: request.Body.CargoLower.StableReadCount,
+			StableReadCount: req.Body.CargoLower.StableReadCount,
+			BottomObstacleTracking: config.ObstacleTracking{
+				EnterDistance: req.Body.CargoLower.BottomObstacleTracking.EnterDistance,
+				ExitDistance:  req.Body.CargoLower.BottomObstacleTracking.ExitDistance,
+			},
 		},
 	})
 	if err != nil {
@@ -340,6 +344,10 @@ func (configHandler) convertCommandConfigToResponse(cfg config.Command) gen.Comm
 		},
 		CargoLower: gen.CargoLowerConfig{
 			StableReadCount: cfg.CargoLower.StableReadCount,
+			BottomObstacleTracking: gen.ObstacleTracking{
+				EnterDistance: cfg.CargoLower.BottomObstacleTracking.EnterDistance,
+				ExitDistance:  cfg.CargoLower.BottomObstacleTracking.ExitDistance,
+			},
 		},
 	}
 }
