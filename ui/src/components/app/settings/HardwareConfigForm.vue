@@ -87,14 +87,9 @@ function fetchPorts(newValue: boolean) {
     <div class="grid grid-cols-1 gap-8">
       <!-- ESP Controller Section -->
       <div class="space-y-3">
-        <div>
-          <h4 class="text-lg font-medium tracking-tight">
-            ESP Controller
-          </h4>
-          <p class="text-sm text-muted-foreground">
-            Configure the ESP controller
-          </p>
-        </div>
+        <h4 class="text-lg font-medium tracking-tight">
+          ESP Controller
+        </h4>
 
         <div class="px-4 space-y-6">
           <div class="space-y-6">
@@ -279,14 +274,9 @@ function fetchPorts(newValue: boolean) {
 
       <!-- PIC Controller Section -->
       <div class="space-y-3">
-        <div>
-          <h4 class="text-lg font-medium tracking-tight">
-            PIC Controller
-          </h4>
-          <p class="text-sm text-muted-foreground">
-            Configure the PIC controller
-          </p>
-        </div>
+        <h4 class="text-lg font-medium tracking-tight">
+          PIC Controller
+        </h4>
         <div class="px-4 space-y-6">
           <div class="space-y-6">
             <h4 class="pb-2 text-lg font-medium border-b">

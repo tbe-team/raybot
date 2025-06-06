@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useCommandConfigQuery } from '@/composables/use-config'
-import CommandsConfigForm from './CommandsConfigForm.vue'
+import CommandsConfigForm from './CommandConfigForm.vue'
 
 const { data, isPending } = useCommandConfigQuery()
 </script>

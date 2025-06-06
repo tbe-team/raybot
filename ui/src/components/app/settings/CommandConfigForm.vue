@@ -64,14 +64,9 @@ const onSubmit = form.handleSubmit((values) => {
     <div class="grid grid-cols-1 gap-8">
       <!-- ESP Controller Section -->
       <div class="space-y-3">
-        <div>
-          <h4 class="text-lg font-medium tracking-tight">
-            Cargo Lift configuration
-          </h4>
-          <p class="text-sm text-muted-foreground">
-            Configure the cargo lift
-          </p>
-        </div>
+        <h4 class="text-lg font-medium tracking-tight">
+          Cargo Lift configuration
+        </h4>
 
         <div class="space-y-6 ps-4">
           <FormField v-slot="{ componentField }" name="cargoLift.stableReadCount">
@@ -89,14 +84,9 @@ const onSubmit = form.handleSubmit((values) => {
     <div class="grid grid-cols-1 gap-8">
       <!-- ESP Controller Section -->
       <div class="space-y-3">
-        <div>
-          <h4 class="text-lg font-medium tracking-tight">
-            Cargo Lower configuration
-          </h4>
-          <p class="text-sm text-muted-foreground">
-            Configure the cargo lower
-          </p>
-        </div>
+        <h4 class="text-lg font-medium tracking-tight">
+          Cargo Lower configuration
+        </h4>
 
         <div class="space-y-6 ps-4">
           <FormField v-slot="{ componentField }" name="cargoLower.stableReadCount">

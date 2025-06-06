@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import CloudConfigTab from '@/components/app/settings/CloudConfigTab.vue'
-import CommandsConfigTab from '@/components/app/settings/CommandsConfigTab.vue'
+import CommandConfigTab from '@/components/app/settings/CommandConfigTab.vue'
 import HardwareConfigTab from '@/components/app/settings/HardwareConfigTab.vue'
 import HTTPConfigTab from '@/components/app/settings/HTTPConfigTab.vue'
 import WifiConfigTab from '@/components/app/settings/WifiConfigTab.vue'
@@ -61,7 +61,7 @@ function handleTabChange(value: string | number) {
         <WifiConfigTab />
       </TabsContent>
       <TabsContent value="command">
-        <CommandsConfigTab />
+        <CommandConfigTab />
       </TabsContent>
     </Tabs>
   </PageContainer>
