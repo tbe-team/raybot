@@ -56,7 +56,7 @@ go mod tidy
 4. Run
 
 ```bash
-cp raybot-config.yml bin/config.yml
+cp config/config.yml bin/config.yml
 touch bin/raybot.db
 
 # Run the project
