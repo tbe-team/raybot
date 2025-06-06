@@ -20,7 +20,7 @@ require (
 	github.com/tbe-team/raybot-api v0.1.2
 	go.bug.st/serial v1.6.4
 	go.uber.org/goleak v1.3.0
-	golang.org/x/sync v0.14.0
+	golang.org/x/sync v0.15.0
 	google.golang.org/grpc v1.72.2
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
