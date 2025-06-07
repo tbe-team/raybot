@@ -21,7 +21,7 @@ require (
 	go.bug.st/serial v1.6.4
 	go.uber.org/goleak v1.3.0
 	golang.org/x/sync v0.15.0
-	google.golang.org/grpc v1.72.2
+	google.golang.org/grpc v1.73.0
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
