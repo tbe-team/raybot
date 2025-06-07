@@ -121,7 +121,7 @@ func (s service) initSTAMode() error {
 		"nmcli", "con", "add",
 		"type", "wifi",
 		"con-name", staName,
-		"autoconnect", "no",
+		"autoconnect", "yes",
 		"ssid", s.cfg.STA.SSID,
 		"wifi-sec.key-mgmt", "wpa-psk",
 		"wifi-sec.psk", s.cfg.STA.Password,
