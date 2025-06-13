@@ -50,6 +50,13 @@ func (h commandHandler) GetCommand(ctx context.Context, req *commandv1.GetComman
 	}, nil
 }
 
+func (h commandHandler) CancelCurrentProcessingCommand(ctx context.Context, _ *commandv1.CancelCurrentProcessingCommandRequest) (*commandv1.CancelCurrentProcessingCommandResponse, error) {
+	if err := h.commandService.CancelCurrentProcessingCommand(ctx); err != nil {
+		return nil, fmt.Errorf("cancel current processing command: %v", err)
+	}
+	return &commandv1.CancelCurrentProcessingCommandResponse{}, nil
+}
+
 //nolint:gosec
 func (commandHandler) convertReqInputsToCommandInputs(req *commandv1.CreateCommandRequest) (command.Inputs, error) {
 	switch req.Type {
