@@ -1,5 +1,5 @@
-import{c as e}from"./http-D8I8Ubdl.js";/**
- * @license lucide-vue-next v0.513.0 - ISC
+import{c as e}from"./http-D4Je9GED.js";/**
+ * @license lucide-vue-next v0.516.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
