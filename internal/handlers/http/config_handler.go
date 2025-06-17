@@ -159,6 +159,7 @@ func (h configHandler) UpdateWifiConfig(ctx context.Context, request gen.UpdateW
 			Enable:   request.Body.Sta.Enable,
 			SSID:     request.Body.Sta.Ssid,
 			Password: request.Body.Sta.Password,
+			IP:       request.Body.Sta.Ip,
 		},
 	})
 	if err != nil {
@@ -266,6 +267,7 @@ func (configHandler) convertWifiConfigToResponse(cfg config.Wifi) gen.WifiConfig
 		Enable:   cfg.STA.Enable,
 		Ssid:     cfg.STA.SSID,
 		Password: cfg.STA.Password,
+		Ip:       cfg.STA.IP,
 	}
 
 	return gen.WifiConfig{

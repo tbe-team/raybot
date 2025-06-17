@@ -292,10 +292,17 @@ STAConfig:
       example: "password"
       description: The password for the wifi connection
       x-order: 3
+    ip:
+      type: string
+      format: ipv4
+      example: "192.168.1.100/24"
+      description: The IP address for the wifi connection
+      x-order: 4
   required:
     - enable
     - ssid
     - password
+    - ip
 
 CommandConfig:
   type: object
