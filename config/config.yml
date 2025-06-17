@@ -47,6 +47,7 @@ wifi:
     enable: false
     ssid: ssid
     password: password
+    ip: 192.168.1.100/24
 cron:
   delete_old_command:
     schedule: "@every 1h"

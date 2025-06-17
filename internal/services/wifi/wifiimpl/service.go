@@ -125,6 +125,7 @@ func (s service) initSTAMode() error {
 		"ssid", s.cfg.STA.SSID,
 		"wifi-sec.key-mgmt", "wpa-psk",
 		"wifi-sec.psk", s.cfg.STA.Password,
+		"ipv4.addresses", s.cfg.STA.IP,
 	)
 	out, err := cmd.CombinedOutput()
 	if err != nil {
