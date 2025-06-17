@@ -11,6 +11,7 @@ import (
 	"github.com/tbe-team/raybot/internal/config"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/storage/file"
+	"github.com/tbe-team/raybot/pkg/xerror"
 )
 
 type service struct {
@@ -35,7 +36,7 @@ func (s *service) GetLogConfig(_ context.Context) (config.Log, error) {
 
 func (s *service) UpdateLogConfig(ctx context.Context, logCfg config.Log) (config.Log, error) {
 	if err := logCfg.Validate(); err != nil {
-		return config.Log{}, fmt.Errorf("validate log config: %w", err)
+		return config.Log{}, xerror.ValidationFailed(err, "invalid log config")
 	}
 
 	cfg := *s.cfg
@@ -60,7 +61,7 @@ func (s *service) GetHardwareConfig(_ context.Context) (config.Hardware, error) 
 
 func (s *service) UpdateHardwareConfig(ctx context.Context, hardwareCfg config.Hardware) (config.Hardware, error) {
 	if err := hardwareCfg.Validate(); err != nil {
-		return config.Hardware{}, fmt.Errorf("validate hardware config: %w", err)
+		return config.Hardware{}, xerror.ValidationFailed(err, "invalid hardware config")
 	}
 
 	cfg := *s.cfg
@@ -85,7 +86,7 @@ func (s *service) GetCloudConfig(_ context.Context) (config.Cloud, error) {
 
 func (s *service) UpdateCloudConfig(ctx context.Context, cloudCfg config.Cloud) (config.Cloud, error) {
 	if err := cloudCfg.Validate(); err != nil {
-		return config.Cloud{}, fmt.Errorf("validate cloud config: %w", err)
+		return config.Cloud{}, xerror.ValidationFailed(err, "invalid cloud config")
 	}
 
 	cfg := *s.cfg
@@ -110,7 +111,7 @@ func (s *service) GetHTTPConfig(_ context.Context) (config.HTTP, error) {
 
 func (s *service) UpdateHTTPConfig(ctx context.Context, httpCfg config.HTTP) (config.HTTP, error) {
 	if err := httpCfg.Validate(); err != nil {
-		return config.HTTP{}, fmt.Errorf("validate http config: %w", err)
+		return config.HTTP{}, xerror.ValidationFailed(err, "invalid http config")
 	}
 
 	cfg := *s.cfg
@@ -135,7 +136,7 @@ func (s *service) GetWifiConfig(_ context.Context) (config.Wifi, error) {
 
 func (s *service) UpdateWifiConfig(ctx context.Context, wifiCfg config.Wifi) (config.Wifi, error) {
 	if err := wifiCfg.Validate(); err != nil {
-		return config.Wifi{}, fmt.Errorf("validate wifi config: %w", err)
+		return config.Wifi{}, xerror.ValidationFailed(err, "invalid wifi config")
 	}
 
 	cfg := *s.cfg
@@ -160,7 +161,7 @@ func (s *service) GetCommandConfig(_ context.Context) (config.Command, error) {
 
 func (s *service) UpdateCommandConfig(ctx context.Context, commandCfg config.Command) (config.Command, error) {
 	if err := commandCfg.Validate(); err != nil {
-		return config.Command{}, fmt.Errorf("validate command config: %w", err)
+		return config.Command{}, xerror.ValidationFailed(err, "invalid command config")
 	}
 
 	cfg := *s.cfg
