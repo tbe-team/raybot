@@ -80,4 +80,5 @@ export interface STAConfig {
   enable: boolean
   ssid: string
   password: string
+  ip: string
 }

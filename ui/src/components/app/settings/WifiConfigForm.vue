@@ -19,6 +19,7 @@ const props = defineProps<Props>()
 const ssidRegex = /^[\w\s\-.]*$/ // alphanumeric, space, -, _, .
 const passwordRegex = /^[\x21-\x7E]*$/ // printable characters
 const ipv4Regex = /^(?:(?:25[0-5]|2[0-4]\d|[01]?\d{1,2})\.){3}(?:25[0-5]|2[0-4]\d|[01]?\d{1,2})$/
+const ipv4CidrRegex = /^(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(?:\/(16|24))?$/
 
 const wifiConfigSchema = z.object({
   ap: z.object({
@@ -45,6 +46,9 @@ const wifiConfigSchema = z.object({
       .min(8, 'Password must be at least 8 characters')
       .max(63, 'Password must be at most 63 characters')
       .regex(passwordRegex, 'Password can only contain printable characters'),
+    ip: z.string()
+      .min(1, 'IP address is required')
+      .regex(ipv4CidrRegex, 'Invalid IPv4 address format'),
   }),
 }).superRefine((data, ctx) => {
   if ((data.ap.enable && data.sta.enable) || (!data.ap.enable && !data.sta.enable)) {
@@ -187,6 +191,20 @@ const onSubmit = form.handleSubmit((values) => {
           <PasswordInput
             v-bind="componentField"
             placeholder="Enter password"
+            :disabled="isPending"
+          />
+        </FormControl>
+        <FormMessage />
+      </FormItem>
+    </FormField>
+
+    <FormField v-slot="{ componentField }" name="sta.ip">
+      <FormItem>
+        <FormLabel>Static IP Address</FormLabel>
+        <FormControl>
+          <Input
+            v-bind="componentField"
+            placeholder="Enter IP address"
             :disabled="isPending"
           />
         </FormControl>
