@@ -104,8 +104,8 @@ const onSubmit = form.handleSubmit((values) => {
             @update:model-value="handleChange"
           />
         </FormControl>
+        <FormMessage />
       </FormItem>
-      <FormMessage />
     </FormField>
 
     <FormField v-slot="{ componentField }" name="ap.ssid">
@@ -166,8 +166,8 @@ const onSubmit = form.handleSubmit((values) => {
             @update:model-value="handleChange"
           />
         </FormControl>
+        <FormMessage />
       </FormItem>
-      <FormMessage />
     </FormField>
 
     <FormField v-slot="{ componentField }" name="sta.ssid">

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Loader } from 'lucide-vue-next'
 import { useCommandConfigQuery } from '@/composables/use-config'
 import CommandsConfigForm from './CommandConfigForm.vue'
 
