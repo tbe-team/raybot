@@ -1,4 +1,4 @@
-import{P as d,c as m,a as y}from"./http-D4Je9GED.js";import{m as _,c as f}from"./check-BkU-WFoY.js";import{d as c,c as l,o as n,w as p,a as u,m as i,u as a,k as x}from"./index-CXAYBSVx.js";const[b,C]=f("SelectGroup"),k=c({__name:"SelectGroup",props:{asChild:{type:Boolean},as:{}},setup(o){const e=o,t=_(void 0,"reka-select-group");return C({id:t}),(s,r)=>(n(),l(a(d),i({role:"group"},e,{"aria-labelledby":a(t)}),{default:p(()=>[u(s.$slots,"default")]),_:3},16,["aria-labelledby"]))}});/**
+import{P as d,c as m,a as y}from"./http-COdMawGS.js";import{m as _,c as f}from"./check-DrQAqh1d.js";import{d as c,c as l,o as n,w as p,a as u,m as i,u as a,k as x}from"./index-D6wOVdbG.js";const[b,C]=f("SelectGroup"),k=c({__name:"SelectGroup",props:{asChild:{type:Boolean},as:{}},setup(o){const e=o,t=_(void 0,"reka-select-group");return C({id:t}),(s,r)=>(n(),l(a(d),i({role:"group"},e,{"aria-labelledby":a(t)}),{default:p(()=>[u(s.$slots,"default")]),_:3},16,["aria-labelledby"]))}});/**
  * @license lucide-vue-next v0.516.0 - ISC
  *
  * This source code is licensed under the ISC license.
