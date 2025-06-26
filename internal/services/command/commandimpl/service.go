@@ -81,7 +81,7 @@ func (s *Service) CreateCommand(ctx context.Context, params command.CreateComman
 		return command.Command{}, fmt.Errorf("validate params: %w", err)
 	}
 
-	cmd := command.NewCommand(params.Source, params.Inputs)
+	cmd := command.NewCommand(params.Source, params.Inputs, params.RequestID)
 	cmd, err := s.commandRepository.CreateCommand(ctx, cmd)
 	if err != nil {
 		return command.Command{}, fmt.Errorf("create command: %w", err)

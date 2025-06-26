@@ -47,6 +47,7 @@ type Command struct {
 	UpdatedAt   string  `json:"updated_at"`
 	StartedAt   *string `json:"started_at"`
 	Outputs     string  `json:"outputs"`
+	RequestID   *string `json:"request_id"`
 }
 
 type Location struct {

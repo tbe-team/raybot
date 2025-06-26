@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 //nolint:revive
@@ -94,9 +96,15 @@ type Command struct {
 	CompletedAt *time.Time
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	RequestID   *string
 }
 
-func NewCommand(source Source, inputs Inputs) Command {
+func NewCommand(source Source, inputs Inputs, requestID *string) Command {
+	var reqID string
+	if requestID == nil {
+		reqID = uuid.NewString()
+	}
+
 	now := time.Now()
 	return Command{
 		Type:      inputs.CommandType(),
@@ -105,6 +113,7 @@ func NewCommand(source Source, inputs Inputs) Command {
 		Inputs:    inputs,
 		CreatedAt: now,
 		UpdatedAt: now,
+		RequestID: &reqID,
 	}
 }
 

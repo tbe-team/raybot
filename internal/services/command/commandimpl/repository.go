@@ -89,6 +89,7 @@ func (r repository) ListCommands(ctx context.Context, params command.ListCommand
 				&row.UpdatedAt,
 				&row.StartedAt,
 				&row.Outputs,
+				&row.RequestID,
 			); err != nil {
 				return fmt.Errorf("scan command: %w", err)
 			}
@@ -176,6 +177,7 @@ func (r repository) CreateCommand(ctx context.Context, commandArg command.Comman
 		CompletedAt: completedAt,
 		CreatedAt:   commandArg.CreatedAt.Format(time.RFC3339Nano),
 		UpdatedAt:   commandArg.UpdatedAt.Format(time.RFC3339Nano),
+		RequestID:   commandArg.RequestID,
 	})
 	if err != nil {
 		return command.Command{}, fmt.Errorf("queries create command: %w", err)
@@ -184,6 +186,9 @@ func (r repository) CreateCommand(ctx context.Context, commandArg command.Comman
 	commandArg.ID = row.ID
 	commandArg.Outputs, err = command.UnmarshalOutputs(commandArg.Type, []byte(row.Outputs))
 	if err != nil {
+		if db.IsUniqueViolationError(err, "request_id") {
+			return command.Command{}, command.ErrCommandAlreadyExists
+		}
 		return command.Command{}, fmt.Errorf("failed to unmarshal outputs: %w", err)
 	}
 
@@ -269,11 +274,12 @@ func (r repository) DeleteOldCommands(ctx context.Context, cutoffTime time.Time)
 
 func (repository) convertRowToCommand(row sqlc.Command) (command.Command, error) {
 	ret := command.Command{
-		ID:     row.ID,
-		Type:   command.CommandType(row.Type),
-		Status: command.Status(row.Status),
-		Source: command.Source(row.Source),
-		Error:  row.Error,
+		ID:        row.ID,
+		Type:      command.CommandType(row.Type),
+		Status:    command.Status(row.Status),
+		Source:    command.Source(row.Source),
+		Error:     row.Error,
+		RequestID: row.RequestID,
 	}
 	var err error
 

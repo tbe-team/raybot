@@ -41,7 +41,8 @@ INSERT INTO
 		started_at,
 		created_at,
 		updated_at,
-		completed_at
+		completed_at,
+		request_id
 	)
 VALUES
 	(
@@ -53,7 +54,8 @@ VALUES
 		@started_at,
 		@created_at,
 		@updated_at,
-		@completed_at
+		@completed_at,
+		@request_id
 	) RETURNING id,
 	outputs;
 

@@ -49,7 +49,8 @@ INSERT INTO
 		started_at,
 		created_at,
 		updated_at,
-		completed_at
+		completed_at,
+		request_id
 	)
 VALUES
 	(
@@ -61,7 +62,8 @@ VALUES
 		?6,
 		?7,
 		?8,
-		?9
+		?9,
+		?10
 	) RETURNING id,
 	outputs
 `
@@ -76,6 +78,7 @@ type CommandCreateParams struct {
 	CreatedAt   string  `json:"created_at"`
 	UpdatedAt   string  `json:"updated_at"`
 	CompletedAt *string `json:"completed_at"`
+	RequestID   *string `json:"request_id"`
 }
 
 type CommandCreateRow struct {
@@ -94,6 +97,7 @@ func (q *Queries) CommandCreate(ctx context.Context, db DBTX, arg CommandCreateP
 		arg.CreatedAt,
 		arg.UpdatedAt,
 		arg.CompletedAt,
+		arg.RequestID,
 	)
 	var i CommandCreateRow
 	err := row.Scan(&i.ID, &i.Outputs)
@@ -136,7 +140,7 @@ func (q *Queries) CommandDeleteOldCommands(ctx context.Context, db DBTX, created
 
 const commandGetByID = `-- name: CommandGetByID :one
 SELECT
-	id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs
+	id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs, request_id
 FROM
 	commands
 WHERE
@@ -158,13 +162,14 @@ func (q *Queries) CommandGetByID(ctx context.Context, db DBTX, id int64) (Comman
 		&i.UpdatedAt,
 		&i.StartedAt,
 		&i.Outputs,
+		&i.RequestID,
 	)
 	return i, err
 }
 
 const commandGetCurrentProcessing = `-- name: CommandGetCurrentProcessing :one
 SELECT
-	id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs
+	id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs, request_id
 FROM
 	commands
 WHERE
@@ -190,13 +195,14 @@ func (q *Queries) CommandGetCurrentProcessing(ctx context.Context, db DBTX) (Com
 		&i.UpdatedAt,
 		&i.StartedAt,
 		&i.Outputs,
+		&i.RequestID,
 	)
 	return i, err
 }
 
 const commandGetNextExecutable = `-- name: CommandGetNextExecutable :one
 SELECT
-	id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs
+	id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs, request_id
 FROM
 	commands
 WHERE
@@ -222,6 +228,7 @@ func (q *Queries) CommandGetNextExecutable(ctx context.Context, db DBTX) (Comman
 		&i.UpdatedAt,
 		&i.StartedAt,
 		&i.Outputs,
+		&i.RequestID,
 	)
 	return i, err
 }
@@ -252,7 +259,7 @@ SET
 	END,
 	updated_at = ?11
 WHERE
-	id = ?12 RETURNING id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs
+	id = ?12 RETURNING id, type, status, source, inputs, error, completed_at, created_at, updated_at, started_at, outputs, request_id
 `
 
 type CommandUpdateParams struct {
@@ -298,6 +305,7 @@ func (q *Queries) CommandUpdate(ctx context.Context, db DBTX, arg CommandUpdateP
 		&i.UpdatedAt,
 		&i.StartedAt,
 		&i.Outputs,
+		&i.RequestID,
 	)
 	return i, err
 }

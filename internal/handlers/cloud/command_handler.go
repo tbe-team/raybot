@@ -27,8 +27,9 @@ func (h commandHandler) CreateCommand(ctx context.Context, req *commandv1.Create
 		return nil, fmt.Errorf("convert req inputs to command inputs: %v", err)
 	}
 	cmd, err := h.commandService.CreateCommand(ctx, command.CreateCommandParams{
-		Source: command.SourceCloud,
-		Inputs: inputs,
+		Source:    command.SourceCloud,
+		Inputs:    inputs,
+		RequestID: GetRequestIDFromContext(ctx),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("create command: %v", err)

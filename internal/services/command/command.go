@@ -14,14 +14,16 @@ var (
 	ErrNoNextExecutableCommand            = xerror.NotFound(nil, "command.noNextExecutable", "no next executable command")
 	ErrNoCommandBeingProcessed            = xerror.BadRequest(nil, "command.noCommandBeingProcessed", "no command being processed")
 	ErrCommandInProcessingCanNotBeDeleted = xerror.BadRequest(nil, "command.inProcessingCanNotBeDeleted", "command in processing can not be deleted")
+	ErrCommandAlreadyExists               = xerror.Conflict(nil, "command.alreadyExists", "command already exists")
 
 	ErrRunningCommandNotFound = xerror.NotFound(nil, "command.runningCommandNotFound", "running command not found")
 	ErrRunningCommandExists   = xerror.BadRequest(nil, "command.runningCommandExists", "running command already exists")
 )
 
 type CreateCommandParams struct {
-	Source Source `validate:"enum"`
-	Inputs Inputs `validate:"required"`
+	Source    Source  `validate:"enum"`
+	Inputs    Inputs  `validate:"required"`
+	RequestID *string `validate:"omitempty,max=64"` // Optional request ID for idempotency
 }
 
 type GetCommandByIDParams struct {
