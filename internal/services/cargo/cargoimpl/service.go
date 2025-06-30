@@ -99,6 +99,14 @@ func (s *service) UpdateCargoDoorMotorState(ctx context.Context, params cargo.Up
 	return s.cargoRepo.UpdateCargoDoorMotorState(ctx, params)
 }
 
+func (s *service) UpdateCargoHasItem(ctx context.Context, params cargo.UpdateCargoHasItemParams) error {
+	if err := s.validator.Validate(params); err != nil {
+		return fmt.Errorf("validate params: %w", err)
+	}
+
+	return s.cargoRepo.UpdateCargoHasItem(ctx, params)
+}
+
 func (s *service) OpenCargoDoor(ctx context.Context, params cargo.OpenCargoDoorParams) error {
 	if err := s.cargoDoorController.OpenCargoDoor(ctx, params.Speed); err != nil {
 		return fmt.Errorf("open cargo door: %w", err)

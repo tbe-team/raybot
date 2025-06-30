@@ -75,7 +75,7 @@ func (q *Queries) CargoDoorMotorUpdate(ctx context.Context, db DBTX, arg CargoDo
 
 const cargoGet = `-- name: CargoGet :one
 SELECT
-	id, is_open, qr_code, bottom_distance, updated_at
+	id, is_open, qr_code, bottom_distance, updated_at, has_item
 FROM
 	cargo
 WHERE
@@ -91,6 +91,7 @@ func (q *Queries) CargoGet(ctx context.Context, db DBTX) (Cargo, error) {
 		&i.QrCode,
 		&i.BottomDistance,
 		&i.UpdatedAt,
+		&i.HasItem,
 	)
 	return i, err
 }
@@ -102,7 +103,7 @@ SET
 	bottom_distance = ?1,
 	updated_at = ?2
 WHERE
-	id = 1 RETURNING id, is_open, qr_code, bottom_distance, updated_at
+	id = 1 RETURNING id, is_open, qr_code, bottom_distance, updated_at, has_item
 `
 
 type CargoUpdateBottomDistanceParams struct {
@@ -119,6 +120,36 @@ func (q *Queries) CargoUpdateBottomDistance(ctx context.Context, db DBTX, arg Ca
 		&i.QrCode,
 		&i.BottomDistance,
 		&i.UpdatedAt,
+		&i.HasItem,
+	)
+	return i, err
+}
+
+const cargoUpdateHasItem = `-- name: CargoUpdateHasItem :one
+UPDATE
+	cargo
+SET
+	has_item = ?1,
+	updated_at = ?2
+WHERE
+	id = 1 RETURNING id, is_open, qr_code, bottom_distance, updated_at, has_item
+`
+
+type CargoUpdateHasItemParams struct {
+	HasItem   int64  `json:"has_item"`
+	UpdatedAt string `json:"updated_at"`
+}
+
+func (q *Queries) CargoUpdateHasItem(ctx context.Context, db DBTX, arg CargoUpdateHasItemParams) (Cargo, error) {
+	row := db.QueryRowContext(ctx, cargoUpdateHasItem, arg.HasItem, arg.UpdatedAt)
+	var i Cargo
+	err := row.Scan(
+		&i.ID,
+		&i.IsOpen,
+		&i.QrCode,
+		&i.BottomDistance,
+		&i.UpdatedAt,
+		&i.HasItem,
 	)
 	return i, err
 }
@@ -130,7 +161,7 @@ SET
 	is_open = ?1,
 	updated_at = ?2
 WHERE
-	id = 1 RETURNING id, is_open, qr_code, bottom_distance, updated_at
+	id = 1 RETURNING id, is_open, qr_code, bottom_distance, updated_at, has_item
 `
 
 type CargoUpdateIsOpenParams struct {
@@ -147,6 +178,7 @@ func (q *Queries) CargoUpdateIsOpen(ctx context.Context, db DBTX, arg CargoUpdat
 		&i.QrCode,
 		&i.BottomDistance,
 		&i.UpdatedAt,
+		&i.HasItem,
 	)
 	return i, err
 }
@@ -158,7 +190,7 @@ SET
 	qr_code = ?1,
 	updated_at = ?2
 WHERE
-	id = 1 RETURNING id, is_open, qr_code, bottom_distance, updated_at
+	id = 1 RETURNING id, is_open, qr_code, bottom_distance, updated_at, has_item
 `
 
 type CargoUpdateQRCodeParams struct {
@@ -175,6 +207,7 @@ func (q *Queries) CargoUpdateQRCode(ctx context.Context, db DBTX, arg CargoUpdat
 		&i.QrCode,
 		&i.BottomDistance,
 		&i.UpdatedAt,
+		&i.HasItem,
 	)
 	return i, err
 }

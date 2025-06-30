@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	"github.com/tbe-team/raybot/internal/services/battery"
+	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
@@ -164,6 +165,20 @@ func (s *Service) HandleSyncState(ctx context.Context, msg syncStateMessage) err
 			return fmt.Errorf("failed to update limit switch state: %w", err)
 		}
 
+	case syncStateTypeCargoObstacle:
+		var temp struct {
+			Object uint8 `json:"object"`
+		}
+		if err := json.Unmarshal(msg.Data, &temp); err != nil {
+			return fmt.Errorf("failed to unmarshal cargo obstacle data: %w", err)
+		}
+
+		if err := s.cargoService.UpdateCargoHasItem(ctx, cargo.UpdateCargoHasItemParams{
+			HasItem: temp.Object == 1,
+		}); err != nil {
+			return fmt.Errorf("failed to update cargo has item: %w", err)
+		}
+
 	default:
 		return fmt.Errorf("invalid sync state type: %s", string(msg.Data))
 	}
@@ -196,6 +211,8 @@ func (s *syncStateType) UnmarshalJSON(data []byte) error {
 		*s = syncStateTypeDriveMotor
 	case 6:
 		*s = syncStateTypeLimitSwitch1
+	case 7:
+		*s = syncStateTypeCargoObstacle
 	default:
 		return fmt.Errorf("invalid sync state type: %s", string(data))
 	}
@@ -210,6 +227,7 @@ const (
 	syncStateTypeLiftMotor      syncStateType = 4
 	syncStateTypeDriveMotor     syncStateType = 5
 	syncStateTypeLimitSwitch1   syncStateType = 6
+	syncStateTypeCargoObstacle  syncStateType = 7
 )
 
 type syncStateMessage struct {

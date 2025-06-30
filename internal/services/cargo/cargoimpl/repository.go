@@ -38,6 +38,7 @@ func (r cargoRepository) GetCargo(ctx context.Context) (cargo.Cargo, error) {
 		IsOpen:         row.IsOpen == 1,
 		QRCode:         row.QrCode,
 		BottomDistance: uint16(row.BottomDistance),
+		HasItem:        row.HasItem == 1,
 		UpdatedAt:      updatedAt,
 	}, nil
 }
@@ -120,6 +121,17 @@ func (r cargoRepository) UpdateCargoDoorMotorState(ctx context.Context, params c
 		UpdatedAt: time.Now().Format(time.RFC3339Nano),
 	}); err != nil {
 		return fmt.Errorf("failed to update cargo door motor state: %w", err)
+	}
+
+	return nil
+}
+
+func (r cargoRepository) UpdateCargoHasItem(ctx context.Context, params cargo.UpdateCargoHasItemParams) error {
+	if _, err := r.queries.CargoUpdateHasItem(ctx, r.db, sqlc.CargoUpdateHasItemParams{
+		HasItem:   boolToInt64(params.HasItem),
+		UpdatedAt: time.Now().Format(time.RFC3339Nano),
+	}); err != nil {
+		return fmt.Errorf("failed to update cargo has item: %w", err)
 	}
 
 	return nil

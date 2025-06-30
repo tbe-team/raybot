@@ -19,6 +19,7 @@ func startPICSerial(app *application.Application, interruptChan <-chan any, read
 		app.LiftMotorService,
 		app.DriveMotorService,
 		app.LimitSwitchService,
+		app.CargoService,
 		app.AppStateService,
 	)
 

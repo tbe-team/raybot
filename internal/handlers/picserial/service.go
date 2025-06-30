@@ -13,6 +13,7 @@ import (
 	"github.com/tbe-team/raybot/internal/hardware/picserial"
 	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/battery"
+	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
@@ -32,6 +33,7 @@ type Service struct {
 	liftMotorService      liftmotor.Service
 	driveMotorService     drivemotor.Service
 	limitSwitchService    limitswitch.Service
+	cargoService          cargo.Service
 	appStateService       appstate.Service
 }
 
@@ -47,6 +49,7 @@ func New(
 	liftMotorService liftmotor.Service,
 	driveMotorService drivemotor.Service,
 	limitSwitchService limitswitch.Service,
+	cargoService cargo.Service,
 	appStateService appstate.Service,
 ) *Service {
 	s := &Service{
@@ -59,6 +62,7 @@ func New(
 		liftMotorService:      liftMotorService,
 		driveMotorService:     driveMotorService,
 		limitSwitchService:    limitSwitchService,
+		cargoService:          cargoService,
 		appStateService:       appStateService,
 	}
 

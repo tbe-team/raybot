@@ -24,6 +24,7 @@ type Cargo struct {
 	QrCode         string `json:"qr_code"`
 	BottomDistance int64  `json:"bottom_distance"`
 	UpdatedAt      string `json:"updated_at"`
+	HasItem        int64  `json:"has_item"`
 }
 
 type CargoDoorMotor struct {

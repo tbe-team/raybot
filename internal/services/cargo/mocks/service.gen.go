@@ -314,6 +314,53 @@ func (_c *FakeService_UpdateCargoDoorMotorState_Call) RunAndReturn(run func(cont
 	return _c
 }
 
+// UpdateCargoHasItem provides a mock function with given fields: ctx, params
+func (_m *FakeService) UpdateCargoHasItem(ctx context.Context, params cargo.UpdateCargoHasItemParams) error {
+	ret := _m.Called(ctx, params)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateCargoHasItem")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, cargo.UpdateCargoHasItemParams) error); ok {
+		r0 = rf(ctx, params)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeService_UpdateCargoHasItem_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateCargoHasItem'
+type FakeService_UpdateCargoHasItem_Call struct {
+	*mock.Call
+}
+
+// UpdateCargoHasItem is a helper method to define mock.On call
+//   - ctx context.Context
+//   - params cargo.UpdateCargoHasItemParams
+func (_e *FakeService_Expecter) UpdateCargoHasItem(ctx interface{}, params interface{}) *FakeService_UpdateCargoHasItem_Call {
+	return &FakeService_UpdateCargoHasItem_Call{Call: _e.mock.On("UpdateCargoHasItem", ctx, params)}
+}
+
+func (_c *FakeService_UpdateCargoHasItem_Call) Run(run func(ctx context.Context, params cargo.UpdateCargoHasItemParams)) *FakeService_UpdateCargoHasItem_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(cargo.UpdateCargoHasItemParams))
+	})
+	return _c
+}
+
+func (_c *FakeService_UpdateCargoHasItem_Call) Return(_a0 error) *FakeService_UpdateCargoHasItem_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeService_UpdateCargoHasItem_Call) RunAndReturn(run func(context.Context, cargo.UpdateCargoHasItemParams) error) *FakeService_UpdateCargoHasItem_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // UpdateCargoQRCode provides a mock function with given fields: ctx, params
 func (_m *FakeService) UpdateCargoQRCode(ctx context.Context, params cargo.UpdateCargoQRCodeParams) error {
 	ret := _m.Called(ctx, params)

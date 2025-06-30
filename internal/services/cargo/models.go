@@ -9,6 +9,7 @@ type Cargo struct {
 	IsOpen         bool
 	QRCode         string
 	BottomDistance uint16
+	HasItem        bool
 	UpdatedAt      time.Time
 }
 

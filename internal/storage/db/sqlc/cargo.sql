@@ -41,6 +41,15 @@ SET
 WHERE
 	id = 1 RETURNING *;
 
+-- name: CargoUpdateHasItem :one
+UPDATE
+	cargo
+SET
+	has_item = @has_item,
+	updated_at = @updated_at
+WHERE
+	id = 1 RETURNING *;
+
 -- name: CargoDoorMotorUpdate :one
 UPDATE
 	cargo_door_motor

@@ -14,6 +14,10 @@ type UpdateCargoBottomDistanceParams struct {
 	BottomDistance uint16 `validate:"min=0"`
 }
 
+type UpdateCargoHasItemParams struct {
+	HasItem bool
+}
+
 type UpdateCargoDoorMotorStateParams struct {
 	Direction    DoorDirection `validate:"enum"`
 	SetDirection bool
@@ -40,6 +44,7 @@ type Service interface {
 	UpdateCargoQRCode(ctx context.Context, params UpdateCargoQRCodeParams) error
 	UpdateCargoBottomDistance(ctx context.Context, params UpdateCargoBottomDistanceParams) error
 	UpdateCargoDoorMotorState(ctx context.Context, params UpdateCargoDoorMotorStateParams) error
+	UpdateCargoHasItem(ctx context.Context, params UpdateCargoHasItemParams) error
 
 	OpenCargoDoor(ctx context.Context, params OpenCargoDoorParams) error
 	CloseCargoDoor(ctx context.Context, params CloseCargoDoorParams) error
@@ -52,4 +57,5 @@ type Repository interface {
 	UpdateCargoQRCode(ctx context.Context, params UpdateCargoQRCodeParams) error
 	UpdateCargoBottomDistance(ctx context.Context, params UpdateCargoBottomDistanceParams) error
 	UpdateCargoDoorMotorState(ctx context.Context, params UpdateCargoDoorMotorStateParams) error
+	UpdateCargoHasItem(ctx context.Context, params UpdateCargoHasItemParams) error
 }
