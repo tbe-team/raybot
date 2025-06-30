@@ -23,6 +23,7 @@ type UpdateDischargeSettingParams struct {
 }
 
 type Service interface {
+	GetBatteryState(ctx context.Context) (BatteryState, error)
 	UpdateBatteryState(ctx context.Context, params UpdateBatteryStateParams) error
 	UpdateChargeSetting(ctx context.Context, params UpdateChargeSettingParams) error
 	UpdateDischargeSetting(ctx context.Context, params UpdateDischargeSettingParams) error

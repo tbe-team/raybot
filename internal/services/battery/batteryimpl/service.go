@@ -27,6 +27,10 @@ func NewService(
 	}
 }
 
+func (s service) GetBatteryState(ctx context.Context) (battery.BatteryState, error) {
+	return s.batteryStateRepo.GetBatteryState(ctx)
+}
+
 func (s service) UpdateBatteryState(ctx context.Context, params battery.UpdateBatteryStateParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)

@@ -92,6 +92,7 @@ func SetupTunnelTestEnv(t *testing.T) TunnelTestEnv {
 		bus,
 		commandService,
 		systemService,
+		nil,
 		cloud.WithConnectTimeout(500*time.Millisecond),
 	)
 	cleanupCloudSvc, err := cloudSvc.Run(context.Background())
