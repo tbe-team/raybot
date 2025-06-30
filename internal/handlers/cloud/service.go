@@ -16,6 +16,7 @@ import (
 	batteryv1 "github.com/tbe-team/raybot-api/battery/v1"
 	cargov1 "github.com/tbe-team/raybot-api/cargo/v1"
 	commandv1 "github.com/tbe-team/raybot-api/command/v1"
+	distanceSensorv1 "github.com/tbe-team/raybot-api/distancesensor/v1"
 	sysv1 "github.com/tbe-team/raybot-api/sys/v1"
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
@@ -23,6 +24,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/battery"
 	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/command"
+	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/system"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
@@ -32,11 +34,12 @@ type Service struct {
 	cfg  config.Cloud
 	log  *slog.Logger
 
-	publisher      eventbus.Publisher
-	commandService command.Service
-	systemService  system.Service
-	batteryService battery.Service
-	cargoService   cargo.Service
+	publisher             eventbus.Publisher
+	commandService        command.Service
+	systemService         system.Service
+	batteryService        battery.Service
+	cargoService          cargo.Service
+	distanceSensorService distancesensor.Service
 
 	closing atomic.Bool
 }
@@ -67,6 +70,7 @@ func New(
 	systemService system.Service,
 	batteryService battery.Service,
 	cargoService cargo.Service,
+	distanceSensorService distancesensor.Service,
 	optFuncs ...OptionFunc,
 ) *Service {
 	opts := defaultOptions
@@ -210,4 +214,7 @@ func (s *Service) registerHandlers(sr grpc.ServiceRegistrar) {
 
 	cargoHandler := newCargoHandler(s.cargoService)
 	cargov1.RegisterCargoServiceServer(sr, cargoHandler)
+
+	distanceSensorHandler := newDistanceSensorHandler(s.distanceSensorService)
+	distanceSensorv1.RegisterDistanceSensorServiceServer(sr, distanceSensorHandler)
 }

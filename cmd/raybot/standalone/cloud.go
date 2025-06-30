@@ -20,6 +20,7 @@ func startCloud(app *application.Application, interruptChan <-chan any) error {
 		app.SystemService,
 		app.BatteryService,
 		app.CargoService,
+		app.DistanceSensorService,
 	)
 
 	cleanup, err := service.Run(app.Context)
