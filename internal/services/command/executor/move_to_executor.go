@@ -84,7 +84,7 @@ func (e moveToExecutor) trackingLocationUntilReached(ctx context.Context, locati
 	doneCh := make(chan struct{})
 	e.log.Info("start tracking location", slog.String("target_location", location))
 	e.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(msg *eventbus.Message) {
-		ev, ok := msg.Payload.(events.UpdateLocationEvent)
+		ev, ok := msg.Payload.(events.LocationUpdatedEvent)
 		if !ok {
 			e.log.Error("invalid event", slog.Any("event", msg.Payload))
 			return

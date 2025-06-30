@@ -18,6 +18,7 @@ import (
 	commandv1 "github.com/tbe-team/raybot-api/command/v1"
 	distanceSensorv1 "github.com/tbe-team/raybot-api/distancesensor/v1"
 	limitSwitchv1 "github.com/tbe-team/raybot-api/limitswitch/v1"
+	locationv1 "github.com/tbe-team/raybot-api/location/v1"
 	sysv1 "github.com/tbe-team/raybot-api/sys/v1"
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
@@ -27,6 +28,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/limitswitch"
+	"github.com/tbe-team/raybot/internal/services/location"
 	"github.com/tbe-team/raybot/internal/services/system"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
@@ -45,6 +47,7 @@ type Service struct {
 	cargoService          cargo.Service
 	distanceSensorService distancesensor.Service
 	limitSwitchService    limitswitch.Service
+	locationService       location.Service
 
 	closing atomic.Bool
 }
@@ -78,6 +81,7 @@ func New(
 	cargoService cargo.Service,
 	distanceSensorService distancesensor.Service,
 	limitSwitchService limitswitch.Service,
+	locationService location.Service,
 	optFuncs ...OptionFunc,
 ) *Service {
 	opts := defaultOptions
@@ -97,6 +101,7 @@ func New(
 		cargoService:          cargoService,
 		distanceSensorService: distanceSensorService,
 		limitSwitchService:    limitSwitchService,
+		locationService:       locationService,
 	}
 }
 
@@ -230,4 +235,7 @@ func (s *Service) registerHandlers(sr grpc.ServiceRegistrar) {
 
 	limitSwitchHandler := newLimitSwitchHandler(s.log, s.subscriber, s.limitSwitchService)
 	limitSwitchv1.RegisterLimitSwitchServiceServer(sr, limitSwitchHandler)
+
+	locationHandler := newLocationHandler(s.log, s.subscriber, s.locationService)
+	locationv1.RegisterLocationServiceServer(sr, locationHandler)
 }
