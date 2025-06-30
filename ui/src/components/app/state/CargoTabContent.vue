@@ -44,7 +44,7 @@ const props = defineProps<{
             <h3 class="text-sm font-medium">
               Cargo Details
             </h3>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-3 gap-4">
               <div>
                 <p class="text-sm text-muted-foreground">
                   QR Code
@@ -59,6 +59,14 @@ const props = defineProps<{
                 </p>
                 <p class="text-lg font-medium">
                   {{ props.cargo.bottomDistance }} cm
+                </p>
+              </div>
+              <div>
+                <p class="text-sm text-muted-foreground">
+                  Has Item
+                </p>
+                <p class="text-lg font-medium">
+                  {{ props.cargo.hasItem ? 'Yes' : 'No' }}
                 </p>
               </div>
             </div>

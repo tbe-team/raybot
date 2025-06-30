@@ -2,6 +2,7 @@ export interface Cargo {
   isOpen: boolean
   qrCode: string
   bottomDistance: number
+  hasItem: boolean
   updatedAt: string
 }
 
