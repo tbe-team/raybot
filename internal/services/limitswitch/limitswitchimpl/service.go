@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"time"
 
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/limitswitch"
@@ -57,23 +58,26 @@ func (s Service) UpdateLimitSwitchByID(ctx context.Context, params limitswitch.U
 	if cur.Pressed == params.Pressed {
 		return nil
 	}
+	pressedAt := time.Now()
 
 	if err := s.repo.UpdateLimitSwitchByID(ctx, params.ID, params.Pressed); err != nil {
 		return fmt.Errorf("update limit switch state: %w", err)
 	}
 
 	if params.Pressed {
-		s.publishLimitSwitchPressedEvent(ctx, params.ID)
+		s.publishLimitSwitchPressedEvent(ctx, params.ID, pressedAt)
 	}
 
 	return nil
 }
 
-func (s Service) publishLimitSwitchPressedEvent(_ context.Context, id limitswitch.LimitSwitchID) {
+func (s Service) publishLimitSwitchPressedEvent(_ context.Context, id limitswitch.LimitSwitchID, pressedAt time.Time) {
 	switch id {
 	case limitswitch.LimitSwitchID1:
 		s.publisher.Publish(events.LimitSwitch1PressedTopic, &eventbus.Message{
-			Payload: events.LimitSwitch1PressedEvent{},
+			Payload: events.LimitSwitch1PressedEvent{
+				PressedAt: pressedAt,
+			},
 		})
 
 	default:

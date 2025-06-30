@@ -28,9 +28,9 @@ func (h distanceSensorHandler) GetDistanceSensor(ctx context.Context, _ *distanc
 	}
 
 	return &distanceSensorv1.GetDistanceSensorResponse{
-		FrontDistance:  uint32(state.FrontDistance),
-		BackDistance:   uint32(state.BackDistance),
-		DownDistance:   uint32(state.DownDistance),
-		UpdatedAt:      timestamppb.New(state.UpdatedAt),
+		FrontDistance: uint32(state.FrontDistance),
+		BackDistance:  uint32(state.BackDistance),
+		DownDistance:  uint32(state.DownDistance),
+		UpdatedAt:     timestamppb.New(state.UpdatedAt),
 	}, nil
 }

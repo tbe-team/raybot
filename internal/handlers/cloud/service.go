@@ -17,6 +17,7 @@ import (
 	cargov1 "github.com/tbe-team/raybot-api/cargo/v1"
 	commandv1 "github.com/tbe-team/raybot-api/command/v1"
 	distanceSensorv1 "github.com/tbe-team/raybot-api/distancesensor/v1"
+	limitSwitchv1 "github.com/tbe-team/raybot-api/limitswitch/v1"
 	sysv1 "github.com/tbe-team/raybot-api/sys/v1"
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
@@ -25,6 +26,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/command"
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
+	"github.com/tbe-team/raybot/internal/services/limitswitch"
 	"github.com/tbe-team/raybot/internal/services/system"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
@@ -34,12 +36,15 @@ type Service struct {
 	cfg  config.Cloud
 	log  *slog.Logger
 
-	publisher             eventbus.Publisher
+	publisher  eventbus.Publisher
+	subscriber eventbus.Subscriber
+
 	commandService        command.Service
 	systemService         system.Service
 	batteryService        battery.Service
 	cargoService          cargo.Service
 	distanceSensorService distancesensor.Service
+	limitSwitchService    limitswitch.Service
 
 	closing atomic.Bool
 }
@@ -66,11 +71,13 @@ func New(
 	cfg config.Cloud,
 	log *slog.Logger,
 	publisher eventbus.Publisher,
+	subscriber eventbus.Subscriber,
 	commandService command.Service,
 	systemService system.Service,
 	batteryService battery.Service,
 	cargoService cargo.Service,
 	distanceSensorService distancesensor.Service,
+	limitSwitchService limitswitch.Service,
 	optFuncs ...OptionFunc,
 ) *Service {
 	opts := defaultOptions
@@ -79,14 +86,17 @@ func New(
 	}
 
 	return &Service{
-		opts:           opts,
-		cfg:            cfg,
-		log:            log.With("service", "cloud"),
-		publisher:      publisher,
-		commandService: commandService,
-		systemService:  systemService,
-		batteryService: batteryService,
-		cargoService:   cargoService,
+		opts:                  opts,
+		cfg:                   cfg,
+		log:                   log.With("service", "cloud"),
+		publisher:             publisher,
+		subscriber:            subscriber,
+		commandService:        commandService,
+		systemService:         systemService,
+		batteryService:        batteryService,
+		cargoService:          cargoService,
+		distanceSensorService: distanceSensorService,
+		limitSwitchService:    limitSwitchService,
 	}
 }
 
@@ -217,4 +227,7 @@ func (s *Service) registerHandlers(sr grpc.ServiceRegistrar) {
 
 	distanceSensorHandler := newDistanceSensorHandler(s.distanceSensorService)
 	distanceSensorv1.RegisterDistanceSensorServiceServer(sr, distanceSensorHandler)
+
+	limitSwitchHandler := newLimitSwitchHandler(s.log, s.subscriber, s.limitSwitchService)
+	limitSwitchv1.RegisterLimitSwitchServiceServer(sr, limitSwitchHandler)
 }
