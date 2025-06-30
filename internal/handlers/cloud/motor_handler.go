@@ -31,7 +31,7 @@ func newMotorHandler(
 	}
 }
 
-func (h motorHandler) GetDriveMotor(ctx context.Context, req *motorv1.GetDriveMotorRequest) (*motorv1.GetDriveMotorResponse, error) {
+func (h motorHandler) GetDriveMotor(ctx context.Context, _ *motorv1.GetDriveMotorRequest) (*motorv1.GetDriveMotorResponse, error) {
 	state, err := h.driveMotorService.GetDriveMotorState(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get drive motor state: %w", err)
@@ -51,7 +51,7 @@ func (h motorHandler) GetDriveMotor(ctx context.Context, req *motorv1.GetDriveMo
 	}, nil
 }
 
-func (h motorHandler) GetLiftMotor(ctx context.Context, req *motorv1.GetLiftMotorRequest) (*motorv1.GetLiftMotorResponse, error) {
+func (h motorHandler) GetLiftMotor(ctx context.Context, _ *motorv1.GetLiftMotorRequest) (*motorv1.GetLiftMotorResponse, error) {
 	state, err := h.liftMotorService.GetLiftMotorState(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get lift motor state: %w", err)
@@ -66,7 +66,7 @@ func (h motorHandler) GetLiftMotor(ctx context.Context, req *motorv1.GetLiftMoto
 	}, nil
 }
 
-func (h motorHandler) GetCargoDoorMotor(ctx context.Context, req *motorv1.GetCargoDoorMotorRequest) (*motorv1.GetCargoDoorMotorResponse, error) {
+func (h motorHandler) GetCargoDoorMotor(ctx context.Context, _ *motorv1.GetCargoDoorMotorRequest) (*motorv1.GetCargoDoorMotorResponse, error) {
 	state, err := h.cargoService.GetCargoDoorMotorState(ctx)
 	if err != nil {
 		return nil, fmt.Errorf("get cargo door motor state: %w", err)

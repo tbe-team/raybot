@@ -35,7 +35,7 @@ func newLocationHandler(
 
 func (h locationHandler) GetLocation(
 	ctx context.Context,
-	req *locationv1.GetLocationRequest,
+	_ *locationv1.GetLocationRequest,
 ) (*locationv1.GetLocationResponse, error) {
 	location, err := h.locationService.GetLocation(ctx)
 	if err != nil {

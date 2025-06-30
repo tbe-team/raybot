@@ -109,6 +109,8 @@ func New(
 		distanceSensorService: distanceSensorService,
 		limitSwitchService:    limitSwitchService,
 		locationService:       locationService,
+		driveMotorService:     driveMotorService,
+		liftMotorService:      liftMotorService,
 	}
 }
 
