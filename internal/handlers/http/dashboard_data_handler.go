@@ -78,6 +78,7 @@ func (h dashboardDataHandler) convertRobotStateToResponse(state dashboarddata.Ro
 			IsOpen:         state.Cargo.IsOpen,
 			QrCode:         state.Cargo.QRCode,
 			BottomDistance: state.Cargo.BottomDistance,
+			HasItem:        state.Cargo.HasItem,
 			UpdatedAt:      state.Cargo.UpdatedAt,
 		},
 		CargoDoorMotor: gen.CargoDoorMotorState{

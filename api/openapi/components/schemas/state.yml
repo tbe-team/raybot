@@ -304,16 +304,22 @@ CargoState:
       description: The bottom distance of the cargo
       x-order: 3
       x-go-type: uint16
+    hasItem:
+      type: boolean
+      example: true
+      description: Whether the cargo has an item
+      x-order: 4
     updatedAt:
       type: string
       format: date-time
       example: "2025-01-01T00:00:00Z"
       description: The updated at time of the cargo
-      x-order: 4
+      x-order: 5
   required:
     - isOpen
     - qrCode
     - bottomDistance
+    - hasItem
     - updatedAt
 
 CargoDoorMotorState:
