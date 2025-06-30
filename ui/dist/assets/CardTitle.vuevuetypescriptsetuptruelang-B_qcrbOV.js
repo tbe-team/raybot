@@ -1,10 +1,10 @@
-import{c as t,a as r}from"./http-COdMawGS.js";import{d as o,p as n,o as c,a as l,q as p,u as d}from"./index-D6wOVdbG.js";/**
- * @license lucide-vue-next v0.516.0 - ISC
+import{c as t,a as r}from"./http-DjcjWivh.js";import{d as o,p as n,o as c,a as l,q as p,u as d}from"./index-DRzwQtIY.js";/**
+ * @license lucide-vue-next v0.525.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
  */const h=t("arrow-left",[["path",{d:"m12 19-7-7 7-7",key:"1l729n"}],["path",{d:"M19 12H5",key:"x3x0zl"}]]);/**
- * @license lucide-vue-next v0.516.0 - ISC
+ * @license lucide-vue-next v0.525.0 - ISC
  *
  * This source code is licensed under the ISC license.
  * See the LICENSE file in the root directory of this source tree.
