@@ -29,6 +29,9 @@ type MoveBackwardParams struct {
 }
 
 type Service interface {
+	// GetDriveMotorState returns the current state of the drive motor.
+	GetDriveMotorState(ctx context.Context) (DriveMotorState, error)
+
 	// UpdateDriveMotorState updates the desired state of the drive motor.
 	// This does not directly interact with the hardware, it just updates the internal state.
 	UpdateDriveMotorState(ctx context.Context, params UpdateDriveMotorStateParams) error

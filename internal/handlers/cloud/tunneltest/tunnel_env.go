@@ -98,6 +98,8 @@ func SetupTunnelTestEnv(t *testing.T) TunnelTestEnv {
 		nil,
 		nil,
 		nil,
+		nil,
+		nil,
 		cloud.WithConnectTimeout(500*time.Millisecond),
 	)
 	cleanupCloudSvc, err := cloudSvc.Run(context.Background())
@@ -125,6 +127,10 @@ func (e noopExecutorService) Execute(_ context.Context, _ command.Command) error
 }
 
 type noopDriveMotorService struct{}
+
+func (noopDriveMotorService) GetDriveMotorState(_ context.Context) (drivemotor.DriveMotorState, error) {
+	return drivemotor.DriveMotorState{}, nil
+}
 
 func (noopDriveMotorService) UpdateDriveMotorState(_ context.Context, _ drivemotor.UpdateDriveMotorStateParams) error {
 	return nil
