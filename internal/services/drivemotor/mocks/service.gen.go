@@ -22,6 +22,62 @@ func (_m *FakeService) EXPECT() *FakeService_Expecter {
 	return &FakeService_Expecter{mock: &_m.Mock}
 }
 
+// GetDriveMotorState provides a mock function with given fields: ctx
+func (_m *FakeService) GetDriveMotorState(ctx context.Context) (drivemotor.DriveMotorState, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetDriveMotorState")
+	}
+
+	var r0 drivemotor.DriveMotorState
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (drivemotor.DriveMotorState, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) drivemotor.DriveMotorState); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(drivemotor.DriveMotorState)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeService_GetDriveMotorState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetDriveMotorState'
+type FakeService_GetDriveMotorState_Call struct {
+	*mock.Call
+}
+
+// GetDriveMotorState is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) GetDriveMotorState(ctx interface{}) *FakeService_GetDriveMotorState_Call {
+	return &FakeService_GetDriveMotorState_Call{Call: _e.mock.On("GetDriveMotorState", ctx)}
+}
+
+func (_c *FakeService_GetDriveMotorState_Call) Run(run func(ctx context.Context)) *FakeService_GetDriveMotorState_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_GetDriveMotorState_Call) Return(_a0 drivemotor.DriveMotorState, _a1 error) *FakeService_GetDriveMotorState_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeService_GetDriveMotorState_Call) RunAndReturn(run func(context.Context) (drivemotor.DriveMotorState, error)) *FakeService_GetDriveMotorState_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // MoveBackward provides a mock function with given fields: ctx, params
 func (_m *FakeService) MoveBackward(ctx context.Context, params drivemotor.MoveBackwardParams) error {
 	ret := _m.Called(ctx, params)

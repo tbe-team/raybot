@@ -39,6 +39,7 @@ type CloseCargoDoorParams struct {
 
 type Service interface {
 	GetCargo(ctx context.Context) (Cargo, error)
+	GetCargoDoorMotorState(ctx context.Context) (DoorMotorState, error)
 
 	UpdateCargoDoor(ctx context.Context, params UpdateCargoDoorParams) error
 	UpdateCargoQRCode(ctx context.Context, params UpdateCargoQRCodeParams) error

@@ -126,6 +126,62 @@ func (_c *FakeService_GetCargo_Call) RunAndReturn(run func(context.Context) (car
 	return _c
 }
 
+// GetCargoDoorMotorState provides a mock function with given fields: ctx
+func (_m *FakeService) GetCargoDoorMotorState(ctx context.Context) (cargo.DoorMotorState, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCargoDoorMotorState")
+	}
+
+	var r0 cargo.DoorMotorState
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (cargo.DoorMotorState, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) cargo.DoorMotorState); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(cargo.DoorMotorState)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeService_GetCargoDoorMotorState_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCargoDoorMotorState'
+type FakeService_GetCargoDoorMotorState_Call struct {
+	*mock.Call
+}
+
+// GetCargoDoorMotorState is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) GetCargoDoorMotorState(ctx interface{}) *FakeService_GetCargoDoorMotorState_Call {
+	return &FakeService_GetCargoDoorMotorState_Call{Call: _e.mock.On("GetCargoDoorMotorState", ctx)}
+}
+
+func (_c *FakeService_GetCargoDoorMotorState_Call) Run(run func(ctx context.Context)) *FakeService_GetCargoDoorMotorState_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_GetCargoDoorMotorState_Call) Return(_a0 cargo.DoorMotorState, _a1 error) *FakeService_GetCargoDoorMotorState_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeService_GetCargoDoorMotorState_Call) RunAndReturn(run func(context.Context) (cargo.DoorMotorState, error)) *FakeService_GetCargoDoorMotorState_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // OpenCargoDoor provides a mock function with given fields: ctx, params
 func (_m *FakeService) OpenCargoDoor(ctx context.Context, params cargo.OpenCargoDoorParams) error {
 	ret := _m.Called(ctx, params)

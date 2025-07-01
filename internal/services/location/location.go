@@ -9,6 +9,7 @@ type UpdateLocationParams struct {
 }
 
 type Service interface {
+	GetLocation(ctx context.Context) (Location, error)
 	UpdateLocation(ctx context.Context, params UpdateLocationParams) error
 }
 

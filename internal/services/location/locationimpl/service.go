@@ -3,6 +3,7 @@ package locationimpl
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/location"
@@ -29,6 +30,10 @@ func NewService(
 	}
 }
 
+func (s *service) GetLocation(ctx context.Context) (location.Location, error) {
+	return s.locationRepo.GetLocation(ctx)
+}
+
 func (s *service) UpdateLocation(ctx context.Context, params location.UpdateLocationParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
@@ -40,8 +45,9 @@ func (s *service) UpdateLocation(ctx context.Context, params location.UpdateLoca
 
 	s.publisher.Publish(
 		events.LocationUpdatedTopic,
-		eventbus.NewMessage(events.UpdateLocationEvent{
-			Location: params.CurrentLocation,
+		eventbus.NewMessage(events.LocationUpdatedEvent{
+			Location:  params.CurrentLocation,
+			UpdatedAt: time.Now(),
 		}),
 	)
 

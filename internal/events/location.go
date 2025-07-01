@@ -1,9 +1,12 @@
 package events
 
+import "time"
+
 const (
 	LocationUpdatedTopic = "location:updated"
 )
 
-type UpdateLocationEvent struct {
-	Location string
+type LocationUpdatedEvent struct {
+	Location  string
+	UpdatedAt time.Time
 }

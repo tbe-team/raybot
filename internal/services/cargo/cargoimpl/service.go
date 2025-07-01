@@ -33,6 +33,10 @@ func NewService(
 	}
 }
 
+func (s *service) GetCargoDoorMotorState(ctx context.Context) (cargo.DoorMotorState, error) {
+	return s.cargoRepo.GetCargoDoorMotorState(ctx)
+}
+
 func (s *service) GetCargo(ctx context.Context) (cargo.Cargo, error) {
 	return s.cargoRepo.GetCargo(ctx)
 }

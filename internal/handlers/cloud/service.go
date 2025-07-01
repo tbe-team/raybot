@@ -13,12 +13,25 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	batteryv1 "github.com/tbe-team/raybot-api/battery/v1"
+	cargov1 "github.com/tbe-team/raybot-api/cargo/v1"
 	commandv1 "github.com/tbe-team/raybot-api/command/v1"
+	distanceSensorv1 "github.com/tbe-team/raybot-api/distancesensor/v1"
+	limitSwitchv1 "github.com/tbe-team/raybot-api/limitswitch/v1"
+	locationv1 "github.com/tbe-team/raybot-api/location/v1"
+	motorv1 "github.com/tbe-team/raybot-api/motor/v1"
 	sysv1 "github.com/tbe-team/raybot-api/sys/v1"
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/handlers/cloud/interceptor"
+	"github.com/tbe-team/raybot/internal/services/battery"
+	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/command"
+	"github.com/tbe-team/raybot/internal/services/distancesensor"
+	"github.com/tbe-team/raybot/internal/services/drivemotor"
+	"github.com/tbe-team/raybot/internal/services/liftmotor"
+	"github.com/tbe-team/raybot/internal/services/limitswitch"
+	"github.com/tbe-team/raybot/internal/services/location"
 	"github.com/tbe-team/raybot/internal/services/system"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
@@ -28,9 +41,18 @@ type Service struct {
 	cfg  config.Cloud
 	log  *slog.Logger
 
-	publisher      eventbus.Publisher
-	commandService command.Service
-	systemService  system.Service
+	publisher  eventbus.Publisher
+	subscriber eventbus.Subscriber
+
+	commandService        command.Service
+	systemService         system.Service
+	batteryService        battery.Service
+	cargoService          cargo.Service
+	distanceSensorService distancesensor.Service
+	limitSwitchService    limitswitch.Service
+	locationService       location.Service
+	driveMotorService     drivemotor.Service
+	liftMotorService      liftmotor.Service
 
 	closing atomic.Bool
 }
@@ -57,8 +79,16 @@ func New(
 	cfg config.Cloud,
 	log *slog.Logger,
 	publisher eventbus.Publisher,
+	subscriber eventbus.Subscriber,
 	commandService command.Service,
 	systemService system.Service,
+	batteryService battery.Service,
+	cargoService cargo.Service,
+	distanceSensorService distancesensor.Service,
+	limitSwitchService limitswitch.Service,
+	locationService location.Service,
+	driveMotorService drivemotor.Service,
+	liftMotorService liftmotor.Service,
 	optFuncs ...OptionFunc,
 ) *Service {
 	opts := defaultOptions
@@ -67,12 +97,20 @@ func New(
 	}
 
 	return &Service{
-		opts:           opts,
-		cfg:            cfg,
-		log:            log.With("service", "cloud"),
-		publisher:      publisher,
-		commandService: commandService,
-		systemService:  systemService,
+		opts:                  opts,
+		cfg:                   cfg,
+		log:                   log.With("service", "cloud"),
+		publisher:             publisher,
+		subscriber:            subscriber,
+		commandService:        commandService,
+		systemService:         systemService,
+		batteryService:        batteryService,
+		cargoService:          cargoService,
+		distanceSensorService: distanceSensorService,
+		limitSwitchService:    limitSwitchService,
+		locationService:       locationService,
+		driveMotorService:     driveMotorService,
+		liftMotorService:      liftMotorService,
 	}
 }
 
@@ -194,4 +232,22 @@ func (s *Service) registerHandlers(sr grpc.ServiceRegistrar) {
 
 	systemHandler := newSystemHandler(s.systemService)
 	sysv1.RegisterSysServiceServer(sr, systemHandler)
+
+	batteryHandler := newBatteryHandler(s.batteryService)
+	batteryv1.RegisterBatteryServiceServer(sr, batteryHandler)
+
+	cargoHandler := newCargoHandler(s.cargoService)
+	cargov1.RegisterCargoServiceServer(sr, cargoHandler)
+
+	distanceSensorHandler := newDistanceSensorHandler(s.distanceSensorService)
+	distanceSensorv1.RegisterDistanceSensorServiceServer(sr, distanceSensorHandler)
+
+	limitSwitchHandler := newLimitSwitchHandler(s.log, s.subscriber, s.limitSwitchService)
+	limitSwitchv1.RegisterLimitSwitchServiceServer(sr, limitSwitchHandler)
+
+	locationHandler := newLocationHandler(s.log, s.subscriber, s.locationService)
+	locationv1.RegisterLocationServiceServer(sr, locationHandler)
+
+	motorHandler := newMotorHandler(s.driveMotorService, s.liftMotorService, s.cargoService)
+	motorv1.RegisterMotorServiceServer(sr, motorHandler)
 }

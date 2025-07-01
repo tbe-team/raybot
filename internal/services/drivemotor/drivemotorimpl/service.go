@@ -35,6 +35,10 @@ func NewService(
 	}
 }
 
+func (s service) GetDriveMotorState(ctx context.Context) (drivemotor.DriveMotorState, error) {
+	return s.driveMotorStateRepo.GetDriveMotorState(ctx)
+}
+
 func (s service) UpdateDriveMotorState(ctx context.Context, params drivemotor.UpdateDriveMotorStateParams) error {
 	if err := s.validator.Validate(params); err != nil {
 		return fmt.Errorf("validate params: %w", err)
