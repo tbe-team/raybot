@@ -18,10 +18,10 @@ const props = defineProps<Props>()
 
 const commandConfigSchema = z.object({
   cargoLift: z.object({
-    stableReadCount: z.number().int().positive('Stable read count must be positive').min(1),
+    stableReadCount: z.number().int().positive('Stable read count must be positive').min(3),
   }),
   cargoLower: z.object({
-    stableReadCount: z.number().int().positive('Stable read count must be positive').min(1),
+    stableReadCount: z.number().int().positive('Stable read count must be positive').min(3),
     bottomObstacleTracking: z.object({
       enterDistance: z.number().int().min(1),
       exitDistance: z.number().int().min(1),
@@ -60,7 +60,7 @@ const onSubmit = form.handleSubmit((values) => {
 </script>
 
 <template>
-  <form class="flex flex-col w-full max-w-lg space-y-6" @submit="onSubmit">
+  <form class="flex flex-col space-y-6 w-full max-w-lg" @submit="onSubmit">
     <div class="grid grid-cols-1 gap-8">
       <!-- ESP Controller Section -->
       <div class="space-y-3">
@@ -127,7 +127,7 @@ const onSubmit = form.handleSubmit((values) => {
 
     <div>
       <Button type="submit" :disabled="isPending">
-        <Loader v-if="isPending" class="w-4 h-4 mr-2 animate-spin" />
+        <Loader v-if="isPending" class="mr-2 w-4 h-4 animate-spin" />
         Save
       </Button>
     </div>
