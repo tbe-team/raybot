@@ -1,0 +1,19 @@
+get:
+  summary: Get the system status
+  operationId: getSystemStatus
+  description: Get the system status
+  tags:
+    - system
+  responses:
+    "200":
+      description: The system status
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/system.yml#/SystemStatus"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/system.yml#/SystemStatus"

@@ -25,6 +25,17 @@ func (h systemHandler) GetSystemInfo(ctx context.Context, _ gen.GetSystemInfoReq
 	return gen.GetSystemInfo200JSONResponse(h.convertSysInfoToResponse(info)), nil
 }
 
+func (h systemHandler) GetSystemStatus(ctx context.Context, _ gen.GetSystemStatusRequestObject) (gen.GetSystemStatusResponseObject, error) {
+	status, err := h.systemService.GetStatus(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("system service get status: %w", err)
+	}
+
+	return gen.GetSystemStatus200JSONResponse(gen.SystemStatus{
+		Status: status.String(),
+	}), nil
+}
+
 func (h systemHandler) RebootSystem(ctx context.Context, _ gen.RebootSystemRequestObject) (gen.RebootSystemResponseObject, error) {
 	if err := h.systemService.Reboot(ctx); err != nil {
 		return nil, fmt.Errorf("system service reboot: %w", err)

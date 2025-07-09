@@ -27,3 +27,17 @@ SystemInfo:
     - memoryUsage
     - totalMemory
     - uptime
+
+SystemStatus:
+  type: object
+  properties:
+    status:
+      type: string
+      enum:
+        - NORMAL
+        - ERROR
+      description: The status of the system
+      x-order: 1
+      x-go-type: string
+  required:
+    - status

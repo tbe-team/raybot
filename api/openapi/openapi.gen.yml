@@ -361,6 +361,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /system/status:
+    get:
+      summary: Get the system status
+      operationId: getSystemStatus
+      description: Get the system status
+      tags:
+        - system
+      responses:
+        '200':
+          description: The system status
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStatus'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SystemStatus'
   /system/reboot:
     post:
       summary: Reboot the system
@@ -1062,6 +1082,19 @@ components:
         - memoryUsage
         - totalMemory
         - uptime
+    SystemStatus:
+      type: object
+      properties:
+        status:
+          type: string
+          enum:
+            - NORMAL
+            - ERROR
+          description: The status of the system
+          x-order: 1
+          x-go-type: string
+      required:
+        - status
     BatteryState:
       type: object
       properties:

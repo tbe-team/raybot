@@ -31,6 +31,8 @@ paths:
     $ref: "./paths/configs@command.yml"
   /system/info:
     $ref: "./paths/system@info.yml"
+  /system/status:
+    $ref: "./paths/system@status.yml"
   /system/reboot:
     $ref: "./paths/system@reboot.yml"
   /system/stop-emergency:
