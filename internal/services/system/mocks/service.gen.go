@@ -78,6 +78,62 @@ func (_c *FakeService_GetInfo_Call) RunAndReturn(run func(context.Context) (syst
 	return _c
 }
 
+// GetStatus provides a mock function with given fields: ctx
+func (_m *FakeService) GetStatus(ctx context.Context) (system.Status, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetStatus")
+	}
+
+	var r0 system.Status
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (system.Status, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) system.Status); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(system.Status)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeService_GetStatus_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetStatus'
+type FakeService_GetStatus_Call struct {
+	*mock.Call
+}
+
+// GetStatus is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) GetStatus(ctx interface{}) *FakeService_GetStatus_Call {
+	return &FakeService_GetStatus_Call{Call: _e.mock.On("GetStatus", ctx)}
+}
+
+func (_c *FakeService_GetStatus_Call) Run(run func(ctx context.Context)) *FakeService_GetStatus_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_GetStatus_Call) Return(_a0 system.Status, _a1 error) *FakeService_GetStatus_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeService_GetStatus_Call) RunAndReturn(run func(context.Context) (system.Status, error)) *FakeService_GetStatus_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Reboot provides a mock function with given fields: ctx
 func (_m *FakeService) Reboot(ctx context.Context) error {
 	ret := _m.Called(ctx)
@@ -120,6 +176,52 @@ func (_c *FakeService_Reboot_Call) Return(_a0 error) *FakeService_Reboot_Call {
 }
 
 func (_c *FakeService_Reboot_Call) RunAndReturn(run func(context.Context) error) *FakeService_Reboot_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetStatusError provides a mock function with given fields: ctx
+func (_m *FakeService) SetStatusError(ctx context.Context) error {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetStatusError")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context) error); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeService_SetStatusError_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetStatusError'
+type FakeService_SetStatusError_Call struct {
+	*mock.Call
+}
+
+// SetStatusError is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) SetStatusError(ctx interface{}) *FakeService_SetStatusError_Call {
+	return &FakeService_SetStatusError_Call{Call: _e.mock.On("SetStatusError", ctx)}
+}
+
+func (_c *FakeService_SetStatusError_Call) Run(run func(ctx context.Context)) *FakeService_SetStatusError_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_SetStatusError_Call) Return(_a0 error) *FakeService_SetStatusError_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeService_SetStatusError_Call) RunAndReturn(run func(context.Context) error) *FakeService_SetStatusError_Call {
 	_c.Call.Return(run)
 	return _c
 }

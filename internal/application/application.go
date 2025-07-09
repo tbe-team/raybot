@@ -237,12 +237,18 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	}
 
 	apperrorcodeService := apperrorcodeimpl.NewService()
-	systemService := systemimpl.NewService(log, commandService, driveMotorService, liftMotorService, systemInfoRepository)
-	systemInfoCollectorService := systeminfocollector.NewService(log, systemInfoRepository)
-	systemInfoCollectorService.Run(ctx)
-
 	ledService := ledimpl.NewService(cfg.Hardware.Leds, log, ledRepository)
 	ledService.Start(ctx)
+	systemService := systemimpl.NewService(
+		log,
+		commandService,
+		driveMotorService,
+		liftMotorService,
+		ledService,
+		systemInfoRepository,
+	)
+	systemInfoCollectorService := systeminfocollector.NewService(log, systemInfoRepository)
+	systemInfoCollectorService.Run(ctx)
 
 	cleanup := func() error {
 		var errs []error

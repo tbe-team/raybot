@@ -2,8 +2,11 @@ package event
 
 import (
 	"context"
+	"fmt"
 	"log/slog"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/appstate"
@@ -22,17 +25,34 @@ func (s *Service) HandlePICSerialConnectedEvent(ctx context.Context, _ events.PI
 }
 
 func (s *Service) HandlePICSerialDisconnectedEvent(ctx context.Context, event events.PICSerialDisconnectedEvent) {
-	var errStr string
-	if event.Error != nil {
-		errStr = event.Error.Error()
-	}
+	g, ctx := errgroup.WithContext(ctx)
 
-	if err := s.appStateService.UpdatePICSerialConnection(ctx, appstate.UpdatePICSerialConnectionParams{
-		Connected:    false,
-		SetConnected: true,
-		Error:        &errStr,
-		SetError:     true,
-	}); err != nil {
-		s.log.Error("failed to update PIC serial connection", slog.Any("error", err))
+	g.Go(func() error {
+		var errStr string
+		if event.Error != nil {
+			errStr = event.Error.Error()
+		}
+
+		if err := s.appStateService.UpdatePICSerialConnection(ctx, appstate.UpdatePICSerialConnectionParams{
+			Connected:    false,
+			SetConnected: true,
+			Error:        &errStr,
+			SetError:     true,
+		}); err != nil {
+			return fmt.Errorf("failed to update PIC serial connection: %w", err)
+		}
+
+		return nil
+	})
+
+	g.Go(func() error {
+		if err := s.systemService.SetStatusError(ctx); err != nil {
+			return fmt.Errorf("failed to set system status error: %w", err)
+		}
+		return nil
+	})
+
+	if err := g.Wait(); err != nil {
+		s.log.Error("failed to update cloud connection", slog.Any("error", err))
 	}
 }

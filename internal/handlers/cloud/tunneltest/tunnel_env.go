@@ -18,6 +18,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/command/commandimpl"
 	"github.com/tbe-team/raybot/internal/services/command/processinglockimpl"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
+	"github.com/tbe-team/raybot/internal/services/led"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 	"github.com/tbe-team/raybot/internal/services/system/systemimpl"
 	"github.com/tbe-team/raybot/internal/storage/db"
@@ -81,6 +82,7 @@ func SetupTunnelTestEnv(t *testing.T) TunnelTestEnv {
 		commandService,
 		noopDriveMotorService{},
 		noopLiftMotorService{},
+		noopLedService{},
 		systemimpl.NewRepository(),
 	)
 
@@ -163,5 +165,31 @@ func (noopLiftMotorService) SetCargoPosition(_ context.Context, _ liftmotor.SetC
 }
 
 func (noopLiftMotorService) Stop(_ context.Context) error {
+	return nil
+}
+
+type noopLedService struct{}
+
+func (noopLedService) SetSystemLedOn(_ context.Context) error {
+	return nil
+}
+
+func (noopLedService) SetSystemLedOff(_ context.Context) error {
+	return nil
+}
+
+func (noopLedService) BlinkSystemLed(_ context.Context, _ led.BlinkSystemLedParams) error {
+	return nil
+}
+
+func (noopLedService) SetAlertLedOn(_ context.Context) error {
+	return nil
+}
+
+func (noopLedService) SetAlertLedOff(_ context.Context) error {
+	return nil
+}
+
+func (noopLedService) BlinkAlertLed(_ context.Context, _ led.BlinkAlertLedParams) error {
 	return nil
 }

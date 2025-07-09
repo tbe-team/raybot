@@ -3,7 +3,11 @@ package led
 import (
 	"context"
 	"time"
+
+	"github.com/tbe-team/raybot/pkg/xerror"
 )
+
+var ErrLedNotConnected = xerror.BadRequest(nil, "led.notConnected", "led is not connected")
 
 type BlinkSystemLedParams struct {
 	Duration time.Duration

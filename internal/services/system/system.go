@@ -13,6 +13,12 @@ type Service interface {
 
 	// GetInfo returns the system information.
 	GetInfo(ctx context.Context) (Info, error)
+
+	// GetStatus returns the system status.
+	GetStatus(ctx context.Context) (Status, error)
+
+	// SetStatusError sets the system status to error.
+	SetStatusError(ctx context.Context) error
 }
 
 type SysInfoCollectorService interface {
@@ -36,4 +42,6 @@ type UpdateInfoParams struct {
 type Repository interface {
 	GetInfo(ctx context.Context) (Info, error)
 	UpdateInfo(ctx context.Context, params UpdateInfoParams) error
+	GetStatus(ctx context.Context) (Status, error)
+	UpdateStatus(ctx context.Context, status Status) error
 }

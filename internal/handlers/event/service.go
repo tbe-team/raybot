@@ -7,6 +7,7 @@ import (
 	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/appstate"
 	"github.com/tbe-team/raybot/internal/services/command"
+	"github.com/tbe-team/raybot/internal/services/system"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
@@ -17,6 +18,7 @@ type Service struct {
 
 	appStateService appstate.Service
 	commandService  command.Service
+	systemService   system.Service
 }
 
 type CleanupFunc func(context.Context) error
@@ -26,12 +28,14 @@ func New(
 	subscriber eventbus.Subscriber,
 	appStateService appstate.Service,
 	commandService command.Service,
+	systemService system.Service,
 ) *Service {
 	return &Service{
 		log:             log.With("service", "event"),
 		subscriber:      subscriber,
 		appStateService: appStateService,
 		commandService:  commandService,
+		systemService:   systemService,
 	}
 }
 

@@ -107,7 +107,7 @@ func (s *Service) Stop() error {
 
 func (s *Service) SetSystemLedOn(ctx context.Context) error {
 	if s.systemLed == nil {
-		return fmt.Errorf("system led is not connected")
+		return led.ErrLedNotConnected
 	}
 
 	if err := s.systemLed.On(); err != nil {
@@ -121,7 +121,7 @@ func (s *Service) SetSystemLedOn(ctx context.Context) error {
 
 func (s *Service) SetSystemLedOff(ctx context.Context) error {
 	if s.systemLed == nil {
-		return fmt.Errorf("system led is not connected")
+		return led.ErrLedNotConnected
 	}
 
 	if err := s.systemLed.Off(); err != nil {
@@ -135,7 +135,7 @@ func (s *Service) SetSystemLedOff(ctx context.Context) error {
 
 func (s *Service) BlinkSystemLed(ctx context.Context, params led.BlinkSystemLedParams) error {
 	if s.systemLed == nil {
-		return fmt.Errorf("system led is not connected")
+		return led.ErrLedNotConnected
 	}
 
 	defer func() {
@@ -176,7 +176,7 @@ func (s *Service) BlinkSystemLed(ctx context.Context, params led.BlinkSystemLedP
 
 func (s *Service) SetAlertLedOn(ctx context.Context) error {
 	if s.alertLed == nil {
-		return fmt.Errorf("alert led is not connected")
+		return led.ErrLedNotConnected
 	}
 
 	if err := s.alertLed.On(); err != nil {
@@ -190,7 +190,7 @@ func (s *Service) SetAlertLedOn(ctx context.Context) error {
 
 func (s *Service) SetAlertLedOff(ctx context.Context) error {
 	if s.alertLed == nil {
-		return fmt.Errorf("alert led is not connected")
+		return led.ErrLedNotConnected
 	}
 
 	if err := s.alertLed.Off(); err != nil {
@@ -204,7 +204,7 @@ func (s *Service) SetAlertLedOff(ctx context.Context) error {
 
 func (s *Service) BlinkAlertLed(ctx context.Context, params led.BlinkAlertLedParams) error {
 	if s.alertLed == nil {
-		return fmt.Errorf("alert led is not connected")
+		return led.ErrLedNotConnected
 	}
 
 	defer func() {

@@ -13,6 +13,7 @@ func startEventService(app *application.Application, interruptChan <-chan any) e
 		app.EventBus,
 		app.AppStateService,
 		app.CommandService,
+		app.SystemService,
 	)
 
 	cleanup, err := service.Run(app.Context)

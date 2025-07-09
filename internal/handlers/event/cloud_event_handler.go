@@ -53,6 +53,13 @@ func (s *Service) HandleCloudDisconnectedEvent(ctx context.Context, event events
 		return nil
 	})
 
+	g.Go(func() error {
+		if err := s.systemService.SetStatusError(ctx); err != nil {
+			return fmt.Errorf("failed to set system status error: %w", err)
+		}
+		return nil
+	})
+
 	if err := g.Wait(); err != nil {
 		s.log.Error("failed to update cloud connection", slog.Any("error", err))
 	}

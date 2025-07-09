@@ -12,3 +12,14 @@ type Info struct {
 	TotalMemory uint64
 	Uptime      time.Duration
 }
+
+type Status string
+
+func (s Status) String() string {
+	return string(s)
+}
+
+const (
+	StatusNormal Status = "NORMAL"
+	StatusError  Status = "ERROR"
+)

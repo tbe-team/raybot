@@ -10,11 +10,13 @@ import (
 type repository struct {
 	mu         sync.RWMutex
 	systemInfo system.Info
+	status     system.Status
 }
 
 func NewRepository() system.Repository {
 	return &repository{
 		systemInfo: system.Info{},
+		status:     system.StatusNormal,
 	}
 }
 
@@ -44,6 +46,22 @@ func (r *repository) UpdateInfo(_ context.Context, params system.UpdateInfoParam
 	if params.SetUptime {
 		r.systemInfo.Uptime = params.Uptime
 	}
+
+	return nil
+}
+
+func (r *repository) GetStatus(_ context.Context) (system.Status, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	return r.status, nil
+}
+
+func (r *repository) UpdateStatus(_ context.Context, status system.Status) error {
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	r.status = status
 
 	return nil
 }
