@@ -2930,7 +2930,7 @@ func (response GetSystemStatus200JSONResponse) VisitGetSystemStatusResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
-type GetSystemStatus400JSONResponse SystemStatus
+type GetSystemStatus400JSONResponse ErrorResponse
 
 func (response GetSystemStatus400JSONResponse) VisitGetSystemStatusResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -3927,9 +3927,9 @@ var swaggerSpec = []string{
 	"IV1g11knSGsia845hVmSfbzU115RUtb+ViBjE3jveq2whnaV6cfbZJcmyflb0DJONUFIhT0qMwR7+GfS",
 	"46X09khRC9F+VFSrHuYgmmfFeh3AbZ4S6rBMJ8cm5jt4dNSRN+dghXc8k6GXx41beVbkcYjkL8MJQcnd",
 	"2aYFLKEY+KTBdvf4pCVpwSeRZVJhFIZzhKg5qu2Wtytz7zd4JLpM8xSW9vikK+SNJL12h4KNhbYQrkzu",
-	"cZHx4ucVDeI9zdu3LOD5b1VaRZwUP2h59IYIOAt3QUs7e1C2B1cQL2EaPpnle0pRxr0zXtOJ5GFpIUz4",
-	"X2Uh5cD7aw3XMOLNzSjFJmPZtOMC+jerFK9GHS2rlBwx8wm0XLYn+7dtGL8VGWVbU6YcxDdx1mylYM6c",
-	"nB8fOQxxAhIBkCKPqweyuPcw8DcfN/8XAAD//+yJTMMHnQAA",
+	"cZHx4ucVDeI9zdu3LOD5b1VaRZwUP2i5m9JdENPOH5TtwRXES5iGT2YBn1KUcfeMF3UieVxaCBP+V1lJ",
+	"OfD+WsM1jHhzM0yxyVk27biA/s1qxatRR8sqJUnMfAQtl+3J/m07xm9FStnWtCkH8U0cNlspmDMn58dH",
+	"DkMcgUQEpEjk6oEs7j0M/M3Hzf8FAAD//4bLQUYInQAA",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

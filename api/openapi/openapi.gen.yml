@@ -380,7 +380,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SystemStatus'
+                $ref: '#/components/schemas/ErrorResponse'
   /system/reboot:
     post:
       summary: Reboot the system
