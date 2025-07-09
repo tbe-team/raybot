@@ -23,7 +23,15 @@ type Service interface {
 	BlinkAlertLed(ctx context.Context, params BlinkAlertLedParams) error
 }
 
+type LedsOutput struct {
+	SystemLedState      State
+	SystemLedConnection Connection
+	AlertLedState       State
+	AlertLedConnection  Connection
+}
+
 type Repository interface {
+	GetLeds(ctx context.Context) (LedsOutput, error)
 	UpdateSystemLedState(ctx context.Context, state State) error
 	UpdateAlertLedState(ctx context.Context, state State) error
 	UpdateSystemLedConnection(ctx context.Context, connection Connection) error

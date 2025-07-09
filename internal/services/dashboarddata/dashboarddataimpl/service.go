@@ -12,6 +12,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/dashboarddata"
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
+	"github.com/tbe-team/raybot/internal/services/led"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 	"github.com/tbe-team/raybot/internal/services/location"
 )
@@ -25,6 +26,7 @@ type service struct {
 	locationRepo       location.Repository
 	cargoRepo          cargo.Repository
 	appStateRepo       appstate.Repository
+	ledRepo            led.Repository
 }
 
 func NewService(
@@ -36,6 +38,7 @@ func NewService(
 	locationRepo location.Repository,
 	cargoRepo cargo.Repository,
 	appStateRepo appstate.Repository,
+	ledRepo led.Repository,
 ) dashboarddata.Service {
 	return &service{
 		batteryStateRepo:   batteryStateRepo,
@@ -46,6 +49,7 @@ func NewService(
 		locationRepo:       locationRepo,
 		cargoRepo:          cargoRepo,
 		appStateRepo:       appStateRepo,
+		ledRepo:            ledRepo,
 	}
 }
 
@@ -110,6 +114,12 @@ func (s *service) GetRobotState(ctx context.Context) (dashboarddata.RobotState, 
 	g.Go(func() error {
 		var err error
 		ret.AppState, err = s.appStateRepo.GetAppState(ctx)
+		return err
+	})
+
+	g.Go(func() error {
+		var err error
+		ret.Leds, err = s.ledRepo.GetLeds(ctx)
 		return err
 	})
 

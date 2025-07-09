@@ -205,6 +205,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		locationRepository,
 		cargoRepository,
 		appStateRepository,
+		ledRepository,
 	)
 	appStateService := appstateimpl.NewService(appStateRepository)
 	peripheralService := peripheralimpl.NewService()

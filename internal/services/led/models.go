@@ -4,6 +4,10 @@ import "time"
 
 type Mode string
 
+func (m Mode) String() string {
+	return string(m)
+}
+
 const (
 	ModeOff   Mode = "OFF"
 	ModeOn    Mode = "ON"

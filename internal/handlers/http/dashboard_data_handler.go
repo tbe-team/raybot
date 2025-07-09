@@ -111,6 +111,33 @@ func (h dashboardDataHandler) convertRobotStateToResponse(state dashboarddata.Ro
 				Error:           state.AppState.RFIDUSBConnection.Error,
 			},
 		},
+		Leds: struct {
+			AlertLed  gen.Led `json:"alertLed"`
+			SystemLed gen.Led `json:"systemLed"`
+		}{
+			AlertLed: gen.Led{
+				Connection: gen.LedConnection{
+					Connected:       state.Leds.AlertLedConnection.Connected,
+					LastConnectedAt: state.Leds.AlertLedConnection.LastConnectedAt,
+					Error:           state.Leds.AlertLedConnection.Error,
+				},
+				State: gen.LedState{
+					Mode:      state.Leds.AlertLedState.Mode.String(),
+					UpdatedAt: state.Leds.AlertLedState.UpdatedAt,
+				},
+			},
+			SystemLed: gen.Led{
+				Connection: gen.LedConnection{
+					Connected:       state.Leds.SystemLedConnection.Connected,
+					LastConnectedAt: state.Leds.SystemLedConnection.LastConnectedAt,
+					Error:           state.Leds.SystemLedConnection.Error,
+				},
+				State: gen.LedState{
+					Mode:      state.Leds.SystemLedState.Mode.String(),
+					UpdatedAt: state.Leds.SystemLedState.UpdatedAt,
+				},
+			},
+		},
 	}
 }
 

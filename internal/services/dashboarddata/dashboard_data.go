@@ -8,6 +8,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/cargo"
 	"github.com/tbe-team/raybot/internal/services/distancesensor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
+	"github.com/tbe-team/raybot/internal/services/led"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 	"github.com/tbe-team/raybot/internal/services/location"
 )
@@ -23,6 +24,7 @@ type RobotState struct {
 	Cargo            cargo.Cargo
 	CargoDoorMotor   cargo.DoorMotorState
 	AppState         appstate.AppState
+	Leds             led.LedsOutput
 }
 
 type Service interface {

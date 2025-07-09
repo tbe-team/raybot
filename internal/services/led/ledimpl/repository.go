@@ -3,6 +3,7 @@ package ledimpl
 import (
 	"context"
 	"sync"
+	"time"
 
 	"github.com/tbe-team/raybot/internal/services/led"
 )
@@ -18,18 +19,32 @@ type Repository struct {
 func NewRepository() *Repository {
 	return &Repository{
 		systemLedState: led.State{
-			Mode: led.ModeOff,
+			Mode:      led.ModeOff,
+			UpdatedAt: time.Now(),
 		},
 		systemLedConnection: led.Connection{
 			Connected: false,
 		},
 		alertLedState: led.State{
-			Mode: led.ModeOff,
+			Mode:      led.ModeOff,
+			UpdatedAt: time.Now(),
 		},
 		alertLedConnection: led.Connection{
 			Connected: false,
 		},
 	}
+}
+
+func (r *Repository) GetLeds(_ context.Context) (led.LedsOutput, error) {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
+
+	return led.LedsOutput{
+		SystemLedState:      r.systemLedState,
+		SystemLedConnection: r.systemLedConnection,
+		AlertLedState:       r.alertLedState,
+		AlertLedConnection:  r.alertLedConnection,
+	}, nil
 }
 
 func (r *Repository) UpdateSystemLedState(_ context.Context, state led.State) error {
