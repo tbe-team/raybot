@@ -30,6 +30,11 @@ hardware:
       read_timeout: 1s
     enable_ack: false
     command_ack_timeout: 1s
+  leds:
+    system:
+      pin: 57
+    alert:
+      pin: 58
 cloud:
   enable: false
   address: localhost:50051

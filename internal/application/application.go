@@ -2,6 +2,7 @@ package application
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
@@ -31,6 +32,8 @@ import (
 	"github.com/tbe-team/raybot/internal/services/distancesensor/distancesensorimpl"
 	"github.com/tbe-team/raybot/internal/services/drivemotor"
 	"github.com/tbe-team/raybot/internal/services/drivemotor/drivemotorimpl"
+	"github.com/tbe-team/raybot/internal/services/led"
+	"github.com/tbe-team/raybot/internal/services/led/ledimpl"
 	"github.com/tbe-team/raybot/internal/services/liftmotor"
 	"github.com/tbe-team/raybot/internal/services/liftmotor/liftmotorimpl"
 	"github.com/tbe-team/raybot/internal/services/limitswitch"
@@ -75,6 +78,7 @@ type Application struct {
 	PeripheralService     peripheral.Service
 	CommandService        command.Service
 	ApperrorcodeService   apperrorcode.Service
+	LedService            led.Service
 }
 
 type CleanupFunc func() error
@@ -127,6 +131,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	appStateRepository := appstateimpl.NewAppStateRepository()
 	commandRepository := commandimpl.NewCommandRepository(db, queries)
 	systemInfoRepository := systemimpl.NewRepository()
+	ledRepository := ledimpl.NewRepository()
 
 	// Initialize hardware components
 	espSerialClient := espserial.NewClient(cfg.Hardware.ESP.Serial)
@@ -235,32 +240,39 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	systemInfoCollectorService := systeminfocollector.NewService(log, systemInfoRepository)
 	systemInfoCollectorService.Run(ctx)
 
+	ledService := ledimpl.NewService(cfg.Hardware.Leds, log, ledRepository)
+	ledService.Start(ctx)
+
 	cleanup := func() error {
+		var errs []error
+
 		systemInfoCollectorService.Stop()
 		appStateRepository.Cleanup()
+		if err := ledService.Stop(); err != nil {
+			errs = append(errs, fmt.Errorf("failed to stop led service: %w", err))
+		}
 
-		var err error
 		if espSerialClient.Connected() {
 			if espErr := espSerialClient.Close(); espErr != nil {
-				err = fmt.Errorf("failed to close ESP serial client: %w", espErr)
+				errs = append(errs, fmt.Errorf("failed to close ESP serial client: %w", espErr))
 			}
 		}
 
 		if picSerialClient.Connected() {
 			if picErr := picSerialClient.Close(); picErr != nil {
-				err = fmt.Errorf("failed to close PIC serial client: %w", picErr)
+				errs = append(errs, fmt.Errorf("failed to close PIC serial client: %w", picErr))
 			}
 		}
 
 		if dbErr := db.Close(); dbErr != nil {
-			err = fmt.Errorf("failed to close db: %w", dbErr)
+			errs = append(errs, fmt.Errorf("failed to close db: %w", dbErr))
 		}
 
 		if err := cleanupLogger(); err != nil {
-			return fmt.Errorf("failed to cleanup logger: %w", err)
+			errs = append(errs, fmt.Errorf("failed to cleanup logger: %w", err))
 		}
 
-		return err
+		return errors.Join(errs...)
 	}
 
 	return &Application{

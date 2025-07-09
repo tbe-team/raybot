@@ -9,8 +9,9 @@ import (
 const defaultCommandACKTimeout = 1 * time.Second
 
 type Hardware struct {
-	ESP ESP `yaml:"esp"`
-	PIC PIC `yaml:"pic"`
+	ESP  ESP  `yaml:"esp"`
+	PIC  PIC  `yaml:"pic"`
+	Leds Leds `yaml:"leds"`
 }
 
 func (h *Hardware) Validate() error {
@@ -24,6 +25,10 @@ func (h *Hardware) Validate() error {
 
 	if h.ESP.Serial.Port == h.PIC.Serial.Port {
 		return fmt.Errorf("esp and pic serial ports cannot be the same")
+	}
+
+	if err := h.Leds.Validate(); err != nil {
+		return fmt.Errorf("validate leds: %w", err)
 	}
 
 	return nil
@@ -93,5 +98,30 @@ func (s *Serial) Validate() error {
 	}
 	s.Parity = p
 
+	return nil
+}
+
+type Leds struct {
+	System Led `yaml:"system"`
+	Alert  Led `yaml:"alert"`
+}
+
+func (l *Leds) Validate() error {
+	if err := l.System.Validate(); err != nil {
+		return fmt.Errorf("validate system led: %w", err)
+	}
+
+	if err := l.Alert.Validate(); err != nil {
+		return fmt.Errorf("validate alert led: %w", err)
+	}
+
+	return nil
+}
+
+type Led struct {
+	Pin string `yaml:"pin"`
+}
+
+func (l *Led) Validate() error {
 	return nil
 }
