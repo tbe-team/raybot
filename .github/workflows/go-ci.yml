@@ -1,19 +1,6 @@
 name: Go CI
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - '**/*.go'
-      - 'go.mod'
-      - 'go.sum'
-      - 'internal/**'
-      - 'pkg/**'
-      - 'cmd/**'
-      - '.golangci.yml'
-      - 'Makefile'
-      - '.github/workflows/go-ci.yml'
   pull_request:
     paths:
       - '**/*.go'
