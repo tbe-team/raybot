@@ -107,7 +107,12 @@ docker-build-raybot:
 
 .PHONY: docker-run-raybot
 docker-run-raybot:
-	docker run -p 3000:3000 raybot
+	docker run --rm -it \
+		-v ./bin/config.yml:/app/config.yml \
+		-v ./bin/raybot.db:/app/raybot.db \
+		-p 3000:3000 \
+		raybot \
+		/app/raybot -config /app/config.yml -db /app/raybot.db
 
 #########################
 # Run
