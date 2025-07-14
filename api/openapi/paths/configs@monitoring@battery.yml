@@ -1,0 +1,45 @@
+get:
+  summary: Get the battery monitoring configuration
+  operationId: getBatteryMonitoringConfig
+  description: Get the battery monitoring configuration
+  tags:
+    - config
+  responses:
+    "200":
+      description: The battery monitoring configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/BatteryMonitoringConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
+
+put:
+  summary: Update the battery monitoring configuration
+  operationId: updateBatteryMonitoringConfig
+  description: Update the battery monitoring configuration
+  tags:
+    - config
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/config.yml#/BatteryMonitoringConfig"
+  responses:
+    "200":
+      description: The updated battery monitoring configuration
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/config.yml#/BatteryMonitoringConfig"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

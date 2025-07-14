@@ -341,6 +341,51 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /configs/monitoring/battery:
+    get:
+      summary: Get the battery monitoring configuration
+      operationId: getBatteryMonitoringConfig
+      description: Get the battery monitoring configuration
+      tags:
+        - config
+      responses:
+        '200':
+          description: The battery monitoring configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatteryMonitoringConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      summary: Update the battery monitoring configuration
+      operationId: updateBatteryMonitoringConfig
+      description: Update the battery monitoring configuration
+      tags:
+        - config
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatteryMonitoringConfig'
+      responses:
+        '200':
+          description: The updated battery monitoring configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatteryMonitoringConfig'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /system/info:
     get:
       summary: Get the system information
@@ -1053,6 +1098,219 @@ components:
       required:
         - cargoLift
         - cargoLower
+    BatteryVoltageLowConfig:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: false
+          description: Whether to enable battery voltage low monitoring
+          x-order: 1
+        threshold:
+          type: number
+          format: double
+          example: 14
+          description: The threshold voltage value for low battery voltage alert (V)
+          x-order: 2
+          minimum: 0
+          x-go-type: float64
+      required:
+        - enable
+        - threshold
+    BatteryVoltageHighConfig:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: false
+          description: Whether to enable battery voltage high monitoring
+          x-order: 1
+        threshold:
+          type: number
+          format: double
+          example: 18
+          description: The threshold voltage value for high battery voltage alert (V)
+          x-order: 2
+          minimum: 0
+          x-go-type: float64
+      required:
+        - enable
+        - threshold
+    BatteryCellVoltageHighConfig:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: false
+          description: Whether to enable battery cell voltage high monitoring
+          x-order: 1
+        threshold:
+          type: number
+          format: double
+          example: 4.3
+          description: The threshold voltage value for high battery cell voltage alert (V)
+          x-order: 2
+          minimum: 0
+          x-go-type: float64
+      required:
+        - enable
+        - threshold
+    BatteryCellVoltageLowConfig:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: false
+          description: Whether to enable battery cell voltage low monitoring
+          x-order: 1
+        threshold:
+          type: number
+          format: double
+          example: 3.8
+          description: The threshold voltage value for low battery cell voltage alert (V)
+          x-order: 2
+          minimum: 0
+          x-go-type: float64
+      required:
+        - enable
+        - threshold
+    BatteryCellVoltageDiffConfig:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: false
+          description: Whether to enable battery cell voltage difference monitoring
+          x-order: 1
+        threshold:
+          type: number
+          format: double
+          example: 0.5
+          description: The threshold voltage difference between cells for alert (V)
+          x-order: 2
+          minimum: 0
+          x-go-type: float64
+      required:
+        - enable
+        - threshold
+    BatteryCurrentHighConfig:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: false
+          description: Whether to enable battery current high monitoring
+          x-order: 1
+        threshold:
+          type: number
+          format: double
+          example: 6
+          description: The threshold current value for high battery current alert (A)
+          x-order: 2
+          minimum: 0
+          x-go-type: float64
+      required:
+        - enable
+        - threshold
+    BatteryTempHighConfig:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: false
+          description: Whether to enable battery temperature high monitoring
+          x-order: 1
+        threshold:
+          type: number
+          format: double
+          example: 60
+          description: The threshold temperature value for high battery temperature alert (°C)
+          x-order: 2
+          minimum: 0
+          x-go-type: float64
+      required:
+        - enable
+        - threshold
+    BatteryPercentLowConfig:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: false
+          description: Whether to enable battery percentage low monitoring
+          x-order: 1
+        threshold:
+          type: number
+          format: double
+          example: 20
+          description: The threshold percentage value for low battery percentage alert (%)
+          x-order: 2
+          minimum: 0
+          maximum: 100
+          x-go-type: float64
+      required:
+        - enable
+        - threshold
+    BatteryHealthLowConfig:
+      type: object
+      properties:
+        enable:
+          type: boolean
+          example: false
+          description: Whether to enable battery health low monitoring
+          x-order: 1
+        threshold:
+          type: number
+          format: double
+          example: 60
+          description: The threshold health value for low battery health alert (%)
+          x-order: 2
+          minimum: 0
+          maximum: 100
+          x-go-type: float64
+      required:
+        - enable
+        - threshold
+    BatteryMonitoringConfig:
+      type: object
+      properties:
+        voltageLow:
+          $ref: '#/components/schemas/BatteryVoltageLowConfig'
+          x-order: 1
+        voltageHigh:
+          $ref: '#/components/schemas/BatteryVoltageHighConfig'
+          x-order: 2
+        cellVoltageHigh:
+          $ref: '#/components/schemas/BatteryCellVoltageHighConfig'
+          x-order: 3
+        cellVoltageLow:
+          $ref: '#/components/schemas/BatteryCellVoltageLowConfig'
+          x-order: 4
+        cellVoltageDiff:
+          $ref: '#/components/schemas/BatteryCellVoltageDiffConfig'
+          x-order: 5
+        currentHigh:
+          $ref: '#/components/schemas/BatteryCurrentHighConfig'
+          x-order: 6
+        tempHigh:
+          $ref: '#/components/schemas/BatteryTempHighConfig'
+          x-order: 7
+        percentLow:
+          $ref: '#/components/schemas/BatteryPercentLowConfig'
+          x-order: 8
+        healthLow:
+          $ref: '#/components/schemas/BatteryHealthLowConfig'
+          x-order: 9
+      required:
+        - voltageLow
+        - voltageHigh
+        - cellVoltageHigh
+        - cellVoltageLow
+        - cellVoltageDiff
+        - currentHigh
+        - tempHigh
+        - percentLow
+        - healthLow
     SystemInfo:
       type: object
       properties:
