@@ -24,4 +24,8 @@ type Service interface {
 
 	GetCommandConfig(ctx context.Context) (config.Command, error)
 	UpdateCommandConfig(ctx context.Context, commandCfg config.Command) (config.Command, error)
+
+	// Monitoring
+	GetBatteryMonitoringConfig(ctx context.Context) (config.BatteryMonitoring, error)
+	UpdateBatteryMonitoringConfig(ctx context.Context, batteryMonitoringCfg config.BatteryMonitoring) (config.BatteryMonitoring, error)
 }

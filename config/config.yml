@@ -65,3 +65,32 @@ command:
     bottom_obstacle_tracking:
       enter_distance: 20
       exit_distance: 30
+monitoring:
+  battery:
+    voltage_low:
+      enable: false
+      threshold: 14
+    voltage_high:
+      enable: false
+      threshold: 18
+    cell_voltage_high:
+      enable: false
+      threshold: 4.3
+    cell_voltage_low:
+      enable: false
+      threshold: 3.8
+    cell_voltage_diff:
+      enable: false
+      threshold: 0.5
+    current_high:
+      enable: false
+      threshold: 6
+    temp_high:
+      enable: false
+      threshold: 60
+    percent_low:
+      enable: false
+      threshold: 20
+    health_low:
+      enable: false
+      threshold: 60
