@@ -83,7 +83,6 @@ func (s *Service) Start(ctx context.Context) {
 	if err = s.SetAlertLedOff(ctx); err != nil {
 		s.log.Error("failed to set alert led on", slog.Any("error", err))
 	}
-
 }
 
 func (s *Service) Stop() error {

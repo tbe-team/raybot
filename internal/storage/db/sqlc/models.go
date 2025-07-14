@@ -4,6 +4,14 @@
 
 package sqlc
 
+type Alarm struct {
+	ID            int64   `json:"id"`
+	Type          string  `json:"type"`
+	Data          string  `json:"data"`
+	ActivatedAt   string  `json:"activated_at"`
+	DeactivatedAt *string `json:"deactivated_at"`
+}
+
 type BatteryChargeSetting struct {
 	ID           int64  `json:"id"`
 	CurrentLimit int64  `json:"current_limit"`
