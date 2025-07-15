@@ -1,5 +1,5 @@
 import type { AxiosRequestConfig } from 'axios'
-import type { SystemInfo } from '@/types/system-info'
+import type { SystemInfo, SystemStatusResponse } from '@/types/system-info'
 import http from '@/lib/http'
 
 const systemAPI = {
@@ -11,6 +11,9 @@ const systemAPI = {
   },
   getInfo(axiosOpts?: Partial<AxiosRequestConfig>): Promise<SystemInfo> {
     return http.get('/system/info', axiosOpts)
+  },
+  getStatus(axiosOpts?: Partial<AxiosRequestConfig>): Promise<SystemStatusResponse> {
+    return http.get('/system/status', axiosOpts)
   },
 }
 export default systemAPI
