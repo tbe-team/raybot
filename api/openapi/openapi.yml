@@ -53,3 +53,5 @@ paths:
     $ref: "./paths/commands@processing.yml"
   /commands/processing/cancel:
     $ref: "./paths/commands@processing@cancel.yml"
+  /alarms:
+    $ref: "./paths/alarms.yml"

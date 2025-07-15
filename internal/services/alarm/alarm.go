@@ -5,6 +5,11 @@ import (
 	"time"
 
 	"github.com/tbe-team/raybot/pkg/paging"
+	"github.com/tbe-team/raybot/pkg/xerror"
+)
+
+var (
+	ErrAlarmAlreadyActivated = xerror.BadRequest(nil, "alarm.alreadyActivated", "Alarm already activated")
 )
 
 type ListActiveAlarmsParams struct {
@@ -29,6 +34,7 @@ type DeactivateAlarmParams struct {
 type Service interface {
 	ListActiveAlarms(ctx context.Context, params ListActiveAlarmsParams) (paging.List[Alarm], error)
 	ListDeactiveAlarms(ctx context.Context, params ListDeactiveAlarmsParams) (paging.List[Alarm], error)
+	DeleteDeactiveAlarms(ctx context.Context) error
 }
 
 type Repository interface {
@@ -36,4 +42,6 @@ type Repository interface {
 	ListDeactiveAlarms(ctx context.Context, params ListDeactiveAlarmsParams) (paging.List[Alarm], error)
 	CreateAlarm(ctx context.Context, params CreateAlarmParams) (Alarm, error)
 	DeactivateAlarm(ctx context.Context, params DeactivateAlarmParams) error
+	DeactivateAllAlarms(ctx context.Context) error
+	DeleteDeactiveAlarms(ctx context.Context) error
 }

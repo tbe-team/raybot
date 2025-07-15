@@ -84,6 +84,26 @@ func (q *Queries) AlarmDeactivate(ctx context.Context, db DBTX, arg AlarmDeactiv
 	return err
 }
 
+const alarmDeactivateAll = `-- name: AlarmDeactivateAll :exec
+UPDATE alarms
+SET deactivated_at = ?1
+`
+
+func (q *Queries) AlarmDeactivateAll(ctx context.Context, db DBTX, deactivatedAt *string) error {
+	_, err := db.ExecContext(ctx, alarmDeactivateAll, deactivatedAt)
+	return err
+}
+
+const alarmDeleteDeactive = `-- name: AlarmDeleteDeactive :exec
+DELETE FROM alarms
+WHERE deactivated_at IS NULL
+`
+
+func (q *Queries) AlarmDeleteDeactive(ctx context.Context, db DBTX) error {
+	_, err := db.ExecContext(ctx, alarmDeleteDeactive)
+	return err
+}
+
 const alarmListActive = `-- name: AlarmListActive :many
 SELECT
 	id, type, data, activated_at, deactivated_at

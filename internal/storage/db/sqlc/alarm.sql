@@ -43,3 +43,11 @@ RETURNING *;
 UPDATE alarms
 SET deactivated_at = @deactivated_at
 WHERE id = @id;
+
+-- name: AlarmDeactivateAll :exec
+UPDATE alarms
+SET deactivated_at = @deactivated_at;
+
+-- name: AlarmDeleteDeactive :exec
+DELETE FROM alarms
+WHERE deactivated_at IS NULL;

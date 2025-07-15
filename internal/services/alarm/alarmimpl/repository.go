@@ -12,6 +12,7 @@ import (
 	"github.com/tbe-team/raybot/internal/storage/db"
 	"github.com/tbe-team/raybot/internal/storage/db/sqlc"
 	"github.com/tbe-team/raybot/pkg/paging"
+	"github.com/tbe-team/raybot/pkg/ptr"
 )
 
 type Repository struct {
@@ -140,6 +141,9 @@ func (r Repository) CreateAlarm(ctx context.Context, params alarm.CreateAlarmPar
 		ActivatedAt: params.ActivatedAt.Format(time.RFC3339Nano),
 	})
 	if err != nil {
+		if db.IsUniqueViolationError(err, "alarms.type") {
+			return alarm.Alarm{}, alarm.ErrAlarmAlreadyActivated
+		}
 		return alarm.Alarm{}, fmt.Errorf("failed to create alarm: %w", err)
 	}
 
@@ -153,6 +157,23 @@ func (r Repository) DeactivateAlarm(ctx context.Context, params alarm.Deactivate
 		DeactivatedAt: &deactivatedAt,
 	}); err != nil {
 		return fmt.Errorf("failed to deactivate alarm: %w", err)
+	}
+
+	return nil
+}
+
+func (r Repository) DeactivateAllAlarms(ctx context.Context) error {
+	if err := r.queries.AlarmDeactivateAll(ctx, r.db,
+		ptr.New(time.Now().Format(time.RFC3339Nano)),
+	); err != nil {
+		return fmt.Errorf("failed to deactivate all alarms: %w", err)
+	}
+	return nil
+}
+
+func (r Repository) DeleteDeactiveAlarms(ctx context.Context) error {
+	if err := r.queries.AlarmDeleteDeactive(ctx, r.db); err != nil {
+		return fmt.Errorf("failed to delete deactive alarms: %w", err)
 	}
 
 	return nil

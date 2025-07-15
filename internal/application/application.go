@@ -12,6 +12,8 @@ import (
 	"github.com/tbe-team/raybot/internal/hardware/espserial"
 	"github.com/tbe-team/raybot/internal/hardware/picserial"
 	"github.com/tbe-team/raybot/internal/logging"
+	"github.com/tbe-team/raybot/internal/services/alarm"
+	"github.com/tbe-team/raybot/internal/services/alarm/alarmimpl"
 	"github.com/tbe-team/raybot/internal/services/apperrorcode"
 	"github.com/tbe-team/raybot/internal/services/apperrorcode/apperrorcodeimpl"
 	"github.com/tbe-team/raybot/internal/services/appstate"
@@ -79,6 +81,7 @@ type Application struct {
 	CommandService        command.Service
 	ApperrorcodeService   apperrorcode.Service
 	LedService            led.Service
+	AlarmService          alarm.Service
 }
 
 type CleanupFunc func() error
@@ -132,6 +135,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	commandRepository := commandimpl.NewCommandRepository(db, queries)
 	systemInfoRepository := systemimpl.NewRepository()
 	ledRepository := ledimpl.NewRepository()
+	alarmRepository := alarmimpl.NewRepository(db, queries)
 
 	// Initialize hardware components
 	espSerialClient := espserial.NewClient(cfg.Hardware.ESP.Serial)
@@ -249,6 +253,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	)
 	systemInfoCollectorService := systeminfocollector.NewService(log, systemInfoRepository)
 	systemInfoCollectorService.Run(ctx)
+	alarmService := alarmimpl.NewService(log, validator, alarmRepository)
 
 	cleanup := func() error {
 		var errs []error
@@ -303,5 +308,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		PeripheralService:     peripheralService,
 		CommandService:        commandService,
 		ApperrorcodeService:   apperrorcodeService,
+		AlarmService:          alarmService,
 	}, cleanup, nil
 }

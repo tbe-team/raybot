@@ -22,6 +22,12 @@ import (
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
 
+// Defines values for ListAlarmsParamsStatus.
+const (
+	ListAlarmsParamsStatusActive   ListAlarmsParamsStatus = "ACTIVE"
+	ListAlarmsParamsStatusDeactive ListAlarmsParamsStatus = "DEACTIVE"
+)
+
 // APConfig defines model for APConfig.
 type APConfig struct {
 	// Enable Whether to enable the AP mode
@@ -35,6 +41,42 @@ type APConfig struct {
 
 	// Ip The IP address for the AP mode
 	Ip string `json:"ip"`
+}
+
+// AlarmData defines model for AlarmData.
+type AlarmData struct {
+	union json.RawMessage
+}
+
+// AlarmResponse defines model for AlarmResponse.
+type AlarmResponse struct {
+	// Id The id of the alarm
+	Id int64 `json:"id"`
+
+	// Type The type of alarm
+	Type AlarmType `json:"type"`
+
+	// Message The alarm message
+	Message string    `json:"message"`
+	Data    AlarmData `json:"data"`
+
+	// ActivatedAt The activation date of the alarm
+	ActivatedAt time.Time `json:"activatedAt"`
+
+	// DeactivatedAt The deactivation date of the alarm
+	DeactivatedAt *time.Time `json:"deactivatedAt"`
+}
+
+// AlarmType The type of alarm
+type AlarmType = string
+
+// AlarmsListResponse defines model for AlarmsListResponse.
+type AlarmsListResponse struct {
+	// TotalItems The total number of alarms
+	TotalItems int `json:"totalItems"`
+
+	// Items The list of alarms
+	Items []AlarmResponse `json:"items"`
 }
 
 // AppConnection defines model for AppConnection.
@@ -384,6 +426,96 @@ type CreateCommandRequest struct {
 	// Type The type of command
 	Type   CommandType   `json:"type"`
 	Inputs CommandInputs `json:"inputs"`
+}
+
+// DataBatteryCellVoltageDiff defines model for DataBatteryCellVoltageDiff.
+type DataBatteryCellVoltageDiff struct {
+	// Threshold The voltage difference threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// CellVoltages The voltage readings from all battery cells
+	CellVoltages []float64 `json:"cellVoltages"`
+
+	// DiffIndex Indices of cells with voltage difference exceeding threshold
+	DiffIndex []int `json:"diffIndex"`
+}
+
+// DataBatteryCellVoltageHigh defines model for DataBatteryCellVoltageHigh.
+type DataBatteryCellVoltageHigh struct {
+	// Threshold The cell voltage threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// CellVoltages The voltage readings from all battery cells
+	CellVoltages []float64 `json:"cellVoltages"`
+
+	// OverThresholdIndex Indices of cells that exceeded the threshold
+	OverThresholdIndex []int `json:"overThresholdIndex"`
+}
+
+// DataBatteryCellVoltageLow defines model for DataBatteryCellVoltageLow.
+type DataBatteryCellVoltageLow struct {
+	// Threshold The cell voltage threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// CellVoltages The voltage readings from all battery cells
+	CellVoltages []float64 `json:"cellVoltages"`
+
+	// UnderThresholdIndex Indices of cells that fell below the threshold
+	UnderThresholdIndex []int `json:"underThresholdIndex"`
+}
+
+// DataBatteryCurrentHigh defines model for DataBatteryCurrentHigh.
+type DataBatteryCurrentHigh struct {
+	// Threshold The current threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Current The actual current that triggered the alarm
+	Current float64 `json:"current"`
+}
+
+// DataBatteryHealthLow defines model for DataBatteryHealthLow.
+type DataBatteryHealthLow struct {
+	// Threshold The battery health threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Health The actual battery health that triggered the alarm
+	Health float64 `json:"health"`
+}
+
+// DataBatteryPercentLow defines model for DataBatteryPercentLow.
+type DataBatteryPercentLow struct {
+	// Threshold The battery percentage threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Percent The actual battery percentage that triggered the alarm
+	Percent float64 `json:"percent"`
+}
+
+// DataBatteryTempHigh defines model for DataBatteryTempHigh.
+type DataBatteryTempHigh struct {
+	// Threshold The temperature threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Temp The actual temperature that triggered the alarm
+	Temp float64 `json:"temp"`
+}
+
+// DataBatteryVoltageHigh defines model for DataBatteryVoltageHigh.
+type DataBatteryVoltageHigh struct {
+	// Threshold The voltage threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Voltage The actual voltage that triggered the alarm
+	Voltage float64 `json:"voltage"`
+}
+
+// DataBatteryVoltageLow defines model for DataBatteryVoltageLow.
+type DataBatteryVoltageLow struct {
+	// Threshold The voltage threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Voltage The actual voltage that triggered the alarm
+	Voltage float64 `json:"voltage"`
 }
 
 // DischargeState defines model for DischargeState.
@@ -816,6 +948,23 @@ type Page = uint
 // PageSize defines model for PageSize.
 type PageSize = uint
 
+// ListAlarmsParams defines parameters for ListAlarms.
+type ListAlarmsParams struct {
+	// Page The page number
+	Page *Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize The number of items per page
+	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Status Filter alarms by status. Required parameter. Allowed values:
+	//   - ACTIVE
+	//   - DEACTIVE
+	Status ListAlarmsParamsStatus `form:"status" json:"status"`
+}
+
+// ListAlarmsParamsStatus defines parameters for ListAlarms.
+type ListAlarmsParamsStatus string
+
 // ListCommandsParams defines parameters for ListCommands.
 type ListCommandsParams struct {
 	// Page The page number
@@ -865,6 +1014,250 @@ type UpdateBatteryMonitoringConfigJSONRequestBody = BatteryMonitoringConfig
 
 // UpdateWifiConfigJSONRequestBody defines body for UpdateWifiConfig for application/json ContentType.
 type UpdateWifiConfigJSONRequestBody = WifiConfig
+
+// AsDataBatteryVoltageLow returns the union data inside the AlarmData as a DataBatteryVoltageLow
+func (t AlarmData) AsDataBatteryVoltageLow() (DataBatteryVoltageLow, error) {
+	var body DataBatteryVoltageLow
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryVoltageLow overwrites any union data inside the AlarmData as the provided DataBatteryVoltageLow
+func (t *AlarmData) FromDataBatteryVoltageLow(v DataBatteryVoltageLow) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryVoltageLow performs a merge with any union data inside the AlarmData, using the provided DataBatteryVoltageLow
+func (t *AlarmData) MergeDataBatteryVoltageLow(v DataBatteryVoltageLow) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryVoltageHigh returns the union data inside the AlarmData as a DataBatteryVoltageHigh
+func (t AlarmData) AsDataBatteryVoltageHigh() (DataBatteryVoltageHigh, error) {
+	var body DataBatteryVoltageHigh
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryVoltageHigh overwrites any union data inside the AlarmData as the provided DataBatteryVoltageHigh
+func (t *AlarmData) FromDataBatteryVoltageHigh(v DataBatteryVoltageHigh) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryVoltageHigh performs a merge with any union data inside the AlarmData, using the provided DataBatteryVoltageHigh
+func (t *AlarmData) MergeDataBatteryVoltageHigh(v DataBatteryVoltageHigh) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryCellVoltageHigh returns the union data inside the AlarmData as a DataBatteryCellVoltageHigh
+func (t AlarmData) AsDataBatteryCellVoltageHigh() (DataBatteryCellVoltageHigh, error) {
+	var body DataBatteryCellVoltageHigh
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryCellVoltageHigh overwrites any union data inside the AlarmData as the provided DataBatteryCellVoltageHigh
+func (t *AlarmData) FromDataBatteryCellVoltageHigh(v DataBatteryCellVoltageHigh) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryCellVoltageHigh performs a merge with any union data inside the AlarmData, using the provided DataBatteryCellVoltageHigh
+func (t *AlarmData) MergeDataBatteryCellVoltageHigh(v DataBatteryCellVoltageHigh) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryCellVoltageLow returns the union data inside the AlarmData as a DataBatteryCellVoltageLow
+func (t AlarmData) AsDataBatteryCellVoltageLow() (DataBatteryCellVoltageLow, error) {
+	var body DataBatteryCellVoltageLow
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryCellVoltageLow overwrites any union data inside the AlarmData as the provided DataBatteryCellVoltageLow
+func (t *AlarmData) FromDataBatteryCellVoltageLow(v DataBatteryCellVoltageLow) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryCellVoltageLow performs a merge with any union data inside the AlarmData, using the provided DataBatteryCellVoltageLow
+func (t *AlarmData) MergeDataBatteryCellVoltageLow(v DataBatteryCellVoltageLow) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryCellVoltageDiff returns the union data inside the AlarmData as a DataBatteryCellVoltageDiff
+func (t AlarmData) AsDataBatteryCellVoltageDiff() (DataBatteryCellVoltageDiff, error) {
+	var body DataBatteryCellVoltageDiff
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryCellVoltageDiff overwrites any union data inside the AlarmData as the provided DataBatteryCellVoltageDiff
+func (t *AlarmData) FromDataBatteryCellVoltageDiff(v DataBatteryCellVoltageDiff) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryCellVoltageDiff performs a merge with any union data inside the AlarmData, using the provided DataBatteryCellVoltageDiff
+func (t *AlarmData) MergeDataBatteryCellVoltageDiff(v DataBatteryCellVoltageDiff) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryCurrentHigh returns the union data inside the AlarmData as a DataBatteryCurrentHigh
+func (t AlarmData) AsDataBatteryCurrentHigh() (DataBatteryCurrentHigh, error) {
+	var body DataBatteryCurrentHigh
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryCurrentHigh overwrites any union data inside the AlarmData as the provided DataBatteryCurrentHigh
+func (t *AlarmData) FromDataBatteryCurrentHigh(v DataBatteryCurrentHigh) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryCurrentHigh performs a merge with any union data inside the AlarmData, using the provided DataBatteryCurrentHigh
+func (t *AlarmData) MergeDataBatteryCurrentHigh(v DataBatteryCurrentHigh) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryTempHigh returns the union data inside the AlarmData as a DataBatteryTempHigh
+func (t AlarmData) AsDataBatteryTempHigh() (DataBatteryTempHigh, error) {
+	var body DataBatteryTempHigh
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryTempHigh overwrites any union data inside the AlarmData as the provided DataBatteryTempHigh
+func (t *AlarmData) FromDataBatteryTempHigh(v DataBatteryTempHigh) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryTempHigh performs a merge with any union data inside the AlarmData, using the provided DataBatteryTempHigh
+func (t *AlarmData) MergeDataBatteryTempHigh(v DataBatteryTempHigh) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryPercentLow returns the union data inside the AlarmData as a DataBatteryPercentLow
+func (t AlarmData) AsDataBatteryPercentLow() (DataBatteryPercentLow, error) {
+	var body DataBatteryPercentLow
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryPercentLow overwrites any union data inside the AlarmData as the provided DataBatteryPercentLow
+func (t *AlarmData) FromDataBatteryPercentLow(v DataBatteryPercentLow) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryPercentLow performs a merge with any union data inside the AlarmData, using the provided DataBatteryPercentLow
+func (t *AlarmData) MergeDataBatteryPercentLow(v DataBatteryPercentLow) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryHealthLow returns the union data inside the AlarmData as a DataBatteryHealthLow
+func (t AlarmData) AsDataBatteryHealthLow() (DataBatteryHealthLow, error) {
+	var body DataBatteryHealthLow
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryHealthLow overwrites any union data inside the AlarmData as the provided DataBatteryHealthLow
+func (t *AlarmData) FromDataBatteryHealthLow(v DataBatteryHealthLow) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryHealthLow performs a merge with any union data inside the AlarmData, using the provided DataBatteryHealthLow
+func (t *AlarmData) MergeDataBatteryHealthLow(v DataBatteryHealthLow) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t AlarmData) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *AlarmData) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
 
 // AsStopInputs returns the union data inside the CommandInputs as a StopInputs
 func (t CommandInputs) AsStopInputs() (StopInputs, error) {
@@ -1460,6 +1853,12 @@ func (t *CommandOutputs) UnmarshalJSON(b []byte) error {
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Delete all deactive alarms
+	// (DELETE /alarms)
+	DeleteDeactiveAlarms(w http.ResponseWriter, r *http.Request)
+	// List alarms
+	// (GET /alarms)
+	ListAlarms(w http.ResponseWriter, r *http.Request, params ListAlarmsParams)
 	// List all commands
 	// (GET /commands)
 	ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams)
@@ -1555,6 +1954,18 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// Delete all deactive alarms
+// (DELETE /alarms)
+func (_ Unimplemented) DeleteDeactiveAlarms(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// List alarms
+// (GET /alarms)
+func (_ Unimplemented) ListAlarms(w http.ResponseWriter, r *http.Request, params ListAlarmsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // List all commands
 // (GET /commands)
@@ -1744,6 +2155,70 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// DeleteDeactiveAlarms operation middleware
+func (siw *ServerInterfaceWrapper) DeleteDeactiveAlarms(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteDeactiveAlarms(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListAlarms operation middleware
+func (siw *ServerInterfaceWrapper) ListAlarms(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListAlarmsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "pageSize", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		return
+	}
+
+	// ------------- Required query parameter "status" -------------
+
+	if paramValue := r.URL.Query().Get("status"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "status", r.URL.Query(), &params.Status)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListAlarms(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // ListCommands operation middleware
 func (siw *ServerInterfaceWrapper) ListCommands(w http.ResponseWriter, r *http.Request) {
@@ -2338,6 +2813,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/alarms", wrapper.DeleteDeactiveAlarms)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/alarms", wrapper.ListAlarms)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/commands", wrapper.ListCommands)
 	})
 	r.Group(func(r chi.Router) {
@@ -2429,6 +2910,56 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 
 	return r
+}
+
+type DeleteDeactiveAlarmsRequestObject struct {
+}
+
+type DeleteDeactiveAlarmsResponseObject interface {
+	VisitDeleteDeactiveAlarmsResponse(w http.ResponseWriter) error
+}
+
+type DeleteDeactiveAlarms204Response struct {
+}
+
+func (response DeleteDeactiveAlarms204Response) VisitDeleteDeactiveAlarmsResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteDeactiveAlarms400JSONResponse ErrorResponse
+
+func (response DeleteDeactiveAlarms400JSONResponse) VisitDeleteDeactiveAlarmsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListAlarmsRequestObject struct {
+	Params ListAlarmsParams
+}
+
+type ListAlarmsResponseObject interface {
+	VisitListAlarmsResponse(w http.ResponseWriter) error
+}
+
+type ListAlarms200JSONResponse AlarmsListResponse
+
+func (response ListAlarms200JSONResponse) VisitListAlarmsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListAlarms400JSONResponse ErrorResponse
+
+func (response ListAlarms400JSONResponse) VisitListAlarmsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type ListCommandsRequestObject struct {
@@ -3190,6 +3721,12 @@ func (response GetVersion400JSONResponse) VisitGetVersionResponse(w http.Respons
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// Delete all deactive alarms
+	// (DELETE /alarms)
+	DeleteDeactiveAlarms(ctx context.Context, request DeleteDeactiveAlarmsRequestObject) (DeleteDeactiveAlarmsResponseObject, error)
+	// List alarms
+	// (GET /alarms)
+	ListAlarms(ctx context.Context, request ListAlarmsRequestObject) (ListAlarmsResponseObject, error)
 	// List all commands
 	// (GET /commands)
 	ListCommands(ctx context.Context, request ListCommandsRequestObject) (ListCommandsResponseObject, error)
@@ -3309,6 +3846,56 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// DeleteDeactiveAlarms operation middleware
+func (sh *strictHandler) DeleteDeactiveAlarms(w http.ResponseWriter, r *http.Request) {
+	var request DeleteDeactiveAlarmsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteDeactiveAlarms(ctx, request.(DeleteDeactiveAlarmsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteDeactiveAlarms")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteDeactiveAlarmsResponseObject); ok {
+		if err := validResponse.VisitDeleteDeactiveAlarmsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListAlarms operation middleware
+func (sh *strictHandler) ListAlarms(w http.ResponseWriter, r *http.Request, params ListAlarmsParams) {
+	var request ListAlarmsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListAlarms(ctx, request.(ListAlarmsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListAlarms")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListAlarmsResponseObject); ok {
+		if err := validResponse.VisitListAlarmsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // ListCommands operation middleware
@@ -4096,109 +4683,124 @@ func (sh *strictHandler) GetVersion(w http.ResponseWriter, r *http.Request) {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
-	"AAD//87Yy7sxswAA",
+	"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",
+	"GwAA//9t/c6kKNAAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

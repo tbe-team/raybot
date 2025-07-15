@@ -16,7 +16,7 @@ type DataBatteryVoltageLow struct {
 }
 
 func (a DataBatteryVoltageLow) Message() string {
-	return fmt.Sprintf("Battery voltage is low: %f", a.Voltage)
+	return fmt.Sprintf("Battery voltage is low: %.2f", a.Voltage)
 }
 
 func (DataBatteryVoltageLow) isAlarmData() {}
@@ -29,7 +29,7 @@ type DataBatteryVoltageHigh struct {
 func (DataBatteryVoltageHigh) isAlarmData() {}
 
 func (a DataBatteryVoltageHigh) Message() string {
-	return fmt.Sprintf("Battery voltage is high: %f", a.Voltage)
+	return fmt.Sprintf("Battery voltage is high: %.2f", a.Voltage)
 }
 
 type DataBatteryCellVoltageHigh struct {
@@ -106,7 +106,7 @@ type DataBatteryCurrentHigh struct {
 func (DataBatteryCurrentHigh) isAlarmData() {}
 
 func (a DataBatteryCurrentHigh) Message() string {
-	return fmt.Sprintf("Battery current is high: %f", a.Current)
+	return fmt.Sprintf("Battery current is high: %.2f", a.Current)
 }
 
 type DataBatteryTempHigh struct {
@@ -117,7 +117,7 @@ type DataBatteryTempHigh struct {
 func (DataBatteryTempHigh) isAlarmData() {}
 
 func (a DataBatteryTempHigh) Message() string {
-	return fmt.Sprintf("Battery temperature is high: %f", a.Temp)
+	return fmt.Sprintf("Battery temperature is high: %.2f", a.Temp)
 }
 
 type DataBatteryPercentLow struct {
@@ -128,7 +128,7 @@ type DataBatteryPercentLow struct {
 func (DataBatteryPercentLow) isAlarmData() {}
 
 func (a DataBatteryPercentLow) Message() string {
-	return fmt.Sprintf("Battery percent is low: %f", a.Percent)
+	return fmt.Sprintf("Battery percent is low: %.2f", a.Percent)
 }
 
 type DataBatteryHealthLow struct {
@@ -139,7 +139,7 @@ type DataBatteryHealthLow struct {
 func (DataBatteryHealthLow) isAlarmData() {}
 
 func (a DataBatteryHealthLow) Message() string {
-	return fmt.Sprintf("Battery health is low: %f", a.Health)
+	return fmt.Sprintf("Battery health is low: %.2f", a.Health)
 }
 
 func UnmarshalAlarmData(alarmType AlarmType, data []byte) (Data, error) {

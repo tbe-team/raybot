@@ -13,6 +13,7 @@ import (
 	"github.com/tbe-team/raybot/internal/handlers/http/gen"
 	"github.com/tbe-team/raybot/internal/handlers/http/middleware"
 	"github.com/tbe-team/raybot/internal/handlers/http/swagger"
+	"github.com/tbe-team/raybot/internal/services/alarm"
 	"github.com/tbe-team/raybot/internal/services/apperrorcode"
 	"github.com/tbe-team/raybot/internal/services/command"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
@@ -33,6 +34,7 @@ type Service struct {
 	commandService       command.Service
 	apperrorcodeService  apperrorcode.Service
 	limitSwitchService   limitswitch.Service
+	alarmService         alarm.Service
 }
 
 type CleanupFunc func(ctx context.Context) error
@@ -47,6 +49,7 @@ func New(
 	commandService command.Service,
 	apperrorcodeService apperrorcode.Service,
 	limitSwitchService limitswitch.Service,
+	alarmService alarm.Service,
 ) *Service {
 	return &Service{
 		cfg:                  cfg,
@@ -58,6 +61,7 @@ func New(
 		commandService:       commandService,
 		apperrorcodeService:  apperrorcodeService,
 		limitSwitchService:   limitSwitchService,
+		alarmService:         alarmService,
 	}
 }
 
@@ -132,6 +136,7 @@ type handler struct {
 	*peripheralHandler
 	*commandHandler
 	*stateHandler
+	*alarmHandler
 }
 
 func (s *Service) newHandler() *handler {
@@ -145,5 +150,6 @@ func (s *Service) newHandler() *handler {
 		peripheralHandler:    newPeripheralHandler(s.peripheralService),
 		commandHandler:       newCommandHandler(s.commandService),
 		stateHandler:         newStateHandler(s.limitSwitchService),
+		alarmHandler:         newAlarmHandler(s.alarmService),
 	}
 }
