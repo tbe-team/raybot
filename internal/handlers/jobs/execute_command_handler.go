@@ -37,13 +37,19 @@ func newExecuteCommandHandler(
 
 func (h *executeCommandHandler) Run(ctx context.Context) func() {
 	ctx, cancel := context.WithCancel(ctx)
+	stoppedCh := make(chan struct{})
 
-	go h.run(ctx)
+	go h.run(ctx, stoppedCh)
 
-	return cancel
+	return func() {
+		cancel()
+		<-stoppedCh
+	}
 }
 
-func (h *executeCommandHandler) run(ctx context.Context) {
+func (h *executeCommandHandler) run(ctx context.Context, stoppedCh chan struct{}) {
+	defer close(stoppedCh)
+
 	ch := make(chan struct{}, 1)
 
 	h.subscriber.Subscribe(ctx, events.CommandCreatedTopic, func(_ *eventbus.Message) {

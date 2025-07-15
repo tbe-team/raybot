@@ -1,5 +1,6 @@
 import type { AppConnection } from './app-connection'
 import type { Cargo, CargoDoorMotorState } from './cargo'
+import type { Led } from './led'
 
 export interface BatteryState {
   current: number
@@ -52,6 +53,11 @@ export interface LocationState {
   updatedAt: string
 }
 
+export interface Leds {
+  systemLed: Led
+  alertLed: Led
+}
+
 export interface RobotState {
   battery: BatteryState
   charge: ChargeState
@@ -63,4 +69,5 @@ export interface RobotState {
   cargo: Cargo
   cargoDoorMotor: CargoDoorMotorState
   appConnection: AppConnection
+  leds: Leds
 }

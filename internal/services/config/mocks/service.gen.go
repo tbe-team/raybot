@@ -23,6 +23,62 @@ func (_m *FakeService) EXPECT() *FakeService_Expecter {
 	return &FakeService_Expecter{mock: &_m.Mock}
 }
 
+// GetBatteryMonitoringConfig provides a mock function with given fields: ctx
+func (_m *FakeService) GetBatteryMonitoringConfig(ctx context.Context) (config.BatteryMonitoring, error) {
+	ret := _m.Called(ctx)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetBatteryMonitoringConfig")
+	}
+
+	var r0 config.BatteryMonitoring
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (config.BatteryMonitoring, error)); ok {
+		return rf(ctx)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) config.BatteryMonitoring); ok {
+		r0 = rf(ctx)
+	} else {
+		r0 = ret.Get(0).(config.BatteryMonitoring)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(ctx)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeService_GetBatteryMonitoringConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetBatteryMonitoringConfig'
+type FakeService_GetBatteryMonitoringConfig_Call struct {
+	*mock.Call
+}
+
+// GetBatteryMonitoringConfig is a helper method to define mock.On call
+//   - ctx context.Context
+func (_e *FakeService_Expecter) GetBatteryMonitoringConfig(ctx interface{}) *FakeService_GetBatteryMonitoringConfig_Call {
+	return &FakeService_GetBatteryMonitoringConfig_Call{Call: _e.mock.On("GetBatteryMonitoringConfig", ctx)}
+}
+
+func (_c *FakeService_GetBatteryMonitoringConfig_Call) Run(run func(ctx context.Context)) *FakeService_GetBatteryMonitoringConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *FakeService_GetBatteryMonitoringConfig_Call) Return(_a0 config.BatteryMonitoring, _a1 error) *FakeService_GetBatteryMonitoringConfig_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeService_GetBatteryMonitoringConfig_Call) RunAndReturn(run func(context.Context) (config.BatteryMonitoring, error)) *FakeService_GetBatteryMonitoringConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetCloudConfig provides a mock function with given fields: ctx
 func (_m *FakeService) GetCloudConfig(ctx context.Context) (config.Cloud, error) {
 	ret := _m.Called(ctx)
@@ -355,6 +411,63 @@ func (_c *FakeService_GetWifiConfig_Call) Return(_a0 config.Wifi, _a1 error) *Fa
 }
 
 func (_c *FakeService_GetWifiConfig_Call) RunAndReturn(run func(context.Context) (config.Wifi, error)) *FakeService_GetWifiConfig_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateBatteryMonitoringConfig provides a mock function with given fields: ctx, batteryMonitoringCfg
+func (_m *FakeService) UpdateBatteryMonitoringConfig(ctx context.Context, batteryMonitoringCfg config.BatteryMonitoring) (config.BatteryMonitoring, error) {
+	ret := _m.Called(ctx, batteryMonitoringCfg)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateBatteryMonitoringConfig")
+	}
+
+	var r0 config.BatteryMonitoring
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, config.BatteryMonitoring) (config.BatteryMonitoring, error)); ok {
+		return rf(ctx, batteryMonitoringCfg)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, config.BatteryMonitoring) config.BatteryMonitoring); ok {
+		r0 = rf(ctx, batteryMonitoringCfg)
+	} else {
+		r0 = ret.Get(0).(config.BatteryMonitoring)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, config.BatteryMonitoring) error); ok {
+		r1 = rf(ctx, batteryMonitoringCfg)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// FakeService_UpdateBatteryMonitoringConfig_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateBatteryMonitoringConfig'
+type FakeService_UpdateBatteryMonitoringConfig_Call struct {
+	*mock.Call
+}
+
+// UpdateBatteryMonitoringConfig is a helper method to define mock.On call
+//   - ctx context.Context
+//   - batteryMonitoringCfg config.BatteryMonitoring
+func (_e *FakeService_Expecter) UpdateBatteryMonitoringConfig(ctx interface{}, batteryMonitoringCfg interface{}) *FakeService_UpdateBatteryMonitoringConfig_Call {
+	return &FakeService_UpdateBatteryMonitoringConfig_Call{Call: _e.mock.On("UpdateBatteryMonitoringConfig", ctx, batteryMonitoringCfg)}
+}
+
+func (_c *FakeService_UpdateBatteryMonitoringConfig_Call) Run(run func(ctx context.Context, batteryMonitoringCfg config.BatteryMonitoring)) *FakeService_UpdateBatteryMonitoringConfig_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(config.BatteryMonitoring))
+	})
+	return _c
+}
+
+func (_c *FakeService_UpdateBatteryMonitoringConfig_Call) Return(_a0 config.BatteryMonitoring, _a1 error) *FakeService_UpdateBatteryMonitoringConfig_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *FakeService_UpdateBatteryMonitoringConfig_Call) RunAndReturn(run func(context.Context, config.BatteryMonitoring) (config.BatteryMonitoring, error)) *FakeService_UpdateBatteryMonitoringConfig_Call {
 	_c.Call.Return(run)
 	return _c
 }

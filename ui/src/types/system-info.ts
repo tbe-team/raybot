@@ -5,3 +5,9 @@ export interface SystemInfo {
   totalMemory: number
   uptime: number
 }
+
+export interface SystemStatusResponse {
+  status: SystemStatusType
+}
+
+export type SystemStatusType = 'NORMAL' | 'ERROR'

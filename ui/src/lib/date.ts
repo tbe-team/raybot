@@ -75,3 +75,10 @@ export function formatDuration(dateString: string): string {
   const duration = dayjs().diff(dayjs(dateString), 'second')
   return formatUptimeShort(duration)
 }
+
+export function getSecondsFromNow(dateString: string): number {
+  const inputTime = dayjs(dateString)
+  const now = dayjs()
+
+  return now.diff(inputTime, 'second')
+}

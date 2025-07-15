@@ -29,6 +29,8 @@ paths:
     $ref: "./paths/configs@wifi.yml"
   /configs/command:
     $ref: "./paths/configs@command.yml"
+  /configs/monitoring/battery:
+    $ref: "./paths/configs@monitoring@battery.yml"
   /system/info:
     $ref: "./paths/system@info.yml"
   /system/status:
@@ -51,3 +53,5 @@ paths:
     $ref: "./paths/commands@processing.yml"
   /commands/processing/cancel:
     $ref: "./paths/commands@processing@cancel.yml"
+  /alarms:
+    $ref: "./paths/alarms.yml"
