@@ -52,7 +52,7 @@ onUnmounted(() => {
       </CardTitle>
     </CardHeader>
     <CardContent>
-      <div class="gap-2 space-y-2 text-sm columns-2">
+      <div class="gap-2 space-y-2 text-sm columns-1 md:columns-2">
         <div class="grid grid-cols-2 gap-2">
           <span class="font-medium text-muted-foreground">Battery SOC</span>
           <span :class="getBatteryColor(props.battery.percent)">
