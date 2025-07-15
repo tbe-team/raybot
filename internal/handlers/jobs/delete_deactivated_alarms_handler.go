@@ -27,13 +27,19 @@ func newDeleteDeactivatedAlarmsHandler(
 
 func (h *deleteDeactivatedAlarmsHandler) Run(ctx context.Context) func() {
 	ctx, cancel := context.WithCancel(ctx)
+	stoppedCh := make(chan struct{})
 
-	go h.run(ctx)
+	go h.run(ctx, stoppedCh)
 
-	return cancel
+	return func() {
+		cancel()
+		<-stoppedCh
+	}
 }
 
-func (h *deleteDeactivatedAlarmsHandler) run(ctx context.Context) {
+func (h *deleteDeactivatedAlarmsHandler) run(ctx context.Context, stoppedCh chan struct{}) {
+	defer close(stoppedCh)
+
 	for {
 		select {
 		case <-ctx.Done():

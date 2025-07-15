@@ -3,6 +3,7 @@ package jobs
 import (
 	"context"
 	"log/slog"
+	"sync"
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/services/alarm"
@@ -42,14 +43,22 @@ func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
 	executeCommandHandler := newExecuteCommandHandler(s.log, s.commandService, s.subscriber)
 	deleteDeactivatedAlarmsHandler := newDeleteDeactivatedAlarmsHandler(s.log, s.alarmService)
 
-	cancelDeleteOldCommand := deleteOldCommandHandler.Run(ctx)
-	cancelExecuteCommand := executeCommandHandler.Run(ctx)
-	cancelDeleteDeactivatedAlarms := deleteDeactivatedAlarmsHandler.Run(ctx)
+	stopFuncs := []func(){}
+	stopFuncs = append(stopFuncs, deleteOldCommandHandler.Run(ctx))
+	stopFuncs = append(stopFuncs, executeCommandHandler.Run(ctx))
+	stopFuncs = append(stopFuncs, deleteDeactivatedAlarmsHandler.Run(ctx))
 
 	cleanup := func(_ context.Context) error {
-		cancelDeleteOldCommand()
-		cancelExecuteCommand()
-		cancelDeleteDeactivatedAlarms()
+		wg := sync.WaitGroup{}
+		for _, stopFunc := range stopFuncs {
+			wg.Add(1)
+			go func(stopFunc func()) {
+				defer wg.Done()
+				stopFunc()
+			}(stopFunc)
+		}
+
+		wg.Wait()
 
 		return nil
 	}
