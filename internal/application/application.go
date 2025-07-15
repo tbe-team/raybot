@@ -254,12 +254,10 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	systemInfoCollectorService := systeminfocollector.NewService(log, systemInfoRepository)
 	systemInfoCollectorService.Run(ctx)
 	alarmService := alarmimpl.NewService(log, validator, alarmRepository)
-	alarmService.Start(ctx)
 
 	cleanup := func() error {
 		var errs []error
 
-		alarmService.Stop()
 		systemInfoCollectorService.Stop()
 		appStateRepository.Cleanup()
 		if err := ledService.Stop(); err != nil {

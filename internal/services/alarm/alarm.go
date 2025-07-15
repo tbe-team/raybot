@@ -34,7 +34,7 @@ type DeactivateAlarmParams struct {
 type Service interface {
 	ListActiveAlarms(ctx context.Context, params ListActiveAlarmsParams) (paging.List[Alarm], error)
 	ListDeactiveAlarms(ctx context.Context, params ListDeactiveAlarmsParams) (paging.List[Alarm], error)
-	DeleteDeactiveAlarms(ctx context.Context) error
+	DeleteDeactivatedAlarms(ctx context.Context) error
 }
 
 type Repository interface {
@@ -43,5 +43,5 @@ type Repository interface {
 	CreateAlarm(ctx context.Context, params CreateAlarmParams) (Alarm, error)
 	DeactivateAlarm(ctx context.Context, params DeactivateAlarmParams) error
 	DeactivateAllAlarms(ctx context.Context) error
-	DeleteDeactiveAlarms(ctx context.Context) error
+	DeleteDeactivedAlarms(ctx context.Context) error
 }

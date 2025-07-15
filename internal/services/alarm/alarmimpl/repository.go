@@ -171,7 +171,7 @@ func (r Repository) DeactivateAllAlarms(ctx context.Context) error {
 	return nil
 }
 
-func (r Repository) DeleteDeactiveAlarms(ctx context.Context) error {
+func (r Repository) DeleteDeactivedAlarms(ctx context.Context) error {
 	if err := r.queries.AlarmDeleteDeactive(ctx, r.db); err != nil {
 		return fmt.Errorf("failed to delete deactive alarms: %w", err)
 	}

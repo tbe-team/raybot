@@ -5,9 +5,10 @@ package mocks
 import (
 	context "context"
 
+	alarm "github.com/tbe-team/raybot/internal/services/alarm"
+
 	mock "github.com/stretchr/testify/mock"
 
-	alarm "github.com/tbe-team/raybot/internal/services/alarm"
 	paging "github.com/tbe-team/raybot/pkg/paging"
 )
 
@@ -24,12 +25,12 @@ func (_m *FakeService) EXPECT() *FakeService_Expecter {
 	return &FakeService_Expecter{mock: &_m.Mock}
 }
 
-// DeleteDeactiveAlarms provides a mock function with given fields: ctx
-func (_m *FakeService) DeleteDeactiveAlarms(ctx context.Context) error {
+// DeleteDeactivatedAlarms provides a mock function with given fields: ctx
+func (_m *FakeService) DeleteDeactivatedAlarms(ctx context.Context) error {
 	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
-		panic("no return value specified for DeleteDeactiveAlarms")
+		panic("no return value specified for DeleteDeactivatedAlarms")
 	}
 
 	var r0 error
@@ -42,30 +43,30 @@ func (_m *FakeService) DeleteDeactiveAlarms(ctx context.Context) error {
 	return r0
 }
 
-// FakeService_DeleteDeactiveAlarms_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteDeactiveAlarms'
-type FakeService_DeleteDeactiveAlarms_Call struct {
+// FakeService_DeleteDeactivatedAlarms_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteDeactivatedAlarms'
+type FakeService_DeleteDeactivatedAlarms_Call struct {
 	*mock.Call
 }
 
-// DeleteDeactiveAlarms is a helper method to define mock.On call
+// DeleteDeactivatedAlarms is a helper method to define mock.On call
 //   - ctx context.Context
-func (_e *FakeService_Expecter) DeleteDeactiveAlarms(ctx interface{}) *FakeService_DeleteDeactiveAlarms_Call {
-	return &FakeService_DeleteDeactiveAlarms_Call{Call: _e.mock.On("DeleteDeactiveAlarms", ctx)}
+func (_e *FakeService_Expecter) DeleteDeactivatedAlarms(ctx interface{}) *FakeService_DeleteDeactivatedAlarms_Call {
+	return &FakeService_DeleteDeactivatedAlarms_Call{Call: _e.mock.On("DeleteDeactivatedAlarms", ctx)}
 }
 
-func (_c *FakeService_DeleteDeactiveAlarms_Call) Run(run func(ctx context.Context)) *FakeService_DeleteDeactiveAlarms_Call {
+func (_c *FakeService_DeleteDeactivatedAlarms_Call) Run(run func(ctx context.Context)) *FakeService_DeleteDeactivatedAlarms_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context))
 	})
 	return _c
 }
 
-func (_c *FakeService_DeleteDeactiveAlarms_Call) Return(_a0 error) *FakeService_DeleteDeactiveAlarms_Call {
+func (_c *FakeService_DeleteDeactivatedAlarms_Call) Return(_a0 error) *FakeService_DeleteDeactivatedAlarms_Call {
 	_c.Call.Return(_a0)
 	return _c
 }
 
-func (_c *FakeService_DeleteDeactiveAlarms_Call) RunAndReturn(run func(context.Context) error) *FakeService_DeleteDeactiveAlarms_Call {
+func (_c *FakeService_DeleteDeactivatedAlarms_Call) RunAndReturn(run func(context.Context) error) *FakeService_DeleteDeactivatedAlarms_Call {
 	_c.Call.Return(run)
 	return _c
 }

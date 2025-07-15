@@ -73,7 +73,7 @@ func (h alarmHandler) ListAlarms(ctx context.Context, req gen.ListAlarmsRequestO
 }
 
 func (h alarmHandler) DeleteDeactiveAlarms(ctx context.Context, _ gen.DeleteDeactiveAlarmsRequestObject) (gen.DeleteDeactiveAlarmsResponseObject, error) {
-	if err := h.alarmService.DeleteDeactiveAlarms(ctx); err != nil {
+	if err := h.alarmService.DeleteDeactivatedAlarms(ctx); err != nil {
 		return nil, fmt.Errorf("delete deactive alarms: %w", err)
 	}
 

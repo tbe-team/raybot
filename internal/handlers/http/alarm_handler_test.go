@@ -150,7 +150,7 @@ func TestAlarmHandler_ListAlarms(t *testing.T) {
 func TestAlarmHandler_DeleteDeactiveAlarms(t *testing.T) {
 	t.Run("Should delete deactive alarms successfully", func(t *testing.T) {
 		alarmService := alarmmocks.NewFakeService(t)
-		alarmService.EXPECT().DeleteDeactiveAlarms(mock.Anything).Return(nil)
+		alarmService.EXPECT().DeleteDeactivatedAlarms(mock.Anything).Return(nil)
 
 		h := SetupAPITestHandler(t, func(hs *Service) {
 			hs.alarmService = alarmService
@@ -165,7 +165,7 @@ func TestAlarmHandler_DeleteDeactiveAlarms(t *testing.T) {
 
 	t.Run("Should not able to delete deactive alarms if deleting failed", func(t *testing.T) {
 		alarmService := alarmmocks.NewFakeService(t)
-		alarmService.EXPECT().DeleteDeactiveAlarms(mock.Anything).
+		alarmService.EXPECT().DeleteDeactivatedAlarms(mock.Anything).
 			Return(errors.New("deleting failed"))
 
 		h := SetupAPITestHandler(t, func(hs *Service) {
