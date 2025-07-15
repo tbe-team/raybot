@@ -47,7 +47,7 @@ onUnmounted(() => {
         Battery
         <div v-if="batteryOutdated.isOutdated" class="flex gap-1 items-center text-warning">
           <TriangleAlert class="size-4" />
-          <span class="text-xs font-normal">{{ batteryOutdated.timeAgo || 'Outdated' }}</span>
+          <span class="text-xs font-normal">{{ `Last updated ${batteryOutdated.timeAgo}` || 'Outdated' }}</span>
         </div>
       </CardTitle>
     </CardHeader>

@@ -32,7 +32,7 @@ onUnmounted(() => {
         Distance Sensor
         <div v-if="distanceSensorOutdated.isOutdated" class="flex gap-1 items-center text-warning">
           <TriangleAlert class="size-4" />
-          <span class="text-xs font-normal">{{ distanceSensorOutdated.timeAgo || 'Outdated' }}</span>
+          <span class="text-xs font-normal">{{ `Last updated ${distanceSensorOutdated.timeAgo}` || 'Outdated' }}</span>
         </div>
       </CardTitle>
     </CardHeader>
