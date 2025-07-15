@@ -86,6 +86,14 @@ func (h configHandler) UpdateHardwareConfig(ctx context.Context, request gen.Upd
 			EnableACK:         request.Body.Pic.EnableAck,
 			CommandACKTimeout: time.Duration(request.Body.Pic.CommandAckTimeout) * time.Millisecond,
 		},
+		Leds: config.Leds{
+			System: config.Led{
+				Pin: request.Body.Leds.System.Pin,
+			},
+			Alert: config.Led{
+				Pin: request.Body.Leds.Alert.Pin,
+			},
+		},
 	})
 	if err != nil {
 		return nil, fmt.Errorf("config service update hardware config: %w", err)
@@ -281,6 +289,14 @@ func (h configHandler) convertHardwareConfigToResponse(cfg config.Hardware) gen.
 			Serial:            h.convertSerialConfigToResponse(cfg.ESP.Serial),
 			EnableAck:         cfg.ESP.EnableACK,
 			CommandAckTimeout: int(cfg.ESP.CommandACKTimeout.Milliseconds()),
+		},
+		Leds: gen.LedsConfig{
+			System: gen.LedConfig{
+				Pin: cfg.Leds.System.Pin,
+			},
+			Alert: gen.LedConfig{
+				Pin: cfg.Leds.Alert.Pin,
+			},
 		},
 	}
 }

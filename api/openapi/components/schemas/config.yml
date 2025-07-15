@@ -94,11 +94,17 @@ HardwareConfig:
   properties:
     esp:
       $ref: "#/ESPConfig"
+      x-order: 1
     pic:
       $ref: "#/PICConfig"
+      x-order: 2
+    leds:
+      $ref: "#/LedsConfig"
+      x-order: 3
   required:
     - esp
     - pic
+    - leds
 
 PICConfig:
   type: object
@@ -593,4 +599,28 @@ BatteryHealthLowConfig:
   required:
     - enable
     - threshold
+
+LedsConfig:
+  type: object
+  properties:
+    system:
+      $ref: "#/LedConfig"
+      x-order: 1
+    alert:
+      $ref: "#/LedConfig"
+      x-order: 2
+  required:
+    - system
+    - alert
+
+LedConfig:
+  type: object
+  properties:
+    pin:
+      type: string
+      example: "GPIO2"
+      description: The GPIO pin for the LED
+      x-order: 1
+  required:
+    - pin
 

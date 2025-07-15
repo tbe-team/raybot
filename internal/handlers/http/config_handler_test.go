@@ -166,6 +166,14 @@ func TestConfigHandler_UpdateHardwareConfig(t *testing.T) {
 			},
 			CommandAckTimeout: 10,
 		},
+		Leds: gen.LedsConfig{
+			System: gen.LedConfig{
+				Pin: "GPIO2",
+			},
+			Alert: gen.LedConfig{
+				Pin: "GPIO3",
+			},
+		},
 	}
 
 	t.Run("Should update hardware config successfully", func(t *testing.T) {
