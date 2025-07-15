@@ -1,9 +1,10 @@
 import type { Reactive } from 'vue'
-import { getSecondsFromNow } from '@/lib/date'
+import { formatUptimeShort, getSecondsFromNow } from '@/lib/date'
 
 export interface Outdated {
   isOutdated: boolean
   timeoutId: number | null
+  timeAgo?: string
 }
 
 export function setOutdated(
@@ -14,6 +15,7 @@ export function setOutdated(
   const diff = getSecondsFromNow(updatedAt)
   if (diff > threshold) {
     outdated.isOutdated = true
+    outdated.timeAgo = `${formatUptimeShort(diff)} ago`
   }
   else {
     if (outdated.timeoutId) {
@@ -25,6 +27,7 @@ export function setOutdated(
     }, (threshold - diff) * 1000)
 
     outdated.isOutdated = false
+    outdated.timeAgo = undefined
   }
 }
 

@@ -90,8 +90,8 @@ const { data: robotState, isPending, isError, error } = useQueryRobotState({
         </div>
       </div>
       <div class="flex flex-col gap-4">
-        <div class="space-y-4 columns-1 md:columns-2">
-          <BatteryContent class="break-inside-avoid" :battery="robotState.battery" :charge="robotState.charge" :discharge="robotState.discharge" />
+        <BatteryContent class="break-inside-avoid" :battery="robotState.battery" :charge="robotState.charge" :discharge="robotState.discharge" />
+        <div class="space-y-4 columns-1 md:columns-3">
           <DriveMotorContent class="break-inside-avoid" :drive-motor="robotState.driveMotor" />
           <LiftMotorContent class="break-inside-avoid" :lift-motor="robotState.liftMotor" />
           <DistanceSensorContent class="break-inside-avoid" :distance-sensor="robotState.distanceSensor" />

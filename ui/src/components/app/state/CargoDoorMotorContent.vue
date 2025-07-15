@@ -33,7 +33,7 @@ onUnmounted(() => {
         Cargo Door Motor
         <div v-if="cargoDoorMotorOutdated.isOutdated" class="flex gap-1 items-center text-warning">
           <TriangleAlert class="size-4" />
-          <span class="text-xs font-normal">Outdated</span>
+          <span class="text-xs font-normal">{{ cargoDoorMotorOutdated.timeAgo || 'Outdated' }}</span>
         </div>
       </CardTitle>
     </CardHeader>

@@ -30,7 +30,7 @@ watch(() => props.driveMotor.updatedAt, (newVal) => {
         Drive Motor
         <div v-if="driveMotorOutdated.isOutdated" class="flex gap-1 items-center text-warning">
           <TriangleAlert class="size-4" />
-          <span class="text-xs font-normal">Outdated</span>
+          <span class="text-xs font-normal">{{ driveMotorOutdated.timeAgo || 'Outdated' }}</span>
         </div>
       </CardTitle>
     </CardHeader>
