@@ -178,6 +178,31 @@ func (s *service) UpdateCommandConfig(ctx context.Context, commandCfg config.Com
 	return commandCfg, nil
 }
 
+func (s *service) GetBatteryMonitoringConfig(_ context.Context) (config.BatteryMonitoring, error) {
+	s.mu.RLock()
+	defer s.mu.RUnlock()
+	return s.cfg.Monitoring.Battery, nil
+}
+
+func (s *service) UpdateBatteryMonitoringConfig(ctx context.Context, batteryMonitoringCfg config.BatteryMonitoring) (config.BatteryMonitoring, error) {
+	if err := batteryMonitoringCfg.Validate(); err != nil {
+		return config.BatteryMonitoring{}, xerror.ValidationFailed(err, "invalid battery monitoring config")
+	}
+
+	cfg := *s.cfg
+	cfg.Monitoring.Battery = batteryMonitoringCfg
+
+	if err := s.writeConfig(ctx, cfg); err != nil {
+		return config.BatteryMonitoring{}, fmt.Errorf("write config: %w", err)
+	}
+
+	s.mu.Lock()
+	s.cfg = &cfg
+	s.mu.Unlock()
+
+	return batteryMonitoringCfg, nil
+}
+
 func (s *service) writeConfig(ctx context.Context, cfg config.Config) error {
 	writer, err := s.fileClient.Write(ctx, s.cfg.ConfigFilePath)
 	if err != nil {

@@ -58,6 +58,10 @@ packages:
     config:
     interfaces:
       Service:
+  github.com/tbe-team/raybot/internal/services/alarm:
+    config:
+    interfaces:
+      Service:
   github.com/tbe-team/raybot/pkg/eventbus:
     config:
     interfaces:

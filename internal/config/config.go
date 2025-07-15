@@ -8,13 +8,14 @@ import (
 )
 
 type Config struct {
-	Log      Log      `yaml:"log"`
-	Hardware Hardware `yaml:"hardware"`
-	Cloud    Cloud    `yaml:"cloud"`
-	HTTP     HTTP     `yaml:"http"`
-	Wifi     Wifi     `yaml:"wifi"`
-	Cron     Cron     `yaml:"cron"`
-	Command  Command  `yaml:"command"`
+	Log        Log        `yaml:"log"`
+	Hardware   Hardware   `yaml:"hardware"`
+	Cloud      Cloud      `yaml:"cloud"`
+	HTTP       HTTP       `yaml:"http"`
+	Wifi       Wifi       `yaml:"wifi"`
+	Cron       Cron       `yaml:"cron"`
+	Command    Command    `yaml:"command"`
+	Monitoring Monitoring `yaml:"monitoring"`
 
 	ConfigFilePath string `yaml:"-"`
 	DBPath         string `yaml:"-"`
@@ -47,6 +48,10 @@ func (c *Config) Validate() error {
 
 	if err := c.Command.Validate(); err != nil {
 		return fmt.Errorf("validate command: %w", err)
+	}
+
+	if err := c.Monitoring.Validate(); err != nil {
+		return fmt.Errorf("validate monitoring: %w", err)
 	}
 
 	return nil

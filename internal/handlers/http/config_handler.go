@@ -198,6 +198,61 @@ func (h configHandler) UpdateCommandConfig(ctx context.Context, req gen.UpdateCo
 	return gen.UpdateCommandConfig200JSONResponse(h.convertCommandConfigToResponse(cfg)), nil
 }
 
+func (h configHandler) GetBatteryMonitoringConfig(ctx context.Context, _ gen.GetBatteryMonitoringConfigRequestObject) (gen.GetBatteryMonitoringConfigResponseObject, error) {
+	cfg, err := h.configService.GetBatteryMonitoringConfig(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("config service get battery monitoring config: %w", err)
+	}
+
+	return gen.GetBatteryMonitoringConfig200JSONResponse(h.convertBatteryMonitoringConfigToResponse(cfg)), nil
+}
+
+func (h configHandler) UpdateBatteryMonitoringConfig(ctx context.Context, request gen.UpdateBatteryMonitoringConfigRequestObject) (gen.UpdateBatteryMonitoringConfigResponseObject, error) {
+	cfg, err := h.configService.UpdateBatteryMonitoringConfig(ctx, config.BatteryMonitoring{
+		BatteryVoltageLow: config.BatteryVoltageLow{
+			Enable:    request.Body.VoltageLow.Enable,
+			Threshold: request.Body.VoltageLow.Threshold,
+		},
+		BatteryVoltageHigh: config.BatteryVoltageHigh{
+			Enable:    request.Body.VoltageHigh.Enable,
+			Threshold: request.Body.VoltageHigh.Threshold,
+		},
+		BatteryCellVoltageHigh: config.BatteryCellVoltageHigh{
+			Enable:    request.Body.CellVoltageHigh.Enable,
+			Threshold: request.Body.CellVoltageHigh.Threshold,
+		},
+		BatteryCellVoltageLow: config.BatteryCellVoltageLow{
+			Enable:    request.Body.CellVoltageLow.Enable,
+			Threshold: request.Body.CellVoltageLow.Threshold,
+		},
+		BatteryCellVoltageDiff: config.BatteryCellVoltageDiff{
+			Enable:    request.Body.CellVoltageDiff.Enable,
+			Threshold: request.Body.CellVoltageDiff.Threshold,
+		},
+		BatteryCurrentHigh: config.BatteryCurrentHigh{
+			Enable:    request.Body.CurrentHigh.Enable,
+			Threshold: request.Body.CurrentHigh.Threshold,
+		},
+		BatteryTempHigh: config.BatteryTempHigh{
+			Enable:    request.Body.TempHigh.Enable,
+			Threshold: request.Body.TempHigh.Threshold,
+		},
+		BatteryPercentLow: config.BatteryPercentLow{
+			Enable:    request.Body.PercentLow.Enable,
+			Threshold: request.Body.PercentLow.Threshold,
+		},
+		BatteryHealthLow: config.BatteryHealthLow{
+			Enable:    request.Body.HealthLow.Enable,
+			Threshold: request.Body.HealthLow.Threshold,
+		},
+	})
+	if err != nil {
+		return nil, fmt.Errorf("config service update battery monitoring config: %w", err)
+	}
+
+	return gen.UpdateBatteryMonitoringConfig200JSONResponse(h.convertBatteryMonitoringConfigToResponse(cfg)), nil
+}
+
 func (configHandler) convertLogConfigToResponse(cfg config.Log) gen.LogConfig {
 	return gen.LogConfig{
 		File: gen.LogFileHandler{
@@ -350,6 +405,47 @@ func (configHandler) convertCommandConfigToResponse(cfg config.Command) gen.Comm
 				EnterDistance: cfg.CargoLower.BottomObstacleTracking.EnterDistance,
 				ExitDistance:  cfg.CargoLower.BottomObstacleTracking.ExitDistance,
 			},
+		},
+	}
+}
+
+func (configHandler) convertBatteryMonitoringConfigToResponse(cfg config.BatteryMonitoring) gen.BatteryMonitoringConfig {
+	return gen.BatteryMonitoringConfig{
+		VoltageLow: gen.BatteryVoltageLowConfig{
+			Enable:    cfg.BatteryVoltageLow.Enable,
+			Threshold: cfg.BatteryVoltageLow.Threshold,
+		},
+		VoltageHigh: gen.BatteryVoltageHighConfig{
+			Enable:    cfg.BatteryVoltageHigh.Enable,
+			Threshold: cfg.BatteryVoltageHigh.Threshold,
+		},
+		CellVoltageHigh: gen.BatteryCellVoltageHighConfig{
+			Enable:    cfg.BatteryCellVoltageHigh.Enable,
+			Threshold: cfg.BatteryCellVoltageHigh.Threshold,
+		},
+		CellVoltageLow: gen.BatteryCellVoltageLowConfig{
+			Enable:    cfg.BatteryCellVoltageLow.Enable,
+			Threshold: cfg.BatteryCellVoltageLow.Threshold,
+		},
+		CellVoltageDiff: gen.BatteryCellVoltageDiffConfig{
+			Enable:    cfg.BatteryCellVoltageDiff.Enable,
+			Threshold: cfg.BatteryCellVoltageDiff.Threshold,
+		},
+		CurrentHigh: gen.BatteryCurrentHighConfig{
+			Enable:    cfg.BatteryCurrentHigh.Enable,
+			Threshold: cfg.BatteryCurrentHigh.Threshold,
+		},
+		TempHigh: gen.BatteryTempHighConfig{
+			Enable:    cfg.BatteryTempHigh.Enable,
+			Threshold: cfg.BatteryTempHigh.Threshold,
+		},
+		PercentLow: gen.BatteryPercentLowConfig{
+			Enable:    cfg.BatteryPercentLow.Enable,
+			Threshold: cfg.BatteryPercentLow.Threshold,
+		},
+		HealthLow: gen.BatteryHealthLowConfig{
+			Enable:    cfg.BatteryHealthLow.Enable,
+			Threshold: cfg.BatteryHealthLow.Threshold,
 		},
 	}
 }

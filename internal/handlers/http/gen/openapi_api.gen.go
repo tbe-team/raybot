@@ -22,6 +22,12 @@ import (
 	strictnethttp "github.com/oapi-codegen/runtime/strictmiddleware/nethttp"
 )
 
+// Defines values for ListAlarmsParamsStatus.
+const (
+	ListAlarmsParamsStatusActive   ListAlarmsParamsStatus = "ACTIVE"
+	ListAlarmsParamsStatusDeactive ListAlarmsParamsStatus = "DEACTIVE"
+)
+
 // APConfig defines model for APConfig.
 type APConfig struct {
 	// Enable Whether to enable the AP mode
@@ -37,12 +43,115 @@ type APConfig struct {
 	Ip string `json:"ip"`
 }
 
+// AlarmData defines model for AlarmData.
+type AlarmData struct {
+	union json.RawMessage
+}
+
+// AlarmResponse defines model for AlarmResponse.
+type AlarmResponse struct {
+	// Id The id of the alarm
+	Id int64 `json:"id"`
+
+	// Type The type of alarm
+	Type AlarmType `json:"type"`
+
+	// Message The alarm message
+	Message string    `json:"message"`
+	Data    AlarmData `json:"data"`
+
+	// ActivatedAt The activation date of the alarm
+	ActivatedAt time.Time `json:"activatedAt"`
+
+	// DeactivatedAt The deactivation date of the alarm
+	DeactivatedAt *time.Time `json:"deactivatedAt"`
+}
+
+// AlarmType The type of alarm
+type AlarmType = string
+
+// AlarmsListResponse defines model for AlarmsListResponse.
+type AlarmsListResponse struct {
+	// TotalItems The total number of alarms
+	TotalItems int `json:"totalItems"`
+
+	// Items The list of alarms
+	Items []AlarmResponse `json:"items"`
+}
+
 // AppConnection defines model for AppConnection.
 type AppConnection struct {
 	CloudConnection     CloudConnection     `json:"cloudConnection"`
 	EspSerialConnection ESPSerialConnection `json:"espSerialConnection"`
 	PicSerialConnection PICSerialConnection `json:"picSerialConnection"`
 	RfidUsbConnection   RFIDUSBConnection   `json:"rfidUsbConnection"`
+}
+
+// BatteryCellVoltageDiffConfig defines model for BatteryCellVoltageDiffConfig.
+type BatteryCellVoltageDiffConfig struct {
+	// Enable Whether to enable battery cell voltage difference monitoring
+	Enable bool `json:"enable"`
+
+	// Threshold The threshold voltage difference between cells for alert (V)
+	Threshold float64 `json:"threshold"`
+}
+
+// BatteryCellVoltageHighConfig defines model for BatteryCellVoltageHighConfig.
+type BatteryCellVoltageHighConfig struct {
+	// Enable Whether to enable battery cell voltage high monitoring
+	Enable bool `json:"enable"`
+
+	// Threshold The threshold voltage value for high battery cell voltage alert (V)
+	Threshold float64 `json:"threshold"`
+}
+
+// BatteryCellVoltageLowConfig defines model for BatteryCellVoltageLowConfig.
+type BatteryCellVoltageLowConfig struct {
+	// Enable Whether to enable battery cell voltage low monitoring
+	Enable bool `json:"enable"`
+
+	// Threshold The threshold voltage value for low battery cell voltage alert (V)
+	Threshold float64 `json:"threshold"`
+}
+
+// BatteryCurrentHighConfig defines model for BatteryCurrentHighConfig.
+type BatteryCurrentHighConfig struct {
+	// Enable Whether to enable battery current high monitoring
+	Enable bool `json:"enable"`
+
+	// Threshold The threshold current value for high battery current alert (A)
+	Threshold float64 `json:"threshold"`
+}
+
+// BatteryHealthLowConfig defines model for BatteryHealthLowConfig.
+type BatteryHealthLowConfig struct {
+	// Enable Whether to enable battery health low monitoring
+	Enable bool `json:"enable"`
+
+	// Threshold The threshold health value for low battery health alert (%)
+	Threshold float64 `json:"threshold"`
+}
+
+// BatteryMonitoringConfig defines model for BatteryMonitoringConfig.
+type BatteryMonitoringConfig struct {
+	VoltageLow      BatteryVoltageLowConfig      `json:"voltageLow"`
+	VoltageHigh     BatteryVoltageHighConfig     `json:"voltageHigh"`
+	CellVoltageHigh BatteryCellVoltageHighConfig `json:"cellVoltageHigh"`
+	CellVoltageLow  BatteryCellVoltageLowConfig  `json:"cellVoltageLow"`
+	CellVoltageDiff BatteryCellVoltageDiffConfig `json:"cellVoltageDiff"`
+	CurrentHigh     BatteryCurrentHighConfig     `json:"currentHigh"`
+	TempHigh        BatteryTempHighConfig        `json:"tempHigh"`
+	PercentLow      BatteryPercentLowConfig      `json:"percentLow"`
+	HealthLow       BatteryHealthLowConfig       `json:"healthLow"`
+}
+
+// BatteryPercentLowConfig defines model for BatteryPercentLowConfig.
+type BatteryPercentLowConfig struct {
+	// Enable Whether to enable battery percentage low monitoring
+	Enable bool `json:"enable"`
+
+	// Threshold The threshold percentage value for low battery percentage alert (%)
+	Threshold float64 `json:"threshold"`
 }
 
 // BatteryState defines model for BatteryState.
@@ -70,6 +179,33 @@ type BatteryState struct {
 
 	// UpdatedAt The updated at time of the battery
 	UpdatedAt time.Time `json:"updatedAt"`
+}
+
+// BatteryTempHighConfig defines model for BatteryTempHighConfig.
+type BatteryTempHighConfig struct {
+	// Enable Whether to enable battery temperature high monitoring
+	Enable bool `json:"enable"`
+
+	// Threshold The threshold temperature value for high battery temperature alert (°C)
+	Threshold float64 `json:"threshold"`
+}
+
+// BatteryVoltageHighConfig defines model for BatteryVoltageHighConfig.
+type BatteryVoltageHighConfig struct {
+	// Enable Whether to enable battery voltage high monitoring
+	Enable bool `json:"enable"`
+
+	// Threshold The threshold voltage value for high battery voltage alert (V)
+	Threshold float64 `json:"threshold"`
+}
+
+// BatteryVoltageLowConfig defines model for BatteryVoltageLowConfig.
+type BatteryVoltageLowConfig struct {
+	// Enable Whether to enable battery voltage low monitoring
+	Enable bool `json:"enable"`
+
+	// Threshold The threshold voltage value for low battery voltage alert (V)
+	Threshold float64 `json:"threshold"`
 }
 
 // BottomObstacleTracking defines model for BottomObstacleTracking.
@@ -290,6 +426,96 @@ type CreateCommandRequest struct {
 	// Type The type of command
 	Type   CommandType   `json:"type"`
 	Inputs CommandInputs `json:"inputs"`
+}
+
+// DataBatteryCellVoltageDiff defines model for DataBatteryCellVoltageDiff.
+type DataBatteryCellVoltageDiff struct {
+	// Threshold The voltage difference threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// CellVoltages The voltage readings from all battery cells
+	CellVoltages []float64 `json:"cellVoltages"`
+
+	// DiffIndex Indices of cells with voltage difference exceeding threshold
+	DiffIndex []int `json:"diffIndex"`
+}
+
+// DataBatteryCellVoltageHigh defines model for DataBatteryCellVoltageHigh.
+type DataBatteryCellVoltageHigh struct {
+	// Threshold The cell voltage threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// CellVoltages The voltage readings from all battery cells
+	CellVoltages []float64 `json:"cellVoltages"`
+
+	// OverThresholdIndex Indices of cells that exceeded the threshold
+	OverThresholdIndex []int `json:"overThresholdIndex"`
+}
+
+// DataBatteryCellVoltageLow defines model for DataBatteryCellVoltageLow.
+type DataBatteryCellVoltageLow struct {
+	// Threshold The cell voltage threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// CellVoltages The voltage readings from all battery cells
+	CellVoltages []float64 `json:"cellVoltages"`
+
+	// UnderThresholdIndex Indices of cells that fell below the threshold
+	UnderThresholdIndex []int `json:"underThresholdIndex"`
+}
+
+// DataBatteryCurrentHigh defines model for DataBatteryCurrentHigh.
+type DataBatteryCurrentHigh struct {
+	// Threshold The current threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Current The actual current that triggered the alarm
+	Current float64 `json:"current"`
+}
+
+// DataBatteryHealthLow defines model for DataBatteryHealthLow.
+type DataBatteryHealthLow struct {
+	// Threshold The battery health threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Health The actual battery health that triggered the alarm
+	Health float64 `json:"health"`
+}
+
+// DataBatteryPercentLow defines model for DataBatteryPercentLow.
+type DataBatteryPercentLow struct {
+	// Threshold The battery percentage threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Percent The actual battery percentage that triggered the alarm
+	Percent float64 `json:"percent"`
+}
+
+// DataBatteryTempHigh defines model for DataBatteryTempHigh.
+type DataBatteryTempHigh struct {
+	// Threshold The temperature threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Temp The actual temperature that triggered the alarm
+	Temp float64 `json:"temp"`
+}
+
+// DataBatteryVoltageHigh defines model for DataBatteryVoltageHigh.
+type DataBatteryVoltageHigh struct {
+	// Threshold The voltage threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Voltage The actual voltage that triggered the alarm
+	Voltage float64 `json:"voltage"`
+}
+
+// DataBatteryVoltageLow defines model for DataBatteryVoltageLow.
+type DataBatteryVoltageLow struct {
+	// Threshold The voltage threshold that triggered the alarm
+	Threshold float64 `json:"threshold"`
+
+	// Voltage The actual voltage that triggered the alarm
+	Voltage float64 `json:"voltage"`
 }
 
 // DischargeState defines model for DischargeState.
@@ -722,6 +948,23 @@ type Page = uint
 // PageSize defines model for PageSize.
 type PageSize = uint
 
+// ListAlarmsParams defines parameters for ListAlarms.
+type ListAlarmsParams struct {
+	// Page The page number
+	Page *Page `form:"page,omitempty" json:"page,omitempty"`
+
+	// PageSize The number of items per page
+	PageSize *PageSize `form:"pageSize,omitempty" json:"pageSize,omitempty"`
+
+	// Status Filter alarms by status. Required parameter. Allowed values:
+	//   - ACTIVE
+	//   - DEACTIVE
+	Status ListAlarmsParamsStatus `form:"status" json:"status"`
+}
+
+// ListAlarmsParamsStatus defines parameters for ListAlarms.
+type ListAlarmsParamsStatus string
+
 // ListCommandsParams defines parameters for ListCommands.
 type ListCommandsParams struct {
 	// Page The page number
@@ -766,8 +1009,255 @@ type UpdateHTTPConfigJSONRequestBody = HTTPConfig
 // UpdateLogConfigJSONRequestBody defines body for UpdateLogConfig for application/json ContentType.
 type UpdateLogConfigJSONRequestBody = LogConfig
 
+// UpdateBatteryMonitoringConfigJSONRequestBody defines body for UpdateBatteryMonitoringConfig for application/json ContentType.
+type UpdateBatteryMonitoringConfigJSONRequestBody = BatteryMonitoringConfig
+
 // UpdateWifiConfigJSONRequestBody defines body for UpdateWifiConfig for application/json ContentType.
 type UpdateWifiConfigJSONRequestBody = WifiConfig
+
+// AsDataBatteryVoltageLow returns the union data inside the AlarmData as a DataBatteryVoltageLow
+func (t AlarmData) AsDataBatteryVoltageLow() (DataBatteryVoltageLow, error) {
+	var body DataBatteryVoltageLow
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryVoltageLow overwrites any union data inside the AlarmData as the provided DataBatteryVoltageLow
+func (t *AlarmData) FromDataBatteryVoltageLow(v DataBatteryVoltageLow) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryVoltageLow performs a merge with any union data inside the AlarmData, using the provided DataBatteryVoltageLow
+func (t *AlarmData) MergeDataBatteryVoltageLow(v DataBatteryVoltageLow) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryVoltageHigh returns the union data inside the AlarmData as a DataBatteryVoltageHigh
+func (t AlarmData) AsDataBatteryVoltageHigh() (DataBatteryVoltageHigh, error) {
+	var body DataBatteryVoltageHigh
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryVoltageHigh overwrites any union data inside the AlarmData as the provided DataBatteryVoltageHigh
+func (t *AlarmData) FromDataBatteryVoltageHigh(v DataBatteryVoltageHigh) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryVoltageHigh performs a merge with any union data inside the AlarmData, using the provided DataBatteryVoltageHigh
+func (t *AlarmData) MergeDataBatteryVoltageHigh(v DataBatteryVoltageHigh) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryCellVoltageHigh returns the union data inside the AlarmData as a DataBatteryCellVoltageHigh
+func (t AlarmData) AsDataBatteryCellVoltageHigh() (DataBatteryCellVoltageHigh, error) {
+	var body DataBatteryCellVoltageHigh
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryCellVoltageHigh overwrites any union data inside the AlarmData as the provided DataBatteryCellVoltageHigh
+func (t *AlarmData) FromDataBatteryCellVoltageHigh(v DataBatteryCellVoltageHigh) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryCellVoltageHigh performs a merge with any union data inside the AlarmData, using the provided DataBatteryCellVoltageHigh
+func (t *AlarmData) MergeDataBatteryCellVoltageHigh(v DataBatteryCellVoltageHigh) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryCellVoltageLow returns the union data inside the AlarmData as a DataBatteryCellVoltageLow
+func (t AlarmData) AsDataBatteryCellVoltageLow() (DataBatteryCellVoltageLow, error) {
+	var body DataBatteryCellVoltageLow
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryCellVoltageLow overwrites any union data inside the AlarmData as the provided DataBatteryCellVoltageLow
+func (t *AlarmData) FromDataBatteryCellVoltageLow(v DataBatteryCellVoltageLow) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryCellVoltageLow performs a merge with any union data inside the AlarmData, using the provided DataBatteryCellVoltageLow
+func (t *AlarmData) MergeDataBatteryCellVoltageLow(v DataBatteryCellVoltageLow) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryCellVoltageDiff returns the union data inside the AlarmData as a DataBatteryCellVoltageDiff
+func (t AlarmData) AsDataBatteryCellVoltageDiff() (DataBatteryCellVoltageDiff, error) {
+	var body DataBatteryCellVoltageDiff
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryCellVoltageDiff overwrites any union data inside the AlarmData as the provided DataBatteryCellVoltageDiff
+func (t *AlarmData) FromDataBatteryCellVoltageDiff(v DataBatteryCellVoltageDiff) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryCellVoltageDiff performs a merge with any union data inside the AlarmData, using the provided DataBatteryCellVoltageDiff
+func (t *AlarmData) MergeDataBatteryCellVoltageDiff(v DataBatteryCellVoltageDiff) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryCurrentHigh returns the union data inside the AlarmData as a DataBatteryCurrentHigh
+func (t AlarmData) AsDataBatteryCurrentHigh() (DataBatteryCurrentHigh, error) {
+	var body DataBatteryCurrentHigh
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryCurrentHigh overwrites any union data inside the AlarmData as the provided DataBatteryCurrentHigh
+func (t *AlarmData) FromDataBatteryCurrentHigh(v DataBatteryCurrentHigh) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryCurrentHigh performs a merge with any union data inside the AlarmData, using the provided DataBatteryCurrentHigh
+func (t *AlarmData) MergeDataBatteryCurrentHigh(v DataBatteryCurrentHigh) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryTempHigh returns the union data inside the AlarmData as a DataBatteryTempHigh
+func (t AlarmData) AsDataBatteryTempHigh() (DataBatteryTempHigh, error) {
+	var body DataBatteryTempHigh
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryTempHigh overwrites any union data inside the AlarmData as the provided DataBatteryTempHigh
+func (t *AlarmData) FromDataBatteryTempHigh(v DataBatteryTempHigh) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryTempHigh performs a merge with any union data inside the AlarmData, using the provided DataBatteryTempHigh
+func (t *AlarmData) MergeDataBatteryTempHigh(v DataBatteryTempHigh) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryPercentLow returns the union data inside the AlarmData as a DataBatteryPercentLow
+func (t AlarmData) AsDataBatteryPercentLow() (DataBatteryPercentLow, error) {
+	var body DataBatteryPercentLow
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryPercentLow overwrites any union data inside the AlarmData as the provided DataBatteryPercentLow
+func (t *AlarmData) FromDataBatteryPercentLow(v DataBatteryPercentLow) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryPercentLow performs a merge with any union data inside the AlarmData, using the provided DataBatteryPercentLow
+func (t *AlarmData) MergeDataBatteryPercentLow(v DataBatteryPercentLow) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+// AsDataBatteryHealthLow returns the union data inside the AlarmData as a DataBatteryHealthLow
+func (t AlarmData) AsDataBatteryHealthLow() (DataBatteryHealthLow, error) {
+	var body DataBatteryHealthLow
+	err := json.Unmarshal(t.union, &body)
+	return body, err
+}
+
+// FromDataBatteryHealthLow overwrites any union data inside the AlarmData as the provided DataBatteryHealthLow
+func (t *AlarmData) FromDataBatteryHealthLow(v DataBatteryHealthLow) error {
+	b, err := json.Marshal(v)
+	t.union = b
+	return err
+}
+
+// MergeDataBatteryHealthLow performs a merge with any union data inside the AlarmData, using the provided DataBatteryHealthLow
+func (t *AlarmData) MergeDataBatteryHealthLow(v DataBatteryHealthLow) error {
+	b, err := json.Marshal(v)
+	if err != nil {
+		return err
+	}
+
+	merged, err := runtime.JSONMerge(t.union, b)
+	t.union = merged
+	return err
+}
+
+func (t AlarmData) MarshalJSON() ([]byte, error) {
+	b, err := t.union.MarshalJSON()
+	return b, err
+}
+
+func (t *AlarmData) UnmarshalJSON(b []byte) error {
+	err := t.union.UnmarshalJSON(b)
+	return err
+}
 
 // AsStopInputs returns the union data inside the CommandInputs as a StopInputs
 func (t CommandInputs) AsStopInputs() (StopInputs, error) {
@@ -1363,6 +1853,12 @@ func (t *CommandOutputs) UnmarshalJSON(b []byte) error {
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
+	// Delete all deactive alarms
+	// (DELETE /alarms)
+	DeleteDeactiveAlarms(w http.ResponseWriter, r *http.Request)
+	// List alarms
+	// (GET /alarms)
+	ListAlarms(w http.ResponseWriter, r *http.Request, params ListAlarmsParams)
 	// List all commands
 	// (GET /commands)
 	ListCommands(w http.ResponseWriter, r *http.Request, params ListCommandsParams)
@@ -1411,6 +1907,12 @@ type ServerInterface interface {
 	// Update the log configuration
 	// (PUT /configs/log)
 	UpdateLogConfig(w http.ResponseWriter, r *http.Request)
+	// Get the battery monitoring configuration
+	// (GET /configs/monitoring/battery)
+	GetBatteryMonitoringConfig(w http.ResponseWriter, r *http.Request)
+	// Update the battery monitoring configuration
+	// (PUT /configs/monitoring/battery)
+	UpdateBatteryMonitoringConfig(w http.ResponseWriter, r *http.Request)
 	// Get the wifi configuration
 	// (GET /configs/wifi)
 	GetWifiConfig(w http.ResponseWriter, r *http.Request)
@@ -1452,6 +1954,18 @@ type ServerInterface interface {
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
 
 type Unimplemented struct{}
+
+// Delete all deactive alarms
+// (DELETE /alarms)
+func (_ Unimplemented) DeleteDeactiveAlarms(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// List alarms
+// (GET /alarms)
+func (_ Unimplemented) ListAlarms(w http.ResponseWriter, r *http.Request, params ListAlarmsParams) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
 
 // List all commands
 // (GET /commands)
@@ -1549,6 +2063,18 @@ func (_ Unimplemented) UpdateLogConfig(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
+// Get the battery monitoring configuration
+// (GET /configs/monitoring/battery)
+func (_ Unimplemented) GetBatteryMonitoringConfig(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Update the battery monitoring configuration
+// (PUT /configs/monitoring/battery)
+func (_ Unimplemented) UpdateBatteryMonitoringConfig(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
 // Get the wifi configuration
 // (GET /configs/wifi)
 func (_ Unimplemented) GetWifiConfig(w http.ResponseWriter, r *http.Request) {
@@ -1629,6 +2155,70 @@ type ServerInterfaceWrapper struct {
 }
 
 type MiddlewareFunc func(http.Handler) http.Handler
+
+// DeleteDeactiveAlarms operation middleware
+func (siw *ServerInterfaceWrapper) DeleteDeactiveAlarms(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.DeleteDeactiveAlarms(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ListAlarms operation middleware
+func (siw *ServerInterfaceWrapper) ListAlarms(w http.ResponseWriter, r *http.Request) {
+
+	var err error
+
+	// Parameter object where we will unmarshal all parameters from the context
+	var params ListAlarmsParams
+
+	// ------------- Optional query parameter "page" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "page", r.URL.Query(), &params.Page)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "page", Err: err})
+		return
+	}
+
+	// ------------- Optional query parameter "pageSize" -------------
+
+	err = runtime.BindQueryParameter("form", true, false, "pageSize", r.URL.Query(), &params.PageSize)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "pageSize", Err: err})
+		return
+	}
+
+	// ------------- Required query parameter "status" -------------
+
+	if paramValue := r.URL.Query().Get("status"); paramValue != "" {
+
+	} else {
+		siw.ErrorHandlerFunc(w, r, &RequiredParamError{ParamName: "status"})
+		return
+	}
+
+	err = runtime.BindQueryParameter("form", true, true, "status", r.URL.Query(), &params.Status)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "status", Err: err})
+		return
+	}
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ListAlarms(w, r, params)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
 
 // ListCommands operation middleware
 func (siw *ServerInterfaceWrapper) ListCommands(w http.ResponseWriter, r *http.Request) {
@@ -1904,6 +2494,34 @@ func (siw *ServerInterfaceWrapper) UpdateLogConfig(w http.ResponseWriter, r *htt
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.UpdateLogConfig(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetBatteryMonitoringConfig operation middleware
+func (siw *ServerInterfaceWrapper) GetBatteryMonitoringConfig(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetBatteryMonitoringConfig(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// UpdateBatteryMonitoringConfig operation middleware
+func (siw *ServerInterfaceWrapper) UpdateBatteryMonitoringConfig(w http.ResponseWriter, r *http.Request) {
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.UpdateBatteryMonitoringConfig(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -2195,6 +2813,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	}
 
 	r.Group(func(r chi.Router) {
+		r.Delete(options.BaseURL+"/alarms", wrapper.DeleteDeactiveAlarms)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/alarms", wrapper.ListAlarms)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/commands", wrapper.ListCommands)
 	})
 	r.Group(func(r chi.Router) {
@@ -2243,6 +2867,12 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 		r.Put(options.BaseURL+"/configs/log", wrapper.UpdateLogConfig)
 	})
 	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/configs/monitoring/battery", wrapper.GetBatteryMonitoringConfig)
+	})
+	r.Group(func(r chi.Router) {
+		r.Put(options.BaseURL+"/configs/monitoring/battery", wrapper.UpdateBatteryMonitoringConfig)
+	})
+	r.Group(func(r chi.Router) {
 		r.Get(options.BaseURL+"/configs/wifi", wrapper.GetWifiConfig)
 	})
 	r.Group(func(r chi.Router) {
@@ -2280,6 +2910,56 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 
 	return r
+}
+
+type DeleteDeactiveAlarmsRequestObject struct {
+}
+
+type DeleteDeactiveAlarmsResponseObject interface {
+	VisitDeleteDeactiveAlarmsResponse(w http.ResponseWriter) error
+}
+
+type DeleteDeactiveAlarms204Response struct {
+}
+
+func (response DeleteDeactiveAlarms204Response) VisitDeleteDeactiveAlarmsResponse(w http.ResponseWriter) error {
+	w.WriteHeader(204)
+	return nil
+}
+
+type DeleteDeactiveAlarms400JSONResponse ErrorResponse
+
+func (response DeleteDeactiveAlarms400JSONResponse) VisitDeleteDeactiveAlarmsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListAlarmsRequestObject struct {
+	Params ListAlarmsParams
+}
+
+type ListAlarmsResponseObject interface {
+	VisitListAlarmsResponse(w http.ResponseWriter) error
+}
+
+type ListAlarms200JSONResponse AlarmsListResponse
+
+func (response ListAlarms200JSONResponse) VisitListAlarmsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ListAlarms400JSONResponse ErrorResponse
+
+func (response ListAlarms400JSONResponse) VisitListAlarmsResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type ListCommandsRequestObject struct {
@@ -2689,6 +3369,57 @@ func (response UpdateLogConfig400JSONResponse) VisitUpdateLogConfigResponse(w ht
 	return json.NewEncoder(w).Encode(response)
 }
 
+type GetBatteryMonitoringConfigRequestObject struct {
+}
+
+type GetBatteryMonitoringConfigResponseObject interface {
+	VisitGetBatteryMonitoringConfigResponse(w http.ResponseWriter) error
+}
+
+type GetBatteryMonitoringConfig200JSONResponse BatteryMonitoringConfig
+
+func (response GetBatteryMonitoringConfig200JSONResponse) VisitGetBatteryMonitoringConfigResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetBatteryMonitoringConfig400JSONResponse ErrorResponse
+
+func (response GetBatteryMonitoringConfig400JSONResponse) VisitGetBatteryMonitoringConfigResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateBatteryMonitoringConfigRequestObject struct {
+	Body *UpdateBatteryMonitoringConfigJSONRequestBody
+}
+
+type UpdateBatteryMonitoringConfigResponseObject interface {
+	VisitUpdateBatteryMonitoringConfigResponse(w http.ResponseWriter) error
+}
+
+type UpdateBatteryMonitoringConfig200JSONResponse BatteryMonitoringConfig
+
+func (response UpdateBatteryMonitoringConfig200JSONResponse) VisitUpdateBatteryMonitoringConfigResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type UpdateBatteryMonitoringConfig400JSONResponse ErrorResponse
+
+func (response UpdateBatteryMonitoringConfig400JSONResponse) VisitUpdateBatteryMonitoringConfigResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 type GetWifiConfigRequestObject struct {
 }
 
@@ -2990,6 +3721,12 @@ func (response GetVersion400JSONResponse) VisitGetVersionResponse(w http.Respons
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
+	// Delete all deactive alarms
+	// (DELETE /alarms)
+	DeleteDeactiveAlarms(ctx context.Context, request DeleteDeactiveAlarmsRequestObject) (DeleteDeactiveAlarmsResponseObject, error)
+	// List alarms
+	// (GET /alarms)
+	ListAlarms(ctx context.Context, request ListAlarmsRequestObject) (ListAlarmsResponseObject, error)
 	// List all commands
 	// (GET /commands)
 	ListCommands(ctx context.Context, request ListCommandsRequestObject) (ListCommandsResponseObject, error)
@@ -3038,6 +3775,12 @@ type StrictServerInterface interface {
 	// Update the log configuration
 	// (PUT /configs/log)
 	UpdateLogConfig(ctx context.Context, request UpdateLogConfigRequestObject) (UpdateLogConfigResponseObject, error)
+	// Get the battery monitoring configuration
+	// (GET /configs/monitoring/battery)
+	GetBatteryMonitoringConfig(ctx context.Context, request GetBatteryMonitoringConfigRequestObject) (GetBatteryMonitoringConfigResponseObject, error)
+	// Update the battery monitoring configuration
+	// (PUT /configs/monitoring/battery)
+	UpdateBatteryMonitoringConfig(ctx context.Context, request UpdateBatteryMonitoringConfigRequestObject) (UpdateBatteryMonitoringConfigResponseObject, error)
 	// Get the wifi configuration
 	// (GET /configs/wifi)
 	GetWifiConfig(ctx context.Context, request GetWifiConfigRequestObject) (GetWifiConfigResponseObject, error)
@@ -3103,6 +3846,56 @@ type strictHandler struct {
 	ssi         StrictServerInterface
 	middlewares []StrictMiddlewareFunc
 	options     StrictHTTPServerOptions
+}
+
+// DeleteDeactiveAlarms operation middleware
+func (sh *strictHandler) DeleteDeactiveAlarms(w http.ResponseWriter, r *http.Request) {
+	var request DeleteDeactiveAlarmsRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.DeleteDeactiveAlarms(ctx, request.(DeleteDeactiveAlarmsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "DeleteDeactiveAlarms")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(DeleteDeactiveAlarmsResponseObject); ok {
+		if err := validResponse.VisitDeleteDeactiveAlarmsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ListAlarms operation middleware
+func (sh *strictHandler) ListAlarms(w http.ResponseWriter, r *http.Request, params ListAlarmsParams) {
+	var request ListAlarmsRequestObject
+
+	request.Params = params
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ListAlarms(ctx, request.(ListAlarmsRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ListAlarms")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ListAlarmsResponseObject); ok {
+		if err := validResponse.VisitListAlarmsResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
 }
 
 // ListCommands operation middleware
@@ -3537,6 +4330,61 @@ func (sh *strictHandler) UpdateLogConfig(w http.ResponseWriter, r *http.Request)
 	}
 }
 
+// GetBatteryMonitoringConfig operation middleware
+func (sh *strictHandler) GetBatteryMonitoringConfig(w http.ResponseWriter, r *http.Request) {
+	var request GetBatteryMonitoringConfigRequestObject
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetBatteryMonitoringConfig(ctx, request.(GetBatteryMonitoringConfigRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetBatteryMonitoringConfig")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetBatteryMonitoringConfigResponseObject); ok {
+		if err := validResponse.VisitGetBatteryMonitoringConfigResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// UpdateBatteryMonitoringConfig operation middleware
+func (sh *strictHandler) UpdateBatteryMonitoringConfig(w http.ResponseWriter, r *http.Request) {
+	var request UpdateBatteryMonitoringConfigRequestObject
+
+	var body UpdateBatteryMonitoringConfigJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.UpdateBatteryMonitoringConfig(ctx, request.(UpdateBatteryMonitoringConfigRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "UpdateBatteryMonitoringConfig")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(UpdateBatteryMonitoringConfigResponseObject); ok {
+		if err := validResponse.VisitUpdateBatteryMonitoringConfigResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
 // GetWifiConfig operation middleware
 func (sh *strictHandler) GetWifiConfig(w http.ResponseWriter, r *http.Request) {
 	var request GetWifiConfigRequestObject
@@ -3835,101 +4683,124 @@ func (sh *strictHandler) GetVersion(w http.ResponseWriter, r *http.Request) {
 // Base64 encoded, gzipped, json marshaled Swagger object
 var swaggerSpec = []string{
 
-	"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",
+	"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",
+	"GwAA//9t/c6kKNAAAA==",
 }
 
 // GetSwagger returns the content of the embedded swagger specification file

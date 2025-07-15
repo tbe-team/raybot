@@ -14,7 +14,7 @@ func IsUniqueViolationError(err error, constraint string) bool {
 		return false
 	}
 
-	var sqliteErr *sqlite3.Error
+	var sqliteErr sqlite3.Error
 	if errors.As(err, &sqliteErr) && sqliteErr.Code == sqlite3.ErrConstraint {
 		return strings.Contains(sqliteErr.Error(), constraint)
 	}

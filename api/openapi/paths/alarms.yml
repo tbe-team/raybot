@@ -1,0 +1,55 @@
+get:
+  summary: List alarms
+  operationId: listAlarms
+  description: List alarms filtered by status
+  tags:
+    - alarms
+  parameters:
+    - $ref: "../components/parameters/paging.yml#/Page"
+    - $ref: "../components/parameters/paging.yml#/PageSize"
+    - name: status
+      in: query
+      description: >
+        Filter alarms by status.
+        Required parameter.
+        Allowed values:
+          - ACTIVE
+          - DEACTIVE
+      required: true
+      schema:
+        type: string
+        enum:
+          - ACTIVE
+          - DEACTIVE
+        x-enum-varnames:
+          - ListAlarmsParamsStatusActive
+          - ListAlarmsParamsStatusDeactive
+  responses:
+    "200":
+      description: A list of alarms
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/alarm.yml#/AlarmsListResponse"
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
+
+delete:
+  summary: Delete all deactive alarms
+  operationId: deleteDeactiveAlarms
+  description: Delete all deactive alarms
+  tags:
+    - alarms
+  responses:
+    "204":
+      description: All deactive alarms deleted successfully
+    "400":
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"
