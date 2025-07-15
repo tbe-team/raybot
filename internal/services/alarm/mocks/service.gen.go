@@ -71,6 +71,53 @@ func (_c *FakeService_DeleteDeactivatedAlarms_Call) RunAndReturn(run func(contex
 	return _c
 }
 
+// DeleteDeactivatedAlarmsByThreshold provides a mock function with given fields: ctx, params
+func (_m *FakeService) DeleteDeactivatedAlarmsByThreshold(ctx context.Context, params alarm.DeleteDeactivatedAlarmsByThresholdParams) error {
+	ret := _m.Called(ctx, params)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteDeactivatedAlarmsByThreshold")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, alarm.DeleteDeactivatedAlarmsByThresholdParams) error); ok {
+		r0 = rf(ctx, params)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeService_DeleteDeactivatedAlarmsByThreshold_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteDeactivatedAlarmsByThreshold'
+type FakeService_DeleteDeactivatedAlarmsByThreshold_Call struct {
+	*mock.Call
+}
+
+// DeleteDeactivatedAlarmsByThreshold is a helper method to define mock.On call
+//   - ctx context.Context
+//   - params alarm.DeleteDeactivatedAlarmsByThresholdParams
+func (_e *FakeService_Expecter) DeleteDeactivatedAlarmsByThreshold(ctx interface{}, params interface{}) *FakeService_DeleteDeactivatedAlarmsByThreshold_Call {
+	return &FakeService_DeleteDeactivatedAlarmsByThreshold_Call{Call: _e.mock.On("DeleteDeactivatedAlarmsByThreshold", ctx, params)}
+}
+
+func (_c *FakeService_DeleteDeactivatedAlarmsByThreshold_Call) Run(run func(ctx context.Context, params alarm.DeleteDeactivatedAlarmsByThresholdParams)) *FakeService_DeleteDeactivatedAlarmsByThreshold_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(alarm.DeleteDeactivatedAlarmsByThresholdParams))
+	})
+	return _c
+}
+
+func (_c *FakeService_DeleteDeactivatedAlarmsByThreshold_Call) Return(_a0 error) *FakeService_DeleteDeactivatedAlarmsByThreshold_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeService_DeleteDeactivatedAlarmsByThreshold_Call) RunAndReturn(run func(context.Context, alarm.DeleteDeactivatedAlarmsByThresholdParams) error) *FakeService_DeleteDeactivatedAlarmsByThreshold_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListActiveAlarms provides a mock function with given fields: ctx, params
 func (_m *FakeService) ListActiveAlarms(ctx context.Context, params alarm.ListActiveAlarmsParams) (paging.List[alarm.Alarm], error) {
 	ret := _m.Called(ctx, params)

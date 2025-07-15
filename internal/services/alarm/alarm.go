@@ -31,10 +31,15 @@ type DeactivateAlarmParams struct {
 	DeactivatedAt time.Time `validate:"required"`
 }
 
+type DeleteDeactivatedAlarmsByThresholdParams struct {
+	Threshold time.Time `validate:"required"`
+}
+
 type Service interface {
 	ListActiveAlarms(ctx context.Context, params ListActiveAlarmsParams) (paging.List[Alarm], error)
 	ListDeactiveAlarms(ctx context.Context, params ListDeactiveAlarmsParams) (paging.List[Alarm], error)
 	DeleteDeactivatedAlarms(ctx context.Context) error
+	DeleteDeactivatedAlarmsByThreshold(ctx context.Context, params DeleteDeactivatedAlarmsByThresholdParams) error
 }
 
 type Repository interface {
@@ -43,5 +48,6 @@ type Repository interface {
 	CreateAlarm(ctx context.Context, params CreateAlarmParams) (Alarm, error)
 	DeactivateAlarm(ctx context.Context, params DeactivateAlarmParams) error
 	DeactivateAllAlarms(ctx context.Context) error
-	DeleteDeactivedAlarms(ctx context.Context) error
+	DeleteDeactivatedAlarms(ctx context.Context) error
+	DeleteDeactivatedAlarmsByThreshold(ctx context.Context, threshold time.Time) error
 }

@@ -163,17 +163,27 @@ func (r Repository) DeactivateAlarm(ctx context.Context, params alarm.Deactivate
 }
 
 func (r Repository) DeactivateAllAlarms(ctx context.Context) error {
-	if err := r.queries.AlarmDeactivateAll(ctx, r.db,
+	if err := r.queries.AlarmDeactivateAllActivated(ctx, r.db,
 		ptr.New(time.Now().Format(time.RFC3339Nano)),
 	); err != nil {
-		return fmt.Errorf("failed to deactivate all alarms: %w", err)
+		return fmt.Errorf("failed to deactivate all activated alarms: %w", err)
 	}
 	return nil
 }
 
-func (r Repository) DeleteDeactivedAlarms(ctx context.Context) error {
-	if err := r.queries.AlarmDeleteDeactive(ctx, r.db); err != nil {
-		return fmt.Errorf("failed to delete deactive alarms: %w", err)
+func (r Repository) DeleteDeactivatedAlarms(ctx context.Context) error {
+	if err := r.queries.AlarmDeleteDeactivated(ctx, r.db); err != nil {
+		return fmt.Errorf("failed to delete deactivated alarms: %w", err)
+	}
+
+	return nil
+}
+
+func (r Repository) DeleteDeactivatedAlarmsByThreshold(ctx context.Context, threshold time.Time) error {
+	if err := r.queries.AlarmDeleteDeactivatedByThreshold(ctx, r.db,
+		ptr.New(threshold.Format(time.RFC3339Nano)),
+	); err != nil {
+		return fmt.Errorf("failed to delete deactivated alarms by threshold time: %w", err)
 	}
 
 	return nil

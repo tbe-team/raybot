@@ -8,7 +8,10 @@ import (
 	"github.com/tbe-team/raybot/internal/services/alarm"
 )
 
-const deleteDeactivatedAlarmsInterval = 24 * time.Hour
+const (
+	deleteDeactivatedAlarmsInterval  = 24 * time.Hour
+	deleteDeactivatedAlarmsThreshold = 7 * 24 * time.Hour
+)
 
 type deleteDeactivatedAlarmsHandler struct {
 	log          *slog.Logger
@@ -46,7 +49,11 @@ func (h *deleteDeactivatedAlarmsHandler) run(ctx context.Context, stoppedCh chan
 			return
 
 		case <-time.After(deleteDeactivatedAlarmsInterval):
-			if err := h.alarmService.DeleteDeactivatedAlarms(ctx); err != nil {
+			if err := h.alarmService.DeleteDeactivatedAlarmsByThreshold(ctx,
+				alarm.DeleteDeactivatedAlarmsByThresholdParams{
+					Threshold: time.Now().Add(-deleteDeactivatedAlarmsThreshold),
+				},
+			); err != nil {
 				h.log.Error("failed to delete deactivated alarms", slog.Any("error", err))
 			}
 		}

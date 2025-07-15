@@ -84,23 +84,34 @@ func (q *Queries) AlarmDeactivate(ctx context.Context, db DBTX, arg AlarmDeactiv
 	return err
 }
 
-const alarmDeactivateAll = `-- name: AlarmDeactivateAll :exec
+const alarmDeactivateAllActivated = `-- name: AlarmDeactivateAllActivated :exec
 UPDATE alarms
 SET deactivated_at = ?1
-`
-
-func (q *Queries) AlarmDeactivateAll(ctx context.Context, db DBTX, deactivatedAt *string) error {
-	_, err := db.ExecContext(ctx, alarmDeactivateAll, deactivatedAt)
-	return err
-}
-
-const alarmDeleteDeactive = `-- name: AlarmDeleteDeactive :exec
-DELETE FROM alarms
 WHERE deactivated_at IS NULL
 `
 
-func (q *Queries) AlarmDeleteDeactive(ctx context.Context, db DBTX) error {
-	_, err := db.ExecContext(ctx, alarmDeleteDeactive)
+func (q *Queries) AlarmDeactivateAllActivated(ctx context.Context, db DBTX, deactivatedAt *string) error {
+	_, err := db.ExecContext(ctx, alarmDeactivateAllActivated, deactivatedAt)
+	return err
+}
+
+const alarmDeleteDeactivated = `-- name: AlarmDeleteDeactivated :exec
+DELETE FROM alarms
+WHERE deactivated_at IS NOT NULL
+`
+
+func (q *Queries) AlarmDeleteDeactivated(ctx context.Context, db DBTX) error {
+	_, err := db.ExecContext(ctx, alarmDeleteDeactivated)
+	return err
+}
+
+const alarmDeleteDeactivatedByThreshold = `-- name: AlarmDeleteDeactivatedByThreshold :exec
+DELETE FROM alarms
+WHERE deactivated_at < ?1
+`
+
+func (q *Queries) AlarmDeleteDeactivatedByThreshold(ctx context.Context, db DBTX, threshold *string) error {
+	_, err := db.ExecContext(ctx, alarmDeleteDeactivatedByThreshold, threshold)
 	return err
 }
 

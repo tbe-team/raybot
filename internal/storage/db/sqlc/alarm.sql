@@ -44,10 +44,15 @@ UPDATE alarms
 SET deactivated_at = @deactivated_at
 WHERE id = @id;
 
--- name: AlarmDeactivateAll :exec
+-- name: AlarmDeactivateAllActivated :exec
 UPDATE alarms
-SET deactivated_at = @deactivated_at;
-
--- name: AlarmDeleteDeactive :exec
-DELETE FROM alarms
+SET deactivated_at = @deactivated_at
 WHERE deactivated_at IS NULL;
+
+-- name: AlarmDeleteDeactivated :exec
+DELETE FROM alarms
+WHERE deactivated_at IS NOT NULL;
+
+-- name: AlarmDeleteDeactivatedByThreshold :exec
+DELETE FROM alarms
+WHERE deactivated_at < @threshold;
