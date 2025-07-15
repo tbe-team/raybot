@@ -4,6 +4,7 @@ import { Moon, Pause, Sun } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { useSystemStopEmergencyMutation } from '@/composables/use-system'
 import { useConfirmationStore } from '@/stores/confirmation-store'
+import AlarmButton from './AlarmButton.vue'
 
 const { store } = useColorMode()
 
@@ -33,11 +34,13 @@ function handleEmergencyStop() {
 </script>
 
 <template>
-  <div class="flex items-center gap-2">
+  <div class="flex gap-2 items-center">
     <Button class="text-destructive" variant="ghost" @click="handleEmergencyStop">
       <Pause class="w-4 h-4" />
       STOP EMERGENCY
     </Button>
+
+    <AlarmButton />
 
     <Button
       class="rounded-lg bg-muted hover:bg-muted-hover"

@@ -29,6 +29,18 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'Command history' },
       },
       {
+        path: 'alarm',
+        name: 'alarm',
+        component: () => import('@/views/AlarmView.vue'),
+        meta: { title: 'Alarm' },
+      },
+      {
+        path: 'monitoring',
+        name: 'monitor',
+        component: () => import('@/views/MonitoringView.vue'),
+        meta: { title: 'Monitor' },
+      },
+      {
         path: 'settings',
         name: 'settings',
         component: () => import('@/views/SettingsView.vue'),

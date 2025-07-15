@@ -82,3 +82,42 @@ export interface STAConfig {
   password: string
   ip: string
 }
+
+export interface MonitoringConfig {
+  voltageLow: {
+    enable: boolean
+    threshold: number
+  }
+  voltageHigh: {
+    enable: boolean
+    threshold: number
+  }
+  cellVoltageHigh: {
+    enable: boolean
+    threshold: number
+  }
+  cellVoltageLow: {
+    enable: boolean
+    threshold: number
+  }
+  cellVoltageDiff: {
+    enable: boolean
+    threshold: number
+  }
+  currentHigh: {
+    enable: boolean
+    threshold: number
+  }
+  tempHigh: {
+    enable: boolean
+    threshold: number
+  }
+  percentLow: {
+    enable: boolean
+    threshold: number
+  }
+  healthLow: {
+    enable: boolean
+    threshold: number
+  }
+}

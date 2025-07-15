@@ -1,9 +1,11 @@
 import type { Item } from './Navigation.vue'
 import {
+  Bell,
   ChartBarBig,
   Command,
   FileText,
   LayoutList,
+  Monitor,
   Power,
   Settings2,
 } from 'lucide-vue-next'
@@ -23,6 +25,16 @@ export const menus: Item[] = [
     title: 'Commands history',
     path: '/command-history',
     icon: Command,
+  },
+  {
+    title: 'Alarm',
+    path: '/alarm',
+    icon: Bell,
+  },
+  {
+    title: 'Monitoring',
+    path: '/monitoring',
+    icon: Monitor,
   },
   {
     title: 'Settings',

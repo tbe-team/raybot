@@ -1,4 +1,5 @@
-import { useMutation, useQuery } from '@tanstack/vue-query'
+import type { MonitoringConfig } from '@/types/config'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
 import configAPI from '@/api/config'
 
 export const LOG_CONFIG_QUERY_KEY = 'logConfig'
@@ -82,5 +83,23 @@ export function useCommandConfigQuery() {
 export function useCommandConfigMutation() {
   return useMutation({
     mutationFn: configAPI.updateCommandConfig,
+  })
+}
+
+export function useMonitoringConfigQuery() {
+  return useQuery({
+    queryKey: ['config', 'monitoring'],
+    queryFn: () => configAPI.getMonitoringBatteryConfig(),
+  })
+}
+
+export function useMonitoringConfigMutation() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: (config: MonitoringConfig) => configAPI.updateMonitoringBatteryConfig(config),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['config', 'monitoring'] })
+    },
   })
 }

@@ -65,3 +65,13 @@ export function formatUptimeShort(seconds: number): string {
 
   return parts.join(' ')
 }
+
+/**
+ * Converts a date string to a human-readable duration string.
+ * @param dateString - The date string to convert.
+ * @returns A string representing the duration since the given date.
+ */
+export function formatDuration(dateString: string): string {
+  const duration = dayjs().diff(dayjs(dateString), 'second')
+  return formatUptimeShort(duration)
+}
