@@ -1,7 +1,6 @@
 import type { ColumnDef } from '@tanstack/vue-table'
 import type { Alarm } from '@/types/alarm'
 import { formatDate, formatDuration } from '@/lib/date'
-import AlarmMessageIcon from './AlarmMessageIcon.vue'
 
 export const columns: ColumnDef<Alarm>[] = [
   {
@@ -12,12 +11,7 @@ export const columns: ColumnDef<Alarm>[] = [
   {
     accessorKey: 'message',
     header: () => h('div', { class: 'text-xs' }, 'Message'),
-    cell: ({ row }) => h('div', { class: 'flex gap-2 items-center' }, [
-      h(AlarmMessageIcon, {}, {
-        default: () => row.original.message,
-      }),
-      h('span', null, row.original.message),
-    ]),
+    cell: ({ row }) => h('div', { class: 'max-w-96' }, row.original.message),
   },
   {
     accessorKey: 'activatedAt',

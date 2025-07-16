@@ -1,17 +1,36 @@
 <script setup lang="ts">
-import AlarmActiveTab from '@/components/app/alarm/AlarmActiveTab.vue'
-import AlarmHistoryTab from '@/components/app/alarm/AlarmHistoryTab.vue'
+import type { AlarmStatus } from '@/api/alarm'
+import AlarmActiveTab from '@/components/app/alarm/AlarmActiveTabContent.vue'
+import AlarmHistoryTab from '@/components/app/alarm/AlarmHistoryTabContent.vue'
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { useAlarmsQuery } from '@/composables/use-alarm'
 
 const route = useRoute()
 const router = useRouter()
 const page = ref(Number(route.query.page) || 1)
 const pageSize = ref(Number(route.query.pageSize) || 10)
-const tab = route.query.tab as string | undefined ?? 'active'
+const tab = ref(route.query.tab as string | undefined ?? 'active')
+const status = computed<AlarmStatus>(() => tab.value === 'history' ? 'DEACTIVE' : 'ACTIVE')
+
+const { data, isFetching, isPending, isError, error, refetch } = useAlarmsQuery(page, pageSize, status)
 
 function handleTabChange(value: string | number) {
+  tab.value = value.toString()
+  page.value = 1
+  pageSize.value = 10
   router.replace({ query: { tab: value } })
+}
+
+function handlePageChange(p: number) {
+  page.value = p
+  router.replace({ query: { ...route.query, page: p.toString() } })
+}
+
+function handlePageSizeChange(ps: number) {
+  pageSize.value = ps
+  page.value = 1
+  router.replace({ query: { ...route.query, pageSize: ps.toString(), page: '1' } })
 }
 </script>
 
@@ -36,10 +55,34 @@ function handleTabChange(value: string | number) {
       </TabsList>
 
       <TabsContent value="active">
-        <AlarmActiveTab v-model:page="page" v-model:page-size="pageSize" />
+        <AlarmActiveTab
+          :page="page"
+          :page-size="pageSize"
+          :data="data?.items ?? []"
+          :total-items="data?.totalItems ?? 0"
+          :is-fetching="isFetching"
+          :is-pending="isPending"
+          :is-error="isError"
+          :error="error"
+          @update:page="handlePageChange"
+          @update:page-size="handlePageSizeChange"
+          @update:data="refetch"
+        />
       </TabsContent>
       <TabsContent value="history">
-        <AlarmHistoryTab v-model:page="page" v-model:page-size="pageSize" />
+        <AlarmHistoryTab
+          :page="page"
+          :page-size="pageSize"
+          :data="data?.items ?? []"
+          :total-items="data?.totalItems ?? 0"
+          :is-fetching="isFetching"
+          :is-pending="isPending"
+          :is-error="isError"
+          :error="error"
+          @update:page="handlePageChange"
+          @update:page-size="handlePageSizeChange"
+          @update:data="refetch"
+        />
       </TabsContent>
     </Tabs>
   </PageContainer>
