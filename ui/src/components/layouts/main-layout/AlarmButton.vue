@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/tooltip'
 import { useCountAlarmsActivedQuery } from '@/composables/use-alarm'
 
-const REFRESH_INTERVAL = 1000
+const REFRESH_INTERVAL = 5000
 const router = useRouter()
 const { data, isError } = useCountAlarmsActivedQuery({
   axiosOpts: { doNotShowLoading: true },
@@ -33,6 +33,9 @@ const { data, isError } = useCountAlarmsActivedQuery({
       <TooltipContent>
         <p v-if="data && data.count > 0">
           The system has {{ data.count }} alert. Click to view
+        </p>
+        <p v-if="data && data.count === 0">
+          No alarm found
         </p>
         <p v-else-if="isError">
           Failed to load alarms

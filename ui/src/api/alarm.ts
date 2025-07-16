@@ -1,5 +1,5 @@
 import type { AxiosRequestConfig } from 'axios'
-import type { Alarm, CountAlarmsActivedResponse } from '@/types/alarm'
+import type { Alarm } from '@/types/alarm'
 import type { Paging } from '@/types/paging'
 import http from '@/lib/http'
 
@@ -12,11 +12,6 @@ export interface AlarmParams {
 }
 
 const alarmAPI = {
-  getCountAlarmsActived: (axiosOpts?: AxiosRequestConfig): Promise<CountAlarmsActivedResponse> => {
-    // return http.get('/alarms/count/actived', axiosOpts)
-    return Promise.resolve({ count: 5 })
-  },
-
   getAlarms: (params: AlarmParams, axiosOpts?: AxiosRequestConfig): Promise<Paging<Alarm>> => {
     return http.get('/alarms', {
       params,

@@ -9,8 +9,9 @@ export const ALARMS_QUERY_KEY = 'alarms'
 export function useCountAlarmsActivedQuery(opts?: { axiosOpts?: Partial<AxiosRequestConfig>, refetchInterval?: number }) {
   return useQuery({
     queryKey: [COUNT_ALARMS_ACTIVED_QUERY_KEY],
-    queryFn: () => alarmAPI.getCountAlarmsActived(opts?.axiosOpts),
+    queryFn: () => alarmAPI.getAlarms({ page: 1, pageSize: 1, status: 'ACTIVE' }, opts?.axiosOpts),
     refetchInterval: opts?.refetchInterval,
+    select: data => ({ count: data.totalItems }),
   })
 }
 

@@ -80,7 +80,3 @@ export interface Alarm<T extends AlarmType = AlarmType> {
   activatedAt: string
   deactivatedAt?: string
 }
-
-export interface CountAlarmsActivedResponse {
-  count: number
-}
