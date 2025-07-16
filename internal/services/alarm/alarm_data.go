@@ -11,6 +11,11 @@ type Data interface {
 	Message() string
 }
 
+type BatteryData interface {
+	Data
+	isBatteryData()
+}
+
 type DataBatteryVoltageLow struct {
 	Threshold float64 `json:"threshold"`
 	Voltage   float64 `json:"voltage"`
@@ -26,6 +31,8 @@ func (a DataBatteryVoltageLow) Message() string {
 
 func (DataBatteryVoltageLow) isAlarmData() {}
 
+func (DataBatteryVoltageLow) isBatteryData() {}
+
 type DataBatteryVoltageHigh struct {
 	Threshold float64 `json:"threshold"`
 	Voltage   float64 `json:"voltage"`
@@ -36,6 +43,8 @@ func (DataBatteryVoltageHigh) AlarmType() AlarmType {
 }
 
 func (DataBatteryVoltageHigh) isAlarmData() {}
+
+func (DataBatteryVoltageHigh) isBatteryData() {}
 
 func (a DataBatteryVoltageHigh) Message() string {
 	return fmt.Sprintf("Battery voltage is high: %.2f", a.Voltage)
@@ -67,6 +76,8 @@ func (a DataBatteryCellVoltageHigh) Message() string {
 
 func (DataBatteryCellVoltageHigh) isAlarmData() {}
 
+func (DataBatteryCellVoltageHigh) isBatteryData() {}
+
 type DataBatteryCellVoltageLow struct {
 	Threshold           float64   `json:"threshold"`
 	CellVoltages        []float64 `json:"cell_voltages"`
@@ -92,6 +103,8 @@ func (a DataBatteryCellVoltageLow) Message() string {
 }
 
 func (DataBatteryCellVoltageLow) isAlarmData() {}
+
+func (DataBatteryCellVoltageLow) isBatteryData() {}
 
 type DataBatteryCellVoltageDiff struct {
 	Threshold    float64   `json:"threshold"`
@@ -119,6 +132,8 @@ func (a DataBatteryCellVoltageDiff) Message() string {
 
 func (DataBatteryCellVoltageDiff) isAlarmData() {}
 
+func (DataBatteryCellVoltageDiff) isBatteryData() {}
+
 type DataBatteryCurrentHigh struct {
 	Threshold float64 `json:"threshold"`
 	Current   float64 `json:"current"`
@@ -133,6 +148,8 @@ func (a DataBatteryCurrentHigh) Message() string {
 }
 
 func (DataBatteryCurrentHigh) isAlarmData() {}
+
+func (DataBatteryCurrentHigh) isBatteryData() {}
 
 type DataBatteryTempHigh struct {
 	Threshold float64 `json:"threshold"`
@@ -149,6 +166,8 @@ func (a DataBatteryTempHigh) Message() string {
 
 func (DataBatteryTempHigh) isAlarmData() {}
 
+func (DataBatteryTempHigh) isBatteryData() {}
+
 type DataBatteryPercentLow struct {
 	Threshold float64 `json:"threshold"`
 	Percent   float64 `json:"percent"`
@@ -164,6 +183,8 @@ func (a DataBatteryPercentLow) Message() string {
 
 func (DataBatteryPercentLow) isAlarmData() {}
 
+func (DataBatteryPercentLow) isBatteryData() {}
+
 type DataBatteryHealthLow struct {
 	Threshold float64 `json:"threshold"`
 	Health    float64 `json:"health"`
@@ -178,6 +199,8 @@ func (a DataBatteryHealthLow) Message() string {
 }
 
 func (DataBatteryHealthLow) isAlarmData() {}
+
+func (DataBatteryHealthLow) isBatteryData() {}
 
 func UnmarshalAlarmData(alarmType AlarmType, data []byte) (Data, error) {
 	var ret Data

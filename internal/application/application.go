@@ -195,7 +195,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	hardwareController := controller.New(cfg.Hardware, log, eventBus, picSerialClient, espSerialClient)
 
 	// Initialize services
-	batteryService := batteryimpl.NewService(validator, eventBus, batteryStateRepository, batterySettingRepository)
+	batteryService := batteryimpl.NewService(validator, eventBus, batteryStateRepository, batterySettingRepository, hardwareController)
 	distanceSensorService := distancesensorimpl.NewService(validator, eventBus, distanceSensorStateRepository)
 	driveMotorService := drivemotorimpl.NewService(validator, eventBus, driveMotorStateRepository, hardwareController)
 	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, hardwareController)
@@ -257,7 +257,15 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	systemInfoCollectorService := systeminfocollector.NewService(log, systemInfoRepository)
 	systemInfoCollectorService.Run(ctx)
 	alarmService := alarmimpl.NewService(log, validator, alarmRepository)
-	monitoringService := monitoringimpl.NewService(log, eventBus, alarmRepository, batteryStateRepository, configService, systemService)
+	monitoringService := monitoringimpl.NewService(
+		log,
+		eventBus,
+		alarmRepository,
+		batteryStateRepository,
+		configService,
+		systemService,
+		batteryService,
+	)
 	monitoringService.Start(ctx)
 
 	cleanup := func() error {

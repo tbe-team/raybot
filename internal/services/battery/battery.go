@@ -27,6 +27,8 @@ type Service interface {
 	UpdateBatteryState(ctx context.Context, params UpdateBatteryStateParams) error
 	UpdateChargeSetting(ctx context.Context, params UpdateChargeSettingParams) error
 	UpdateDischargeSetting(ctx context.Context, params UpdateDischargeSettingParams) error
+
+	DisableCharge(ctx context.Context) error
 }
 
 //nolint:revive
