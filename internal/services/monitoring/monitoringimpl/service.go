@@ -13,6 +13,7 @@ import (
 	"github.com/tbe-team/raybot/internal/services/alarm"
 	"github.com/tbe-team/raybot/internal/services/battery"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
+	"github.com/tbe-team/raybot/internal/services/system"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
@@ -22,6 +23,7 @@ type Service struct {
 	alarmRepo       alarm.Repository
 	batteryRepo     battery.BatteryStateRepository
 	configService   configsvc.Service
+	systemService   system.Service
 
 	stopCh chan struct{}
 	wg     sync.WaitGroup
@@ -33,6 +35,7 @@ func NewService(
 	alarmRepo alarm.Repository,
 	batteryRepo battery.BatteryStateRepository,
 	configService configsvc.Service,
+	systemService system.Service,
 ) *Service {
 	return &Service{
 		log:             log,
@@ -40,6 +43,7 @@ func NewService(
 		alarmRepo:       alarmRepo,
 		batteryRepo:     batteryRepo,
 		configService:   configService,
+		systemService:   systemService,
 		stopCh:          make(chan struct{}),
 	}
 }
@@ -287,6 +291,9 @@ func (s *Service) createAlarm(ctx context.Context, data alarm.Data) {
 	})
 	if err != nil {
 		s.log.Error("failed to create battery alarm", slog.Any("error", err))
-		return
+	}
+
+	if err := s.systemService.SetStatusError(ctx); err != nil {
+		s.log.Error("failed to set system status error due to alarm", slog.Any("error", err))
 	}
 }

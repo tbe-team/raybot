@@ -257,7 +257,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	systemInfoCollectorService := systeminfocollector.NewService(log, systemInfoRepository)
 	systemInfoCollectorService.Run(ctx)
 	alarmService := alarmimpl.NewService(log, validator, alarmRepository)
-	monitoringService := monitoringimpl.NewService(log, eventBus, alarmRepository, batteryStateRepository, configService)
+	monitoringService := monitoringimpl.NewService(log, eventBus, alarmRepository, batteryStateRepository, configService, systemService)
 	monitoringService.Start(ctx)
 
 	cleanup := func() error {
