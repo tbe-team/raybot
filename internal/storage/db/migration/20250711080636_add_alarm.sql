@@ -1,7 +1,7 @@
 -- +goose Up
 -- +goose StatementBegin
 CREATE TABLE alarms (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	id INTEGER PRIMARY KEY,
 	type TEXT NOT NULL,
 	data TEXT NOT NULL,
 	activated_at TEXT NOT NULL,

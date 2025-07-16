@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"golang.org/x/sync/errgroup"
+	"periph.io/x/host/v3"
 
 	"github.com/tbe-team/raybot/internal/config"
 	ledh "github.com/tbe-team/raybot/internal/hardware/led"
@@ -38,6 +39,10 @@ func NewService(
 }
 
 func (s *Service) Start(ctx context.Context) {
+	if _, err := host.Init(); err != nil {
+		s.log.Error("failed to init periph", slog.Any("error", err))
+	}
+
 	systemLed, err := ledh.New(s.cfg.System.Pin)
 	if err != nil {
 		s.log.Error("failed to create system led", slog.Any("error", err))

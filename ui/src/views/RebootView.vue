@@ -63,7 +63,7 @@ function handleReboot() {
               <RefreshCw class="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
               <div>
                 <h3 class="mb-1 text-sm font-medium text-blue-800 dark:text-blue-300">
-                  What happens during restart
+                  What happens during reboot
                 </h3>
                 <ul class="ml-4 space-y-1 text-sm text-blue-600 list-disc dark:text-blue-400">
                   <li>All system services will be stopped</li>
