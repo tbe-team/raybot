@@ -6,7 +6,7 @@ import "time"
 type BatteryState struct {
 	Current      uint16 // unit: mA
 	Temp         uint8
-	Voltage      uint16   // unit: V
+	Voltage      uint16   // unit: mV
 	CellVoltages []uint16 // unit: mV
 	Percent      uint8
 	Fault        uint8
