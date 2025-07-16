@@ -27,12 +27,12 @@ func NewRepository(db db.DB, queries *sqlc.Queries) Repository {
 	}
 }
 
-func (r Repository) ListActiveAlarms(ctx context.Context, params alarm.ListActiveAlarmsParams) (paging.List[alarm.Alarm], error) {
+func (r Repository) ListActiveAlarms(ctx context.Context, pagingParams paging.Params) (paging.List[alarm.Alarm], error) {
 	var ret paging.List[alarm.Alarm]
 	g, ctx := errgroup.WithContext(ctx)
 
 	g.Go(func() error {
-		alarms, err := r.listActiveAlarms(ctx, params)
+		alarms, err := r.listActiveAlarms(ctx, pagingParams)
 		if err != nil {
 			return fmt.Errorf("failed to list active alarms: %w", err)
 		}
@@ -57,10 +57,10 @@ func (r Repository) ListActiveAlarms(ctx context.Context, params alarm.ListActiv
 }
 
 //nolint:gosec
-func (r Repository) listActiveAlarms(ctx context.Context, params alarm.ListActiveAlarmsParams) ([]alarm.Alarm, error) {
+func (r Repository) listActiveAlarms(ctx context.Context, pagingParams paging.Params) ([]alarm.Alarm, error) {
 	alarms, err := r.queries.AlarmListActive(ctx, r.db, sqlc.AlarmListActiveParams{
-		Limit:  int64(params.PagingParams.Limit()),
-		Offset: int64(params.PagingParams.Offset()),
+		Limit:  int64(pagingParams.Limit()),
+		Offset: int64(pagingParams.Offset()),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list active alarms: %w", err)
@@ -78,12 +78,12 @@ func (r Repository) listActiveAlarms(ctx context.Context, params alarm.ListActiv
 	return items, nil
 }
 
-func (r Repository) ListDeactiveAlarms(ctx context.Context, params alarm.ListDeactiveAlarmsParams) (paging.List[alarm.Alarm], error) {
+func (r Repository) ListDeactiveAlarms(ctx context.Context, pagingParams paging.Params) (paging.List[alarm.Alarm], error) {
 	var ret paging.List[alarm.Alarm]
 	g, ctx := errgroup.WithContext(ctx)
 
 	g.Go(func() error {
-		alarms, err := r.listDeactiveAlarms(ctx, params)
+		alarms, err := r.listDeactiveAlarms(ctx, pagingParams)
 		if err != nil {
 			return fmt.Errorf("failed to list deactive alarms: %w", err)
 		}
@@ -108,10 +108,10 @@ func (r Repository) ListDeactiveAlarms(ctx context.Context, params alarm.ListDea
 }
 
 //nolint:gosec
-func (r Repository) listDeactiveAlarms(ctx context.Context, params alarm.ListDeactiveAlarmsParams) ([]alarm.Alarm, error) {
+func (r Repository) listDeactiveAlarms(ctx context.Context, pagingParams paging.Params) ([]alarm.Alarm, error) {
 	alarms, err := r.queries.AlarmListDeactive(ctx, r.db, sqlc.AlarmListDeactiveParams{
-		Limit:  int64(params.PagingParams.Limit()),
-		Offset: int64(params.PagingParams.Offset()),
+		Limit:  int64(pagingParams.Limit()),
+		Offset: int64(pagingParams.Offset()),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("failed to list deactive alarms: %w", err)
@@ -129,16 +129,16 @@ func (r Repository) listDeactiveAlarms(ctx context.Context, params alarm.ListDea
 	return items, nil
 }
 
-func (r Repository) CreateAlarm(ctx context.Context, params alarm.CreateAlarmParams) (alarm.Alarm, error) {
-	data, err := json.Marshal(params.Data)
+func (r Repository) UpsertActivatedAlarm(ctx context.Context, a alarm.Alarm) (alarm.Alarm, error) {
+	data, err := json.Marshal(a.Data)
 	if err != nil {
 		return alarm.Alarm{}, fmt.Errorf("failed to marshal alarm data: %w", err)
 	}
 
-	row, err := r.queries.AlarmCreate(ctx, r.db, sqlc.AlarmCreateParams{
-		Type:        params.Type.String(),
+	row, err := r.queries.AlarmUpsertActivated(ctx, r.db, sqlc.AlarmUpsertActivatedParams{
+		Type:        a.Type.String(),
 		Data:        string(data),
-		ActivatedAt: params.ActivatedAt.Format(time.RFC3339Nano),
+		ActivatedAt: a.ActivatedAt.Format(time.RFC3339Nano),
 	})
 	if err != nil {
 		if db.IsUniqueViolationError(err, "alarms.type") {
@@ -150,11 +150,10 @@ func (r Repository) CreateAlarm(ctx context.Context, params alarm.CreateAlarmPar
 	return r.convertRowToAlarm(row)
 }
 
-func (r Repository) DeactivateAlarm(ctx context.Context, params alarm.DeactivateAlarmParams) error {
-	deactivatedAt := params.DeactivatedAt.Format(time.RFC3339Nano)
+func (r Repository) DeactivateAlarm(ctx context.Context, id int64, deactivatedAt time.Time) error {
 	if err := r.queries.AlarmDeactivate(ctx, r.db, sqlc.AlarmDeactivateParams{
-		ID:            params.ID,
-		DeactivatedAt: &deactivatedAt,
+		ID:            id,
+		DeactivatedAt: ptr.New(deactivatedAt.Format(time.RFC3339Nano)),
 	}); err != nil {
 		return fmt.Errorf("failed to deactivate alarm: %w", err)
 	}

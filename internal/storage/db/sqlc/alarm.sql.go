@@ -35,39 +35,6 @@ func (q *Queries) AlarmCountDeactive(ctx context.Context, db DBTX) (int64, error
 	return count, err
 }
 
-const alarmCreate = `-- name: AlarmCreate :one
-INSERT INTO alarms (
-	type,
-	data,
-	activated_at
-)
-VALUES (
-	?1,
-	?2,
-	?3
-)
-RETURNING id, type, data, activated_at, deactivated_at
-`
-
-type AlarmCreateParams struct {
-	Type        string `json:"type"`
-	Data        string `json:"data"`
-	ActivatedAt string `json:"activated_at"`
-}
-
-func (q *Queries) AlarmCreate(ctx context.Context, db DBTX, arg AlarmCreateParams) (Alarm, error) {
-	row := db.QueryRowContext(ctx, alarmCreate, arg.Type, arg.Data, arg.ActivatedAt)
-	var i Alarm
-	err := row.Scan(
-		&i.ID,
-		&i.Type,
-		&i.Data,
-		&i.ActivatedAt,
-		&i.DeactivatedAt,
-	)
-	return i, err
-}
-
 const alarmDeactivate = `-- name: AlarmDeactivate :exec
 UPDATE alarms
 SET deactivated_at = ?1
@@ -201,4 +168,34 @@ func (q *Queries) AlarmListDeactive(ctx context.Context, db DBTX, arg AlarmListD
 		return nil, err
 	}
 	return items, nil
+}
+
+const alarmUpsertActivated = `-- name: AlarmUpsertActivated :one
+INSERT INTO alarms (type, data, activated_at)
+VALUES (?1, ?2, ?3)
+ON CONFLICT (type)
+WHERE deactivated_at IS NULL
+DO UPDATE SET
+	data = excluded.data,
+	activated_at = excluded.activated_at
+RETURNING id, type, data, activated_at, deactivated_at
+`
+
+type AlarmUpsertActivatedParams struct {
+	Type        string `json:"type"`
+	Data        string `json:"data"`
+	ActivatedAt string `json:"activated_at"`
+}
+
+func (q *Queries) AlarmUpsertActivated(ctx context.Context, db DBTX, arg AlarmUpsertActivatedParams) (Alarm, error) {
+	row := db.QueryRowContext(ctx, alarmUpsertActivated, arg.Type, arg.Data, arg.ActivatedAt)
+	var i Alarm
+	err := row.Scan(
+		&i.ID,
+		&i.Type,
+		&i.Data,
+		&i.ActivatedAt,
+		&i.DeactivatedAt,
+	)
+	return i, err
 }

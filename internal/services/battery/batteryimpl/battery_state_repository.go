@@ -28,7 +28,7 @@ func (r *batteryStateRepository) GetBatteryState(_ context.Context) (battery.Bat
 	return r.battery, nil
 }
 
-func (r *batteryStateRepository) UpdateBatteryState(_ context.Context, params battery.UpdateBatteryStateParams) error {
+func (r *batteryStateRepository) UpdateBatteryState(_ context.Context, params battery.UpdateBatteryStateParams) (battery.BatteryState, error) {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
@@ -42,5 +42,6 @@ func (r *batteryStateRepository) UpdateBatteryState(_ context.Context, params ba
 		Health:       params.Health,
 		UpdatedAt:    time.Now(),
 	}
-	return nil
+
+	return r.battery, nil
 }

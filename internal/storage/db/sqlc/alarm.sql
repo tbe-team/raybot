@@ -26,17 +26,14 @@ SELECT COUNT(*)
 FROM alarms
 WHERE deactivated_at IS NOT NULL;
 
--- name: AlarmCreate :one
-INSERT INTO alarms (
-	type,
-	data,
-	activated_at
-)
-VALUES (
-	@type,
-	@data,
-	@activated_at
-)
+-- name: AlarmUpsertActivated :one
+INSERT INTO alarms (type, data, activated_at)
+VALUES (@type, @data, @activated_at)
+ON CONFLICT (type)
+WHERE deactivated_at IS NULL
+DO UPDATE SET
+	data = excluded.data,
+	activated_at = excluded.activated_at
 RETURNING *;
 
 -- name: AlarmDeactivate :exec

@@ -42,6 +42,8 @@ import (
 	"github.com/tbe-team/raybot/internal/services/limitswitch/limitswitchimpl"
 	"github.com/tbe-team/raybot/internal/services/location"
 	"github.com/tbe-team/raybot/internal/services/location/locationimpl"
+	"github.com/tbe-team/raybot/internal/services/monitoring"
+	"github.com/tbe-team/raybot/internal/services/monitoring/monitoringimpl"
 	"github.com/tbe-team/raybot/internal/services/peripheral"
 	"github.com/tbe-team/raybot/internal/services/peripheral/peripheralimpl"
 	"github.com/tbe-team/raybot/internal/services/system"
@@ -82,6 +84,7 @@ type Application struct {
 	ApperrorcodeService   apperrorcode.Service
 	LedService            led.Service
 	AlarmService          alarm.Service
+	MonitoringService     monitoring.Service
 }
 
 type CleanupFunc func() error
@@ -192,7 +195,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	hardwareController := controller.New(cfg.Hardware, log, eventBus, picSerialClient, espSerialClient)
 
 	// Initialize services
-	batteryService := batteryimpl.NewService(validator, batteryStateRepository, batterySettingRepository)
+	batteryService := batteryimpl.NewService(validator, eventBus, batteryStateRepository, batterySettingRepository)
 	distanceSensorService := distancesensorimpl.NewService(validator, eventBus, distanceSensorStateRepository)
 	driveMotorService := drivemotorimpl.NewService(validator, eventBus, driveMotorStateRepository, hardwareController)
 	liftMotorService := liftmotorimpl.NewService(validator, liftMotorStateRepository, hardwareController)
@@ -254,10 +257,13 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	systemInfoCollectorService := systeminfocollector.NewService(log, systemInfoRepository)
 	systemInfoCollectorService.Run(ctx)
 	alarmService := alarmimpl.NewService(log, validator, alarmRepository)
+	monitoringService := monitoringimpl.NewService(log, eventBus, alarmRepository, batteryStateRepository, configService)
+	monitoringService.Start(ctx)
 
 	cleanup := func() error {
 		var errs []error
 
+		monitoringService.Stop()
 		systemInfoCollectorService.Stop()
 		appStateRepository.Cleanup()
 		if err := ledService.Stop(); err != nil {

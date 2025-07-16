@@ -32,7 +32,7 @@ type Service interface {
 //nolint:revive
 type BatteryStateRepository interface {
 	GetBatteryState(ctx context.Context) (BatteryState, error)
-	UpdateBatteryState(ctx context.Context, params UpdateBatteryStateParams) error
+	UpdateBatteryState(ctx context.Context, params UpdateBatteryStateParams) (BatteryState, error)
 }
 
 type SettingRepository interface {

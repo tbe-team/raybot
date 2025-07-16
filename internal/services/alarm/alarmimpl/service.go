@@ -37,7 +37,7 @@ func (s Service) ListActiveAlarms(ctx context.Context, params alarm.ListActiveAl
 		return paging.List[alarm.Alarm]{}, fmt.Errorf("validate params: %w", err)
 	}
 
-	return s.alarmRepo.ListActiveAlarms(ctx, params)
+	return s.alarmRepo.ListActiveAlarms(ctx, params.PagingParams)
 }
 
 func (s Service) ListDeactiveAlarms(ctx context.Context, params alarm.ListDeactiveAlarmsParams) (paging.List[alarm.Alarm], error) {
@@ -45,7 +45,7 @@ func (s Service) ListDeactiveAlarms(ctx context.Context, params alarm.ListDeacti
 		return paging.List[alarm.Alarm]{}, fmt.Errorf("validate params: %w", err)
 	}
 
-	return s.alarmRepo.ListDeactiveAlarms(ctx, params)
+	return s.alarmRepo.ListDeactiveAlarms(ctx, params.PagingParams)
 }
 
 func (s Service) DeleteDeactivatedAlarms(ctx context.Context) error {
