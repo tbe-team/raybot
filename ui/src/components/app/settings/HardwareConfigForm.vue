@@ -45,9 +45,9 @@ const hardwareConfigSchema = z.object({
     commandAckTimeout: z.number().int().nonnegative('Command ack timeout must be non-negative'),
   }),
   leds: z.object({
-    system: ledConfigSchema,
-    alert: ledConfigSchema,
-  }),
+    system: ledConfigSchema.default({ pin: '' }),
+    alert: ledConfigSchema.default({ pin: '' }),
+  }).default({ system: { pin: '' }, alert: { pin: '' } }),
 }).superRefine((data, ctx) => {
   if (data.esp.serial.port === data.pic.serial.port) {
     ctx.addIssue({
