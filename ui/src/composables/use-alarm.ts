@@ -6,7 +6,7 @@ import alarmAPI from '@/api/alarm'
 export const COUNT_ACTIVE_ALARMS_QUERY_KEY = 'countActiveAlarms'
 export const LIST_ALARMS_QUERY_KEY = 'listAlarms'
 
-export function useCountActiveAlarmQuery(opts?: { axiosOpts?: Partial<AxiosRequestConfig>, refetchInterval?: number }) {
+export function useCountActiveAlarmsQuery(opts?: { axiosOpts?: Partial<AxiosRequestConfig>, refetchInterval?: number }) {
   return useQuery({
     queryKey: [COUNT_ACTIVE_ALARMS_QUERY_KEY],
     queryFn: () => alarmAPI.listAlarms({ page: 1, pageSize: 1, status: 'ACTIVE' }, opts?.axiosOpts),

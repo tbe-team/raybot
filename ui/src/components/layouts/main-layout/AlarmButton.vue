@@ -7,11 +7,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { useCountActiveAlarmQuery } from '@/composables/use-alarm'
+import { useCountActiveAlarmsQuery } from '@/composables/use-alarm'
 
 const REFRESH_INTERVAL = 5000
 const router = useRouter()
-const { data, isError } = useCountActiveAlarmQuery({
+const { data, isError } = useCountActiveAlarmsQuery({
   axiosOpts: { doNotShowLoading: true },
   refetchInterval: REFRESH_INTERVAL,
 })
