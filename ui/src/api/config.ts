@@ -1,5 +1,5 @@
 import type { CommandConfig } from '@/types/command-config'
-import type { CloudConfig, HardwareConfig, HTTPConfig, LogConfig, MonitoringConfig, WifiConfig } from '@/types/config'
+import type { CloudConfig, HardwareConfig, HTTPConfig, LogConfig, BatteryMonitoringConfig, WifiConfig } from '@/types/config'
 import http from '@/lib/http'
 
 const configAPI = {
@@ -21,8 +21,8 @@ const configAPI = {
   getCommandConfig: (): Promise<CommandConfig> => http.get('/configs/command'),
   updateCommandConfig: (config: CommandConfig): Promise<void> => http.put('/configs/command', config),
 
-  getMonitoringBatteryConfig: (): Promise<MonitoringConfig> => http.get('/configs/monitoring/battery'),
-  updateMonitoringBatteryConfig: (config: MonitoringConfig): Promise<void> => http.put('/configs/monitoring/battery', config),
+  getBatteryMonitoringConfig: (): Promise<BatteryMonitoringConfig> => http.get('/configs/monitoring/battery'),
+  updateBatteryMonitoringConfig: (config: BatteryMonitoringConfig): Promise<void> => http.put('/configs/monitoring/battery', config),
 }
 
 export default configAPI

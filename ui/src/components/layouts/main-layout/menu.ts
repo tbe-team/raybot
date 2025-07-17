@@ -27,8 +27,8 @@ export const menus: Item[] = [
     icon: Command,
   },
   {
-    title: 'Alarm',
-    path: '/alarm',
+    title: 'Alarms',
+    path: '/alarms',
     icon: Bell,
   },
   {

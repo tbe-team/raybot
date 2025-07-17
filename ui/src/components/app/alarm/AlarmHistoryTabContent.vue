@@ -4,7 +4,7 @@ import { AlertCircle, CircleMinus, Loader, RefreshCw } from 'lucide-vue-next'
 import { columns } from '@/components/app/alarm/alarm-table/alarm-history/columns'
 import DataTable from '@/components/shared/DataTable.vue'
 import { Button } from '@/components/ui/button'
-import { useDeleteAlarmMutation } from '@/composables/use-alarm'
+import { useDeleteDeactiveAlarmsMutation } from '@/composables/use-alarm'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 import { RaybotError } from '@/types/error'
 
@@ -27,7 +27,7 @@ const emit = defineEmits<{
 }>()
 
 const { openConfirmation } = useConfirmationStore()
-const { mutate: deleteAlarms, isPending: isDeletingAlarms } = useDeleteAlarmMutation()
+const { mutate: deleteAlarms, isPending: isDeletingAlarms } = useDeleteDeactiveAlarmsMutation()
 
 function handleClearAlarmHistory() {
   openConfirmation({

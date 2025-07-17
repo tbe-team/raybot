@@ -29,16 +29,16 @@ const routes: RouteRecordRaw[] = [
         meta: { title: 'Command history' },
       },
       {
-        path: 'alarm',
-        name: 'alarm',
+        path: 'alarms',
+        name: 'alarms',
         component: () => import('@/views/AlarmView.vue'),
-        meta: { title: 'Alarm' },
+        meta: { title: 'Alarms' },
       },
       {
         path: 'monitoring',
-        name: 'monitor',
+        name: 'monitoring',
         component: () => import('@/views/MonitoringView.vue'),
-        meta: { title: 'Monitor' },
+        meta: { title: 'Monitoring' },
       },
       {
         path: 'settings',

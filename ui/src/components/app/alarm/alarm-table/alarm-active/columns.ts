@@ -1,6 +1,12 @@
 import type { ColumnDef } from '@tanstack/vue-table'
 import type { Alarm } from '@/types/alarm'
-import { formatDate, formatDuration } from '@/lib/date'
+import dayjs from 'dayjs'
+import { formatDate, formatUptimeShort } from '@/lib/date'
+
+function formatDuration(dateString: string): string {
+  const duration = dayjs().diff(dayjs(dateString), 'second')
+  return formatUptimeShort(duration)
+}
 
 export const columns: ColumnDef<Alarm>[] = [
   {

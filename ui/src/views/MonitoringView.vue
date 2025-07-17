@@ -2,9 +2,9 @@
 import { AlertCircle, Loader } from 'lucide-vue-next'
 import MonitoringConfigForm from '@/components/app/monitoring/MonitoringConfigForm.vue'
 import PageContainer from '@/components/shared/PageContainer.vue'
-import { useMonitoringBatteryConfigQuery } from '@/composables/use-config'
+import { useBatteryMonitoringConfigQuery } from '@/composables/use-config'
 
-const { data, isPending, isError, error } = useMonitoringBatteryConfigQuery()
+const { data, isPending, isError, error } = useBatteryMonitoringConfigQuery()
 </script>
 
 <template>

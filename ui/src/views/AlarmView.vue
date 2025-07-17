@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { AlarmStatus } from '@/api/alarm'
-import AlarmActiveTab from '@/components/app/alarm/AlarmActiveTabContent.vue'
-import AlarmHistoryTab from '@/components/app/alarm/AlarmHistoryTabContent.vue'
+import ActiveAlarmTabContent from '@/components/app/alarm/ActiveAlarmTabContent.vue'
+import AlarmHistoryTabContent from '@/components/app/alarm/AlarmHistoryTabContent.vue'
 import PageContainer from '@/components/shared/PageContainer.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
-import { useAlarmsQuery } from '@/composables/use-alarm'
+import { useListAlarmsQuery } from '@/composables/use-alarm'
 
 const route = useRoute()
 const router = useRouter()
@@ -13,7 +13,7 @@ const pageSize = ref(Number(route.query.pageSize) || 10)
 const tab = ref(route.query.tab as string | undefined ?? 'active')
 const status = computed<AlarmStatus>(() => tab.value === 'history' ? 'DEACTIVE' : 'ACTIVE')
 
-const { data, isFetching, isPending, isError, error, refetch } = useAlarmsQuery(page, pageSize, status)
+const { data, isFetching, isPending, isError, error, refetch } = useListAlarmsQuery(page, pageSize, status)
 
 function handleTabChange(value: string | number) {
   tab.value = value.toString()
@@ -55,7 +55,7 @@ function handlePageSizeChange(ps: number) {
       </TabsList>
 
       <TabsContent value="active">
-        <AlarmActiveTab
+        <ActiveAlarmTabContent
           :page="page"
           :page-size="pageSize"
           :data="data?.items ?? []"
@@ -70,7 +70,7 @@ function handlePageSizeChange(ps: number) {
         />
       </TabsContent>
       <TabsContent value="history">
-        <AlarmHistoryTab
+        <AlarmHistoryTabContent
           :page="page"
           :page-size="pageSize"
           :data="data?.items ?? []"

@@ -5,20 +5,20 @@ import http from '@/lib/http'
 
 export type AlarmStatus = 'ACTIVE' | 'DEACTIVE'
 
-export interface AlarmParams {
+export interface ListAlarmParams {
   page?: number
   pageSize?: number
   status?: AlarmStatus
 }
 
 const alarmAPI = {
-  getAlarms: (params: AlarmParams, axiosOpts?: AxiosRequestConfig): Promise<Paging<Alarm>> => {
+  getListAlarms: (params: ListAlarmParams, axiosOpts?: AxiosRequestConfig): Promise<Paging<Alarm>> => {
     return http.get('/alarms', {
       params,
       ...axiosOpts,
     })
   },
-  deleteAlarms: (axiosOpts?: AxiosRequestConfig): Promise<void> => {
+  deleteDeactiveAlarms: (axiosOpts?: AxiosRequestConfig): Promise<void> => {
     return http.delete('/alarms', axiosOpts)
   },
 }

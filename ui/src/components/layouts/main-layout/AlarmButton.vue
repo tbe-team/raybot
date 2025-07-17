@@ -7,11 +7,11 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { useCountAlarmsActivedQuery } from '@/composables/use-alarm'
+import { useCountActiveAlarmQuery } from '@/composables/use-alarm'
 
 const REFRESH_INTERVAL = 5000
 const router = useRouter()
-const { data, isError } = useCountAlarmsActivedQuery({
+const { data, isError } = useCountActiveAlarmQuery({
   axiosOpts: { doNotShowLoading: true },
   refetchInterval: REFRESH_INTERVAL,
 })
@@ -23,7 +23,7 @@ const { data, isError } = useCountAlarmsActivedQuery({
       <TooltipTrigger as-child>
         <Button
           class="relative rounded-lg bg-muted hover:bg-muted-hover" variant="ghost" size="icon" @click="() => {
-            router.push('/alarm')
+            router.push('/alarms')
           }"
         >
           <Bell class="size-5" />
@@ -32,7 +32,7 @@ const { data, isError } = useCountAlarmsActivedQuery({
       </TooltipTrigger>
       <TooltipContent>
         <p v-if="data && data.count > 0">
-          The system has {{ data.count }} alerts. Click to view
+          The system has {{ data.count }} alarms. Click to view
         </p>
         <p v-if="data && data.count === 0">
           No alarm found

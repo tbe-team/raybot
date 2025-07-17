@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { MonitoringConfig } from '@/types/config'
+import type { BatteryMonitoringConfig } from '@/types/config'
 import { useQueryClient } from '@tanstack/vue-query'
 import { toTypedSchema } from '@vee-validate/zod'
 import { Loader } from 'lucide-vue-next'
@@ -14,16 +14,16 @@ import {
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
-import { MONITORING_BATTERY_CONFIG_QUERY_KEY, useMonitoringBatteryConfigMutation } from '@/composables/use-config'
+import { BATTERY_MONITORING_CONFIG_QUERY_KEY, useBatteryMonitoringConfigMutation } from '@/composables/use-config'
 import { monitoringConfigSchema } from './schemas'
 
 interface Props {
-  initialValues: MonitoringConfig
+  initialValues: BatteryMonitoringConfig
 }
 const props = defineProps<Props>()
 
 const queryClient = useQueryClient()
-const { mutate, isPending } = useMonitoringBatteryConfigMutation()
+const { mutate, isPending } = useBatteryMonitoringConfigMutation()
 
 const form = useForm({
   validationSchema: toTypedSchema(monitoringConfigSchema),
@@ -34,7 +34,7 @@ const onSubmit = form.handleSubmit((values) => {
   mutate(values, {
     onSuccess: () => {
       notification.success('Monitoring configuration updated successfully!')
-      queryClient.invalidateQueries({ queryKey: [MONITORING_BATTERY_CONFIG_QUERY_KEY] })
+      queryClient.invalidateQueries({ queryKey: [BATTERY_MONITORING_CONFIG_QUERY_KEY] })
     },
     onError: (err) => {
       notification.error(err.message)

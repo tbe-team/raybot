@@ -93,7 +93,7 @@ export interface STAConfig {
   ip: string
 }
 
-export interface MonitoringConfig {
+export interface BatteryMonitoringConfig {
   voltageLow: {
     enable: boolean
     threshold: number
