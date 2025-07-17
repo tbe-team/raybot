@@ -32,7 +32,7 @@ const { data, isError } = useCountAlarmsActivedQuery({
       </TooltipTrigger>
       <TooltipContent>
         <p v-if="data && data.count > 0">
-          The system has {{ data.count }} alert. Click to view
+          The system has {{ data.count }} alerts. Click to view
         </p>
         <p v-if="data && data.count === 0">
           No alarm found
