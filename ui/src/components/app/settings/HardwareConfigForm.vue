@@ -61,6 +61,19 @@ const hardwareConfigSchema = z.object({
       path: ['pic.serial.port'],
     })
   }
+
+  if (data.leds.system.pin === data.leds.alert.pin) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'System and alert LEDs cannot use the same pin',
+      path: ['leds.system.pin'],
+    })
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: 'System and alert LEDs cannot use the same pin',
+      path: ['leds.alert.pin'],
+    })
+  }
 })
 
 const queryClient = useQueryClient()
@@ -469,7 +482,7 @@ function fetchPorts(newValue: boolean) {
     <!-- LEDs Section -->
     <div class="space-y-3">
       <h4 class="text-lg font-medium tracking-tight">
-        LED
+        LED Configuration
       </h4>
       <div class="px-4 space-y-6">
         <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
