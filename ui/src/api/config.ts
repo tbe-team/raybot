@@ -1,5 +1,5 @@
 import type { CommandConfig } from '@/types/command-config'
-import type { CloudConfig, HardwareConfig, HTTPConfig, LogConfig, BatteryMonitoringConfig, WifiConfig } from '@/types/config'
+import type { BatteryMonitoringConfig, CloudConfig, HardwareConfig, HTTPConfig, LogConfig, WifiConfig } from '@/types/config'
 import http from '@/lib/http'
 
 const configAPI = {

@@ -12,7 +12,7 @@ export interface ListAlarmParams {
 }
 
 const alarmAPI = {
-  getListAlarms: (params: ListAlarmParams, axiosOpts?: AxiosRequestConfig): Promise<Paging<Alarm>> => {
+  listAlarms: (params: ListAlarmParams, axiosOpts?: AxiosRequestConfig): Promise<Paging<Alarm>> => {
     return http.get('/alarms', {
       params,
       ...axiosOpts,
