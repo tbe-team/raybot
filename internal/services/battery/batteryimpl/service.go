@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/tbe-team/raybot/internal/events"
+	"github.com/tbe-team/raybot/internal/hardware/controller"
 	"github.com/tbe-team/raybot/internal/services/battery"
 	"github.com/tbe-team/raybot/pkg/eventbus"
 	"github.com/tbe-team/raybot/pkg/validator"
@@ -13,22 +14,25 @@ import (
 type service struct {
 	validator validator.Validator
 
-	publisher        eventbus.Publisher
-	batteryStateRepo battery.BatteryStateRepository
-	settingRepo      battery.SettingRepository
+	publisher         eventbus.Publisher
+	batteryStateRepo  battery.BatteryStateRepository
+	settingRepo       battery.SettingRepository
+	batteryController controller.BatteryController
 }
 
 func NewService(
 	validator validator.Validator,
 	publisher eventbus.Publisher,
-	repo battery.BatteryStateRepository,
+	batteryStateRepo battery.BatteryStateRepository,
 	settingRepo battery.SettingRepository,
+	batteryController controller.BatteryController,
 ) battery.Service {
 	return &service{
-		validator:        validator,
-		publisher:        publisher,
-		batteryStateRepo: repo,
-		settingRepo:      settingRepo,
+		validator:         validator,
+		publisher:         publisher,
+		batteryStateRepo:  batteryStateRepo,
+		settingRepo:       settingRepo,
+		batteryController: batteryController,
 	}
 }
 
@@ -69,4 +73,28 @@ func (s service) UpdateDischargeSetting(ctx context.Context, params battery.Upda
 	}
 
 	return s.settingRepo.UpdateDischargeSetting(ctx, params)
+}
+
+func (s service) DisableCharge(ctx context.Context) error {
+	setting, err := s.settingRepo.GetChargeSetting(ctx)
+	if err != nil {
+		return fmt.Errorf("get charge setting: %w", err)
+	}
+
+	if !setting.Enabled {
+		return nil
+	}
+
+	if err := s.batteryController.ConfigBatteryCharge(ctx, setting.CurrentLimit, false); err != nil {
+		return fmt.Errorf("disable charge: %w", err)
+	}
+
+	if err := s.settingRepo.UpdateChargeSetting(ctx, battery.UpdateChargeSettingParams{
+		CurrentLimit: setting.CurrentLimit,
+		Enabled:      false,
+	}); err != nil {
+		return fmt.Errorf("update charge setting: %w", err)
+	}
+
+	return nil
 }

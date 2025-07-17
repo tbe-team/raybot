@@ -22,8 +22,10 @@ type Service struct {
 	eventSubscriber eventbus.Subscriber
 	alarmRepo       alarm.Repository
 	batteryRepo     battery.BatteryStateRepository
-	configService   configsvc.Service
-	systemService   system.Service
+
+	configService  configsvc.Service
+	systemService  system.Service
+	batteryService battery.Service
 
 	stopCh chan struct{}
 	wg     sync.WaitGroup
@@ -36,6 +38,7 @@ func NewService(
 	batteryRepo battery.BatteryStateRepository,
 	configService configsvc.Service,
 	systemService system.Service,
+	batteryService battery.Service,
 ) *Service {
 	return &Service{
 		log:             log,
@@ -44,6 +47,7 @@ func NewService(
 		batteryRepo:     batteryRepo,
 		configService:   configService,
 		systemService:   systemService,
+		batteryService:  batteryService,
 		stopCh:          make(chan struct{}),
 	}
 }
@@ -161,14 +165,14 @@ func (s *Service) checkVoltageAlarms(ctx context.Context, state battery.BatteryS
 	voltage := float64(state.Voltage)
 
 	if config.BatteryVoltageLow.Enable && voltage < config.BatteryVoltageLow.Threshold {
-		s.createAlarm(ctx, alarm.DataBatteryVoltageLow{
+		s.handleBatteryAlarm(ctx, alarm.DataBatteryVoltageLow{
 			Threshold: config.BatteryVoltageLow.Threshold,
 			Voltage:   voltage,
 		})
 	}
 
 	if config.BatteryVoltageHigh.Enable && voltage > config.BatteryVoltageHigh.Threshold {
-		s.createAlarm(ctx, alarm.DataBatteryVoltageHigh{
+		s.handleBatteryAlarm(ctx, alarm.DataBatteryVoltageHigh{
 			Threshold: config.BatteryVoltageHigh.Threshold,
 			Voltage:   voltage,
 		})
@@ -193,7 +197,7 @@ func (s *Service) checkCellVoltageAlarms(ctx context.Context, state battery.Batt
 			}
 		}
 		if len(overThresholdIndex) > 0 {
-			s.createAlarm(ctx, alarm.DataBatteryCellVoltageHigh{
+			s.handleBatteryAlarm(ctx, alarm.DataBatteryCellVoltageHigh{
 				Threshold:          config.BatteryCellVoltageHigh.Threshold,
 				CellVoltages:       cellVoltages,
 				OverThresholdIndex: overThresholdIndex,
@@ -209,7 +213,7 @@ func (s *Service) checkCellVoltageAlarms(ctx context.Context, state battery.Batt
 			}
 		}
 		if len(underThresholdIndex) > 0 {
-			s.createAlarm(ctx, alarm.DataBatteryCellVoltageLow{
+			s.handleBatteryAlarm(ctx, alarm.DataBatteryCellVoltageLow{
 				Threshold:           config.BatteryCellVoltageLow.Threshold,
 				CellVoltages:        cellVoltages,
 				UnderThresholdIndex: underThresholdIndex,
@@ -230,7 +234,7 @@ func (s *Service) checkCellVoltageAlarms(ctx context.Context, state battery.Batt
 			for i := range cellVoltages {
 				diffIndex = append(diffIndex, i)
 			}
-			s.createAlarm(ctx, alarm.DataBatteryCellVoltageDiff{
+			s.handleBatteryAlarm(ctx, alarm.DataBatteryCellVoltageDiff{
 				Threshold:    config.BatteryCellVoltageDiff.Threshold,
 				CellVoltages: cellVoltages,
 				DiffIndex:    diffIndex,
@@ -243,7 +247,7 @@ func (s *Service) checkCurrentAlarms(ctx context.Context, state battery.BatteryS
 	current := float64(state.Current)
 
 	if config.BatteryCurrentHigh.Enable && current > config.BatteryCurrentHigh.Threshold {
-		s.createAlarm(ctx, alarm.DataBatteryCurrentHigh{
+		s.handleBatteryAlarm(ctx, alarm.DataBatteryCurrentHigh{
 			Threshold: config.BatteryCurrentHigh.Threshold,
 			Current:   current,
 		})
@@ -254,7 +258,7 @@ func (s *Service) checkTemperatureAlarms(ctx context.Context, state battery.Batt
 	temp := float64(state.Temp)
 
 	if config.BatteryTempHigh.Enable && temp > config.BatteryTempHigh.Threshold {
-		s.createAlarm(ctx, alarm.DataBatteryTempHigh{
+		s.handleBatteryAlarm(ctx, alarm.DataBatteryTempHigh{
 			Threshold: config.BatteryTempHigh.Threshold,
 			Temp:      temp,
 		})
@@ -265,7 +269,7 @@ func (s *Service) checkPercentAlarms(ctx context.Context, state battery.BatteryS
 	percent := float64(state.Percent)
 
 	if config.BatteryPercentLow.Enable && percent < config.BatteryPercentLow.Threshold {
-		s.createAlarm(ctx, alarm.DataBatteryPercentLow{
+		s.handleBatteryAlarm(ctx, alarm.DataBatteryPercentLow{
 			Threshold: config.BatteryPercentLow.Threshold,
 			Percent:   percent,
 		})
@@ -276,14 +280,14 @@ func (s *Service) checkHealthAlarms(ctx context.Context, state battery.BatterySt
 	health := float64(state.Health)
 
 	if config.BatteryHealthLow.Enable && health < config.BatteryHealthLow.Threshold {
-		s.createAlarm(ctx, alarm.DataBatteryHealthLow{
+		s.handleBatteryAlarm(ctx, alarm.DataBatteryHealthLow{
 			Threshold: config.BatteryHealthLow.Threshold,
 			Health:    health,
 		})
 	}
 }
 
-func (s *Service) createAlarm(ctx context.Context, data alarm.Data) {
+func (s *Service) handleBatteryAlarm(ctx context.Context, data alarm.BatteryData) {
 	_, err := s.alarmRepo.UpsertActivatedAlarm(ctx, alarm.Alarm{
 		Type:        data.AlarmType(),
 		Data:        data,
@@ -295,5 +299,9 @@ func (s *Service) createAlarm(ctx context.Context, data alarm.Data) {
 
 	if err := s.systemService.SetStatusError(ctx); err != nil {
 		s.log.Error("failed to set system status error due to alarm", slog.Any("error", err))
+	}
+
+	if err := s.batteryService.DisableCharge(ctx); err != nil {
+		s.log.Error("failed to disable charge due to alarm", slog.Any("error", err))
 	}
 }
