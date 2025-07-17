@@ -23,9 +23,19 @@ export interface LogConfig {
   console: LogConsoleConfig
 }
 
+export interface LEDConfig {
+  pin: string
+}
+
+export interface LEDsConfig {
+  system: LEDConfig
+  alert: LEDConfig
+}
+
 export interface HardwareConfig {
   esp: ESPConfig
   pic: PICConfig
+  leds: LEDsConfig
 }
 
 export interface ESPConfig {
