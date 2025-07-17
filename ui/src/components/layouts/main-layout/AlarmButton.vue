@@ -27,7 +27,7 @@ const { data, isError } = useCountAlarmsActivedQuery({
           }"
         >
           <Bell class="size-5" />
-          <span v-if=" data && data.count > 0" class="block absolute top-0 right-0 rounded-full border bg-destructive dark:border-white size-2" />
+          <span v-if="data && data.count > 0" class="block absolute top-0 right-0 rounded-full border bg-destructive dark:border-white size-2" />
         </Button>
       </TooltipTrigger>
       <TooltipContent>
