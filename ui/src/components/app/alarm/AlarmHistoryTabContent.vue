@@ -77,7 +77,7 @@ function handleClearAlarmHistory() {
     </div>
   </div>
 
-  <div v-else-if="!props.data || props.data.length === 0" class="flex flex-col gap-4 justify-center items-center pt-20">
+  <div v-else-if="!props.data" class="flex flex-col gap-4 justify-center items-center pt-20">
     <div class="flex flex-col gap-4 items-center p-6">
       <AlertCircle class="size-8 text-muted-foreground" />
       <div class="space-y-2 text-center">
