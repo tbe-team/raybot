@@ -2,9 +2,12 @@ package alarmimpl
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 
 	"github.com/tbe-team/raybot/internal/services/alarm"
 	"github.com/tbe-team/raybot/internal/services/led"
@@ -84,18 +87,30 @@ func (s Service) DeactivateAlarm(ctx context.Context, params alarm.DeactivateAla
 		return fmt.Errorf("failed to deactivate alarm: %w", err)
 	}
 
-	countActivatedAlarms, err := s.alarmRepo.CountActivatedAlarms(ctx)
+	count, err := s.alarmRepo.CountActivatedAlarms(ctx)
 	if err != nil {
 		return fmt.Errorf("failed to count activated alarms: %w", err)
 	}
 
-	if countActivatedAlarms == 0 {
-		if err := s.systemRepo.UpdateStatus(ctx, system.StatusNormal); err != nil {
-			return fmt.Errorf("failed to update system status: %w", err)
-		}
+	if count == 0 {
+		g, ctx := errgroup.WithContext(ctx)
+		g.Go(func() error {
+			return s.systemRepo.UpdateStatus(ctx, system.StatusNormal)
+		})
 
-		if err := s.ledService.SetAlertLedOff(ctx); err != nil {
-			return fmt.Errorf("failed to set alert led off: %w", err)
+		g.Go(func() error {
+			if err := s.ledService.SetAlertLedOff(ctx); err != nil {
+				if errors.Is(err, led.ErrLedNotConnected) {
+					s.log.Warn("alert led is not connected, skipping")
+					return nil
+				}
+				return fmt.Errorf("failed to set alert led off: %w", err)
+			}
+			return nil
+		})
+
+		if err := g.Wait(); err != nil {
+			return fmt.Errorf("failed to update system status or set alert led off: %w", err)
 		}
 	}
 
