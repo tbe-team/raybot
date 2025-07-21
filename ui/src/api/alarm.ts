@@ -21,6 +21,10 @@ const alarmAPI = {
   deleteDeactiveAlarms: (axiosOpts?: AxiosRequestConfig): Promise<void> => {
     return http.delete('/alarms', axiosOpts)
   },
+
+  deactivateAlarm: (alarmId: number, axiosOpts?: AxiosRequestConfig): Promise<void> => {
+    return http.delete(`/alarms/${alarmId}/deactivate`, axiosOpts)
+  },
 }
 
 export default alarmAPI

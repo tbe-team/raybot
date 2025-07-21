@@ -63,21 +63,21 @@ function handleRemoveFromQueue() {
 
 <template>
   <div
-    class="p-4 space-y-3 transition-colors border rounded-lg cursor-pointer bg-muted/30 border-border/50 hover:border-border"
+    class="p-4 space-y-3 rounded-lg border transition-colors cursor-pointer bg-muted/30 border-border/50 hover:border-border"
     @click="emit('viewDetails', props.command.id)"
   >
-    <div class="flex items-center justify-between">
-      <div class="flex items-center gap-2 font-medium">
+    <div class="flex justify-between items-center">
+      <div class="flex gap-2 items-center font-medium">
         <component :is="getCommandIcon(props.command.type)" class="w-5 h-5" />
         <span>{{ getCommandName(props.command.type) }}</span>
       </div>
-      <div class="flex items-center gap-2" @click.stop>
+      <div class="flex gap-2 items-center" @click.stop>
         <StatusBadge :status="props.command.status" />
         <SourceBadge :source="props.command.source" />
         <DropdownMenu>
           <DropdownMenuTrigger as-child>
             <Button variant="ghost" size="icon" class="w-8 h-8">
-              <MoreHorizontal class-name="h-4 w-4" />
+              <MoreHorizontal class="w-4 h-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" @click.stop>
@@ -92,7 +92,7 @@ function handleRemoveFromQueue() {
         </DropdownMenu>
       </div>
     </div>
-    <div class="flex items-center gap-2 text-sm text-muted-foreground">
+    <div class="flex gap-2 items-center text-sm text-muted-foreground">
       <Clock class="w-4 h-4" />
       <span>Created {{ timeSince(props.command.createdAt) }}</span>
     </div>

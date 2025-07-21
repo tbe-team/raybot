@@ -2,6 +2,7 @@ import type { ColumnDef } from '@tanstack/vue-table'
 import type { Alarm } from '@/types/alarm'
 import dayjs from 'dayjs'
 import { formatDate, formatUptimeShort } from '@/lib/date'
+import AlarmActionDropdownMenu from './AlarmActionDropdownMenu.vue'
 
 function formatDuration(dateString: string): string {
   const duration = dayjs().diff(dayjs(dateString), 'second')
@@ -28,5 +29,10 @@ export const columns: ColumnDef<Alarm>[] = [
     accessorKey: 'duration',
     header: () => h('div', { class: 'text-xs' }, 'Duration'),
     cell: ({ row }) => formatDuration(row.original.activatedAt),
+  },
+  {
+    accessorKey: 'action',
+    header: 'Action',
+    cell: ({ row }) => h(AlarmActionDropdownMenu, { alarm: row.original }),
   },
 ]
