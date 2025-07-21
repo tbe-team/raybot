@@ -9,14 +9,14 @@ import (
 	"context"
 )
 
-const alarmCountActive = `-- name: AlarmCountActive :one
+const alarmCountActivated = `-- name: AlarmCountActivated :one
 SELECT COUNT(*)
 FROM alarms
 WHERE deactivated_at IS NULL
 `
 
-func (q *Queries) AlarmCountActive(ctx context.Context, db DBTX) (int64, error) {
-	row := db.QueryRowContext(ctx, alarmCountActive)
+func (q *Queries) AlarmCountActivated(ctx context.Context, db DBTX) (int64, error) {
+	row := db.QueryRowContext(ctx, alarmCountActivated)
 	var count int64
 	err := row.Scan(&count)
 	return count, err
@@ -126,7 +126,7 @@ func (q *Queries) AlarmListActive(ctx context.Context, db DBTX, arg AlarmListAct
 	return items, nil
 }
 
-const alarmListDeactive = `-- name: AlarmListDeactive :many
+const alarmListDeactivated = `-- name: AlarmListDeactivated :many
 SELECT
 	id, type, data, activated_at, deactivated_at
 FROM alarms
@@ -136,13 +136,13 @@ LIMIT ?2
 OFFSET ?1
 `
 
-type AlarmListDeactiveParams struct {
+type AlarmListDeactivatedParams struct {
 	Offset int64 `json:"offset"`
 	Limit  int64 `json:"limit"`
 }
 
-func (q *Queries) AlarmListDeactive(ctx context.Context, db DBTX, arg AlarmListDeactiveParams) ([]Alarm, error) {
-	rows, err := db.QueryContext(ctx, alarmListDeactive, arg.Offset, arg.Limit)
+func (q *Queries) AlarmListDeactivated(ctx context.Context, db DBTX, arg AlarmListDeactivatedParams) ([]Alarm, error) {
+	rows, err := db.QueryContext(ctx, alarmListDeactivated, arg.Offset, arg.Limit)
 	if err != nil {
 		return nil, err
 	}

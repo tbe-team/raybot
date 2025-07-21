@@ -41,7 +41,7 @@ func (r Repository) ListActiveAlarms(ctx context.Context, pagingParams paging.Pa
 	})
 
 	g.Go(func() error {
-		count, err := r.queries.AlarmCountActive(ctx, r.db)
+		count, err := r.queries.AlarmCountActivated(ctx, r.db)
 		if err != nil {
 			return fmt.Errorf("failed to count active alarms: %w", err)
 		}
@@ -109,7 +109,7 @@ func (r Repository) ListDeactiveAlarms(ctx context.Context, pagingParams paging.
 
 //nolint:gosec
 func (r Repository) listDeactiveAlarms(ctx context.Context, pagingParams paging.Params) ([]alarm.Alarm, error) {
-	alarms, err := r.queries.AlarmListDeactive(ctx, r.db, sqlc.AlarmListDeactiveParams{
+	alarms, err := r.queries.AlarmListDeactivated(ctx, r.db, sqlc.AlarmListDeactivatedParams{
 		Limit:  int64(pagingParams.Limit()),
 		Offset: int64(pagingParams.Offset()),
 	})
@@ -127,6 +127,14 @@ func (r Repository) listDeactiveAlarms(ctx context.Context, pagingParams paging.
 	}
 
 	return items, nil
+}
+
+func (r Repository) CountActivatedAlarms(ctx context.Context) (int64, error) {
+	count, err := r.queries.AlarmCountActivated(ctx, r.db)
+	if err != nil {
+		return 0, fmt.Errorf("failed to count activated alarms: %w", err)
+	}
+	return count, nil
 }
 
 func (r Repository) UpsertActivatedAlarm(ctx context.Context, a alarm.Alarm) (alarm.Alarm, error) {
@@ -155,6 +163,9 @@ func (r Repository) DeactivateAlarm(ctx context.Context, id int64, deactivatedAt
 		ID:            id,
 		DeactivatedAt: ptr.New(deactivatedAt.Format(time.RFC3339Nano)),
 	}); err != nil {
+		if db.IsNoRowsError(err) {
+			return alarm.ErrAlarmNotFound
+		}
 		return fmt.Errorf("failed to deactivate alarm: %w", err)
 	}
 

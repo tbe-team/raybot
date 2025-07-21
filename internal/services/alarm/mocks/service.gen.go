@@ -25,6 +25,53 @@ func (_m *FakeService) EXPECT() *FakeService_Expecter {
 	return &FakeService_Expecter{mock: &_m.Mock}
 }
 
+// DeactivateAlarm provides a mock function with given fields: ctx, params
+func (_m *FakeService) DeactivateAlarm(ctx context.Context, params alarm.DeactivateAlarmParams) error {
+	ret := _m.Called(ctx, params)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeactivateAlarm")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, alarm.DeactivateAlarmParams) error); ok {
+		r0 = rf(ctx, params)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// FakeService_DeactivateAlarm_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeactivateAlarm'
+type FakeService_DeactivateAlarm_Call struct {
+	*mock.Call
+}
+
+// DeactivateAlarm is a helper method to define mock.On call
+//   - ctx context.Context
+//   - params alarm.DeactivateAlarmParams
+func (_e *FakeService_Expecter) DeactivateAlarm(ctx interface{}, params interface{}) *FakeService_DeactivateAlarm_Call {
+	return &FakeService_DeactivateAlarm_Call{Call: _e.mock.On("DeactivateAlarm", ctx, params)}
+}
+
+func (_c *FakeService_DeactivateAlarm_Call) Run(run func(ctx context.Context, params alarm.DeactivateAlarmParams)) *FakeService_DeactivateAlarm_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(alarm.DeactivateAlarmParams))
+	})
+	return _c
+}
+
+func (_c *FakeService_DeactivateAlarm_Call) Return(_a0 error) *FakeService_DeactivateAlarm_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *FakeService_DeactivateAlarm_Call) RunAndReturn(run func(context.Context, alarm.DeactivateAlarmParams) error) *FakeService_DeactivateAlarm_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DeleteDeactivatedAlarms provides a mock function with given fields: ctx
 func (_m *FakeService) DeleteDeactivatedAlarms(ctx context.Context) error {
 	ret := _m.Called(ctx)
