@@ -14,6 +14,26 @@ type BatteryState struct {
 	UpdatedAt    time.Time
 }
 
+func (s BatteryState) IsZero() bool {
+	return s.Current == 0 &&
+		s.Temp == 0 &&
+		s.Voltage == 0 &&
+		isAllZero(s.CellVoltages) &&
+		s.Percent == 0 &&
+		s.Fault == 0 &&
+		s.Health == 0 &&
+		s.UpdatedAt.IsZero()
+}
+
+func isAllZero(arr []uint16) bool {
+	for _, v := range arr {
+		if v != 0 {
+			return false
+		}
+	}
+	return true
+}
+
 type ChargeSetting struct {
 	CurrentLimit uint16
 	Enabled      bool

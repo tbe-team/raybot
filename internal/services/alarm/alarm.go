@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	ErrAlarmNotFound         = xerror.NotFound(nil, "alarm.notFound", "Alarm not found")
 	ErrAlarmAlreadyActivated = xerror.BadRequest(nil, "alarm.alreadyActivated", "Alarm already activated")
 )
 
@@ -25,13 +26,12 @@ type CreateAlarmParams struct {
 	ActivatedAt time.Time `validate:"required"`
 }
 
-type DeactivateAlarmParams struct {
-	ID            int64     `validate:"required"`
-	DeactivatedAt time.Time `validate:"required"`
-}
-
 type DeleteDeactivatedAlarmsByThresholdParams struct {
 	Threshold time.Time `validate:"required"`
+}
+
+type DeactivateAlarmParams struct {
+	ID int64 `validate:"required"`
 }
 
 type Service interface {
@@ -39,11 +39,13 @@ type Service interface {
 	ListDeactiveAlarms(ctx context.Context, params ListDeactiveAlarmsParams) (paging.List[Alarm], error)
 	DeleteDeactivatedAlarms(ctx context.Context) error
 	DeleteDeactivatedAlarmsByThreshold(ctx context.Context, params DeleteDeactivatedAlarmsByThresholdParams) error
+	DeactivateAlarm(ctx context.Context, params DeactivateAlarmParams) error
 }
 
 type Repository interface {
 	ListActiveAlarms(ctx context.Context, pagingParams paging.Params) (paging.List[Alarm], error)
 	ListDeactiveAlarms(ctx context.Context, pagingParams paging.Params) (paging.List[Alarm], error)
+	CountActivatedAlarms(ctx context.Context) (int64, error)
 	UpsertActivatedAlarm(ctx context.Context, alarm Alarm) (Alarm, error)
 	DeactivateAlarm(ctx context.Context, id int64, deactivatedAt time.Time) error
 	DeactivateAllAlarms(ctx context.Context) error

@@ -7,12 +7,12 @@ ORDER BY activated_at DESC
 LIMIT @limit
 OFFSET @offset;
 
--- name: AlarmCountActive :one
+-- name: AlarmCountActivated :one
 SELECT COUNT(*)
 FROM alarms
 WHERE deactivated_at IS NULL;
 
--- name: AlarmListDeactive :many
+-- name: AlarmListDeactivated :many
 SELECT
 	*
 FROM alarms
