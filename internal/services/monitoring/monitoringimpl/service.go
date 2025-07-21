@@ -2,26 +2,22 @@ package monitoringimpl
 
 import (
 	"context"
-	"fmt"
 	"log/slog"
 	"math"
 	"sync"
 	"time"
 
 	"github.com/tbe-team/raybot/internal/config"
-	"github.com/tbe-team/raybot/internal/events"
 	"github.com/tbe-team/raybot/internal/services/alarm"
 	"github.com/tbe-team/raybot/internal/services/battery"
 	configsvc "github.com/tbe-team/raybot/internal/services/config"
 	"github.com/tbe-team/raybot/internal/services/system"
-	"github.com/tbe-team/raybot/pkg/eventbus"
 )
 
 type Service struct {
-	log             *slog.Logger
-	eventSubscriber eventbus.Subscriber
-	alarmRepo       alarm.Repository
-	batteryRepo     battery.BatteryStateRepository
+	log         *slog.Logger
+	alarmRepo   alarm.Repository
+	batteryRepo battery.BatteryStateRepository
 
 	configService  configsvc.Service
 	systemService  system.Service
@@ -33,7 +29,6 @@ type Service struct {
 
 func NewService(
 	log *slog.Logger,
-	eventSubscriber eventbus.Subscriber,
 	alarmRepo alarm.Repository,
 	batteryRepo battery.BatteryStateRepository,
 	configService configsvc.Service,
@@ -41,14 +36,13 @@ func NewService(
 	batteryService battery.Service,
 ) *Service {
 	return &Service{
-		log:             log,
-		eventSubscriber: eventSubscriber,
-		alarmRepo:       alarmRepo,
-		batteryRepo:     batteryRepo,
-		configService:   configService,
-		systemService:   systemService,
-		batteryService:  batteryService,
-		stopCh:          make(chan struct{}),
+		log:            log,
+		alarmRepo:      alarmRepo,
+		batteryRepo:    batteryRepo,
+		configService:  configService,
+		systemService:  systemService,
+		batteryService: batteryService,
+		stopCh:         make(chan struct{}),
 	}
 }
 
@@ -83,30 +77,29 @@ func (s *Service) Stop() {
 }
 
 func (s *Service) startMonitorBattery(ctx context.Context) error {
-	cfg, err := s.configService.GetBatteryMonitoringConfig(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to get battery monitoring config: %w", err)
-	}
+	pollingInterval := 2 * time.Second
 
-	// check battery alarms on init
-	batteryState, err := s.batteryRepo.GetBatteryState(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to get battery state: %w", err)
-	}
-	s.checkBatteryAlarms(ctx, batteryState, cfg)
-
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel() // cancel to unsubscribe from the event
-
-	s.eventSubscriber.Subscribe(ctx, events.BatteryUpdatedTopic, func(msg *eventbus.Message) {
-		ev, ok := msg.Payload.(events.BatteryUpdatedEvent)
-		if !ok {
-			s.log.Error("invalid battery updated event", slog.Any("event", msg.Payload))
+	pollingFunc := func() {
+		state, err := s.batteryRepo.GetBatteryState(ctx)
+		if err != nil {
+			s.log.Error("failed to get battery state", slog.Any("error", err))
 			return
 		}
 
-		s.checkBatteryAlarms(ctx, ev.BatteryState, cfg)
-	})
+		if state.IsZero() {
+			return
+		}
+
+		cfg, err := s.configService.GetBatteryMonitoringConfig(ctx)
+		if err != nil {
+			s.log.Error("failed to get battery monitoring config", slog.Any("error", err))
+			return
+		}
+
+		s.checkBatteryAlarms(ctx, state, cfg)
+	}
+
+	pollingFunc()
 
 	for {
 		select {
@@ -115,6 +108,9 @@ func (s *Service) startMonitorBattery(ctx context.Context) error {
 
 		case <-s.stopCh:
 			return nil
+
+		case <-time.After(pollingInterval):
+			pollingFunc()
 		}
 	}
 }

@@ -1,0 +1,24 @@
+delete:
+  summary: Deactivate an alarm
+  operationId: deactivateAlarm
+  description: Deactivate an alarm
+  tags:
+    - alarms
+  parameters:
+    - name: alarmId
+      in: path
+      required: true
+      schema:
+        type: integer
+        description: The ID of the alarm
+        example: 1
+        x-go-type: int64
+  responses:
+    '204':
+      description: The alarm was deactivated
+    '400':
+      description: Invalid request parameters
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/error.yml#/ErrorResponse"

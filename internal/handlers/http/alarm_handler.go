@@ -72,6 +72,16 @@ func (h alarmHandler) ListAlarms(ctx context.Context, req gen.ListAlarmsRequestO
 	}, nil
 }
 
+func (h alarmHandler) DeactivateAlarm(ctx context.Context, request gen.DeactivateAlarmRequestObject) (gen.DeactivateAlarmResponseObject, error) {
+	if err := h.alarmService.DeactivateAlarm(ctx, alarm.DeactivateAlarmParams{
+		ID: request.AlarmId,
+	}); err != nil {
+		return nil, fmt.Errorf("deactivate alarm: %w", err)
+	}
+
+	return gen.DeactivateAlarm204Response{}, nil
+}
+
 func (h alarmHandler) DeleteDeactiveAlarms(ctx context.Context, _ gen.DeleteDeactiveAlarmsRequestObject) (gen.DeleteDeactiveAlarmsResponseObject, error) {
 	if err := h.alarmService.DeleteDeactivatedAlarms(ctx); err != nil {
 		return nil, fmt.Errorf("delete deactive alarms: %w", err)
