@@ -54,8 +54,8 @@ function handleClearAlarmHistory() {
 </script>
 
 <template>
-  <div v-if="isPending" class="flex flex-col gap-4 justify-center items-center pt-20">
-    <div class="flex gap-4 items-center">
+  <div v-if="isPending" class="flex flex-col items-center justify-center gap-4 pt-20">
+    <div class="flex items-center gap-4">
       <Loader class="animate-spin size-8 text-muted-foreground" />
     </div>
     <p class="text-lg text-muted-foreground">
@@ -63,8 +63,8 @@ function handleClearAlarmHistory() {
     </p>
   </div>
 
-  <div v-else-if="props.isError" class="flex flex-col gap-4 justify-center items-center pt-20">
-    <div class="flex flex-col gap-4 items-center p-6 text-red-500">
+  <div v-else-if="props.isError" class="flex flex-col items-center justify-center gap-4 pt-20">
+    <div class="flex flex-col items-center gap-4 p-6 text-red-500">
       <AlertCircle class="size-8" />
       <div class="space-y-2 text-center">
         <h2 class="text-lg font-semibold">
@@ -77,8 +77,8 @@ function handleClearAlarmHistory() {
     </div>
   </div>
 
-  <div v-else-if="!props.data" class="flex flex-col gap-4 justify-center items-center pt-20">
-    <div class="flex flex-col gap-4 items-center p-6">
+  <div v-else-if="!props.data" class="flex flex-col items-center justify-center gap-4 pt-20">
+    <div class="flex flex-col items-center gap-4 p-6">
       <AlertCircle class="size-8 text-muted-foreground" />
       <div class="space-y-2 text-center">
         <h2 class="text-lg font-semibold">
@@ -92,8 +92,8 @@ function handleClearAlarmHistory() {
   </div>
 
   <div v-else class="flex flex-col w-full">
-    <div class="flex justify-end items-center mb-6">
-      <div class="flex gap-2 items-center">
+    <div class="flex items-center justify-end mb-6">
+      <div class="flex items-center gap-2">
         <Button
           variant="outline"
           class="!text-destructive border-destructive"
@@ -103,7 +103,7 @@ function handleClearAlarmHistory() {
           <CircleMinus
             class="mr-2 size-4"
           />
-          Clear History Alarms
+          Clear Alarm History
         </Button>
         <Button
           variant="outline"
