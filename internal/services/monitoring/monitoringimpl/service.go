@@ -88,13 +88,6 @@ func (s *Service) startMonitorBattery(ctx context.Context) error {
 		return fmt.Errorf("failed to get battery monitoring config: %w", err)
 	}
 
-	// check battery alarms on init
-	batteryState, err := s.batteryRepo.GetBatteryState(ctx)
-	if err != nil {
-		return fmt.Errorf("failed to get battery state: %w", err)
-	}
-	s.checkBatteryAlarms(ctx, batteryState, cfg)
-
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel() // cancel to unsubscribe from the event
 
