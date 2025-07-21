@@ -259,7 +259,6 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	alarmService := alarmimpl.NewService(log, validator, alarmRepository)
 	monitoringService := monitoringimpl.NewService(
 		log,
-		eventBus,
 		alarmRepository,
 		batteryStateRepository,
 		configService,
