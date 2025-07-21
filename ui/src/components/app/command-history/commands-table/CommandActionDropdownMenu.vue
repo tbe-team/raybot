@@ -51,7 +51,7 @@ function handleRemoveFromHistory() {
   <DropdownMenu>
     <DropdownMenuTrigger as-child>
       <Button variant="ghost" size="icon" class="w-8 h-8" @click.stop>
-        <MoreHorizontal class-name="h-4 w-4" />
+        <MoreHorizontal class="w-4 h-4" />
       </Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent align="end">
