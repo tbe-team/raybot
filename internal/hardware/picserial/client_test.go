@@ -13,7 +13,7 @@ import (
 func TestClientWrite(t *testing.T) {
 	t.Run("Should write successfully", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		data := []byte(`{"cmd":"test"}`)
@@ -28,7 +28,7 @@ func TestClientWrite(t *testing.T) {
 	})
 
 	t.Run("Should return error when not connected", func(t *testing.T) {
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = nil
 
 		data := []byte(`{"cmd":"test"}`)
@@ -40,7 +40,7 @@ func TestClientWrite(t *testing.T) {
 
 	t.Run("Should return context cancelled error", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		ctx, cancel := context.WithCancel(context.Background())
@@ -57,7 +57,7 @@ func TestClientWrite(t *testing.T) {
 func TestClientRead(t *testing.T) {
 	t.Run("Should return simple data successfully", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		mockPort.ReadBuffer.Write([]byte(">data\r\n"))
@@ -69,7 +69,7 @@ func TestClientRead(t *testing.T) {
 
 	t.Run("Should return double start markers", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		mockPort.ReadBuffer.Write([]byte(">>data\r\n"))
@@ -81,7 +81,7 @@ func TestClientRead(t *testing.T) {
 
 	t.Run("Should return null bytes in data", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		mockPort.ReadBuffer.Write([]byte(">data\x00\r\n"))
@@ -93,7 +93,7 @@ func TestClientRead(t *testing.T) {
 
 	t.Run("Should return start marker in data", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		mockPort.ReadBuffer.Write([]byte(">>data\x00\r\n"))
@@ -105,7 +105,7 @@ func TestClientRead(t *testing.T) {
 
 	t.Run("Should return multiple line endings", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		mockPort.ReadBuffer.Write([]byte(">>data\x00\r\n\r\n"))
@@ -117,7 +117,7 @@ func TestClientRead(t *testing.T) {
 
 	t.Run("Should return random prefix", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		mockPort.ReadBuffer.Write([]byte("random>message here\r\ngarbage"))
@@ -129,7 +129,7 @@ func TestClientRead(t *testing.T) {
 
 	t.Run("Should return null bytes after message", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		mockPort.ReadBuffer.Write([]byte(">null\r\n\x00\x00"))
@@ -141,7 +141,7 @@ func TestClientRead(t *testing.T) {
 
 	t.Run("Should return empty message", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		mockPort.ReadBuffer.Write([]byte(">\r\n"))
@@ -152,7 +152,7 @@ func TestClientRead(t *testing.T) {
 	})
 
 	t.Run("Should return not connected error", func(t *testing.T) {
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = nil
 
 		res, err := client.Read(context.Background())
@@ -163,7 +163,7 @@ func TestClientRead(t *testing.T) {
 
 	t.Run("Should return EOF error on missing end marker", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		mockPort.ReadBuffer.Write([]byte(">data without end"))
@@ -176,7 +176,7 @@ func TestClientRead(t *testing.T) {
 
 	t.Run("Should return EOF error on missing start marker", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		mockPort.ReadBuffer.Write([]byte("data only"))
@@ -189,7 +189,7 @@ func TestClientRead(t *testing.T) {
 
 	t.Run("Should return context cancelled error", func(t *testing.T) {
 		mockPort := &FakeSerialPort{}
-		client := NewClient(config.Serial{})
+		client := NewClient(config.PIC{})
 		client.port = mockPort
 
 		ctx, cancel := context.WithCancel(context.Background())

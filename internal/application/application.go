@@ -167,7 +167,7 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 		}
 	}
 
-	picSerialClient := picserial.NewClient(cfg.Hardware.PIC.Serial)
+	picSerialClient := picserial.NewClient(cfg.Hardware.PIC)
 	if err := picSerialClient.Open(); err != nil {
 		log.Error("failed to open PIC serial client",
 			slog.Any("serial_cfg", cfg.Hardware.PIC.Serial),
@@ -192,6 +192,10 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 			log.Error("failed to update PIC serial connection", slog.Any("error", err))
 		}
 	}
+	if err := picSerialClient.Reset(); err != nil {
+		log.Error("failed to reset PIC serial client", slog.Any("error", err))
+	}
+
 	hardwareController := controller.New(cfg.Hardware, log, eventBus, picSerialClient, espSerialClient)
 
 	// Initialize services
