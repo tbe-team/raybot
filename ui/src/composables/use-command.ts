@@ -49,6 +49,7 @@ export function useListComandsQuery(
       sorts: sorts.value,
     }),
     placeholderData: keepPreviousData,
+    staleTime: 0,
   })
 }
 
