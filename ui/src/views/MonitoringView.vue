@@ -15,9 +15,6 @@ const { data, isPending, isError, error } = useBatteryMonitoringConfigQuery()
       </h1>
       <p class="text-sm text-muted-foreground">
         Configure monitoring alerts and thresholds for your robot
-        <RouterLink to="/reboot" class="text-blue-500">
-          (Reboot to apply changes)
-        </RouterLink>
       </p>
     </div>
 
