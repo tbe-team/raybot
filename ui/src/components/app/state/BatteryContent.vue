@@ -27,8 +27,8 @@ function getBatteryColor(percent: number): string {
   return 'text-success'
 }
 
-function convertMvToV(mv: number): number {
-  return Number.parseFloat((mv / 1000).toFixed(2))
+function convertMillivoltsToVolts(millivolts: number): number {
+  return Number.parseFloat((millivolts / 1000).toFixed(2))
 }
 
 watch(() => props.battery.updatedAt, (newVal) => {
@@ -74,7 +74,7 @@ onUnmounted(() => {
         <div class="grid grid-cols-2 gap-2">
           <span class="font-medium text-muted-foreground">Voltage</span>
           <span>
-            {{ convertMvToV(props.battery.voltage) }} V
+            {{ convertMillivoltsToVolts(props.battery.voltage) }} V
           </span>
         </div>
         <div class="grid grid-cols-2 gap-2">
@@ -86,7 +86,7 @@ onUnmounted(() => {
         <div class="grid grid-cols-2 gap-2">
           <span class="font-medium text-muted-foreground">Cell Voltages</span>
           <span>
-            {{ props.battery.cellVoltages.map(v => convertMvToV(v)).join(', ') }} V
+            {{ props.battery.cellVoltages.map(v => convertMillivoltsToVolts(v)).join(', ') }} V
           </span>
         </div>
         <div class="grid grid-cols-2 gap-2">
