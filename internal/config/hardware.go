@@ -56,6 +56,7 @@ type PIC struct {
 	Serial            Serial        `yaml:"serial"`
 	EnableACK         bool          `yaml:"enable_ack"`
 	CommandACKTimeout time.Duration `yaml:"command_ack_timeout"`
+	ResetPin          string        `yaml:"reset_pin"`
 }
 
 func (p *PIC) Validate() error {
@@ -65,6 +66,10 @@ func (p *PIC) Validate() error {
 
 	if p.CommandACKTimeout == 0 {
 		p.CommandACKTimeout = defaultCommandACKTimeout
+	}
+
+	if p.ResetPin == "" {
+		return fmt.Errorf("reset pin is required")
 	}
 
 	return nil

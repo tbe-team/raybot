@@ -48,6 +48,7 @@ export interface PICConfig {
   serial: SerialConfig
   enableAck: boolean
   commandAckTimeout: number
+  resetPin: string
 }
 
 export type Parity = 'NONE' | 'EVEN' | 'ODD'

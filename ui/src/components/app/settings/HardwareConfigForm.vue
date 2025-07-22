@@ -43,6 +43,7 @@ const hardwareConfigSchema = z.object({
     serial: serialConfigSchema,
     enableAck: z.boolean().default(false),
     commandAckTimeout: z.number().int().nonnegative('Command ack timeout must be non-negative'),
+    resetPin: z.string().min(1, 'Reset pin is required'),
   }),
   leds: z.object({
     system: ledConfigSchema.default({ pin: '' }),
@@ -473,6 +474,24 @@ function fetchPorts(newValue: boolean) {
                   </FormItem>
                 </FormField>
               </div>
+            </div>
+          </div>
+
+          <div class="space-y-6">
+            <h3 class="pb-2 text-lg font-medium border-b">
+              Reset
+            </h3>
+
+            <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+              <FormField v-slot="{ componentField }" name="pic.resetPin">
+                <FormItem>
+                  <FormLabel>Reset Pin</FormLabel>
+                  <FormControl>
+                    <Input v-bind="componentField" :disabled="isPending" placeholder="e.g. GPIO2" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              </FormField>
             </div>
           </div>
         </div>

@@ -30,6 +30,7 @@ hardware:
       read_timeout: 1s
     enable_ack: false
     command_ack_timeout: 1s
+    reset_pin: 59
   leds:
     system:
       pin: 57

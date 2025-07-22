@@ -6,6 +6,8 @@ import (
 	"sync"
 
 	"go.bug.st/serial"
+	"periph.io/x/conn/v3/gpio"
+	"periph.io/x/conn/v3/gpio/gpioreg"
 
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/pkg/xerror"
@@ -24,7 +26,7 @@ type Client interface {
 }
 
 type DefaultClient struct {
-	cfg config.Serial
+	cfg config.PIC
 
 	port serial.Port
 	mode serial.Mode
@@ -32,13 +34,13 @@ type DefaultClient struct {
 	writeMu sync.Mutex
 }
 
-func NewClient(cfg config.Serial) *DefaultClient {
+func NewClient(cfg config.PIC) *DefaultClient {
 	mode := serial.Mode{
-		BaudRate: cfg.BaudRate,
-		DataBits: int(cfg.DataBits),
+		BaudRate: cfg.Serial.BaudRate,
+		DataBits: int(cfg.Serial.DataBits),
 	}
 
-	switch cfg.StopBits {
+	switch cfg.Serial.StopBits {
 	case 1:
 		mode.StopBits = serial.OneStopBit
 	case 1.5:
@@ -47,7 +49,7 @@ func NewClient(cfg config.Serial) *DefaultClient {
 		mode.StopBits = serial.TwoStopBits
 	}
 
-	switch cfg.Parity {
+	switch cfg.Serial.Parity {
 	case "NONE":
 		mode.Parity = serial.NoParity
 	case "ODD":
@@ -69,16 +71,29 @@ func NewClientWithPort(port serial.Port) *DefaultClient {
 }
 
 func (c *DefaultClient) Open() error {
-	port, err := serial.Open(c.cfg.Port, &c.mode)
+	port, err := serial.Open(c.cfg.Serial.Port, &c.mode)
 	if err != nil {
 		return fmt.Errorf("failed to open serial port: %w", err)
 	}
 
-	if err := port.SetReadTimeout(c.cfg.ReadTimeout); err != nil {
+	if err := port.SetReadTimeout(c.cfg.Serial.ReadTimeout); err != nil {
 		return fmt.Errorf("failed to set read timeout: %w", err)
 	}
 
 	c.port = port
+	return nil
+}
+
+func (c *DefaultClient) Reset() error {
+	p := gpioreg.ByName(c.cfg.ResetPin)
+	if p == nil {
+		return fmt.Errorf("pin not found: %s", c.cfg.ResetPin)
+	}
+
+	if err := p.Out(gpio.High); err != nil {
+		return fmt.Errorf("failed to set pin to high: %w", err)
+	}
+
 	return nil
 }
 
