@@ -38,10 +38,10 @@ function handlePageSizeChange(ps: number) {
   <PageContainer>
     <div>
       <h1 class="text-xl font-semibold tracking-tight">
-        Alarm
+        Alarms
       </h1>
       <p class="text-sm text-muted-foreground">
-        View alarms
+        View and manage alarms
       </p>
     </div>
     <Tabs :default-value="tab" @update:model-value="handleTabChange">
