@@ -176,8 +176,7 @@ VALUES (?1, ?2, ?3)
 ON CONFLICT (type)
 WHERE deactivated_at IS NULL
 DO UPDATE SET
-	data = excluded.data,
-	activated_at = excluded.activated_at
+	data = excluded.data
 RETURNING id, type, data, activated_at, deactivated_at
 `
 

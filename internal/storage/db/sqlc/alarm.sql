@@ -32,8 +32,7 @@ VALUES (@type, @data, @activated_at)
 ON CONFLICT (type)
 WHERE deactivated_at IS NULL
 DO UPDATE SET
-	data = excluded.data,
-	activated_at = excluded.activated_at
+	data = excluded.data
 RETURNING *;
 
 -- name: AlarmDeactivate :exec
