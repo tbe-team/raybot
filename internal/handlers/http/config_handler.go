@@ -85,6 +85,7 @@ func (h configHandler) UpdateHardwareConfig(ctx context.Context, request gen.Upd
 			Serial:            picSerial,
 			EnableACK:         request.Body.Pic.EnableAck,
 			CommandACKTimeout: time.Duration(request.Body.Pic.CommandAckTimeout) * time.Millisecond,
+			ResetPin:          request.Body.Pic.ResetPin,
 		},
 		Leds: config.Leds{
 			System: config.Led{
@@ -284,6 +285,7 @@ func (h configHandler) convertHardwareConfigToResponse(cfg config.Hardware) gen.
 			Serial:            h.convertSerialConfigToResponse(cfg.PIC.Serial),
 			EnableAck:         cfg.PIC.EnableACK,
 			CommandAckTimeout: int(cfg.PIC.CommandACKTimeout.Milliseconds()),
+			ResetPin:          cfg.PIC.ResetPin,
 		},
 		Esp: gen.ESPConfig{
 			Serial:            h.convertSerialConfigToResponse(cfg.ESP.Serial),

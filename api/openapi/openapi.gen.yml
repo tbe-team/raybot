@@ -1003,10 +1003,16 @@ components:
           description: The timeout for the command ACK in milliseconds
           x-order: 3
           x-go-type: int
+        resetPin:
+          type: string
+          example: '59'
+          description: The pin number for the reset pin
+          x-order: 4
       required:
         - serial
         - enableAck
         - commandAckTimeout
+        - resetPin
     LedConfig:
       type: object
       properties:
