@@ -128,7 +128,7 @@ func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Contex
 		stableReadCount = 0
 	})
 
-	// Stop tracking if limit switch 1 is pressed (that means the bottom of cargo is obstructed)
+	// Stop tracking if limit switch 1 is pressed (indicates cargo mechanism has reached the bottom limit or an obstruction is detected)
 	e.subscriber.Subscribe(ctx, events.LimitSwitch1PressedTopic, func(_ *eventbus.Message) {
 		select {
 		case doneCh <- struct{}{}:
