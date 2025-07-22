@@ -74,7 +74,7 @@ onUnmounted(() => {
         <div class="grid grid-cols-2 gap-2">
           <span class="font-medium text-muted-foreground">Voltage</span>
           <span>
-            {{ props.battery.voltage }} V
+            {{ convertMvToV(props.battery.voltage) }} V
           </span>
         </div>
         <div class="grid grid-cols-2 gap-2">
