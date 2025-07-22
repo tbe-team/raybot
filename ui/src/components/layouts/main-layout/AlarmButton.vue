@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useQueryClient } from '@tanstack/vue-query'
 import { Bell } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import {
@@ -7,13 +8,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { useCountActiveAlarmsQuery } from '@/composables/use-alarm'
+import { LIST_ALARMS_QUERY_KEY, useCountActiveAlarmsQuery } from '@/composables/use-alarm'
 
 const REFRESH_INTERVAL = 5000
 const router = useRouter()
+const queryClient = useQueryClient()
 const { data, isError } = useCountActiveAlarmsQuery({
   axiosOpts: { doNotShowLoading: true },
   refetchInterval: REFRESH_INTERVAL,
+})
+
+watch(() => data.value?.count, () => {
+  queryClient.invalidateQueries({ queryKey: [LIST_ALARMS_QUERY_KEY] })
 })
 </script>
 

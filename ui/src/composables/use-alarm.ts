@@ -1,6 +1,6 @@
 import type { AxiosRequestConfig } from 'axios'
 import type { AlarmStatus } from '@/api/alarm'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/vue-query'
+import { useMutation, useQuery } from '@tanstack/vue-query'
 import alarmAPI from '@/api/alarm'
 
 export const COUNT_ACTIVE_ALARMS_QUERY_KEY = 'countActiveAlarms'
@@ -34,12 +34,7 @@ export function useDeleteDeactiveAlarmsMutation(opts?: { axiosOpts?: Partial<Axi
 }
 
 export function useDeactivateAlarmMutation(opts?: { axiosOpts?: Partial<AxiosRequestConfig> }) {
-  const queryClient = useQueryClient()
-
   return useMutation({
     mutationFn: (alarmId: number) => alarmAPI.deactivateAlarm(alarmId, opts?.axiosOpts),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [LIST_ALARMS_QUERY_KEY] })
-    },
   })
 }
