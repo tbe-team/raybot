@@ -24,6 +24,7 @@ export function useListAlarmsQuery(page: Ref<number>, pageSize: Ref<number>, sta
       status: status.value,
     }, opts?.axiosOpts),
     refetchInterval: opts?.refetchInterval,
+    staleTime: 0,
   })
 }
 
