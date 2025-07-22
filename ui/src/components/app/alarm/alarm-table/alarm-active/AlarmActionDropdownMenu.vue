@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { Alarm } from '@/types/alarm'
+import { useQueryClient } from '@tanstack/vue-query'
 import { MoreHorizontal } from 'lucide-vue-next'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
-import { useDeactivateAlarmMutation } from '@/composables/use-alarm'
+import { LIST_ALARMS_QUERY_KEY, useDeactivateAlarmMutation } from '@/composables/use-alarm'
 import { useConfirmationStore } from '@/stores/confirmation-store'
 
 const props = defineProps<{
@@ -11,6 +12,7 @@ const props = defineProps<{
 }>()
 
 const { openConfirmation } = useConfirmationStore()
+const queryClient = useQueryClient()
 
 const { mutate: deactivateAlarm } = useDeactivateAlarmMutation()
 
@@ -23,7 +25,8 @@ function handleDeactivateAlarm() {
     onAction: () => {
       deactivateAlarm(props.alarm.id, {
         onSuccess: () => {
-          notification.success('Alarm deactivated')
+          notification.success('Alarm deactivated successfully')
+          queryClient.invalidateQueries({ queryKey: [LIST_ALARMS_QUERY_KEY] })
         },
         onError: (error) => {
           notification.error(error.message)
