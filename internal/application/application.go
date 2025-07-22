@@ -7,6 +7,8 @@ import (
 	"log/slog"
 	"time"
 
+	"periph.io/x/host/v3"
+
 	"github.com/tbe-team/raybot/internal/config"
 	"github.com/tbe-team/raybot/internal/hardware/controller"
 	"github.com/tbe-team/raybot/internal/hardware/espserial"
@@ -141,6 +143,10 @@ func New(configFilePath, dbPath string) (*Application, CleanupFunc, error) {
 	alarmRepository := alarmimpl.NewRepository(db, queries)
 
 	// Initialize hardware components
+	if _, err := host.Init(); err != nil {
+		log.Error("failed to init periph", slog.Any("error", err))
+	}
+
 	espSerialClient := espserial.NewClient(cfg.Hardware.ESP.Serial)
 	if err := espSerialClient.Open(); err != nil {
 		log.Error("failed to open ESP serial client",
