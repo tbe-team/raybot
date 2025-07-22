@@ -18,8 +18,10 @@ const { data, isError } = useCountActiveAlarmsQuery({
   refetchInterval: REFRESH_INTERVAL,
 })
 
-watch(() => data.value?.count, () => {
-  queryClient.invalidateQueries({ queryKey: [LIST_ALARMS_QUERY_KEY] })
+watch(() => data.value?.count, (newValue, oldValue) => {
+  if (oldValue && newValue && oldValue < newValue) {
+    queryClient.invalidateQueries({ queryKey: [LIST_ALARMS_QUERY_KEY] })
+  }
 })
 </script>
 
@@ -33,7 +35,8 @@ watch(() => data.value?.count, () => {
           }"
         >
           <Bell class="size-5" />
-          <span v-if="data && data.count > 0" class="block absolute top-0 right-0 rounded-full border bg-destructive dark:border-white size-2" />
+          <span v-if="data && data.count > 0" class="block absolute -top-1 -right-1 rounded-full border animate-ping bg-destructive size-3" />
+          <span v-if="data && data.count > 0" class="block absolute -top-1 -right-1 rounded-full border bg-destructive dark:border-white size-3" />
         </Button>
       </TooltipTrigger>
       <TooltipContent>
