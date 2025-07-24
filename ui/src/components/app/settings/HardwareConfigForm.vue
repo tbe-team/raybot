@@ -30,7 +30,7 @@ const serialConfigSchema = z.object({
 })
 
 const ledConfigSchema = z.object({
-  pin: z.string().min(1, 'Pin is required'),
+  pin: z.string().min(1, 'Pin is required').default(''),
 })
 
 const hardwareConfigSchema = z.object({
@@ -46,9 +46,9 @@ const hardwareConfigSchema = z.object({
     resetPin: z.string().min(1, 'Reset pin is required'),
   }),
   leds: z.object({
-    system: ledConfigSchema.default({ pin: '' }),
-    alert: ledConfigSchema.default({ pin: '' }),
-  }).default({ system: { pin: '' }, alert: { pin: '' } }),
+    system: ledConfigSchema,
+    alert: ledConfigSchema,
+  }),
 }).superRefine((data, ctx) => {
   if (data.esp.serial.port === data.pic.serial.port) {
     ctx.addIssue({
@@ -105,7 +105,7 @@ function fetchPorts(newValue: boolean) {
 </script>
 
 <template>
-  <form class="flex flex-col w-full space-y-6" @submit="onSubmit">
+  <form class="flex flex-col space-y-6 w-full" @submit="onSubmit">
     <div class="grid grid-cols-1 gap-8">
       <!-- ESP Controller Section -->
       <div class="space-y-3">
@@ -266,7 +266,7 @@ function fetchPorts(newValue: boolean) {
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div class="space-y-6">
                 <FormField v-slot="{ value, handleChange }" name="esp.enableAck">
-                  <FormItem class="flex flex-row items-center justify-between p-4 border rounded-lg">
+                  <FormItem class="flex flex-row justify-between items-center p-4 rounded-lg border">
                     <FormLabel>Enable Ack</FormLabel>
                     <FormControl>
                       <Switch
@@ -451,7 +451,7 @@ function fetchPorts(newValue: boolean) {
             <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
               <div class="space-y-6">
                 <FormField v-slot="{ value, handleChange }" name="pic.enableAck">
-                  <FormItem class="flex flex-row items-center justify-between p-4 border rounded-lg">
+                  <FormItem class="flex flex-row justify-between items-center p-4 rounded-lg border">
                     <FormLabel>Enable Ack</FormLabel>
                     <FormControl>
                       <Switch
@@ -530,7 +530,7 @@ function fetchPorts(newValue: boolean) {
 
     <div>
       <Button type="submit" :disabled="isPending">
-        <Loader v-if="isPending" class="w-4 h-4 mr-2 animate-spin" />
+        <Loader v-if="isPending" class="mr-2 w-4 h-4 animate-spin" />
         Save
       </Button>
     </div>
