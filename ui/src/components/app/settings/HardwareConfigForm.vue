@@ -30,7 +30,7 @@ const serialConfigSchema = z.object({
 })
 
 const ledConfigSchema = z.object({
-  pin: z.string().min(1, 'Pin is required'),
+  pin: z.string().min(1, 'Pin is required').default(''),
 })
 
 const hardwareConfigSchema = z.object({
