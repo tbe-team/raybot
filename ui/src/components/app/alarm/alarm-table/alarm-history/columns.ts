@@ -3,8 +3,8 @@ import type { Alarm } from '@/types/alarm'
 import dayjs from 'dayjs'
 import { formatDate, formatUptimeShort } from '@/lib/date'
 
-function formatDuration(dateString: string): string {
-  const duration = dayjs().diff(dayjs(dateString), 'second')
+function caculateDuration(activatedAt: string, deactivatedAt: string): string {
+  const duration = dayjs(deactivatedAt).diff(dayjs(activatedAt), 'second')
   return formatUptimeShort(duration)
 }
 
@@ -30,6 +30,6 @@ export const columns: ColumnDef<Alarm>[] = [
   {
     accessorKey: 'duration',
     header: () => h('div', { class: 'text-xs' }, 'Duration'),
-    cell: ({ row }) => formatDuration(row.original.activatedAt),
+    cell: ({ row }) => caculateDuration(row.original.activatedAt, row.original.deactivatedAt!),
   },
 ]
