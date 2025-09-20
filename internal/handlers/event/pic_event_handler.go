@@ -20,7 +20,7 @@ func (s *Service) HandlePICSerialConnectedEvent(ctx context.Context, _ events.PI
 		LastConnectedAt:    ptr.New(time.Now()),
 		SetLastConnectedAt: true,
 	}); err != nil {
-		s.log.Error("failed to update PIC serial connection", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to update PIC serial connection", slog.Any("error", err))
 	}
 }
 
@@ -53,6 +53,6 @@ func (s *Service) HandlePICSerialDisconnectedEvent(ctx context.Context, event ev
 	})
 
 	if err := g.Wait(); err != nil {
-		s.log.Error("failed to update cloud connection", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to update cloud connection", slog.Any("error", err))
 	}
 }

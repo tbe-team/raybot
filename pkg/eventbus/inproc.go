@@ -17,7 +17,7 @@ type InProcEventBus struct {
 
 func NewInProcEventBus(log *slog.Logger) *InProcEventBus {
 	return &InProcEventBus{
-		log:         log.With("component", "inproc_event_bus"),
+		log:         log.With(slog.String("component", "inproc_event_bus")),
 		subscribers: make(map[string][]*subscriber),
 	}
 }
@@ -46,7 +46,7 @@ func (e *InProcEventBus) Publish(topic string, message *Message) {
 		go func(sub *subscriber) {
 			defer func() {
 				if r := recover(); r != nil {
-					e.log.Error("recovered panic in subscriber", slog.Any("error", r))
+					e.log.ErrorContext(context.TODO(), "recovered panic in subscriber", slog.Any("error", r))
 				}
 			}()
 

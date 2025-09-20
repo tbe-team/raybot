@@ -17,7 +17,7 @@ func (s *Service) HandleESPSerialConnectedEvent(ctx context.Context, _ events.ES
 		LastConnectedAt:    ptr.New(time.Now()),
 		SetLastConnectedAt: true,
 	}); err != nil {
-		s.log.Error("failed to update ESP serial connection", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to update ESP serial connection", slog.Any("error", err))
 	}
 }
 
@@ -28,6 +28,6 @@ func (s *Service) HandleESPSerialDisconnectedEvent(ctx context.Context, event ev
 		Error:        ptr.New(event.Error.Error()),
 		SetError:     true,
 	}); err != nil {
-		s.log.Error("failed to update ESP serial connection", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to update ESP serial connection", slog.Any("error", err))
 	}
 }

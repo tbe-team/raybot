@@ -99,7 +99,7 @@ func New(
 	return &Service{
 		opts:                  opts,
 		cfg:                   cfg,
-		log:                   log.With("service", "cloud"),
+		log:                   log.With(slog.String("service", "cloud")),
 		publisher:             publisher,
 		subscriber:            subscriber,
 		commandService:        commandService,
@@ -177,7 +177,7 @@ func (s *Service) runReverseTunnel(ctx context.Context, reverseTunnelServer *grp
 		started, err := reverseTunnelServer.Serve(ctx)
 		if !started || err != nil {
 			serveErrChan <- struct{}{}
-			s.log.Error("serving reverse tunnel failed, retrying",
+			s.log.ErrorContext(ctx, "serving reverse tunnel failed, retrying",
 				slog.Bool("started", started),
 				slog.Int("attempts", attempts),
 				slog.Duration("retry_delay", retryDelay),

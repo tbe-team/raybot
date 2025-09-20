@@ -94,7 +94,7 @@ func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Contex
 	requiredStableReadCount := e.getRequiredStableReadCount(ctx)
 	stableReadCount := 0
 
-	e.log.Info("start tracking lower position",
+	e.log.InfoContext(ctx, "start tracking lower position",
 		slog.Int64("lower_position", int64(lowerPosition)),
 		slog.Int("required_stable_read_count", requiredStableReadCount))
 
@@ -150,30 +150,30 @@ func (e cargoLowerExecutor) trackingLowerPositionUntilReached(ctx context.Contex
 func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs command.CargoLowerInputs) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Info("stop tracking bottom obstacle")
+		e.log.InfoContext(ctx, "stop tracking bottom obstacle")
 		cancel()
 	}()
 
 	obstacleTracking, err := e.getObstacleTracking(ctx)
 	if err != nil {
-		e.log.Error("failed to get obstacle tracking", slog.Any("error", err))
+		e.log.ErrorContext(ctx, "failed to get obstacle tracking", slog.Any("error", err))
 		return
 	}
 
 	bottomDistanceCh := make(chan uint16, 1)
 
-	e.log.Info("start tracking bottom obstacle")
+	e.log.InfoContext(ctx, "start tracking bottom obstacle")
 	e.subscriber.Subscribe(ctx, events.CargoBottomDistanceUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.CargoBottomDistanceUpdatedEvent)
 		if !ok {
-			e.log.Error("invalid event", slog.Any("event", msg.Payload))
+			e.log.ErrorContext(ctx, "invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
 		select {
 		case bottomDistanceCh <- ev.BottomDistance:
 		default:
-			e.log.Error("dropped message from bottom distance channel",
+			e.log.ErrorContext(ctx, "dropped message from bottom distance channel",
 				slog.Uint64("bottom_distance", uint64(ev.BottomDistance)))
 		}
 	})
@@ -188,9 +188,9 @@ func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs c
 		case bottomDistance := <-bottomDistanceCh:
 			// If the bottom distance is less than the enter distance, we stop the motor
 			if bottomDistance <= obstacleTracking.EnterDistance && isMotorRunning {
-				e.log.Info("obstacle detected, stopping motor", slog.Uint64("bottom_distance", uint64(bottomDistance)))
+				e.log.InfoContext(ctx, "obstacle detected, stopping motor", slog.Uint64("bottom_distance", uint64(bottomDistance)))
 				if err := e.liftMotorService.Stop(ctx); err != nil {
-					e.log.Error("failed to stop lift motor", slog.Any("error", err))
+					e.log.ErrorContext(ctx, "failed to stop lift motor", slog.Any("error", err))
 				}
 
 				isMotorRunning = false
@@ -199,12 +199,12 @@ func (e cargoLowerExecutor) trackingBottomObstacle(ctx context.Context, inputs c
 
 			// If the bottom distance is greater than the exit distance, we run motor again
 			if bottomDistance >= obstacleTracking.ExitDistance && !isMotorRunning {
-				e.log.Info("obstacle cleared, running motor again", slog.Uint64("bottom_distance", uint64(bottomDistance)))
+				e.log.InfoContext(ctx, "obstacle cleared, running motor again", slog.Uint64("bottom_distance", uint64(bottomDistance)))
 				if err := e.liftMotorService.SetCargoPosition(ctx, liftmotor.SetCargoPositionParams{
 					MotorSpeed: inputs.MotorSpeed,
 					Position:   inputs.Position,
 				}); err != nil {
-					e.log.Error("failed to set cargo position", slog.Any("error", err))
+					e.log.ErrorContext(ctx, "failed to set cargo position", slog.Any("error", err))
 				}
 
 				isMotorRunning = true
@@ -221,7 +221,7 @@ func (e cargoLowerExecutor) isLowerPositionReached(current, target uint16) bool 
 func (e cargoLowerExecutor) getRequiredStableReadCount(ctx context.Context) int {
 	commandCfg, err := e.configService.GetCommandConfig(ctx)
 	if err != nil {
-		e.log.Error("failed to get command config", slog.Any("error", err))
+		e.log.ErrorContext(ctx, "failed to get command config", slog.Any("error", err))
 		return 1
 	}
 	return int(commandCfg.CargoLower.StableReadCount)
@@ -230,7 +230,7 @@ func (e cargoLowerExecutor) getRequiredStableReadCount(ctx context.Context) int 
 func (e cargoLowerExecutor) getObstacleTracking(ctx context.Context) (config.ObstacleTracking, error) {
 	commandCfg, err := e.configService.GetCommandConfig(ctx)
 	if err != nil {
-		e.log.Error("failed to get command config", slog.Any("error", err))
+		e.log.ErrorContext(ctx, "failed to get command config", slog.Any("error", err))
 		return config.ObstacleTracking{
 			EnterDistance: 10,
 			ExitDistance:  20,

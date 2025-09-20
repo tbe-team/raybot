@@ -40,12 +40,12 @@ func NewService(
 func (s *Service) Start(ctx context.Context) {
 	systemLed, err := ledh.New(s.cfg.System.Pin)
 	if err != nil {
-		s.log.Error("failed to create system led", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to create system led", slog.Any("error", err))
 		if err := s.repository.UpdateSystemLedConnection(ctx, led.Connection{
 			Connected: false,
 			Error:     ptr.New(err.Error()),
 		}); err != nil {
-			s.log.Error("failed to update system led connection", slog.Any("error", err))
+			s.log.ErrorContext(ctx, "failed to update system led connection", slog.Any("error", err))
 		}
 	} else {
 		s.systemLed = systemLed
@@ -53,18 +53,18 @@ func (s *Service) Start(ctx context.Context) {
 			Connected:       true,
 			LastConnectedAt: ptr.New(time.Now()),
 		}); err != nil {
-			s.log.Error("failed to update system led connection", slog.Any("error", err))
+			s.log.ErrorContext(ctx, "failed to update system led connection", slog.Any("error", err))
 		}
 	}
 
 	alertLed, err := ledh.New(s.cfg.Alert.Pin)
 	if err != nil {
-		s.log.Error("failed to create alert led", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to create alert led", slog.Any("error", err))
 		if err := s.repository.UpdateAlertLedConnection(ctx, led.Connection{
 			Connected: false,
 			Error:     ptr.New(err.Error()),
 		}); err != nil {
-			s.log.Error("failed to update alert led connection", slog.Any("error", err))
+			s.log.ErrorContext(ctx, "failed to update alert led connection", slog.Any("error", err))
 		}
 	} else {
 		s.alertLed = alertLed
@@ -72,16 +72,16 @@ func (s *Service) Start(ctx context.Context) {
 			Connected:       true,
 			LastConnectedAt: ptr.New(time.Now()),
 		}); err != nil {
-			s.log.Error("failed to update alert led connection", slog.Any("error", err))
+			s.log.ErrorContext(ctx, "failed to update alert led connection", slog.Any("error", err))
 		}
 	}
 
 	if err := s.SetSystemLedOn(ctx); err != nil {
-		s.log.Error("failed to set system led on", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to set system led on", slog.Any("error", err))
 	}
 
 	if err = s.SetAlertLedOff(ctx); err != nil {
-		s.log.Error("failed to set alert led on", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to set alert led on", slog.Any("error", err))
 	}
 }
 
@@ -142,7 +142,7 @@ func (s *Service) BlinkSystemLed(ctx context.Context, params led.BlinkSystemLedP
 			Mode:      led.ModeOff,
 			UpdatedAt: time.Now(),
 		}); err != nil {
-			s.log.Error("failed to update system led state", slog.Any("error", err))
+			s.log.ErrorContext(ctx, "failed to update system led state", slog.Any("error", err))
 		}
 	}()
 
@@ -211,7 +211,7 @@ func (s *Service) BlinkAlertLed(ctx context.Context, params led.BlinkAlertLedPar
 			Mode:      led.ModeOff,
 			UpdatedAt: time.Now(),
 		}); err != nil {
-			s.log.Error("failed to update alert led state", slog.Any("error", err))
+			s.log.ErrorContext(ctx, "failed to update alert led state", slog.Any("error", err))
 		}
 	}()
 
