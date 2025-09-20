@@ -139,4 +139,4 @@ test-cov:
 ########################
 .PHONY: lint-go
 lint-go:
-	golangci-lint run ./... --config .golangci.yml
+	go run github.com/golangci/golangci-lint/v2/cmd/golangci-lint@v2.4.0 run ./... --config .golangci.yml
