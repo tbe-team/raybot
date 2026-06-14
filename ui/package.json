@@ -52,7 +52,7 @@
     "typescript": "~5.9.0",
     "unplugin-auto-import": "^19.1.1",
     "vite": "^6.2.1",
-    "vite-plugin-vue-devtools": "^7.7.2",
+    "vite-plugin-vue-devtools": "^8.0.0",
     "vue-tsc": "^3.0.0"
   },
   "pnpm": {
