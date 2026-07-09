@@ -42,7 +42,7 @@ func NewService(
 ) command.Service {
 	s := &Service{
 		deleteOldCmdCfg:      deleteOldCmdCfg,
-		log:                  log.With("service", "command"),
+		log:                  log.With(slog.String("service", "command")),
 		validator:            validator,
 		publisher:            publisher,
 		runningCmdRepository: runningCmdRepository,
@@ -197,7 +197,7 @@ func (s *Service) DeleteOldCommands(ctx context.Context) error {
 
 func (s *Service) cancelQueuedAndProcessingCommands(ctx context.Context) {
 	if err := s.commandRepository.CancelPendingCommands(ctx); err != nil {
-		s.log.Error("failed to cancel queued and processing commands on startup", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to cancel queued and processing commands on startup", slog.Any("error", err))
 	}
 }
 
@@ -210,7 +210,7 @@ func (s *Service) runNextExecutableCommand(ctx context.Context) error {
 		return fmt.Errorf("get next executable command: %w", err)
 	}
 
-	s.log.Info("found executable command, executing",
+	s.log.InfoContext(ctx, "found executable command, executing",
 		slog.Int64("command_id", cmd.ID),
 		slog.String("command_type", cmd.Type.String()),
 		slog.Any("command_inputs", cmd.Inputs),

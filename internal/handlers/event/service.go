@@ -31,7 +31,7 @@ func New(
 	systemService system.Service,
 ) *Service {
 	return &Service{
-		log:             log.With("service", "event"),
+		log:             log.With(slog.String("service", "event")),
 		subscriber:      subscriber,
 		appStateService: appStateService,
 		commandService:  commandService,
@@ -58,7 +58,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.CloudConnectedEvent)
 			if !ok {
-				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
+				s.log.ErrorContext(ctx, "received invalid event", slog.Any("event", msg.Payload))
 				return
 			}
 
@@ -72,7 +72,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.CloudDisconnectedEvent)
 			if !ok {
-				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
+				s.log.ErrorContext(ctx, "received invalid event", slog.Any("event", msg.Payload))
 				return
 			}
 
@@ -86,7 +86,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.ESPSerialConnectedEvent)
 			if !ok {
-				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
+				s.log.ErrorContext(ctx, "received invalid event", slog.Any("event", msg.Payload))
 				return
 			}
 
@@ -100,7 +100,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.ESPSerialDisconnectedEvent)
 			if !ok {
-				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
+				s.log.ErrorContext(ctx, "received invalid event", slog.Any("event", msg.Payload))
 				return
 			}
 
@@ -114,7 +114,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.PICSerialConnectedEvent)
 			if !ok {
-				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
+				s.log.ErrorContext(ctx, "received invalid event", slog.Any("event", msg.Payload))
 				return
 			}
 
@@ -128,7 +128,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.PICSerialDisconnectedEvent)
 			if !ok {
-				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
+				s.log.ErrorContext(ctx, "received invalid event", slog.Any("event", msg.Payload))
 				return
 			}
 
@@ -142,7 +142,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.RFIDUSBConnectedEvent)
 			if !ok {
-				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
+				s.log.ErrorContext(ctx, "received invalid event", slog.Any("event", msg.Payload))
 				return
 			}
 
@@ -156,7 +156,7 @@ func (s *Service) registerHandlers(ctx context.Context) {
 		func(msg *eventbus.Message) {
 			ev, ok := msg.Payload.(events.RFIDUSBDisconnectedEvent)
 			if !ok {
-				s.log.Error("received invalid event", slog.Any("event", msg.Payload))
+				s.log.ErrorContext(ctx, "received invalid event", slog.Any("event", msg.Payload))
 				return
 			}
 

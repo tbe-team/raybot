@@ -43,7 +43,7 @@ func NewSQLiteDB(path string) (*SQLiteDB, error) {
 }
 
 func (p *SQLiteDB) WithTX(ctx context.Context, fn func(DB) error) (err error) {
-	tx, err := p.DB.BeginTx(ctx, nil)
+	tx, err := p.BeginTx(ctx, nil)
 	if err != nil {
 		return fmt.Errorf("begin tx: %w", err)
 	}

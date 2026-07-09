@@ -24,7 +24,7 @@ type service struct {
 func NewService(cfg config.Wifi, log *slog.Logger) wifi.Service {
 	return &service{
 		cfg: cfg,
-		log: log.With("service", "wifi"),
+		log: log.With(slog.String("service", "wifi")),
 	}
 }
 

@@ -82,7 +82,7 @@ func (s *Service) startMonitorBattery(ctx context.Context) error {
 	pollingFunc := func() {
 		state, err := s.batteryRepo.GetBatteryState(ctx)
 		if err != nil {
-			s.log.Error("failed to get battery state", slog.Any("error", err))
+			s.log.ErrorContext(ctx, "failed to get battery state", slog.Any("error", err))
 			return
 		}
 
@@ -92,7 +92,7 @@ func (s *Service) startMonitorBattery(ctx context.Context) error {
 
 		cfg, err := s.configService.GetBatteryMonitoringConfig(ctx)
 		if err != nil {
-			s.log.Error("failed to get battery monitoring config", slog.Any("error", err))
+			s.log.ErrorContext(ctx, "failed to get battery monitoring config", slog.Any("error", err))
 			return
 		}
 
@@ -290,14 +290,14 @@ func (s *Service) handleBatteryAlarm(ctx context.Context, data alarm.BatteryData
 		ActivatedAt: time.Now(),
 	})
 	if err != nil {
-		s.log.Error("failed to create battery alarm", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to create battery alarm", slog.Any("error", err))
 	}
 
 	if err := s.systemService.SetStatusError(ctx); err != nil {
-		s.log.Error("failed to set system status error due to alarm", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to set system status error due to alarm", slog.Any("error", err))
 	}
 
 	if err := s.batteryService.DisableCharge(ctx); err != nil {
-		s.log.Error("failed to disable charge due to alarm", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to disable charge due to alarm", slog.Any("error", err))
 	}
 }

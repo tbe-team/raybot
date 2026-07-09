@@ -26,7 +26,7 @@ func NewService(
 	repo limitswitch.Repository,
 ) limitswitch.Service {
 	return &Service{
-		log:       log.With("service", "limitswitch"),
+		log:       log.With(slog.String("service", "limitswitch")),
 		validator: validator,
 		publisher: publisher,
 		repo:      repo,
@@ -71,7 +71,7 @@ func (s Service) UpdateLimitSwitchByID(ctx context.Context, params limitswitch.U
 	return nil
 }
 
-func (s Service) publishLimitSwitchPressedEvent(_ context.Context, id limitswitch.LimitSwitchID, pressedAt time.Time) {
+func (s Service) publishLimitSwitchPressedEvent(ctx context.Context, id limitswitch.LimitSwitchID, pressedAt time.Time) {
 	switch id {
 	case limitswitch.LimitSwitchID1:
 		s.publisher.Publish(events.LimitSwitch1PressedTopic, &eventbus.Message{
@@ -81,6 +81,6 @@ func (s Service) publishLimitSwitchPressedEvent(_ context.Context, id limitswitc
 		})
 
 	default:
-		s.log.Error("invalid limit switch id", slog.Any("id", id))
+		s.log.ErrorContext(ctx, "invalid limit switch id", slog.Any("id", id))
 	}
 }

@@ -93,7 +93,7 @@ func (e cargoLiftExecutor) trackingLiftPositionUntilReached(ctx context.Context,
 	requiredStableReadCount := e.getRequiredStableReadCount(ctx)
 	stableReadCount := 0
 
-	e.log.Info("start tracking lift position",
+	e.log.InfoContext(ctx, "start tracking lift position",
 		slog.Int64("target_position", int64(liftPosition)),
 		slog.Int("required_stable_read_count", requiredStableReadCount))
 
@@ -101,13 +101,13 @@ func (e cargoLiftExecutor) trackingLiftPositionUntilReached(ctx context.Context,
 	e.subscriber.Subscribe(ctx, events.DistanceSensorUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.UpdateDistanceSensorEvent)
 		if !ok {
-			e.log.Error("invalid event", slog.Any("event", msg.Payload))
+			e.log.ErrorContext(ctx, "invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
 		if e.isLiftPositionReached(ev.DownDistance, liftPosition) {
 			stableReadCount++
-			e.log.Info("lift position reached",
+			e.log.InfoContext(ctx, "lift position reached",
 				slog.Int("stable_read_count", stableReadCount),
 				slog.Int("required_stable_read_count", requiredStableReadCount),
 				slog.Int64("down_distance", int64(ev.DownDistance)),
@@ -122,7 +122,7 @@ func (e cargoLiftExecutor) trackingLiftPositionUntilReached(ctx context.Context,
 			return
 		}
 
-		e.log.Warn("reset stable read count",
+		e.log.WarnContext(ctx, "reset stable read count",
 			slog.Int64("down_distance", int64(ev.DownDistance)))
 		stableReadCount = 0
 	})
@@ -143,7 +143,7 @@ func (cargoLiftExecutor) isLiftPositionReached(current, target uint16) bool {
 func (e cargoLiftExecutor) getRequiredStableReadCount(ctx context.Context) int {
 	commandCfg, err := e.configService.GetCommandConfig(ctx)
 	if err != nil {
-		e.log.Error("failed to get command config", slog.Any("error", err))
+		e.log.ErrorContext(ctx, "failed to get command config", slog.Any("error", err))
 		return 1
 	}
 	return int(commandCfg.CargoLift.StableReadCount)

@@ -4,7 +4,9 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"time"
 
+	"github.com/lmittmann/tint"
 	"gopkg.in/natefinch/lumberjack.v2"
 
 	"github.com/tbe-team/raybot/internal/config"
@@ -57,8 +59,17 @@ func newConsoleHandler(cfg config.LogConsoleHandler) slog.Handler {
 		})
 	}
 
-	return slog.NewTextHandler(os.Stderr, &slog.HandlerOptions{
-		Level: cfg.Level,
+	return tint.NewHandler(os.Stdout, &tint.Options{
+		Level:      cfg.Level,
+		TimeFormat: time.RFC3339,
+		ReplaceAttr: func(_ []string, a slog.Attr) slog.Attr {
+			if a.Value.Kind() == slog.KindAny {
+				if _, ok := a.Value.Any().(error); ok {
+					return tint.Attr(9, a)
+				}
+			}
+			return a
+		},
 	})
 }
 

@@ -31,7 +31,7 @@ func New(
 ) *Service {
 	return &Service{
 		cronCfg:        cronCfg,
-		log:            log.With("service", "jobs"),
+		log:            log.With(slog.String("service", "jobs")),
 		subscriber:     subscriber,
 		commandService: commandService,
 		alarmService:   alarmService,

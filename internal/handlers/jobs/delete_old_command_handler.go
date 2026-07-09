@@ -50,7 +50,7 @@ func (h *deleteOldCommandHandler) run(ctx context.Context, stoppedCh chan struct
 
 		case <-time.After(h.deleteOldCommandCfg.ScheduleDuration()):
 			if err := h.commandService.DeleteOldCommands(ctx); err != nil {
-				h.log.Error("failed to delete old commands", slog.Any("error", err))
+				h.log.ErrorContext(ctx, "failed to delete old commands", slog.Any("error", err))
 			}
 		}
 	}

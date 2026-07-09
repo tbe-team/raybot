@@ -29,7 +29,7 @@ func newExecuteCommandHandler(
 	subscriber eventbus.Subscriber,
 ) *executeCommandHandler {
 	return &executeCommandHandler{
-		log:            log.With("service", "execute_command_handler"),
+		log:            log.With(slog.String("service", "execute_command_handler")),
 		commandService: commandService,
 		subscriber:     subscriber,
 	}
@@ -81,6 +81,6 @@ func (h *executeCommandHandler) handle(ctx context.Context) {
 	defer h.running.Store(false)
 
 	if err := h.commandService.RunNextExecutableCommand(ctx); err != nil {
-		h.log.Error("failed to find next executable command and run", slog.Any("error", err))
+		h.log.ErrorContext(ctx, "failed to find next executable command and run", slog.Any("error", err))
 	}
 }
