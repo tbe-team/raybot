@@ -38,6 +38,7 @@ Cấu trúc JSON:
 | 1    | uint8        | Cấu hình xả pin            |
 | 2    | uint8        | Cấu hình động cơ nâng hạ   |
 | 3    | uint8        | Cấu hình động cơ di chuyển |
+| 4    | uint8        | Ping (kiểm tra kết nối)    |
 
 ### cmd_data
 
@@ -93,4 +94,13 @@ Ví dụ:
 Ví dụ:
 ```json
 >{"id":"abc","type":3,"data":{"direction":1,"speed":50,"enable":1}}\r\n
+```
+
+### 2.5. Ping (cmd_type = 4)
+
+Lệnh ping dùng để kiểm tra kết nối với thiết bị.
+
+Ví dụ:
+```json
+>{"id":"abc","type":4}\r\n
 ```
