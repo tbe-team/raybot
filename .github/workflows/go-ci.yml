@@ -23,7 +23,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24.x"
+          go-version: "1.27.x"
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
@@ -47,7 +47,7 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24.x"
+          go-version: "1.27.x"
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v6
         with:
@@ -62,6 +62,6 @@ jobs:
       - name: Setup go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24.x"
+          go-version: "1.27.x"
       - name: Test
         run: go test ./... -v -failfast
