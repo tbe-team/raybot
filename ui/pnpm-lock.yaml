@@ -86,7 +86,7 @@ importers:
         version: 0.2.3
       '@vitejs/plugin-vue':
         specifier: ^6.0.0
-        version: 6.0.7(vite@6.3.5(@types/node@22.17.1)(jiti@2.5.1)(yaml@2.8.0))(vue@3.5.24(typescript@5.9.3))
+        version: 6.0.8(vite@6.3.5(@types/node@22.17.1)(jiti@2.5.1)(yaml@2.8.0))(vue@3.5.24(typescript@5.9.3))
       '@vue/eslint-config-typescript':
         specifier: ^14.5.0
         version: 14.6.0(eslint-plugin-vue@10.4.0(@typescript-eslint/parser@8.35.1(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.3))(eslint@9.33.0(jiti@2.5.1))(vue-eslint-parser@10.2.0(eslint@9.33.0(jiti@2.5.1))))(eslint@9.33.0(jiti@2.5.1))(typescript@5.9.3)
@@ -971,8 +971,8 @@ packages:
     peerDependencies:
       zod: ^3.24.0
 
-  '@vitejs/plugin-vue@6.0.7':
-    resolution: {integrity: sha512-km+p+XdSz9Sxm5rqUbqcSfZYaAniKxWBj1KURl+Jr7UaPvvX7BmaWMdP69I5rrFDeQGyxAG7NXdc57vz+snhWg==}
+  '@vitejs/plugin-vue@6.0.8':
+    resolution: {integrity: sha512-0ZjgOg7oO6farnNGup7yvoM/YXZV84OZxHAwtflItNa/6zzQyVb5LNxyea3FEKEX2XlagIKzrlH7wwxkKgtiew==}
     engines: {node: ^20.19.0 || >=22.12.0}
     peerDependencies:
       vite: ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0
@@ -3848,7 +3848,7 @@ snapshots:
     transitivePeerDependencies:
       - vue
 
-  '@vitejs/plugin-vue@6.0.7(vite@6.3.5(@types/node@22.17.1)(jiti@2.5.1)(yaml@2.8.0))(vue@3.5.24(typescript@5.9.3))':
+  '@vitejs/plugin-vue@6.0.8(vite@6.3.5(@types/node@22.17.1)(jiti@2.5.1)(yaml@2.8.0))(vue@3.5.24(typescript@5.9.3))':
     dependencies:
       '@rolldown/pluginutils': 1.0.1
       vite: 6.3.5(@types/node@22.17.1)(jiti@2.5.1)(yaml@2.8.0)
