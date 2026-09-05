@@ -16,7 +16,7 @@ importers:
         version: 8.21.3(vue@3.5.42(typescript@5.9.3))
       '@vee-validate/zod':
         specifier: ^4.15.0
-        version: 4.15.1(vue@3.5.42(typescript@5.9.3))(zod@4.0.17)
+        version: 4.15.1(vue@3.5.42(typescript@5.9.3))(zod@4.5.4)
       '@vueuse/core':
         specifier: ^13.0.0
         version: 13.9.0(vue@3.5.42(typescript@5.9.3))
@@ -67,7 +67,7 @@ importers:
         version: 4.6.4(vue@3.5.42(typescript@5.9.3))
       zod:
         specifier: ^4.0.0
-        version: 4.0.17
+        version: 4.5.4
     devDependencies:
       '@antfu/eslint-config':
         specifier: ^4.8.1
@@ -3056,8 +3056,8 @@ packages:
     resolution: {integrity: sha512-xYqdZFUK/VYazNl/oCDYN+3WloWQwMfZxBoiNt6qNyk+xfOdi598muWE42rNZFp1kNOiqW936q5RhUdnpqElSg==}
     engines: {node: '>=18'}
 
-  zod@4.0.17:
-    resolution: {integrity: sha512-1PHjlYRevNxxdy2JZ8JcNAw7rX8V9P1AKkP+x/xZfxB0K5FYfuV+Ug6P/6NVSR2jHQ+FzDDoDHS04nYUsOIyLQ==}
+  zod@4.5.4:
+    resolution: {integrity: sha512-sC95tT5iHHH9gtpj6A81kh+NEaRAUFN+qlUPDUbRfOMvNf5QCBqsb3WgvnpVtK5Y+4UfA6KqufotuTvMGiTlsA==}
 
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
@@ -3934,11 +3934,11 @@ snapshots:
       '@typescript-eslint/types': 8.69.0
       eslint-visitor-keys: 5.0.1
 
-  '@vee-validate/zod@4.15.1(vue@3.5.42(typescript@5.9.3))(zod@4.0.17)':
+  '@vee-validate/zod@4.15.1(vue@3.5.42(typescript@5.9.3))(zod@4.5.4)':
     dependencies:
       type-fest: 4.41.0
       vee-validate: 4.15.1(vue@3.5.42(typescript@5.9.3))
-      zod: 4.0.17
+      zod: 4.5.4
     transitivePeerDependencies:
       - vue
 
@@ -6242,6 +6242,6 @@ snapshots:
 
   yoctocolors@2.2.0: {}
 
-  zod@4.0.17: {}
+  zod@4.5.4: {}
 
   zwitch@2.0.4: {}
