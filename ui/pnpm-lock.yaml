@@ -72,9 +72,9 @@ importers:
       '@antfu/eslint-config':
         specifier: ^4.8.1
         version: 4.19.0(@vue/compiler-sfc@3.5.42)(eslint@9.39.5(jiti@2.7.0))(typescript@5.9.3)
-      '@tsconfig/node22':
-        specifier: ^22.0.0
-        version: 22.0.6
+      '@tsconfig/node24':
+        specifier: ^24.0.0
+        version: 24.0.5
       '@types/lodash-es':
         specifier: ^4.17.12
         version: 4.17.12
@@ -821,8 +821,8 @@ packages:
     peerDependencies:
       vue: ^2.7.0 || ^3.0.0
 
-  '@tsconfig/node22@22.0.6':
-    resolution: {integrity: sha512-/5thavHAnWDZwH2H6eEn/T8pBEBhtuKaWGMslsj82kJfvzQgOgEMK7X4goBbIUjgVtAzPTtM9Ml64LA0uxO6Iw==}
+  '@tsconfig/node24@24.0.5':
+    resolution: {integrity: sha512-DWC54fGPuhZgg3Ighg4Y/A/bA3ZdB5hnzAuv/MkQ/X85sVsBsMQxu8t7khutdYeiNksBbFdDyeqv1HSW2Zl8aA==}
 
   '@types/debug@4.1.12':
     resolution: {integrity: sha512-vIChWdVG3LG1SMxEvI/AK+FWJthlrqlTu7fbrlywTkkaONwk/UAGaULXRlf8vkzFBLVm0zkMdCquhL5aOjhXPQ==}
@@ -3714,7 +3714,7 @@ snapshots:
       '@tanstack/virtual-core': 3.17.8
       vue: 3.5.42(typescript@5.9.3)
 
-  '@tsconfig/node22@22.0.6': {}
+  '@tsconfig/node24@24.0.5': {}
 
   '@types/debug@4.1.12':
     dependencies:
