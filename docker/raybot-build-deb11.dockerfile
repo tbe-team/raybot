@@ -38,7 +38,7 @@ RUN go build -o bin/raybot\
     cmd/raybot/main.go
 
 
-FROM alpine:3.22.1 AS prod
+FROM alpine:3.24.1 AS prod
 
 WORKDIR /app
 
