@@ -1,6 +1,6 @@
 module github.com/tbe-team/raybot
 
-go 1.24.2
+go 1.25.0
 
 require (
 	github.com/Masterminds/squirrel v1.5.4
@@ -26,7 +26,7 @@ require (
 	google.golang.org/protobuf v1.36.6
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	gopkg.in/yaml.v3 v3.0.1
-	periph.io/x/conn/v3 v3.7.2
+	periph.io/x/conn/v3 v3.7.3
 	periph.io/x/host/v3 v3.8.5
 )
 
