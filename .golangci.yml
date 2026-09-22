@@ -1,36 +1,69 @@
-run:
-  timeout: 5m
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
-    - gofmt
-    - unused
-    - gosimple
-    - copyloopvar
+    - errcheck
     - gocritic
     - gosec
-    - errcheck
-    - goimports
+    - govet
+    - ineffassign
     - revive
     - staticcheck
-    - govet
-    - stylecheck
     - unconvert
-    - ineffassign
-
-linters-settings:
-  goimports:
-    local-prefixes: github.com/tbe-team/raybot
-  staticcheck:
-    checks:
-      - all
-      - "-ST1003"
-      - "-SA4006"
-      - "-SA1029"
-  stylecheck:
-    checks:
-      - all
-      - "-ST1003"
-      - "-SA4006"
-      - "-ST1016"
-      - "-ST1005"
+    - unused
+    - sloglint
+  settings:
+    staticcheck:
+      checks:
+        - -SA1029
+        - -SA4006
+        - -ST1003
+        - -ST1005
+        - -ST1016
+        - all
+    sloglint:
+      no-mixed-args: true
+      attr-only: true
+      context: scope
+      static-msg: true
+      msg-style: lowercased
+      key-naming-case: snake
+      args-on-sep-lines: true
+      no-global: all
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - path: (.+)\.go$
+        text: by other packages, and that stutters; consider calling this
+      - path: (.+)\.go$
+        text: "var-naming:"
+      - path: (.+)\.go$
+        text: "receiver-naming:"
+      - path: (.+)\.go$
+        text: "unexported-return:"
+      - path: (.+)\.go$
+        text: "unused-parameter: parameter"
+      - path: (.+)\.go$
+        text: "context-keys-type: should not use basic type string"
+      - path: (.+)\.go$
+        text: error strings should not be capitalized
+      - linters:
+          - staticcheck
+        text: "ST1003:"
+    paths:
+      - '(.+)_test\.go'
+formatters:
+  enable:
+    - gofmt
+    - goimports
+  settings:
+    goimports:
+      local-prefixes:
+        - github.com/tbe-team/raybot
+  exclusions:
+    generated: disable

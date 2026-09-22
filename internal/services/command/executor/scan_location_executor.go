@@ -69,18 +69,18 @@ func (e scanLocationExecutor) OnCancel(ctx context.Context) error {
 func (e scanLocationExecutor) recordLocationsUntilLoopedBack(ctx context.Context) []command.Location {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Info("stop recording location")
+		e.log.InfoContext(ctx, "stop recording location")
 		cancel()
 	}()
 
 	locs := []command.Location{}
 
 	doneCh := make(chan struct{})
-	e.log.Info("start recording location")
+	e.log.InfoContext(ctx, "start recording location")
 	e.subscriber.Subscribe(ctx, events.LocationUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.LocationUpdatedEvent)
 		if !ok {
-			e.log.Error("invalid event", slog.Any("event", msg.Payload))
+			e.log.ErrorContext(ctx, "invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
@@ -90,7 +90,7 @@ func (e scanLocationExecutor) recordLocationsUntilLoopedBack(ctx context.Context
 			return
 		}
 
-		e.log.Info("record location", slog.String("location", ev.Location))
+		e.log.InfoContext(ctx, "record location", slog.String("location", ev.Location))
 		locs = append(locs, command.Location{
 			Location:  ev.Location,
 			ScannedAt: time.Now(),

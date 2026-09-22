@@ -74,7 +74,7 @@ func (s Service) DeleteDeactivatedAlarmsByThreshold(ctx context.Context, params 
 
 func (s Service) deactivateAllActivatedAlarms(ctx context.Context) {
 	if err := s.alarmRepo.DeactivateAllAlarms(ctx); err != nil {
-		s.log.Error("failed to deactivate all activated alarms", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to deactivate all activated alarms", slog.Any("error", err))
 	}
 }
 
@@ -101,7 +101,7 @@ func (s Service) DeactivateAlarm(ctx context.Context, params alarm.DeactivateAla
 		g.Go(func() error {
 			if err := s.ledService.SetAlertLedOff(ctx); err != nil {
 				if errors.Is(err, led.ErrLedNotConnected) {
-					s.log.Warn("alert led is not connected, skipping")
+					s.log.WarnContext(ctx, "alert led is not connected, skipping")
 					return nil
 				}
 				return fmt.Errorf("failed to set alert led off: %w", err)

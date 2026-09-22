@@ -53,7 +53,7 @@ func New(
 ) *Service {
 	return &Service{
 		cfg:                  cfg,
-		log:                  log.With("service", "http"),
+		log:                  log.With(slog.String("service", "http")),
 		configService:        configService,
 		systemService:        systemService,
 		dashboardDataService: dashboardDataService,

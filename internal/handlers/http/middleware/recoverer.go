@@ -37,7 +37,7 @@ func Recoverer(log *slog.Logger) func(http.Handler) http.Handler {
 						panic(rvr)
 					}
 
-					log.Error("panic", slog.Any("recover", rvr),
+					log.ErrorContext(r.Context(), "http panic", slog.Any("recover", rvr),
 						slog.String("stack", string(debug.Stack())))
 
 					if r.Header.Get("Connection") != "Upgrade" {

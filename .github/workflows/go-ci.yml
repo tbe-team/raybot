@@ -15,7 +15,7 @@ on:
 
 jobs:
   code-gen:
-    name: Code Generation
+    name: Verify code generation
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -39,7 +39,7 @@ jobs:
           fi
 
   golangci:
-    name: GolangCI
+    name: Run golangci-lint
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -49,9 +49,9 @@ jobs:
         with:
           go-version: "1.24.x"
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v8
         with:
-          version: v1.64.6
+          version: v2.4.0
 
   test:
     name: Test

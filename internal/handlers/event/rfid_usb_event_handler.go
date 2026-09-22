@@ -20,7 +20,7 @@ func (s *Service) HandleRFIDUSBConnectedEvent(ctx context.Context, _ events.RFID
 		LastConnectedAt:    ptr.New(time.Now()),
 		SetLastConnectedAt: true,
 	}); err != nil {
-		s.log.Error("failed to update RFID USB connection", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to update RFID USB connection", slog.Any("error", err))
 	}
 }
 
@@ -53,6 +53,6 @@ func (s *Service) HandleRFIDUSBDisconnectedEvent(ctx context.Context, event even
 	})
 
 	if err := g.Wait(); err != nil {
-		s.log.Error("failed to update cloud connection", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to update cloud connection", slog.Any("error", err))
 	}
 }

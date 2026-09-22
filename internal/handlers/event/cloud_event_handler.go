@@ -20,7 +20,7 @@ func (s *Service) HandleCloudConnectedEvent(ctx context.Context, _ events.CloudC
 		LastConnectedAt:    ptr.New(time.Now()),
 		SetLastConnectedAt: true,
 	}); err != nil {
-		s.log.Error("failed to update cloud connection", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to update cloud connection", slog.Any("error", err))
 	}
 }
 
@@ -61,6 +61,6 @@ func (s *Service) HandleCloudDisconnectedEvent(ctx context.Context, event events
 	})
 
 	if err := g.Wait(); err != nil {
-		s.log.Error("failed to update cloud connection", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to update cloud connection", slog.Any("error", err))
 	}
 }

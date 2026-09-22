@@ -54,7 +54,7 @@ func (h *deleteDeactivatedAlarmsHandler) run(ctx context.Context, stoppedCh chan
 					Threshold: time.Now().Add(-deleteDeactivatedAlarmsThreshold),
 				},
 			); err != nil {
-				h.log.Error("failed to delete deactivated alarms", slog.Any("error", err))
+				h.log.ErrorContext(ctx, "failed to delete deactivated alarms", slog.Any("error", err))
 			}
 		}
 	}

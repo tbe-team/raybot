@@ -25,7 +25,7 @@ func New(
 	locationService location.Service,
 ) *Service {
 	return &Service{
-		log:             log.With("service", "rfidusb"),
+		log:             log.With(slog.String("service", "rfidusb")),
 		publisher:       publisher,
 		client:          newClient(),
 		locationService: locationService,
@@ -35,7 +35,7 @@ func New(
 func (s *Service) Run(ctx context.Context) (CleanupFunc, error) {
 	if err := s.client.Open(); err != nil {
 		// We don't want to fail the service if the serial client fails to open
-		s.log.Error("failed to open RFID reader", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to open RFID reader", slog.Any("error", err))
 		s.publisher.Publish(
 			events.RFIDUSBDisconnectedTopic,
 			eventbus.NewMessage(events.RFIDUSBDisconnectedEvent{
@@ -70,7 +70,7 @@ func (s *Service) readLoop(ctx context.Context) {
 		default:
 			tag, err := s.client.Read()
 			if err != nil {
-				s.log.Error("failed to read rfid tag", slog.Any("error", err))
+				s.log.ErrorContext(ctx, "failed to read rfid tag", slog.Any("error", err))
 				s.publisher.Publish(
 					events.RFIDUSBDisconnectedTopic,
 					eventbus.NewMessage(events.RFIDUSBDisconnectedEvent{

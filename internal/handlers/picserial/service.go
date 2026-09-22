@@ -56,7 +56,7 @@ func New(
 		cfg:                   cfg,
 		client:                client,
 		publisher:             publisher,
-		log:                   log.With("service", "picserial"),
+		log:                   log.With(slog.String("service", "picserial")),
 		batteryService:        batteryService,
 		distanceSensorService: distanceSensorService,
 		liftMotorService:      liftMotorService,
@@ -94,7 +94,7 @@ func (s *Service) readLoop(ctx context.Context) {
 		default:
 			msg, err := s.client.Read(ctx)
 			if err != nil {
-				s.log.Error("failed to read from serial client", slog.Any("error", err))
+				s.log.ErrorContext(ctx, "failed to read from serial client", slog.Any("error", err))
 				if errors.Is(err, picserial.ErrPICSerialNotConnected) {
 					s.publisher.Publish(
 						events.PICSerialDisconnectedTopic,
@@ -115,7 +115,11 @@ func (s *Service) routeMessage(ctx context.Context, msg []byte) {
 		Type messageType `json:"type"`
 	}
 	if err := json.Unmarshal(msg, &temp); err != nil {
-		s.log.Error("failed to unmarshal message", slog.Any("error", err), slog.Any("message", msg))
+		s.log.ErrorContext(ctx,
+			"failed to unmarshal message",
+			slog.Any("error", err),
+			slog.Any("message", msg),
+		)
 		return
 	}
 
@@ -124,25 +128,41 @@ func (s *Service) routeMessage(ctx context.Context, msg []byte) {
 	case messageTypeSyncState:
 		var syncStateMsg syncStateMessage
 		if err := json.Unmarshal(msg, &syncStateMsg); err != nil {
-			s.log.Error("failed to unmarshal sync state message", slog.Any("error", err), slog.Any("message", msg))
+			s.log.ErrorContext(ctx,
+				"failed to unmarshal sync state message",
+				slog.Any("error", err),
+				slog.Any("message", msg),
+			)
 			return
 		}
 		if err := s.HandleSyncState(ctx, syncStateMsg); err != nil {
-			s.log.Error("failed to handle sync state message", slog.Any("error", err), slog.Any("message", msg))
+			s.log.ErrorContext(ctx,
+				"failed to handle sync state message",
+				slog.Any("error", err),
+				slog.Any("message", msg),
+			)
 		}
 
 	case messageTypeACK:
 		var ackMsg ackMessage
 		if err := json.Unmarshal(msg, &ackMsg); err != nil {
-			s.log.Error("failed to unmarshal ack message", slog.Any("error", err), slog.Any("message", msg))
+			s.log.ErrorContext(ctx,
+				"failed to unmarshal ack message",
+				slog.Any("error", err),
+				slog.Any("message", msg),
+			)
 			return
 		}
 		if err := s.HandleACK(ackMsg); err != nil {
-			s.log.Error("failed to handle ack message", slog.Any("error", err), slog.Any("message", msg))
+			s.log.ErrorContext(ctx,
+				"failed to handle ack message",
+				slog.Any("error", err),
+				slog.Any("message", msg),
+			)
 		}
 
 	default:
-		s.log.Error("unknown message type", slog.Any("type", temp.Type))
+		s.log.ErrorContext(ctx, "unknown message type", slog.Any("type", temp.Type))
 	}
 }
 

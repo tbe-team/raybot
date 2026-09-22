@@ -150,7 +150,7 @@ func (s *service) execute(ctx context.Context, cmd command.Command) (command.Out
 	runningCmd := command.NewCancelableCommand(ctx, cmd)
 	defer func() {
 		if err := s.runningCommandRepository.Remove(ctx); err != nil {
-			s.log.Error("failed to remove running command", slog.Any("error", err))
+			s.log.ErrorContext(ctx, "failed to remove running command", slog.Any("error", err))
 		}
 	}()
 
@@ -177,7 +177,7 @@ func (s *service) execute(ctx context.Context, cmd command.Command) (command.Out
 func (s *service) runCancelHook(ctx context.Context, cmd command.Command) error {
 	c, ok := s.cancelableMap[cmd.Type]
 	if !ok {
-		s.log.Error("cancelable executor not found", slog.Any("command_type", cmd.Type))
+		s.log.ErrorContext(ctx, "cancelable executor not found", slog.Any("command_type", cmd.Type))
 		return nil
 	}
 	if err := c.OnCancel(ctx); err != nil {
@@ -188,8 +188,11 @@ func (s *service) runCancelHook(ctx context.Context, cmd command.Command) error 
 }
 
 func (s *service) handleSuccess(ctx context.Context, id int64, outputs command.Outputs) error {
-	log := s.log.With(slog.Int64("command_id", id), slog.Any("outputs", outputs))
-	log.Info("command executed successfully")
+	log := s.log.With(
+		slog.Int64("command_id", id),
+		slog.Any("outputs", outputs),
+	)
+	log.InfoContext(ctx, "command executed successfully")
 
 	now := time.Now()
 	_, err := s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
@@ -212,7 +215,7 @@ func (s *service) handleSuccess(ctx context.Context, id int64, outputs command.O
 
 func (s *service) handleCancel(ctx context.Context, id int64, outputs command.Outputs) error {
 	log := s.log.With(slog.Int64("command_id", id))
-	log.Info("command cancelled")
+	log.InfoContext(ctx, "command cancelled")
 
 	now := time.Now()
 	_, err := s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{
@@ -233,8 +236,11 @@ func (s *service) handleCancel(ctx context.Context, id int64, outputs command.Ou
 }
 
 func (s *service) handleFailure(ctx context.Context, id int64, execErr error) error {
-	log := s.log.With(slog.Int64("command_id", id), slog.Any("exec_error", execErr))
-	log.Error("command execution failed")
+	log := s.log.With(
+		slog.Int64("command_id", id),
+		slog.Any("exec_error", execErr),
+	)
+	log.ErrorContext(ctx, "command execution failed")
 
 	now := time.Now()
 	_, err := s.commandRepository.UpdateCommand(ctx, command.UpdateCommandParams{

@@ -8,10 +8,10 @@ import (
 )
 
 func (s *Service) HandleRFIDTag(ctx context.Context, tag string) {
-	s.log.Debug("RFID tag detected", slog.String("tag", tag))
+	s.log.DebugContext(ctx, "RFID tag detected", slog.String("tag", tag))
 	if err := s.locationService.UpdateLocation(ctx, location.UpdateLocationParams{
 		CurrentLocation: tag,
 	}); err != nil {
-		s.log.Error("failed to update location", slog.Any("error", err))
+		s.log.ErrorContext(ctx, "failed to update location", slog.Any("error", err))
 	}
 }

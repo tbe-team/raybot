@@ -47,21 +47,21 @@ func (e cargoCheckQRExecutor) OnCancel(_ context.Context) error {
 func (e cargoCheckQRExecutor) trackingCargoQRCodeUntilMatched(ctx context.Context, qrCode string) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer func() {
-		e.log.Info("stop tracking cargo qr code")
+		e.log.InfoContext(ctx, "stop tracking cargo qr code")
 		cancel()
 	}()
 
 	doneCh := make(chan struct{})
-	e.log.Info("start tracking cargo qr code", slog.Any("qr_code", qrCode))
+	e.log.InfoContext(ctx, "start tracking cargo qr code", slog.Any("qr_code", qrCode))
 	e.subscriber.Subscribe(ctx, events.CargoQRCodeUpdatedTopic, func(msg *eventbus.Message) {
 		ev, ok := msg.Payload.(events.CargoQRCodeUpdatedEvent)
 		if !ok {
-			e.log.Error("invalid event", slog.Any("event", msg.Payload))
+			e.log.ErrorContext(ctx, "invalid event", slog.Any("event", msg.Payload))
 			return
 		}
 
 		if ev.QRCode == qrCode {
-			e.log.Info("cargo qr code matched", slog.Any("qrcode", ev.QRCode))
+			e.log.InfoContext(ctx, "cargo qr code matched", slog.Any("qrcode", ev.QRCode))
 			close(doneCh)
 		}
 	})
