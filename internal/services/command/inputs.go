@@ -67,10 +67,17 @@ const (
 	MoveDirectionBackward MoveDirection = "BACKWARD"
 )
 
+type ObstacleTracking struct {
+	EnterDistance uint16 `json:"enter_distance"`
+	ExitDistance  uint16 `json:"exit_distance"`
+}
+
 type MoveToInputs struct {
-	Location   string        `json:"location" validate:"required"`
-	Direction  MoveDirection `json:"direction" validate:"required,enum"`
-	MotorSpeed uint8         `json:"motor_speed" validate:"required,max=100"`
+	Location          string           `json:"location" validate:"required"`
+	Direction         MoveDirection    `json:"direction" validate:"required,enum"`
+	MotorSpeed        uint8            `json:"motor_speed" validate:"required,max=100"`
+	ObstacleTracking  ObstacleTracking `json:"obstacle_tracking" validate:"required"`
+	CargoLostDistance uint16           `json:"cargo_lost_distance" validate:"required,max=250"`
 }
 
 func (MoveToInputs) CommandType() CommandType {
